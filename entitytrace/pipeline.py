@@ -9,7 +9,8 @@ from pathlib import Path
 from .chapters import detect_chapters
 from .config import load_services
 from .discovery import discover
-from .identity import group_entities, resolve_identities
+from .identity import group_entities
+from .resolution import VERSION as RESOLUTION_VERSION, annotate_groups, resolve_groups
 from .models import Models
 from .storage import Store
 from .text import import_text, validate_span
@@ -59,6 +60,9 @@ def export_run(store: Store, run_id: str, output_root: Path) -> Path:
     identities = store.records(run_id, "identity")
     reviews = store.records(run_id, "review")
     entities, conflicts = group_entities(mentions, identities)
+    group_resolution = run["config"].get("identity_algorithm") == RESOLUTION_VERSION
+    if group_resolution:
+        entities = annotate_groups(entities, store.records(run_id, "entity_annotation"))
     reviews.extend(conflicts)
     by_chapter = {c["id"]: c for c in chapters}
     for mention in mentions:
@@ -79,7 +83,7 @@ def export_run(store: Store, run_id: str, output_root: Path) -> Path:
     state = run["state"]
     complete = all(state.get(name, {}).get("complete", False) for name in ("chapters", "discovery", "identity"))
     status = "incomplete" if not complete else "completed_with_review" if reviews else "completed"
-    result = {"schema_version": 1, "run_id": run_id, "status": status, "source": metadata,
+    result = {"schema_version": 2 if group_resolution else 1, "run_id": run_id, "status": status, "source": metadata,
               "chapters": chapters, "mentions": mentions, "observations": observations, "entities": entities,
               "identity_relations": identities, "scope": "实体提及与身份归组；不含描述、服饰或经历提取",
               "limitations": ["候选召回未采用语义向量检索，可能漏掉没有字面联系的化名。",
@@ -106,15 +110,21 @@ def export_run(store: Store, run_id: str, output_root: Path) -> Path:
                 "validation": {"source_hashes": True, "mention_addresses": True, "entity_membership": True,
                                "semantic_accuracy_measured": False},
                 "files": ["result.json", "review.json", "decisions.jsonl", "requests.jsonl", "source.txt", "source.original"]}
+    if group_resolution:
+        manifest["resolution_rounds"] = store.records(run_id, "resolution_round")
     write_json(output / "manifest.json", manifest)
     return output
 
 
 def run_pipeline(input_path: Path, db_path: Path, output_root: Path, config_path: Path,
                  discovery_concurrency: int = 6, decision_concurrency: int = 3, task_chars: int = 9000,
-                 encoding: str = "utf-8", stop_after: str = "identity", log=print) -> tuple[str, Path, bool]:
+                 encoding: str = "utf-8", stop_after: str = "identity", log=print,
+                 identity_rounds: int = 12, group_candidates: int = 3) -> tuple[str, Path, bool]:
+    wall_begin = time.monotonic()
     if not 1 <= discovery_concurrency <= 32 or not 1 <= decision_concurrency <= 16 or not 500 <= task_chars <= 20000:
         raise ValueError("并发数或任务长度超出本工具支持范围")
+    if not 1 <= identity_rounds <= 24 or not 1 <= group_candidates <= 3:
+        raise ValueError("身份轮次须为 1—24，候选组上限须为 1—3")
     store = Store(db_path)
     begin, invocation = time.monotonic(), uuid.uuid4().hex
     started, stages = utc_now(), {}
@@ -125,7 +135,9 @@ def run_pipeline(input_path: Path, db_path: Path, output_root: Path, config_path
         services = load_services(config_path)
         config = {"implementation": implementation_hash(), "models": {k: v.public() for k, v in services.items()},
                   "discovery_concurrency": discovery_concurrency, "decision_concurrency": decision_concurrency,
-                  "task_chars": task_chars, "offset_unit": "unicode_code_point", "scope": "entity-identity-mvp-v1"}
+                  "task_chars": task_chars, "offset_unit": "unicode_code_point", "scope": "entity-identity-v2",
+                  "identity_algorithm": RESOLUTION_VERSION, "identity_rounds": identity_rounds,
+                  "group_candidates": group_candidates}
         run_id = digest([source["id"], config])
         store.execute("INSERT OR IGNORE INTO runs VALUES(?,?,?,?,?,?)", (run_id, source["id"], dumps(config), "{}", started, started))
         models = Models(store, run_id, invocation, services, discovery_concurrency, decision_concurrency)
@@ -143,7 +155,8 @@ def run_pipeline(input_path: Path, db_path: Path, output_root: Path, config_path
             elif name == "discovery":
                 outcome = discover(store, models, source, run_id, store.records(run_id, "chapter"), task_chars, discovery_concurrency, log)
             else:
-                outcome = resolve_identities(store, models, source, run_id, decision_concurrency, log)
+                outcome = resolve_groups(store, models, source, run_id, decision_concurrency, log,
+                                         identity_rounds, group_candidates)
             stages[name] = {"seconds": round(time.monotonic() - tick, 4), "resumed": reused}
             state[name] = outcome
             store.state(run_id, **{name: outcome})
@@ -165,10 +178,19 @@ def run_pipeline(input_path: Path, db_path: Path, output_root: Path, config_path
     store.put(run_id, "invocation", invocation_record)
     store.state(run_id, last_invocation=invocation, last_error=error)
     try:
+        export_begin = time.monotonic()
         output = export_run(store, run_id, output_root)
+        invocation_record.update(export_seconds=round(time.monotonic() - export_begin, 4),
+                                 wall_seconds=round(time.monotonic() - wall_begin, 4),
+                                 timing_scope="从管线函数入口、数据库初始化至主输出导出完成；不含最终计时回执写入与进程启动退出",
+                                 finished_output_at=utc_now())
+        store.put(run_id, "invocation", invocation_record)
+        manifest = json.loads((output / "manifest.json").read_text(encoding="utf-8"))
+        manifest["invocations"] = store.records(run_id, "invocation")
+        write_json(output / "manifest.json", manifest)
         state = store.run(run_id)["state"]
         complete = all(state.get(name, {}).get("complete", False) for name in ("chapters", "discovery", "identity"))
-        log(f"输出目录：{output.resolve()}\n本次耗时：{invocation_record['seconds']:.2f} 秒；状态：{'流程完成，查看待审清单' if complete else '未完成，可恢复'}")
+        log(f"输出目录：{output.resolve()}\n本次主输出完成用时：{invocation_record['wall_seconds']:.2f} 秒；状态：{'流程完成，查看待审清单' if complete else '未完成，可恢复'}")
         if error:
             log("错误：" + error)
         return run_id, output, complete

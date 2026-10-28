@@ -26,6 +26,8 @@ def main(argv=None) -> int:
     run.add_argument("--decision-concurrency", type=int, default=3)
     run.add_argument("--task-chars", type=int, default=9000)
     run.add_argument("--stop-after", choices=["chapters", "discovery", "identity"], default="identity")
+    run.add_argument("--identity-rounds", type=int, default=12, help="实体组消歧最大轮次，默认 12")
+    run.add_argument("--group-candidates", type=int, default=3, help="每次最多比较的候选组数，默认 3")
     export = subs.add_parser("export", help="从已保存数据重新导出，不调用模型")
     export.add_argument("run_id")
     export.add_argument("--db", type=Path, default=Path("data/entitytrace.sqlite3"))
@@ -40,7 +42,8 @@ def main(argv=None) -> int:
         if args.command == "run":
             _, _, complete = run_pipeline(args.input, args.db, args.output, args.config, args.discovery_concurrency,
                                          args.decision_concurrency, args.task_chars, args.encoding, args.stop_after,
-                                         log=lambda message: print(message, flush=True))
+                                         log=lambda message: print(message, flush=True),
+                                         identity_rounds=args.identity_rounds, group_candidates=args.group_candidates)
             return 0 if complete else 2
         store = Store(args.db)
         try:

@@ -63,6 +63,7 @@ class Models:
         self.cooldown = {name: 0.0 for name in services}
         self.active = {name: 0 for name in services}
         self.peaks = {name: 0 for name in services}
+        self.halted = {}
 
     def _request(self, service_name: str, path: str, payload: dict, stage: str, validate: Callable) -> tuple[dict, str]:
         service = self.services[service_name]
@@ -76,6 +77,8 @@ class Models:
         for attempt in range(1, self.attempts + 1):
             error_status, error_code = None, None
             with self.lock:
+                if service_name in self.halted:
+                    raise ModelError(*self.halted[service_name])
                 delay = self.cooldown[service_name] - time.monotonic()
             if delay > 0:
                 time.sleep(delay)
@@ -85,6 +88,8 @@ class Models:
             raw = None
             with self.gates[service_name]:
                 with self.lock:
+                    if service_name in self.halted:
+                        raise ModelError(*self.halted[service_name])
                     self.active[service_name] += 1
                     self.peaks[service_name] = max(self.peaks[service_name], self.active[service_name])
                     active = self.active[service_name]
@@ -121,7 +126,9 @@ class Models:
                             retry_after = 0
                     detail = {"http_status": exc.code, "hard_quota": hard_quota, "error_type": error_code}
                     if hard_quota:
-                        error += "，余额或硬额度不足，停止自动重试"
+                        error += "，余额或硬额度不足，本次运行停止该服务的新请求；成功缓存仍可复用"
+                        with self.lock:
+                            self.halted[service_name] = (error, error_status, error_code)
                     raw = None
                 except (urllib.error.URLError, TimeoutError, socket.timeout, OSError):
                     error = f"{service_name} 网络失败或超时"

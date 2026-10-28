@@ -72,6 +72,26 @@ def evaluate(directory: Path, reference: dict) -> dict:
             requests[request["id"]] = request
     decision_ids = set()
     span_count = 0
+    group_evidence_count = 0
+    def inspect_group_evidence(value):
+        nonlocal group_evidence_count
+        group_evidence_count += 1
+        members = value["member_ids"]
+        check(len(members) == len(set(members)) == value["member_count"], "组快照成员数不符")
+        check(set(members).issubset(mentions), "组快照引用不存在的提及")
+        check(value["sampled"] == (len(value["representatives"]) < len(members)), "代表抽样标记不符")
+        compact = []
+        for evidence in value["representatives"]:
+            mid = evidence["mention_id"]
+            target, context = evidence["address"], evidence["context_address"]
+            check(mid in members and mid in mentions and target == mentions[mid]["address"], "代表目标与保存提及不一致")
+            check(context["start"] <= target["start"] < target["end"] <= context["end"], "目标不在代表证据范围内")
+            check(evidence["before"] == text[context["start"]:target["start"]] and
+                  evidence["target_mention"] == text[target["start"]:target["end"]] and
+                  evidence["after"] == text[target["end"]:context["end"]], "代表原文与地址不一致")
+            compact.append({key: evidence[key] for key in ("before", "target_mention", "after", "provisional_kinds")})
+        return {"member_count": value["member_count"], "sampled": value["sampled"], "representatives": compact}
+
     def inspect_addresses(value):
         nonlocal span_count
         if isinstance(value, dict):
@@ -90,6 +110,7 @@ def evaluate(directory: Path, reference: dict) -> dict:
     with (directory / "decisions.jsonl").open(encoding="utf-8") as stream:
         for line in stream:
             decision = json.loads(line)
+            check(decision["id"] not in decision_ids, "决策 ID 重复")
             decision_ids.add(decision["id"])
             request = requests.get(decision["request_id"])
             check(request is not None, "决策的请求记录缺失")
@@ -97,6 +118,19 @@ def evaluate(directory: Path, reference: dict) -> dict:
                 key = decision["question_id"]
                 check(key in request["request"]["questions"], "决策的问题不在对应请求内")
                 check(request["response"]["answers"].get(key) == decision["answer"], "保存的决策与服务响应不一致")
+                evidence = decision.get("input", {})
+                compact = None
+                if "A" in evidence and "B" in evidence and "member_ids" in evidence["A"]:
+                    compact = {side: inspect_group_evidence(evidence[side]) for side in ("A", "B")}
+                    compact["extra_evidence"] = [item["text"] for item in evidence["extra_evidence"]]
+                    for item in evidence["extra_evidence"]:
+                        check(item["text"] == text[item["address"]["start"]:item["address"]["end"]], "关系线索原文与地址不一致")
+                elif "member_ids" in evidence and "representatives" in evidence:
+                    compact = inspect_group_evidence(evidence)
+                    if "name_options" in evidence:
+                        compact["name_options"] = evidence["name_options"]
+                if compact is not None:
+                    check(request["request"]["state"].get("cases", {}).get(key) == compact, "保存的组证据与实际模型输入不一致")
             inspect_addresses(decision)
     for pair in relations.values():
         check(all(did in decision_ids for did in pair["decision_ids"]), "身份关系引用不存在的决策")
@@ -104,16 +138,27 @@ def evaluate(directory: Path, reference: dict) -> dict:
         check(observation["request_id"] in requests, "发现记录的模型请求缺失")
     for entity in result["entities"]:
         check(all(pid in relations and relations[pid]["choice"] == "same" for pid in entity["support_pair_ids"]), "分组依据不是已接受的同一关系")
+        if result["schema_version"] >= 2:
+            check(entity["name"] in entity["names"], "展示名不是组内已发现称呼")
+            check(set(entity["representative_mention_ids"]).issubset(entity["mention_ids"]), "类别代表不属于实体组")
+            check(all(did in decision_ids for did in entity["classification_decision_ids"] + entity["display_name_decision_ids"]), "类别或展示名引用的决策不存在")
+            check(entity["kind"] in {"person", "place", "object", "organization", "ability", "concept", "unknown"}, "实体类别不合法")
+    if result["schema_version"] >= 2:
+        for item in review["items"]:
+            check(set(item.get("group_ids", [])).issubset({e["id"] for e in result["entities"]}), "待审引用了过期组")
     return {"title": reference["title"], "run_id": result["run_id"], "result_revision": result["result_revision"],
             "status": result["status"], "implementation": manifest["config"]["implementation"],
             "input_sha256": source["raw_sha256"], "code_points": len(text), "counts": manifest["counts"],
             "chapter_reference_matches": match_count, "chapter_reference_total": len(expected),
             "checked_address_occurrences": span_count, "checks_passed": not errors,
+            "checked_group_evidence_snapshots": group_evidence_count,
             "errors": sorted(set(errors)), "semantic_accuracy_measured": False,
             "relations_by_choice": dict(collections.Counter(p["choice"] for p in relations.values())),
             "groups_by_status": dict(collections.Counter(e["identity_status"] for e in result["entities"])),
             "reviews_by_stage": dict(collections.Counter(r["stage"] for r in review["items"])),
             "total_model_metrics": manifest["total_model_metrics"], "invocations": manifest["invocations"],
+            "resolution_rounds": manifest.get("resolution_rounds", []),
+            "kinds_by_status": dict(collections.Counter(e.get("kind_status", "legacy") for e in result["entities"])),
             "largest_groups": [{"name": e["name"], "names": e["names"], "mentions": len(e["mention_ids"])}
                                for e in sorted(result["entities"], key=lambda e: -len(e["mention_ids"]))[:10]]}
 

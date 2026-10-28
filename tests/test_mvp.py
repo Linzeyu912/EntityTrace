@@ -215,6 +215,39 @@ class RequestTests(unittest.TestCase):
 
 
 class RequestBudgetTests(unittest.TestCase):
+    def test_hard_quota_stops_queued_requests_but_preserves_cache_and_other_service(self):
+        with tempfile.TemporaryDirectory() as directory:
+            store = Store(Path(directory) / "db.sqlite3")
+            services = {"decision": Service("decision", "https://api.typesafe.ai/v1", "jev-1.13.0", "TEST_SECRET"),
+                        "discovery": Service("discovery", "https://api.deepseek.com", "deepseek-flash", "TEST_SECRET")}
+            raw = {"model": "jev-1.13.0", "answers": {"q": {"type": "choice", "choice": "a", "confidence": 1,
+                                                                   "probabilities": {"a": 1, "b": 0}}}}
+            opened, healthy = [], False
+            def opener(request, **kwargs):
+                opened.append(request.full_url)
+                if "deepseek" in request.full_url:
+                    return io.BytesIO(b'{"choices":[{"finish_reason":"stop","message":{"content":"{}"}}]}')
+                if not healthy and not json.loads(request.data)["state"].get("warm"):
+                    raise urllib.error.HTTPError(request.full_url, 402, "Payment Required", {},
+                        io.BytesIO(b'{"detail":{"error_type":"billing_error"}}'))
+                return io.BytesIO(json.dumps(raw).encode())
+            model = Models(store, "r", "i", services, decision_concurrency=1, opener=opener)
+            questions = {"q": choice_question("?", {"a": "a", "b": "b"})}
+            model.choices({"warm": True}, questions, "test")
+            results = list(bounded_map(list(range(8)), lambda n: model.choices({"n": n}, questions, "test"), 4))
+            self.assertEqual(len(opened), 2)
+            self.assertTrue(all(isinstance(error, ModelError) and error.status == 402 for _, _, error in results))
+            model.choices({"warm": True}, questions, "test")
+            self.assertEqual(len(opened), 2)
+            model.generate("test", {}, "test", lambda value: None)
+            self.assertEqual(len(opened), 3)
+            healthy = True
+            restarted = Models(store, "r", "j", services, opener=opener)
+            restarted.choices({"n": 9}, questions, "test")
+            self.assertEqual(len(opened), 4)
+            self.assertEqual(sum(r["status"] == "failed" for r in store.rows("SELECT * FROM calls")), 1)
+            store.close()
+
     def test_provider_http_error_code_is_available_to_batch_splitter(self):
         with tempfile.TemporaryDirectory() as directory:
             store = Store(Path(directory) / "db.sqlite3")
@@ -274,15 +307,21 @@ class RequestBudgetTests(unittest.TestCase):
 
 class FakeModels:
     generated = 0
+    chosen = 0
     fail_once = False
     def __init__(self, *args, **kwargs):
         self.peaks = {}
 
     def choices(self, state, questions, stage):
+        type(self).chosen += 1
         answers = {}
         for key, question in questions.items():
             if "same" in question["criteria"]:
                 choice = "same"
+            elif "person" in question["criteria"]:
+                choice = "person"
+            elif "n0" in question["criteria"]:
+                choice = "n0"
             elif "accept" in question["criteria"]:
                 choice = "accept"
             else:
@@ -312,6 +351,7 @@ class PipelineTests(unittest.TestCase):
             config = root / ".env"
             config.write_text("TYPESAFE_API_KEY=test\nDEEPSEEK_API_KEY=test\n", encoding="utf-8")
             FakeModels.generated = 0
+            FakeModels.chosen = 0
             FakeModels.fail_once = fail
             with patch("entitytrace.pipeline.Models", FakeModels):
                 run_id, output, complete = run_pipeline(text, root / "db.sqlite3", root / "out", config, log=lambda _: None)
@@ -319,14 +359,25 @@ class PipelineTests(unittest.TestCase):
                 if fail:
                     self.assertEqual(json.loads((output / "result.json").read_text(encoding="utf-8"))["status"], "incomplete")
                 before = FakeModels.generated
+                choices_before = FakeModels.chosen
+                revision_before = json.loads((output / "result.json").read_text(encoding="utf-8"))["result_revision"]
                 same_id, same_output, complete = run_pipeline(text, root / "db.sqlite3", root / "out", config, log=lambda _: None)
                 self.assertTrue(complete)
                 self.assertEqual(run_id, same_id)
                 self.assertEqual(output, same_output)
                 self.assertEqual(FakeModels.generated - before, 1 if fail else 0)
                 result = json.loads((output / "result.json").read_text(encoding="utf-8"))
+                if not fail:
+                    self.assertEqual(FakeModels.chosen, choices_before)
+                    self.assertEqual(result["result_revision"], revision_before)
                 self.assertEqual(len(result["mentions"]), 2)
                 self.assertEqual(len(result["entities"]), 1)
+                self.assertEqual(result["schema_version"], 2)
+                self.assertEqual(result["entities"][0]["kind"], "person")
+                manifest = json.loads((output / "manifest.json").read_text(encoding="utf-8"))
+                latest = next(i for i in manifest["invocations"] if i["id"] == manifest["state"]["last_invocation"])
+                self.assertGreaterEqual(latest["wall_seconds"], latest["seconds"])
+                self.assertGreaterEqual(latest["export_seconds"], 0)
                 self.assertEqual((output / "source.original").read_bytes(), text.read_bytes())
 
     def test_pipeline_and_resume(self):
