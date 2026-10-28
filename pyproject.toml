@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "entitytrace"
+version = "0.1.0"
+description = "带原文地址与决策记录的本地实体发现工具"
+requires-python = ">=3.12"
+dependencies = []
+
+[project.scripts]
+entitytrace = "entitytrace.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["entitytrace*"]

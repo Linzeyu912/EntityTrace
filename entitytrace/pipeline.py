@@ -1,0 +1,176 @@
+from __future__ import annotations
+
+import hashlib
+import json
+import time
+import uuid
+from pathlib import Path
+
+from .chapters import detect_chapters
+from .config import load_services
+from .discovery import discover
+from .identity import group_entities, resolve_identities
+from .models import Models
+from .storage import Store
+from .text import import_text, validate_span
+from .util import digest, dumps, implementation_hash, utc_now, write_bytes, write_json
+
+
+def metrics(store: Store, run_id: str, invocation: str | None = None) -> dict:
+    sql, args = "SELECT * FROM calls WHERE run_id=?", (run_id,)
+    if invocation:
+        sql += " AND invocation=?"
+        args += (invocation,)
+    rows = store.rows(sql, args)
+    result = {"network_attempts": 0, "successful_requests": 0, "failed_attempts": 0, "cache_hits": 0,
+              "input_tokens_reported": 0, "output_tokens_reported": 0, "request_seconds_sum": 0.0, "by_stage": {}}
+    for row in rows:
+        stage = result["by_stage"].setdefault(row["stage"], {"attempts": 0, "success": 0, "failed": 0, "cached": 0, "seconds_sum": 0.0})
+        if row["status"] == "cached":
+            result["cache_hits"] += 1
+            stage["cached"] += 1
+            continue
+        result["network_attempts"] += 1
+        result["request_seconds_sum"] += row["seconds"]
+        stage["attempts"] += 1
+        stage["seconds_sum"] += row["seconds"]
+        if row["status"] == "success":
+            result["successful_requests"] += 1
+            stage["success"] += 1
+            usage = json.loads(row["detail"]).get("usage", {})
+            result["input_tokens_reported"] += usage.get("prompt_tokens", usage.get("input_tokens", 0)) or 0
+            result["output_tokens_reported"] += usage.get("completion_tokens", usage.get("output_tokens", 0)) or 0
+        else:
+            result["failed_attempts"] += 1
+            stage["failed"] += 1
+    return result
+
+
+def export_run(store: Store, run_id: str, output_root: Path) -> Path:
+    run = store.run(run_id)
+    source = store.source(run["source_id"])
+    text, metadata = source["text"], source["metadata"]
+    if hashlib.sha256(source["raw"]).hexdigest() != metadata["raw_sha256"] or hashlib.sha256(text.encode("utf-8")).hexdigest() != metadata["text_sha256"]:
+        raise ValueError("保存的原文指纹不匹配，停止导出")
+    chapters = store.records(run_id, "chapter")
+    mentions = store.records(run_id, "mention")
+    observations = store.records(run_id, "observation")
+    decisions = store.records(run_id, "decision")
+    identities = store.records(run_id, "identity")
+    reviews = store.records(run_id, "review")
+    entities, conflicts = group_entities(mentions, identities)
+    reviews.extend(conflicts)
+    by_chapter = {c["id"]: c for c in chapters}
+    for mention in mentions:
+        validate_span(text, mention["address"], source["id"], mention["text"])
+        chapter = by_chapter[mention["chapter_id"]]
+        if not chapter["start"] <= mention["start"] < mention["end"] <= chapter["end"]:
+            raise ValueError("提及地址不属于对应章节")
+        mention["chapter_start"] = mention["start"] - chapter["start"]
+        mention["chapter_end"] = mention["end"] - chapter["start"]
+        for span in mention["evidence"]:
+            validate_span(text, span, source["id"])
+    ids = {m["id"] for m in mentions}
+    if sorted(mid for e in entities for mid in e["mention_ids"]) != sorted(ids):
+        raise ValueError("实体分组未恰好覆盖所有提及")
+    for pair in identities:
+        if pair["left"] not in ids or pair["right"] not in ids:
+            raise ValueError("身份判断引用不存在的提及")
+    state = run["state"]
+    complete = all(state.get(name, {}).get("complete", False) for name in ("chapters", "discovery", "identity"))
+    status = "incomplete" if not complete else "completed_with_review" if reviews else "completed"
+    result = {"schema_version": 1, "run_id": run_id, "status": status, "source": metadata,
+              "chapters": chapters, "mentions": mentions, "observations": observations, "entities": entities,
+              "identity_relations": identities, "scope": "实体提及与身份归组；不含描述、服饰或经历提取",
+              "limitations": ["候选召回未采用语义向量检索，可能漏掉没有字面联系的化名。",
+                              "模型分数门槛尚未标注校准；原文定位通过不代表实体和身份语义正确。",
+                              "无比较关系的单独提及为暂定实体，不能据此断言与所有其他实体不同。"]}
+    result["result_revision"] = digest(result)
+    output = output_root / run_id[:16]
+    write_json(output / "result.json", result)
+    write_json(output / "review.json", {"schema_version": 1, "run_id": run_id, "result_revision": result["result_revision"],
+                                        "items": reviews, "instruction": "按问题编号回答；自动模型判断不冒充人工答案。"})
+    write_bytes(output / "decisions.jsonl", "".join(dumps(d) + "\n" for d in decisions).encode("utf-8"))
+    requests = store.rows("SELECT DISTINCT r.* FROM request_cache r JOIN calls c ON r.id=c.request_id WHERE c.run_id=? ORDER BY r.id", (run_id,))
+    write_bytes(output / "requests.jsonl", "".join(dumps({"id": r["id"], "service": r["service"], "model": r["model"],
+        "request": json.loads(r["request"]), "response": json.loads(r["response"])}) + "\n" for r in requests).encode("utf-8"))
+    write_bytes(output / "source.txt", text.encode("utf-8"))
+    write_bytes(output / "source.original", source["raw"])
+    invocations = store.records(run_id, "invocation")
+    manifest = {"schema_version": 1, "run_id": run_id, "result_revision": result["result_revision"], "status": status,
+                "source": metadata, "config": run["config"], "state": state, "invocations": invocations,
+                "total_model_metrics": metrics(store, run_id), "counts": {"chapters": sum(c["kind"] == "chapter" for c in chapters),
+                "sections": len(chapters), "mentions": len(mentions), "observations": len(observations), "entities": len(entities),
+                "unlocated_observations": sum(o["status"] == "unlocated" for o in observations), "decisions": len(decisions),
+                "identity_pairs": len(identities), "review_items": len(reviews), "grouping_conflicts": len(conflicts)},
+                "validation": {"source_hashes": True, "mention_addresses": True, "entity_membership": True,
+                               "semantic_accuracy_measured": False},
+                "files": ["result.json", "review.json", "decisions.jsonl", "requests.jsonl", "source.txt", "source.original"]}
+    write_json(output / "manifest.json", manifest)
+    return output
+
+
+def run_pipeline(input_path: Path, db_path: Path, output_root: Path, config_path: Path,
+                 discovery_concurrency: int = 6, decision_concurrency: int = 3, task_chars: int = 9000,
+                 encoding: str = "utf-8", stop_after: str = "identity", log=print) -> tuple[str, Path, bool]:
+    if not 1 <= discovery_concurrency <= 32 or not 1 <= decision_concurrency <= 16 or not 500 <= task_chars <= 20000:
+        raise ValueError("并发数或任务长度超出本工具支持范围")
+    store = Store(db_path)
+    begin, invocation = time.monotonic(), uuid.uuid4().hex
+    started, stages = utc_now(), {}
+    run_id = None
+    error = None
+    try:
+        source = import_text(store, input_path, encoding)
+        services = load_services(config_path)
+        config = {"implementation": implementation_hash(), "models": {k: v.public() for k, v in services.items()},
+                  "discovery_concurrency": discovery_concurrency, "decision_concurrency": decision_concurrency,
+                  "task_chars": task_chars, "offset_unit": "unicode_code_point", "scope": "entity-identity-mvp-v1"}
+        run_id = digest([source["id"], config])
+        store.execute("INSERT OR IGNORE INTO runs VALUES(?,?,?,?,?,?)", (run_id, source["id"], dumps(config), "{}", started, started))
+        models = Models(store, run_id, invocation, services, discovery_concurrency, decision_concurrency)
+        log(f"运行编号：{run_id}\n原文：{source['metadata']['code_points']} 个码点；开始处理 {input_path.name}")
+        state = store.run(run_id)["state"]
+        for name in ("chapters", "discovery", "identity"):
+            tick = time.monotonic()
+            reused = state.get(name, {}).get("complete", False)
+            if reused:
+                log(f"复用已完成阶段：{name}")
+                outcome = state[name]
+            elif name == "chapters":
+                outcome = detect_chapters(store, models, source, run_id, log)
+                outcome.pop("chapters", None)
+            elif name == "discovery":
+                outcome = discover(store, models, source, run_id, store.records(run_id, "chapter"), task_chars, discovery_concurrency, log)
+            else:
+                outcome = resolve_identities(store, models, source, run_id, decision_concurrency, log)
+            stages[name] = {"seconds": round(time.monotonic() - tick, 4), "resumed": reused}
+            state[name] = outcome
+            store.state(run_id, **{name: outcome})
+            if not outcome["complete"] or name == stop_after:
+                break
+    except Exception as exc:
+        error = str(exc) if isinstance(exc, (ValueError, RuntimeError)) else "本地运行错误：" + type(exc).__name__
+        if run_id:
+            store.state(run_id, last_error=error)
+        else:
+            store.close()
+            raise
+    if run_id is None:
+        store.close()
+        raise ValueError("尚未建立运行")
+    invocation_record = {"id": invocation, "started": started, "ended": utc_now(), "seconds": round(time.monotonic() - begin, 4),
+                         "stages": stages, "model_metrics": metrics(store, run_id, invocation),
+                         "peak_active_requests": models.peaks if 'models' in locals() else {}, "error": error}
+    store.put(run_id, "invocation", invocation_record)
+    store.state(run_id, last_invocation=invocation, last_error=error)
+    try:
+        output = export_run(store, run_id, output_root)
+        state = store.run(run_id)["state"]
+        complete = all(state.get(name, {}).get("complete", False) for name in ("chapters", "discovery", "identity"))
+        log(f"输出目录：{output.resolve()}\n本次耗时：{invocation_record['seconds']:.2f} 秒；状态：{'流程完成，查看待审清单' if complete else '未完成，可恢复'}")
+        if error:
+            log("错误：" + error)
+        return run_id, output, complete
+    finally:
+        store.close()

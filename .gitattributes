@@ -1,3 +1,8 @@
+# 业务源码的字节参与运行版本哈希，固定换行以便跨设备复核。
+*.py text eol=lf
+*.toml text eol=lf
+*.md text eol=lf
+
 # 测试正文、参考答案与下载底本保持原始字节，避免自动换行改变指纹及位置。
 /test/text-library/texts/*.txt -text -whitespace
 /test/text-library/reference/** -text -whitespace

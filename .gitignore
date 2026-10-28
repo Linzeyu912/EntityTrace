@@ -20,6 +20,8 @@ node_modules/
 .venv/
 __pycache__/
 *.pyc
+*.egg-info/
+build/
 .pytest_cache/
 dist/
 coverage/
