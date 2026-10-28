@@ -1,0 +1,25 @@
+# 本地凭证与运行产物
+.env
+.env.*
+!.env.example
+data/
+outputs/
+.local/
+*.sqlite
+*.sqlite3
+*.db
+*.db-wal
+*.db-shm
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite3-wal
+*.sqlite3-shm
+
+# 工具缓存
+node_modules/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+dist/
+coverage/
