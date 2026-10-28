@@ -1,0 +1,35 @@
+{
+  "checked_date": "2026-10-21",
+  "scope": "2026-10-21 新增的两份百万字级长篇正文；来源附件和说明文件不作为模型输入。",
+  "result": [
+    {
+      "filename": "05_中文长篇_水浒传_120回.txt",
+      "title": "水浒传",
+      "sections": 121,
+      "body_counts": {
+        "han_characters": 745168,
+        "english_words": 0,
+        "non_whitespace_characters": 890934
+      },
+      "sha256_matches_manifest": true,
+      "body_offsets_restored": true,
+      "headings_unique_and_ordered": true,
+      "junk_free": true
+    },
+    {
+      "filename": "06_英文长篇_Moby_Dick_135章.txt",
+      "title": "Moby-Dick; or, The Whale",
+      "sections": 138,
+      "body_counts": {
+        "han_characters": 0,
+        "english_words": 212908,
+        "non_whitespace_characters": 994646
+      },
+      "sha256_matches_manifest": true,
+      "body_offsets_restored": true,
+      "headings_unique_and_ordered": true,
+      "junk_free": true
+    }
+  ],
+  "limit": "只核对所选电子底本、清洗结果、SHA-256 与章节偏移，未与纸本逐字校勘；未调用模型。"
+}

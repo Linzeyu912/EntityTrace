@@ -1,0 +1,45 @@
+{
+  "checked_date": "2026-10-20",
+  "scope": "四份最终 TXT；来源附件和说明文件不作为模型输入。",
+  "result": "未发现广告、网址、网页导航、授权说明、插图占位符或异常控制字符混入。正文段落与所选下载底本对应。",
+  "limit": "这是对所选电子底本及清理结果的检查，未与初版扫描件或纸本进行逐字校勘。",
+  "false_positive_review": "伤逝中登小广告、写信给编辑，以及英文短篇中 advertisement 均为原作情节，未删除。",
+  "books": [
+    {
+      "filename": "01_中文短篇_伤逝_鲁迅.txt",
+      "source_sections_matched": 1,
+      "chapter_count": 0,
+      "external_text_findings": {},
+      "invalid_or_hidden_character_findings": {},
+      "chinese_body_outside_paragraphs": [],
+      "sha256_matches_manifest": true
+    },
+    {
+      "filename": "02_英文短篇_The_Adventure_of_the_Second_Stain.txt",
+      "source_sections_matched": 1,
+      "chapter_count": 0,
+      "external_text_findings": {},
+      "invalid_or_hidden_character_findings": {},
+      "chinese_body_outside_paragraphs": [],
+      "sha256_matches_manifest": true
+    },
+    {
+      "filename": "03_中文长篇_九命奇冤_36回.txt",
+      "source_sections_matched": 36,
+      "chapter_count": 36,
+      "external_text_findings": {},
+      "invalid_or_hidden_character_findings": {},
+      "chinese_body_outside_paragraphs": [],
+      "sha256_matches_manifest": true
+    },
+    {
+      "filename": "04_英文长篇_Pride_and_Prejudice_61章.txt",
+      "source_sections_matched": 61,
+      "chapter_count": 61,
+      "external_text_findings": {},
+      "invalid_or_hidden_character_findings": {},
+      "chinese_body_outside_paragraphs": [],
+      "sha256_matches_manifest": true
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+# 测试正文、参考答案与下载底本保持原始字节，避免自动换行改变指纹及位置。
+/test/text-library/texts/*.txt -text -whitespace
+/test/text-library/reference/** -text -whitespace
+/test/text-library/provenance/source-downloads/** -text -whitespace
+/test/text-library/provenance/metadata/** -text -whitespace
+/test/text-library/provenance/2026-10-20/** -text -whitespace
+/test/text-library/provenance/2026-10-21/** -text -whitespace
+/test/text-library/provenance/YingHe-entity-LICENSE.txt -text -whitespace

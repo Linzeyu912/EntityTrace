@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "library_name": "EntityTrace 中英文完整小说测试文本库",
+  "migrated_date": "2026-10-28",
+  "source_repository": "https://github.com/Linzeyu912/YingHe-entity",
+  "source_commit": "1512f7b32ee2c40aa7bb5a833af266f84be1e07d",
+  "model_input_rule": "仅 books[].filename 指向的六份 TXT 是模型输入；不把清单、reference 或 provenance 目录交给模型。",
+  "encoding": "UTF-8",
+  "newline": "LF",
+  "books": [
+    {
+      "id": "shangshi",
+      "filename": "texts/01_中文短篇_伤逝_鲁迅.txt",
+      "title": "伤逝",
+      "author": "鲁迅",
+      "language": "zh-Hans",
+      "source_url": "https://zh.wikisource.org/zh-hans/傷逝_(魯迅)",
+      "retrieved_date": "2026-10-20",
+      "encoding": "UTF-8",
+      "sha256": "6ccb298c0be472a096ca111c5f30b40b51ffd7ef97722c852ea4c3158db53ecd",
+      "bytes": 32449,
+      "body_counts": {
+        "han_characters": 9432,
+        "english_words": 0,
+        "non_whitespace_characters": 10727
+      },
+      "transformations": [
+        "采用维基文库简体显示版本",
+        "删除网页导航、授权框等非正文，保留所有正文段落及文末日期"
+      ]
+    },
+    {
+      "id": "second-stain",
+      "filename": "texts/02_英文短篇_The_Adventure_of_the_Second_Stain.txt",
+      "title": "The Adventure of the Second Stain",
+      "author": "Arthur Conan Doyle",
+      "language": "en",
+      "source_url": "https://www.gutenberg.org/ebooks/108",
+      "retrieved_date": "2026-10-20",
+      "encoding": "UTF-8",
+      "sha256": "dc72af1c7296f9abd4aa6dba1e09f2845dca40bbeb900c6918a7c7542bd59e71",
+      "bytes": 54364,
+      "body_counts": {
+        "han_characters": 0,
+        "english_words": 9673,
+        "non_whitespace_characters": 43185
+      },
+      "transformations": [
+        "移除小说集目录、其他十二篇及古登堡页眉页脚",
+        "合并固定宽度换行，保留段落；完整原始下载保存在 sources/holmes.txt"
+      ]
+    },
+    {
+      "id": "jiuming-qiyuan",
+      "filename": "texts/03_中文长篇_九命奇冤_36回.txt",
+      "title": "九命奇冤",
+      "author": "吴趼人",
+      "language": "zh-Hans",
+      "source_url": "https://zh.wikisource.org/zh-hans/九命奇冤",
+      "retrieved_date": "2026-10-20",
+      "encoding": "UTF-8",
+      "sha256": "96b254bc40b75e2b38a99360500dafd29624982f9e8e06c5dd6632188b3b36b8",
+      "bytes": 367440,
+      "body_counts": {
+        "han_characters": 101975,
+        "english_words": 0,
+        "non_whitespace_characters": 121416
+      },
+      "transformations": [
+        "采用维基文库简体显示版本",
+        "按目录顺序合并 36 回，保留每回回目",
+        "删除网页导航、授权框等非正文"
+      ]
+    },
+    {
+      "id": "pride-prejudice",
+      "filename": "texts/04_英文长篇_Pride_and_Prejudice_61章.txt",
+      "title": "Pride and Prejudice",
+      "author": "Jane Austen",
+      "language": "en",
+      "source_url": "https://www.gutenberg.org/ebooks/1342",
+      "retrieved_date": "2026-10-20",
+      "encoding": "UTF-8",
+      "sha256": "bef40b0773f5f1857216fa56233e8a4851ab3a98c86b94d4356b005501e912ff",
+      "bytes": 694511,
+      "body_counts": {
+        "han_characters": 0,
+        "english_words": 121860,
+        "non_whitespace_characters": 561438
+      },
+      "transformations": [
+        "删除编者序言、目录、古登堡页眉页脚及印刷厂信息",
+        "删除 155 处插图说明，完整原始下载保存在 sources/pride.txt",
+        "第一章章题原位于插图说明中，提取为独立的 CHAPTER I.",
+        "统一章题格式，合并固定宽度换行，保留所有正文段落"
+      ]
+    },
+    {
+      "id": "shuihu-120",
+      "filename": "texts/05_中文长篇_水浒传_120回.txt",
+      "title": "水浒传",
+      "author": "施耐庵",
+      "language": "zh-Hans",
+      "source_url": "https://zh.wikisource.org/zh-hans/水滸傳_(120回本)",
+      "retrieved_date": "2026-10-21",
+      "encoding": "UTF-8",
+      "sha256": "5a070dde63f8db37d9d3d923d2630c4617cb7d452a2777bc18d3d62f59d972ad",
+      "bytes": 2694776,
+      "body_counts": {
+        "han_characters": 745168,
+        "english_words": 0,
+        "non_whitespace_characters": 890934
+      },
+      "transformations": [
+        "采用维基文库简体显示版本",
+        "按回目顺序合并引首及 120 回，保留每回回目",
+        "诗歌保持分行，正文段落合并为独立段落",
+        "删除网页导航、授权框、页眉页脚等非正文",
+        "完整原始页面保存在 sources/"
+      ]
+    },
+    {
+      "id": "moby-dick",
+      "filename": "texts/06_英文长篇_Moby_Dick_135章.txt",
+      "title": "Moby-Dick; or, The Whale",
+      "author": "Herman Melville",
+      "language": "en",
+      "source_url": "https://www.gutenberg.org/ebooks/2701",
+      "retrieved_date": "2026-10-21",
+      "encoding": "UTF-8",
+      "sha256": "91e130cf1aa12a88e1e6082d5f630460905a65fd2eac14e70b4e2c1ce7016703",
+      "bytes": 1228632,
+      "body_counts": {
+        "han_characters": 0,
+        "english_words": 212908,
+        "non_whitespace_characters": 994646
+      },
+      "transformations": [
+        "删除古登堡页眉页脚、书名页、目录及电子书整理者说明",
+        "保留原书 Etymology 与 Extracts 两篇前置文字，Etymology 保留原书分行，删除 Extracts 内重复的分节标题",
+        "统一章题格式，合并固定宽度换行，保留所有正文段落",
+        "完整原始下载保存在 sources/moby_dick.txt"
+      ]
+    }
+  ],
+  "evaluation_reference": {
+    "path": "reference/source-manifest.json",
+    "offset_unit": "unicode_code_point",
+    "interval": "zero_based_half_open",
+    "scope": "来源整理时保存的章节参考，未包含人工逐项实体或身份金标准。"
+  },
+  "provenance": "provenance/NOTICES.md"
+}

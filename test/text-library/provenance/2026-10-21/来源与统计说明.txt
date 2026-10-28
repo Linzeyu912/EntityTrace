@@ -1,0 +1,38 @@
+2026-10-21 追加的百万字级长篇测试文本，共两篇
+整理日期：2026-10-21（Asia/Singapore）
+
+用途：按用户要求追加一篇中文、一篇英文约百万字量级的长篇，供后续长文本切章与实体提取测试使用。本次只整理文本，没有调用模型或运行评测。
+
+规模口径：
+两篇都按“不含空白的字符数”接近 100 万，而不是按英文单词数计算。
+05 水浒传：745,168 个汉字，890,934 个非空白字符，约 89 万字符。
+06 Moby-Dick：212,908 个英文单词，994,646 个非空白字符，约 99.5 万字符。
+两篇的规格、来源与章节数不同，不能用字符数直接推算相同模型 token 数；后续速度比较应记录实际调用数据。
+
+来源与内容：
+05_中文长篇_水浒传_120回.txt：水浒传 / 施耐庵
+来源：https://zh.wikisource.org/zh-hans/水滸傳_(120回本)
+版本：一百二十回本，全称《忠义水浒全传》，明末袁无涯刊刻，又称“袁本”。
+完整性：引首及第一回至第一百二十回连续完整，共 121 个正文章节单位；开篇引首首句与末回末句已核对。书中章号第一百一回至第一百十回采用“第一百一回”等写法，按源页面原样保留，不另行改写。
+整理操作：采用维基文库简体显示版本；按回目顺序合并，保留每回回目和全角空格；诗歌保持分行，正文段落合并；删除网页导航、授权框、页眉页脚等非正文。
+原始页面：sources/shuihu-引首.html、sources/shuihu-第001回.html 至 sources/shuihu-第120回.html。
+
+06_英文长篇_Moby_Dick_135章.txt：Moby-Dick; or, The Whale / Herman Melville
+来源：https://www.gutenberg.org/ebooks/2701
+完整性：Etymology、Extracts、Chapter 1–135 及 Epilogue 连续完整，共 138 个正文章节单位；开篇 “Call me Ishmael.” 与 Epilogue 末句已核对。chapter_count 统计的是正文单位数，其中原书章数为 135。
+整理操作：删除古登堡页眉页脚、书名页、目录及电子书整理者说明；保留 Etymology 与 Extracts 两篇原书前置文字，Etymology 的分行词汇表按原样保留，删除 Extracts 内重复出现的独立“EXTRACTS.”分节标题；章节正文合并固定宽度换行，保留段落。
+原始下载：sources/moby_dick.txt（含 Project Gutenberg 许可与制作人员信息）。
+
+复核：
+python novel-samples/2026-10-21/verify_samples.py
+核对两篇的 SHA-256、正文偏移可还原、标题唯一且有序、无网页导航或古登堡页眉页脚残留。
+结果另存于 test/text-library/metadata/2026-10-21-百万字长篇复核报告.json。
+本地确定性章名检查：
+pnpm exec tsx scripts/check-chapters.mts "test/text-library/texts/05_中文长篇_水浒传_120回.txt"
+pnpm exec tsx scripts/check-chapters.mts "test/text-library/texts/06_英文长篇_Moby_Dick_135章.txt"
+两篇均识别 120/135 个编号章、异常数 0；该结果不包含模型切章或实体提取质量。
+
+文件说明：
+prepare_samples.py 负责下载、清洗、写入 test/text-library/texts/ 并更新入库 manifest。
+manifest.json 是本批次两篇的独立清单，字段口径与 test/text-library/manifest.json 一致。
+正文固定 UTF-8/LF，已入库到 test/text-library/texts/；本目录保留底本与整理脚本，压缩包和 Python 缓存不入库。
