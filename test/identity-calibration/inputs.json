@@ -1,0 +1,1508 @@
+{
+  "version": "identity-diagnostic-v1",
+  "frozen_at": "2026-10-29T01:11:57Z",
+  "sources": {
+    "zh": {
+      "id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd",
+      "raw_sha256": "96b254bc40b75e2b38a99360500dafd29624982f9e8e06c5dd6632188b3b36b8",
+      "text_sha256": "96b254bc40b75e2b38a99360500dafd29624982f9e8e06c5dd6632188b3b36b8",
+      "offset_unit": "unicode_code_point",
+      "path": "test/text-library/texts/03_中文长篇_九命奇冤_36回.txt",
+      "language": "zh",
+      "baseline_run_id": "51210f4b7429684d3e10751344b698dc02e38da680a748ca5eba2c65b86113d7"
+    },
+    "en": {
+      "id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2",
+      "raw_sha256": "bef40b0773f5f1857216fa56233e8a4851ab3a98c86b94d4356b005501e912ff",
+      "text_sha256": "bef40b0773f5f1857216fa56233e8a4851ab3a98c86b94d4356b005501e912ff",
+      "offset_unit": "unicode_code_point",
+      "path": "test/text-library/texts/04_英文长篇_Pride_and_Prejudice_61章.txt",
+      "language": "en",
+      "baseline_run_id": "d61ab4888a2b741b6c3677972a69655c010efd95226d135fe6291ee620d9d894"
+    }
+  },
+  "cases": [
+    {
+      "id": "p01",
+      "source": "zh",
+      "cohort": "cached_paired",
+      "targets": [
+        {
+          "id": "29b35ef4345ae79d462b85a9a7388b78245f4988576f08c5275776c99d2ecc68",
+          "text": "马半仙",
+          "start": 13767,
+          "end": 13770,
+          "address": {
+            "end": 13770,
+            "offset_unit": "unicode_code_point",
+            "start": 13767,
+            "text_version_id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd"
+          },
+          "chapter_id": "5eaf8ceb47750a7ce83902b664c14b8735f7fd9f15c2fa09f11f8cca13a7bebb",
+          "provisional_kinds": [
+            "person"
+          ]
+        },
+        {
+          "id": "11d31754e6c2f962c5591ffb66ed0a19da67e999eeeca11e7debf76e5724f329",
+          "text": "半仙",
+          "start": 13768,
+          "end": 13770,
+          "address": {
+            "end": 13770,
+            "offset_unit": "unicode_code_point",
+            "start": 13768,
+            "text_version_id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd"
+          },
+          "chapter_id": "5eaf8ceb47750a7ce83902b664c14b8735f7fd9f15c2fa09f11f8cca13a7bebb",
+          "provisional_kinds": [
+            "person"
+          ]
+        }
+      ],
+      "historical": {
+        "run_id": "51210f4b7429684d3e10751344b698dc02e38da680a748ca5eba2c65b86113d7",
+        "comparison_id": "c10b1de5581d2d47965b3449fb2f21117c8560c0f4db81c257438b08e61bf562"
+      },
+      "extra_evidence": [
+        {
+          "end": 14208,
+          "offset_unit": "unicode_code_point",
+          "start": 13708,
+          "text_version_id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd"
+        }
+      ]
+    },
+    {
+      "id": "p02",
+      "source": "zh",
+      "cohort": "cached_paired",
+      "targets": [
+        {
+          "id": "f89d5c5dcf2d34b639f317ea3ca82160cbae46c2fc6f806639e7ba7a763b3b26",
+          "text": "赛诸葛",
+          "start": 18410,
+          "end": 18413,
+          "address": {
+            "end": 18413,
+            "offset_unit": "unicode_code_point",
+            "start": 18410,
+            "text_version_id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd"
+          },
+          "chapter_id": "c392bac29a7f9f2ae6ca4f93f270ce9064186fc4baa31952b82a8fe22a82cc82",
+          "provisional_kinds": [
+            "person"
+          ]
+        },
+        {
+          "id": "bb4cd2d8b98f58420c18cce61138a94fcaf7c3f0bc6c93522637c2b7c5687672",
+          "text": "赛诸葛先生",
+          "start": 93657,
+          "end": 93662,
+          "address": {
+            "end": 93662,
+            "offset_unit": "unicode_code_point",
+            "start": 93657,
+            "text_version_id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd"
+          },
+          "chapter_id": "b78f832cece814ba6e9f84c6d71b28e9d82d0759f7093a44b20b4d8a77ebe9a9",
+          "provisional_kinds": [
+            "person"
+          ]
+        }
+      ],
+      "historical": {
+        "run_id": "51210f4b7429684d3e10751344b698dc02e38da680a748ca5eba2c65b86113d7",
+        "comparison_id": "0257626a346c633bce8f309a693dfe8a04f769b9f75c186b60e4fcfdf756240f"
+      },
+      "extra_evidence": []
+    },
+    {
+      "id": "p03",
+      "source": "zh",
+      "cohort": "cached_paired",
+      "targets": [
+        {
+          "id": "d15f220665ca460a0dbdae4768178294554ede034eec955ac769c57c3e053683",
+          "text": "贵兴",
+          "start": 19210,
+          "end": 19212,
+          "address": {
+            "end": 19212,
+            "offset_unit": "unicode_code_point",
+            "start": 19210,
+            "text_version_id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd"
+          },
+          "chapter_id": "9f4150fe85aafa49ceacaa67b4bf35c3606dcf392302ff51e2e276a4c4642469",
+          "provisional_kinds": [
+            "person"
+          ]
+        },
+        {
+          "id": "4686412190af96a724767d22f6358c5bd340fc282d12d588c795390e2f521388",
+          "text": "凌贵兴",
+          "start": 19209,
+          "end": 19212,
+          "address": {
+            "end": 19212,
+            "offset_unit": "unicode_code_point",
+            "start": 19209,
+            "text_version_id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd"
+          },
+          "chapter_id": "9f4150fe85aafa49ceacaa67b4bf35c3606dcf392302ff51e2e276a4c4642469",
+          "provisional_kinds": [
+            "person"
+          ]
+        }
+      ],
+      "historical": {
+        "run_id": "51210f4b7429684d3e10751344b698dc02e38da680a748ca5eba2c65b86113d7",
+        "comparison_id": "9b1805f847f64e8ef49ea2e113efec6a720312950274899f44b8a6ae1e195cfd"
+      },
+      "extra_evidence": [
+        {
+          "end": 19404,
+          "offset_unit": "unicode_code_point",
+          "start": 19176,
+          "text_version_id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd"
+        }
+      ]
+    },
+    {
+      "id": "p04",
+      "source": "zh",
+      "cohort": "cached_paired",
+      "targets": [
+        {
+          "id": "5cff548652861400d2b87d2d89e9cdd5a051a03353b0e2d21ad7af52deb7f9f4",
+          "text": "区爵兴",
+          "start": 20071,
+          "end": 20074,
+          "address": {
+            "end": 20074,
+            "offset_unit": "unicode_code_point",
+            "start": 20071,
+            "text_version_id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd"
+          },
+          "chapter_id": "9f4150fe85aafa49ceacaa67b4bf35c3606dcf392302ff51e2e276a4c4642469",
+          "provisional_kinds": [
+            "person"
+          ]
+        },
+        {
+          "id": "e6e8b9be03706498d935abb96137e797dba78bd99165e911f527be032f018737",
+          "text": "区表台",
+          "start": 20299,
+          "end": 20302,
+          "address": {
+            "end": 20302,
+            "offset_unit": "unicode_code_point",
+            "start": 20299,
+            "text_version_id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd"
+          },
+          "chapter_id": "9f4150fe85aafa49ceacaa67b4bf35c3606dcf392302ff51e2e276a4c4642469",
+          "provisional_kinds": [
+            "person"
+          ]
+        }
+      ],
+      "historical": {
+        "run_id": "51210f4b7429684d3e10751344b698dc02e38da680a748ca5eba2c65b86113d7",
+        "comparison_id": "1b3d76d9e1ffbb997c098d4467b3749f027c60936aeb93f11837d28b66dee4e6"
+      },
+      "extra_evidence": [
+        {
+          "end": 20535,
+          "offset_unit": "unicode_code_point",
+          "start": 20062,
+          "text_version_id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd"
+        }
+      ]
+    },
+    {
+      "id": "p05",
+      "source": "zh",
+      "cohort": "cached_paired",
+      "targets": [
+        {
+          "id": "0e7a51320cd536712c96048254b6f9e7cd41eb6d476a29a549a947732fb48ccb",
+          "text": "郑氏",
+          "start": 22027,
+          "end": 22029,
+          "address": {
+            "end": 22029,
+            "offset_unit": "unicode_code_point",
+            "start": 22027,
+            "text_version_id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd"
+          },
+          "chapter_id": "9f4150fe85aafa49ceacaa67b4bf35c3606dcf392302ff51e2e276a4c4642469",
+          "provisional_kinds": [
+            "person"
+          ]
+        },
+        {
+          "id": "23ab13348a6937c5668e31ca81d8b87990bb7da445b8ee4d01337d644a4e8a26",
+          "text": "娘子",
+          "start": 22034,
+          "end": 22036,
+          "address": {
+            "end": 22036,
+            "offset_unit": "unicode_code_point",
+            "start": 22034,
+            "text_version_id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd"
+          },
+          "chapter_id": "9f4150fe85aafa49ceacaa67b4bf35c3606dcf392302ff51e2e276a4c4642469",
+          "provisional_kinds": [
+            "person"
+          ]
+        }
+      ],
+      "historical": {
+        "run_id": "51210f4b7429684d3e10751344b698dc02e38da680a748ca5eba2c65b86113d7",
+        "comparison_id": "24aa31a6c4c47f0c76d3e30d775f4dab3d0b43ae69735cbe366a35d2e3d90f86"
+      },
+      "extra_evidence": [
+        {
+          "end": 22115,
+          "offset_unit": "unicode_code_point",
+          "start": 22001,
+          "text_version_id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd"
+        }
+      ]
+    },
+    {
+      "id": "p06",
+      "source": "zh",
+      "cohort": "cached_paired",
+      "targets": [
+        {
+          "id": "58a8d7311b885f8ae5f605f0230dfd532409ef99bb01039a25b101da68d11a11",
+          "text": "林大有",
+          "start": 113137,
+          "end": 113140,
+          "address": {
+            "end": 113140,
+            "offset_unit": "unicode_code_point",
+            "start": 113137,
+            "text_version_id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd"
+          },
+          "chapter_id": "32cd5670394ca2e5ca0a1c5c8403cc984bb57a4aa74177a435a4685c160b9391",
+          "provisional_kinds": [
+            "person"
+          ]
+        },
+        {
+          "id": "df4520d28eaca0b48c1f753ff7a69faa90509191e1bbd2500aa085adba702fcb",
+          "text": "大有",
+          "start": 112801,
+          "end": 112803,
+          "address": {
+            "end": 112803,
+            "offset_unit": "unicode_code_point",
+            "start": 112801,
+            "text_version_id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd"
+          },
+          "chapter_id": "32cd5670394ca2e5ca0a1c5c8403cc984bb57a4aa74177a435a4685c160b9391",
+          "provisional_kinds": [
+            "person"
+          ]
+        }
+      ],
+      "historical": {
+        "run_id": "51210f4b7429684d3e10751344b698dc02e38da680a748ca5eba2c65b86113d7",
+        "comparison_id": "4211e51a4dd6a777d68d98e86b4a4b2fe1ecc4e7411c103240c7d3fc12a2b4f3"
+      },
+      "extra_evidence": [
+        {
+          "end": 113433,
+          "offset_unit": "unicode_code_point",
+          "start": 112958,
+          "text_version_id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd"
+        }
+      ]
+    },
+    {
+      "id": "p07",
+      "source": "zh",
+      "cohort": "cached_paired",
+      "targets": [
+        {
+          "id": "f8b45ae0bfe489e477f36d2af7bf0c42b7a81a8d5b80a3d32036aa6704a4cb78",
+          "text": "小厮",
+          "start": 5307,
+          "end": 5309,
+          "address": {
+            "end": 5309,
+            "offset_unit": "unicode_code_point",
+            "start": 5307,
+            "text_version_id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd"
+          },
+          "chapter_id": "64c89784e859f93d24dabeaf6c79149b5803a939a0c42c4566bd9e5494975004",
+          "provisional_kinds": [
+            "person"
+          ]
+        },
+        {
+          "id": "c6416cd809cb1498584b6c1dbe64b200e073250f4c44688423313bc660c7858f",
+          "text": "喜来",
+          "start": 5337,
+          "end": 5339,
+          "address": {
+            "end": 5339,
+            "offset_unit": "unicode_code_point",
+            "start": 5337,
+            "text_version_id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd"
+          },
+          "chapter_id": "64c89784e859f93d24dabeaf6c79149b5803a939a0c42c4566bd9e5494975004",
+          "provisional_kinds": [
+            "person"
+          ]
+        }
+      ],
+      "historical": {
+        "run_id": "51210f4b7429684d3e10751344b698dc02e38da680a748ca5eba2c65b86113d7",
+        "comparison_id": "9ec1482ed22450ec36167c59d293114c6393dbab8bd39cfd5cfdf5ab3129add3"
+      },
+      "extra_evidence": [
+        {
+          "end": 5553,
+          "offset_unit": "unicode_code_point",
+          "start": 5294,
+          "text_version_id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd"
+        }
+      ]
+    },
+    {
+      "id": "p08",
+      "source": "zh",
+      "cohort": "cached_paired",
+      "targets": [
+        {
+          "id": "2cbf113858343971abf428a16c0ddd8c0f7825a333470d460e525271c3a6d04b",
+          "text": "梁翰昭",
+          "start": 70482,
+          "end": 70485,
+          "address": {
+            "end": 70485,
+            "offset_unit": "unicode_code_point",
+            "start": 70482,
+            "text_version_id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd"
+          },
+          "chapter_id": "7832899d1b030b40aec4d6cf36b0fa7e6db79aea7a6080ea2a15aded0d150dca",
+          "provisional_kinds": [
+            "person"
+          ]
+        },
+        {
+          "id": "dd0b0b64350944ce5879b2790a502780fd4e5ff5908735d1decd6ed54de992e7",
+          "text": "翰昭",
+          "start": 70483,
+          "end": 70485,
+          "address": {
+            "end": 70485,
+            "offset_unit": "unicode_code_point",
+            "start": 70483,
+            "text_version_id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd"
+          },
+          "chapter_id": "7832899d1b030b40aec4d6cf36b0fa7e6db79aea7a6080ea2a15aded0d150dca",
+          "provisional_kinds": [
+            "person"
+          ]
+        }
+      ],
+      "historical": {
+        "run_id": "51210f4b7429684d3e10751344b698dc02e38da680a748ca5eba2c65b86113d7",
+        "comparison_id": "7c14cdeda61731b0c6d7aac5e4a6902a191078df7e0221bb95a48646d4e75079"
+      },
+      "extra_evidence": [
+        {
+          "end": 70834,
+          "offset_unit": "unicode_code_point",
+          "start": 70334,
+          "text_version_id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd"
+        }
+      ]
+    },
+    {
+      "id": "p09",
+      "source": "zh",
+      "cohort": "cached_paired",
+      "targets": [
+        {
+          "id": "e6cf6f670031646926a8d85026fc5f68914de158f49f71301f81cab1f8250fef",
+          "text": "宗孔",
+          "start": 21501,
+          "end": 21503,
+          "address": {
+            "end": 21503,
+            "offset_unit": "unicode_code_point",
+            "start": 21501,
+            "text_version_id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd"
+          },
+          "chapter_id": "9f4150fe85aafa49ceacaa67b4bf35c3606dcf392302ff51e2e276a4c4642469",
+          "provisional_kinds": [
+            "person"
+          ]
+        },
+        {
+          "id": "65d9f4bd943bea182aea7de5a6c5ed8dbbe92f07cb8da6ad30538366cce05949",
+          "text": "哥哥",
+          "start": 27352,
+          "end": 27354,
+          "address": {
+            "end": 27354,
+            "offset_unit": "unicode_code_point",
+            "start": 27352,
+            "text_version_id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd"
+          },
+          "chapter_id": "d376f3a379be99a9b8e1f354f18bba2bd5cb807c4d93e400991fb8c2c0a583ae",
+          "provisional_kinds": [
+            "person"
+          ]
+        }
+      ],
+      "historical": {
+        "run_id": "51210f4b7429684d3e10751344b698dc02e38da680a748ca5eba2c65b86113d7",
+        "comparison_id": "db6905182dd4abf16ea4dee0fae0de98dd78a1cdb5073bcc733cca99c5f25c3f"
+      },
+      "extra_evidence": [
+        {
+          "end": 21751,
+          "offset_unit": "unicode_code_point",
+          "start": 21251,
+          "text_version_id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd"
+        }
+      ]
+    },
+    {
+      "id": "p10",
+      "source": "zh",
+      "cohort": "cached_paired",
+      "targets": [
+        {
+          "id": "aef3852c07e576174abb953c90d55458d51e4d9514c23b8dd9c63d5288cdfb3f",
+          "text": "爵兴",
+          "start": 102590,
+          "end": 102592,
+          "address": {
+            "end": 102592,
+            "offset_unit": "unicode_code_point",
+            "start": 102590,
+            "text_version_id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd"
+          },
+          "chapter_id": "8aa1557cc55cd16e348f69eadeba3a6645f40b68fd42e01fa2058a5cbb5110fe",
+          "provisional_kinds": [
+            "person"
+          ]
+        },
+        {
+          "id": "9bcb22f1e0ad41c485fe696b1a718fc186a286dbaae008c7f31989383dc785a2",
+          "text": "苏兄",
+          "start": 102722,
+          "end": 102724,
+          "address": {
+            "end": 102724,
+            "offset_unit": "unicode_code_point",
+            "start": 102722,
+            "text_version_id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd"
+          },
+          "chapter_id": "8aa1557cc55cd16e348f69eadeba3a6645f40b68fd42e01fa2058a5cbb5110fe",
+          "provisional_kinds": [
+            "person"
+          ]
+        }
+      ],
+      "historical": {
+        "run_id": "51210f4b7429684d3e10751344b698dc02e38da680a748ca5eba2c65b86113d7",
+        "comparison_id": "5c4d1ea1bb0a0dbbcd7c0624adf6a821bcde08a0e5a7a2e846b3dcf33a715802"
+      },
+      "extra_evidence": [
+        {
+          "end": 103097,
+          "offset_unit": "unicode_code_point",
+          "start": 102597,
+          "text_version_id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd"
+        }
+      ]
+    },
+    {
+      "id": "p11",
+      "source": "en",
+      "cohort": "cached_paired",
+      "targets": [
+        {
+          "id": "ee29e19a698e353073ed59dd7ecac4632961055550729c7c4b4dfccaa95c7ea5",
+          "text": "Caroline",
+          "start": 77036,
+          "end": 77044,
+          "address": {
+            "end": 77044,
+            "offset_unit": "unicode_code_point",
+            "start": 77036,
+            "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+          },
+          "chapter_id": "231093a270652b33853b1d1e52d8b695212321a7e6400bbcb82e53b58c9ccc16",
+          "provisional_kinds": [
+            "person"
+          ]
+        },
+        {
+          "id": "5facbb9d862a8245cd67a5f5d9ffaeea992a536da6af872d05149841c21da336",
+          "text": "Miss Bingley",
+          "start": 77241,
+          "end": 77253,
+          "address": {
+            "end": 77253,
+            "offset_unit": "unicode_code_point",
+            "start": 77241,
+            "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+          },
+          "chapter_id": "231093a270652b33853b1d1e52d8b695212321a7e6400bbcb82e53b58c9ccc16",
+          "provisional_kinds": [
+            "person"
+          ]
+        }
+      ],
+      "historical": {
+        "run_id": "d61ab4888a2b741b6c3677972a69655c010efd95226d135fe6291ee620d9d894",
+        "comparison_id": "ad94a422cc61bbc44de9e8ca867a4b336325ea8dec913f198f14917c92a900d2"
+      },
+      "extra_evidence": [
+        {
+          "end": 77175,
+          "offset_unit": "unicode_code_point",
+          "start": 76991,
+          "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+        }
+      ]
+    },
+    {
+      "id": "p12",
+      "source": "en",
+      "cohort": "cached_paired",
+      "targets": [
+        {
+          "id": "97638303e5974e62d55f4ad95f61489cbbca2ab3adfac12d565090b967d95ce2",
+          "text": "Jane",
+          "start": 30051,
+          "end": 30055,
+          "address": {
+            "end": 30055,
+            "offset_unit": "unicode_code_point",
+            "start": 30051,
+            "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+          },
+          "chapter_id": "c154b5d4a5bc784c2838ab39e4dc01ee2a5dae5c538b1d77ba42c15f04bf96ba",
+          "provisional_kinds": [
+            "person"
+          ]
+        },
+        {
+          "id": "f82a3bc14df941853211aaa35d910e00e4384ffb88a3a833db57d1ac8e71bc24",
+          "text": "Miss Bennet",
+          "start": 29781,
+          "end": 29792,
+          "address": {
+            "end": 29792,
+            "offset_unit": "unicode_code_point",
+            "start": 29781,
+            "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+          },
+          "chapter_id": "c154b5d4a5bc784c2838ab39e4dc01ee2a5dae5c538b1d77ba42c15f04bf96ba",
+          "provisional_kinds": [
+            "person"
+          ]
+        }
+      ],
+      "historical": {
+        "run_id": "d61ab4888a2b741b6c3677972a69655c010efd95226d135fe6291ee620d9d894",
+        "comparison_id": "de9bb5c139eec99a9e9566a2a826cfe199d19abd46ba81c8ee4e303f9667b05b"
+      },
+      "extra_evidence": [
+        {
+          "end": 30184,
+          "offset_unit": "unicode_code_point",
+          "start": 29684,
+          "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+        }
+      ]
+    },
+    {
+      "id": "p13",
+      "source": "en",
+      "cohort": "cached_paired",
+      "targets": [
+        {
+          "id": "767e218e81655ebc1671ef0a6f9207b215a9f725d99411c7bec6ea21ffcf4c73",
+          "text": "Charlotte",
+          "start": 30992,
+          "end": 31001,
+          "address": {
+            "end": 31001,
+            "offset_unit": "unicode_code_point",
+            "start": 30992,
+            "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+          },
+          "chapter_id": "c154b5d4a5bc784c2838ab39e4dc01ee2a5dae5c538b1d77ba42c15f04bf96ba",
+          "provisional_kinds": [
+            "person"
+          ]
+        },
+        {
+          "id": "9607ab0ecf3748dde7543135836fd9caf2e91bf5ef5108126b44c5eb423d3091",
+          "text": "Miss Lucas",
+          "start": 30939,
+          "end": 30949,
+          "address": {
+            "end": 30949,
+            "offset_unit": "unicode_code_point",
+            "start": 30939,
+            "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+          },
+          "chapter_id": "c154b5d4a5bc784c2838ab39e4dc01ee2a5dae5c538b1d77ba42c15f04bf96ba",
+          "provisional_kinds": [
+            "person"
+          ]
+        }
+      ],
+      "historical": {
+        "run_id": "d61ab4888a2b741b6c3677972a69655c010efd95226d135fe6291ee620d9d894",
+        "comparison_id": "be2acb945bfedf1073bde3da9da1cd4ae047d96ec19326726186d6a61f81b6e3"
+      },
+      "extra_evidence": [
+        {
+          "end": 30951,
+          "offset_unit": "unicode_code_point",
+          "start": 30684,
+          "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+        }
+      ]
+    },
+    {
+      "id": "p14",
+      "source": "en",
+      "cohort": "cached_paired",
+      "targets": [
+        {
+          "id": "986501b9ed9b505f24a14876024b4f817fab121c43561e4b4e8ac22bb23f3226",
+          "text": "Elizabeth",
+          "start": 49856,
+          "end": 49865,
+          "address": {
+            "end": 49865,
+            "offset_unit": "unicode_code_point",
+            "start": 49856,
+            "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+          },
+          "chapter_id": "3d72b289794c8eb098684e400abe22087a526138859c21e1f975caa5ddec9591",
+          "provisional_kinds": [
+            "person"
+          ]
+        },
+        {
+          "id": "d848075f41bf8b39c97d571ad82cd38d1178fa202818b8df084019ca2c1ff229",
+          "text": "Lizzy",
+          "start": 50275,
+          "end": 50280,
+          "address": {
+            "end": 50280,
+            "offset_unit": "unicode_code_point",
+            "start": 50275,
+            "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+          },
+          "chapter_id": "3d72b289794c8eb098684e400abe22087a526138859c21e1f975caa5ddec9591",
+          "provisional_kinds": [
+            "person"
+          ]
+        }
+      ],
+      "historical": {
+        "run_id": "d61ab4888a2b741b6c3677972a69655c010efd95226d135fe6291ee620d9d894",
+        "comparison_id": "d36ef680462dd8ef7988c9fcbec7b9f2f37ec19f6200706af253bee2ecd882f6"
+      },
+      "extra_evidence": [
+        {
+          "end": 50326,
+          "offset_unit": "unicode_code_point",
+          "start": 50252,
+          "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+        }
+      ]
+    },
+    {
+      "id": "p15",
+      "source": "en",
+      "cohort": "cached_paired",
+      "targets": [
+        {
+          "id": "447fdfb30921a9b394e037f2ca743f34664964668ae07c422aecab6a5a52792d",
+          "text": "Mr. Bingley",
+          "start": 7209,
+          "end": 7220,
+          "address": {
+            "end": 7220,
+            "offset_unit": "unicode_code_point",
+            "start": 7209,
+            "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+          },
+          "chapter_id": "bcf7381587444c851ade0eb2a9abb5f96456b6c7d39885a2d0de3f645363cdca",
+          "provisional_kinds": [
+            "person"
+          ]
+        },
+        {
+          "id": "55eb9c1d8fd53dfa9cdd037b1358b5f986d2579d154f4f3e24794d562dbc090b",
+          "text": "Miss Bingley",
+          "start": 12848,
+          "end": 12860,
+          "address": {
+            "end": 12860,
+            "offset_unit": "unicode_code_point",
+            "start": 12848,
+            "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+          },
+          "chapter_id": "15df29cb9b9a5357ac01be921153920f8b0aeb48a05e0114b4162218908c46e2",
+          "provisional_kinds": [
+            "person"
+          ]
+        }
+      ],
+      "historical": {
+        "run_id": "d61ab4888a2b741b6c3677972a69655c010efd95226d135fe6291ee620d9d894",
+        "comparison_id": "e237f32bf2f8fab19d65ba150b54c1665cd36a630935602eac7160285c3945af"
+      },
+      "extra_evidence": []
+    },
+    {
+      "id": "p16",
+      "source": "en",
+      "cohort": "cached_paired",
+      "targets": [
+        {
+          "id": "950e7a87d32dc22855178fadce80563746e9b88e8925632132e23ec83f7e6fce",
+          "text": "Mrs. Bennet",
+          "start": 7579,
+          "end": 7590,
+          "address": {
+            "end": 7590,
+            "offset_unit": "unicode_code_point",
+            "start": 7579,
+            "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+          },
+          "chapter_id": "bcf7381587444c851ade0eb2a9abb5f96456b6c7d39885a2d0de3f645363cdca",
+          "provisional_kinds": [
+            "person"
+          ]
+        },
+        {
+          "id": "ebfaa84c014f97af0f64df06e3969ed6cb5dc5f2c735d9904393ae4bb49f2f30",
+          "text": "Mr. Bennet",
+          "start": 7770,
+          "end": 7780,
+          "address": {
+            "end": 7780,
+            "offset_unit": "unicode_code_point",
+            "start": 7770,
+            "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+          },
+          "chapter_id": "bcf7381587444c851ade0eb2a9abb5f96456b6c7d39885a2d0de3f645363cdca",
+          "provisional_kinds": [
+            "person"
+          ]
+        }
+      ],
+      "historical": {
+        "run_id": "d61ab4888a2b741b6c3677972a69655c010efd95226d135fe6291ee620d9d894",
+        "comparison_id": "d2f2e9d77ebd6506d0151ba50abf31d700bb4a521bf1b7888f6c47f6033b9332"
+      },
+      "extra_evidence": []
+    },
+    {
+      "id": "p17",
+      "source": "en",
+      "cohort": "cached_paired",
+      "targets": [
+        {
+          "id": "bdf47440fd2a679a7c76eab062b8888055adce380e0ca0b2888f9fb5ed5a93f4",
+          "text": "Mary King",
+          "start": 385544,
+          "end": 385553,
+          "address": {
+            "end": 385553,
+            "offset_unit": "unicode_code_point",
+            "start": 385544,
+            "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+          },
+          "chapter_id": "9b3ed0e39dfa8368675f2e79e49371059e64cb0c8a943dd0173f6f6fbc1eca62",
+          "provisional_kinds": [
+            "person"
+          ]
+        },
+        {
+          "id": "0bb9e3c147eb27491c1d5d351f5bb058d054c52e814872ec326582b863cd7bfe",
+          "text": "Mary",
+          "start": 7077,
+          "end": 7081,
+          "address": {
+            "end": 7081,
+            "offset_unit": "unicode_code_point",
+            "start": 7077,
+            "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+          },
+          "chapter_id": "bcf7381587444c851ade0eb2a9abb5f96456b6c7d39885a2d0de3f645363cdca",
+          "provisional_kinds": [
+            "person"
+          ]
+        }
+      ],
+      "historical": {
+        "run_id": "d61ab4888a2b741b6c3677972a69655c010efd95226d135fe6291ee620d9d894",
+        "comparison_id": "79b1a7cb8f45ba63bd9feb0e86f93f6dbf96246a3dbbc89300cb052549502ab0"
+      },
+      "extra_evidence": []
+    },
+    {
+      "id": "p18",
+      "source": "en",
+      "cohort": "cached_paired",
+      "targets": [
+        {
+          "id": "840871ef58a6a71281ae42a1a3e741d1f42c3e2a83293b7d71527723ffb4f019",
+          "text": "Miss Bennet",
+          "start": 89186,
+          "end": 89197,
+          "address": {
+            "end": 89197,
+            "offset_unit": "unicode_code_point",
+            "start": 89186,
+            "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+          },
+          "chapter_id": "6d26ca927f75b398e67bb89b29496d209f025204a66ea23733e0eb7202ca7eef",
+          "provisional_kinds": [
+            "person"
+          ]
+        },
+        {
+          "id": "4eaacb8ea41fbca163012e6494488175deb6c7ee22470bd015b32a878750c25c",
+          "text": "Miss Eliza Bennet",
+          "start": 91363,
+          "end": 91380,
+          "address": {
+            "end": 91380,
+            "offset_unit": "unicode_code_point",
+            "start": 91363,
+            "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+          },
+          "chapter_id": "6d26ca927f75b398e67bb89b29496d209f025204a66ea23733e0eb7202ca7eef",
+          "provisional_kinds": [
+            "person"
+          ]
+        }
+      ],
+      "historical": {
+        "run_id": "d61ab4888a2b741b6c3677972a69655c010efd95226d135fe6291ee620d9d894",
+        "comparison_id": "70fab37074582d28a01f5afe72593ee141813d39f52949d73e4c482116269efd"
+      },
+      "extra_evidence": []
+    },
+    {
+      "id": "p19",
+      "source": "en",
+      "cohort": "cached_paired",
+      "targets": [
+        {
+          "id": "b25b5cc8a43eb4ac05cb6534b6d274b64ef67364cb74beaa38ea7d09cda6d852",
+          "text": "Miss Bingley",
+          "start": 95887,
+          "end": 95899,
+          "address": {
+            "end": 95899,
+            "offset_unit": "unicode_code_point",
+            "start": 95887,
+            "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+          },
+          "chapter_id": "6d26ca927f75b398e67bb89b29496d209f025204a66ea23733e0eb7202ca7eef",
+          "provisional_kinds": [
+            "person"
+          ]
+        },
+        {
+          "id": "c3117ae63a2ccbafd318ab08ca2c76ee75338b2fff281ea9d2efbc704cf8138a",
+          "text": "Louisa",
+          "start": 95953,
+          "end": 95959,
+          "address": {
+            "end": 95959,
+            "offset_unit": "unicode_code_point",
+            "start": 95953,
+            "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+          },
+          "chapter_id": "6d26ca927f75b398e67bb89b29496d209f025204a66ea23733e0eb7202ca7eef",
+          "provisional_kinds": [
+            "person"
+          ]
+        }
+      ],
+      "historical": {
+        "run_id": "d61ab4888a2b741b6c3677972a69655c010efd95226d135fe6291ee620d9d894",
+        "comparison_id": "6a8fa1edc14f02c32b3c1c5a8257044403cf14259d030adc8415aeaee1f4f222"
+      },
+      "extra_evidence": [
+        {
+          "end": 96001,
+          "offset_unit": "unicode_code_point",
+          "start": 95848,
+          "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+        }
+      ]
+    },
+    {
+      "id": "p20",
+      "source": "en",
+      "cohort": "cached_paired",
+      "targets": [
+        {
+          "id": "1a051bdd47779b7ccd24e10996ae2bd048d4e25d76a3dc6c5c1801e1f1429d70",
+          "text": "the late Mr. Darcy",
+          "start": 132804,
+          "end": 132822,
+          "address": {
+            "end": 132822,
+            "offset_unit": "unicode_code_point",
+            "start": 132804,
+            "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+          },
+          "chapter_id": "c6064e577565ba6fcdbaca51099beca47498d9cf2e26c668614a178513927605",
+          "provisional_kinds": [
+            "person"
+          ]
+        },
+        {
+          "id": "e1cb3f52ae12a0961be18f33460b82473df174b0d550ed79ce2fb87053178179",
+          "text": "Mr. Darcy",
+          "start": 121850,
+          "end": 121859,
+          "address": {
+            "end": 121859,
+            "offset_unit": "unicode_code_point",
+            "start": 121850,
+            "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+          },
+          "chapter_id": "612779080e184a8c2c970e9e6299706289f04216a219f21476bd9a9c7ad800e9",
+          "provisional_kinds": [
+            "person"
+          ]
+        }
+      ],
+      "historical": {
+        "run_id": "d61ab4888a2b741b6c3677972a69655c010efd95226d135fe6291ee620d9d894",
+        "comparison_id": "ba81298b205b4afb8555ed1cf297c789112b4075285f0d78b2e6533f2c3ce3e5"
+      },
+      "extra_evidence": []
+    },
+    {
+      "id": "p21",
+      "source": "en",
+      "cohort": "cached_paired",
+      "targets": [
+        {
+          "id": "f858ed942e26ed9b1963857f7c4ee3f9c10642ad6a63923f44f7a461ecf2e235",
+          "text": "Catherine",
+          "start": 148509,
+          "end": 148518,
+          "address": {
+            "end": 148518,
+            "offset_unit": "unicode_code_point",
+            "start": 148509,
+            "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+          },
+          "chapter_id": "0aa7c988ed1b469c2630bbfee106effd5a034b0ebd1284ebc5eca7053e05bf8a",
+          "provisional_kinds": [
+            "person"
+          ]
+        },
+        {
+          "id": "76d64dcfa635242d8054df7e5807c4607892834331ba320117e59ef8c963450b",
+          "text": "Lady Catherine de Bourgh",
+          "start": 149585,
+          "end": 149609,
+          "address": {
+            "end": 149609,
+            "offset_unit": "unicode_code_point",
+            "start": 149585,
+            "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+          },
+          "chapter_id": "0aa7c988ed1b469c2630bbfee106effd5a034b0ebd1284ebc5eca7053e05bf8a",
+          "provisional_kinds": [
+            "person"
+          ]
+        }
+      ],
+      "historical": {
+        "run_id": "d61ab4888a2b741b6c3677972a69655c010efd95226d135fe6291ee620d9d894",
+        "comparison_id": "a1fa710300f8e838cd318c9e75e2449f6b48d760a8bdab2e4ffcdfb673bbe337"
+      },
+      "extra_evidence": []
+    },
+    {
+      "id": "p22",
+      "source": "en",
+      "cohort": "cached_paired",
+      "targets": [
+        {
+          "id": "65c9f88197f7a37115e38fad0e6f143933701f44bfd99a3d0eecfda62dd245d7",
+          "text": "Mr. Hurst",
+          "start": 51879,
+          "end": 51888,
+          "address": {
+            "end": 51888,
+            "offset_unit": "unicode_code_point",
+            "start": 51879,
+            "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+          },
+          "chapter_id": "3d72b289794c8eb098684e400abe22087a526138859c21e1f975caa5ddec9591",
+          "provisional_kinds": [
+            "person"
+          ]
+        },
+        {
+          "id": "a53590a36aa65b64de041947861225b3dd142e01eea5986d246cfa70bfe63a3e",
+          "text": "Mrs. Hurst",
+          "start": 51590,
+          "end": 51600,
+          "address": {
+            "end": 51600,
+            "offset_unit": "unicode_code_point",
+            "start": 51590,
+            "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+          },
+          "chapter_id": "3d72b289794c8eb098684e400abe22087a526138859c21e1f975caa5ddec9591",
+          "provisional_kinds": [
+            "person"
+          ]
+        }
+      ],
+      "historical": {
+        "run_id": "d61ab4888a2b741b6c3677972a69655c010efd95226d135fe6291ee620d9d894",
+        "comparison_id": "4e47543068367fcb726270729ce4e440b82a63b27d91566cd00d7f81aad43cf2"
+      },
+      "extra_evidence": []
+    },
+    {
+      "id": "p23",
+      "source": "en",
+      "cohort": "cached_paired",
+      "targets": [
+        {
+          "id": "1630949c97928029bbb52260e945b5940aadbb1e3f87bd60cb3e8d1e800f3c72",
+          "text": "Sir William Lucas",
+          "start": 35634,
+          "end": 35651,
+          "address": {
+            "end": 35651,
+            "offset_unit": "unicode_code_point",
+            "start": 35634,
+            "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+          },
+          "chapter_id": "c154b5d4a5bc784c2838ab39e4dc01ee2a5dae5c538b1d77ba42c15f04bf96ba",
+          "provisional_kinds": [
+            "person"
+          ]
+        },
+        {
+          "id": "dbb02e0f6fb105df10da90f99164a9194ec6fe8b7390467a666d7208fc117af5",
+          "text": "Miss Lucas",
+          "start": 36158,
+          "end": 36168,
+          "address": {
+            "end": 36168,
+            "offset_unit": "unicode_code_point",
+            "start": 36158,
+            "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+          },
+          "chapter_id": "c154b5d4a5bc784c2838ab39e4dc01ee2a5dae5c538b1d77ba42c15f04bf96ba",
+          "provisional_kinds": [
+            "person"
+          ]
+        }
+      ],
+      "historical": {
+        "run_id": "d61ab4888a2b741b6c3677972a69655c010efd95226d135fe6291ee620d9d894",
+        "comparison_id": "9486636b16426ebf56086f1f9c869014378644219bab92860923396b2758ad71"
+      },
+      "extra_evidence": []
+    },
+    {
+      "id": "p24",
+      "source": "en",
+      "cohort": "cached_paired",
+      "targets": [
+        {
+          "id": "6543e5515190f02e05895fd4ccdcea9fcca6fa536fd0a5ae1bd30c7dde398279",
+          "text": "Mrs. Philips",
+          "start": 122742,
+          "end": 122754,
+          "address": {
+            "end": 122754,
+            "offset_unit": "unicode_code_point",
+            "start": 122742,
+            "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+          },
+          "chapter_id": "612779080e184a8c2c970e9e6299706289f04216a219f21476bd9a9c7ad800e9",
+          "provisional_kinds": [
+            "person"
+          ]
+        },
+        {
+          "id": "2d6c36374af87d499ed56e9c360cc7e3e319c0367a4bf5e81a4ebd45016dc53b",
+          "text": "Mr. Philips",
+          "start": 122604,
+          "end": 122615,
+          "address": {
+            "end": 122615,
+            "offset_unit": "unicode_code_point",
+            "start": 122604,
+            "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+          },
+          "chapter_id": "612779080e184a8c2c970e9e6299706289f04216a219f21476bd9a9c7ad800e9",
+          "provisional_kinds": [
+            "person"
+          ]
+        }
+      ],
+      "historical": {
+        "run_id": "d61ab4888a2b741b6c3677972a69655c010efd95226d135fe6291ee620d9d894",
+        "comparison_id": "b55e48e7f0837a5f9c9a992dc6a97fc3284b027bc7ec5d6c79fbeb30ea976991"
+      },
+      "extra_evidence": []
+    },
+    {
+      "id": "p25",
+      "source": "zh",
+      "cohort": "challenge_unmeasured",
+      "targets": [
+        {
+          "id": "9e8de01bb3ce3c9160ed1eb45a56299b96c2ccdacefacb913879addbc16a705e",
+          "text": "贵兴",
+          "start": 2332,
+          "end": 2334,
+          "address": {
+            "end": 2334,
+            "offset_unit": "unicode_code_point",
+            "start": 2332,
+            "text_version_id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd"
+          },
+          "chapter_id": "b9d345016b6fa84f40514056a5c3504542d43dc6ee16419301ecf02a1bfbe78f",
+          "provisional_kinds": [
+            "person"
+          ]
+        },
+        {
+          "id": "644747cb41e1ad5114a059704873109908b339186dae84403e8c7e3cb3e45dab",
+          "text": "凌贵兴",
+          "start": 2611,
+          "end": 2614,
+          "address": {
+            "end": 2614,
+            "offset_unit": "unicode_code_point",
+            "start": 2611,
+            "text_version_id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd"
+          },
+          "chapter_id": "b9d345016b6fa84f40514056a5c3504542d43dc6ee16419301ecf02a1bfbe78f",
+          "provisional_kinds": [
+            "person"
+          ]
+        }
+      ],
+      "historical": null,
+      "extra_evidence": []
+    },
+    {
+      "id": "p26",
+      "source": "zh",
+      "cohort": "challenge_unmeasured",
+      "targets": [
+        {
+          "id": "e464113819ec916c0f9666ee0c109c114230eb086bfdfef41dd7555eda3a3278",
+          "text": "天来",
+          "start": 2404,
+          "end": 2406,
+          "address": {
+            "end": 2406,
+            "offset_unit": "unicode_code_point",
+            "start": 2404,
+            "text_version_id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd"
+          },
+          "chapter_id": "b9d345016b6fa84f40514056a5c3504542d43dc6ee16419301ecf02a1bfbe78f",
+          "provisional_kinds": [
+            "person"
+          ]
+        },
+        {
+          "id": "b08535f01dcbdfed251312811054aa80d6de2ff2b2c972ce59798e90e68e62b3",
+          "text": "君来",
+          "start": 2409,
+          "end": 2411,
+          "address": {
+            "end": 2411,
+            "offset_unit": "unicode_code_point",
+            "start": 2409,
+            "text_version_id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd"
+          },
+          "chapter_id": "b9d345016b6fa84f40514056a5c3504542d43dc6ee16419301ecf02a1bfbe78f",
+          "provisional_kinds": [
+            "person"
+          ]
+        }
+      ],
+      "historical": null,
+      "extra_evidence": []
+    },
+    {
+      "id": "p27",
+      "source": "zh",
+      "cohort": "challenge_unmeasured",
+      "targets": [
+        {
+          "id": "acb3a7451c517642348f0ddc4ca4bd3966370968d3140a1e367ceadc18c50f24",
+          "text": "林大有",
+          "start": 43012,
+          "end": 43015,
+          "address": {
+            "end": 43015,
+            "offset_unit": "unicode_code_point",
+            "start": 43012,
+            "text_version_id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd"
+          },
+          "chapter_id": "4e94697a466818086988ef03bb1d6d5f4d004ed1bc8325e3fb707a7f8824db10",
+          "provisional_kinds": [
+            "person"
+          ]
+        },
+        {
+          "id": "db6f9692579ffa64b106f8bb52ec9f7fc752bd38a3c8445143203f99c2190dd9",
+          "text": "聚仙馆",
+          "start": 43008,
+          "end": 43011,
+          "address": {
+            "end": 43011,
+            "offset_unit": "unicode_code_point",
+            "start": 43008,
+            "text_version_id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd"
+          },
+          "chapter_id": "4e94697a466818086988ef03bb1d6d5f4d004ed1bc8325e3fb707a7f8824db10",
+          "provisional_kinds": [
+            "place"
+          ]
+        }
+      ],
+      "historical": null,
+      "extra_evidence": []
+    },
+    {
+      "id": "p28",
+      "source": "zh",
+      "cohort": "challenge_unmeasured",
+      "targets": [
+        {
+          "id": "f4be0747083b62bf1dd83a6bfad858ba959d582908d5c79e518fff6e64608be8",
+          "text": "马半仙",
+          "start": 3408,
+          "end": 3411,
+          "address": {
+            "end": 3411,
+            "offset_unit": "unicode_code_point",
+            "start": 3408,
+            "text_version_id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd"
+          },
+          "chapter_id": "b9d345016b6fa84f40514056a5c3504542d43dc6ee16419301ecf02a1bfbe78f",
+          "provisional_kinds": [
+            "person"
+          ]
+        },
+        {
+          "id": "11d31754e6c2f962c5591ffb66ed0a19da67e999eeeca11e7debf76e5724f329",
+          "text": "半仙",
+          "start": 13768,
+          "end": 13770,
+          "address": {
+            "end": 13770,
+            "offset_unit": "unicode_code_point",
+            "start": 13768,
+            "text_version_id": "76fc20a10309edfed06f08e504df9087deb62607a106e33f546c2f89a8c020cd"
+          },
+          "chapter_id": "5eaf8ceb47750a7ce83902b664c14b8735f7fd9f15c2fa09f11f8cca13a7bebb",
+          "provisional_kinds": [
+            "person"
+          ]
+        }
+      ],
+      "historical": null,
+      "extra_evidence": []
+    },
+    {
+      "id": "p29",
+      "source": "en",
+      "cohort": "challenge_unmeasured",
+      "targets": [
+        {
+          "id": "54a3d0fed8be414c0106a1a8f7c3a58f119bb6ce1968fd98f70af85a5b391c55",
+          "text": "Mr. Bennet",
+          "start": 533,
+          "end": 543,
+          "address": {
+            "end": 543,
+            "offset_unit": "unicode_code_point",
+            "start": 533,
+            "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+          },
+          "chapter_id": "1cfbec76802a6b8a18ba7048c05fc682baab6e808ecb51a57382fa99ee82c1b9",
+          "provisional_kinds": [
+            "person"
+          ]
+        },
+        {
+          "id": "9d6dc7ed8d79608253fddf40c8d5587da4f028d10d9254c796344c1ccb5d6b25",
+          "text": "Mrs. Bennet",
+          "start": 5486,
+          "end": 5497,
+          "address": {
+            "end": 5497,
+            "offset_unit": "unicode_code_point",
+            "start": 5486,
+            "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+          },
+          "chapter_id": "bcf7381587444c851ade0eb2a9abb5f96456b6c7d39885a2d0de3f645363cdca",
+          "provisional_kinds": [
+            "person"
+          ]
+        }
+      ],
+      "historical": null,
+      "extra_evidence": []
+    },
+    {
+      "id": "p30",
+      "source": "en",
+      "cohort": "challenge_unmeasured",
+      "targets": [
+        {
+          "id": "ac2476ac50083ed84f10f434432748e872374b70a065dfa706d48be30b8fe99a",
+          "text": "Miss Lucas",
+          "start": 16831,
+          "end": 16841,
+          "address": {
+            "end": 16841,
+            "offset_unit": "unicode_code_point",
+            "start": 16831,
+            "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+          },
+          "chapter_id": "15df29cb9b9a5357ac01be921153920f8b0aeb48a05e0114b4162218908c46e2",
+          "provisional_kinds": [
+            "person"
+          ]
+        },
+        {
+          "id": "d6a0dbda448ce2186ead2ccc2f3da8e01551738e6df995b45468dfd4c9bdc6b0",
+          "text": "Lucas Lodge",
+          "start": 24942,
+          "end": 24953,
+          "address": {
+            "end": 24953,
+            "offset_unit": "unicode_code_point",
+            "start": 24942,
+            "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+          },
+          "chapter_id": "45db172aaf6e89abb9c182a10ff1097b55553937abb3a5dde524c1efd77f5003",
+          "provisional_kinds": [
+            "place"
+          ]
+        }
+      ],
+      "historical": null,
+      "extra_evidence": []
+    },
+    {
+      "id": "p31",
+      "source": "en",
+      "cohort": "challenge_unmeasured",
+      "targets": [
+        {
+          "id": "1c2b23a94f31eb6bb739b3d48564a803fc08e02a58d1849856785d2896110626",
+          "text": "Miss Bennet",
+          "start": 14397,
+          "end": 14408,
+          "address": {
+            "end": 14408,
+            "offset_unit": "unicode_code_point",
+            "start": 14397,
+            "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+          },
+          "chapter_id": "15df29cb9b9a5357ac01be921153920f8b0aeb48a05e0114b4162218908c46e2",
+          "provisional_kinds": [
+            "person"
+          ]
+        },
+        {
+          "id": "754d21613e19a957285bf5752f5af2fd39eb91cf1ed1916f1887e391e6fe0d77",
+          "text": "Miss Bennet",
+          "start": 619767,
+          "end": 619778,
+          "address": {
+            "end": 619778,
+            "offset_unit": "unicode_code_point",
+            "start": 619767,
+            "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+          },
+          "chapter_id": "2ca146085c21698cbf521b2a681d91b09143b846615d4bc5eb533661c90aa327",
+          "provisional_kinds": [
+            "person"
+          ]
+        }
+      ],
+      "historical": null,
+      "extra_evidence": []
+    },
+    {
+      "id": "p32",
+      "source": "en",
+      "cohort": "challenge_unmeasured",
+      "targets": [
+        {
+          "id": "3f31c1c6326cfb810e1f3d588f3e5e5adc28f4f9a50ba4694f6f16747215c16d",
+          "text": "Netherfield",
+          "start": 910,
+          "end": 921,
+          "address": {
+            "end": 921,
+            "offset_unit": "unicode_code_point",
+            "start": 910,
+            "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+          },
+          "chapter_id": "1cfbec76802a6b8a18ba7048c05fc682baab6e808ecb51a57382fa99ee82c1b9",
+          "provisional_kinds": [
+            "place"
+          ]
+        },
+        {
+          "id": "812a2340e2403f4d7708b406729c8bf16ec7d41bf183cdf8e5c627598ebf2cc6",
+          "text": "Netherfield Park",
+          "start": 498,
+          "end": 514,
+          "address": {
+            "end": 514,
+            "offset_unit": "unicode_code_point",
+            "start": 498,
+            "text_version_id": "4fe4b15904fc7fdd7d8f8aa13191a4c7108a0649de0fdc0ecf424665ad71aca2"
+          },
+          "chapter_id": "1cfbec76802a6b8a18ba7048c05fc682baab6e808ecb51a57382fa99ee82c1b9",
+          "provisional_kinds": [
+            "place"
+          ]
+        }
+      ],
+      "historical": null,
+      "extra_evidence": []
+    }
+  ]
+}
