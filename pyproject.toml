@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "entitytrace"
 version = "0.1.0"
-description = "带原文地址与决策记录的本地实体发现工具"
+description = "面向 agent 的小说实体处理插件核心，提供 CLI、结构化结果与原文证据回溯"
 requires-python = ">=3.12"
 dependencies = []
 
