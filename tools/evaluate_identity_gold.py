@@ -63,12 +63,24 @@ def infer_predicted_entity_gold_id(
     pred_entity_obj: dict | None,
     alias_norm_to_unique_gid: dict[str, str],
 ) -> str | None:
-    """推断某预测实体对应的主导金标准实体 ID（优先依据已匹配实体层/全样本多数投票，其次依据无歧义名册别名）。"""
+    """推断某预测实体对应的主导金标准实体 ID（优先依据已匹配实体层/全样本多数投票，平票时参考无歧义名册别名）。"""
     gids = [g for g in by_pred_all_gids.get(pred_eid, []) if not g.startswith("__not_entity__")]
     if gids:
         counts = collections.Counter(gids)
-        top_gid, _ = sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))[0]
-        return top_gid
+        max_cnt = max(counts.values())
+        tied_top = sorted(k for k, v in counts.items() if v == max_cnt)
+        if len(tied_top) == 1:
+            return tied_top[0]
+        if pred_entity_obj:
+            cand_names = [pred_entity_obj.get("name", "")] + list(pred_entity_obj.get("aliases", [])) + list(pred_entity_obj.get("names", []))
+            matched_tied = [
+                alias_norm_to_unique_gid[normalize_surface(s)]
+                for s in cand_names
+                if s and normalize_surface(s) in alias_norm_to_unique_gid and alias_norm_to_unique_gid[normalize_surface(s)] in set(tied_top)
+            ]
+            if matched_tied:
+                return collections.Counter(matched_tied).most_common(1)[0][0]
+        return tied_top[0]
     if pred_entity_obj:
         cand_names = [pred_entity_obj.get("name", "")] + list(pred_entity_obj.get("aliases", [])) + list(pred_entity_obj.get("names", []))
         matched_gids = [
@@ -142,6 +154,17 @@ def compute_subset_metrics(
             "splits_per_entity": {},
             "overmerges": [],
             "major_entity_overmerges": [],
+            "major_entity_pair_overmerges": [],
+            "major_mention_misassign_rate": {
+                "status": "not_applicable",
+                "numerator": 0,
+                "denominator": 0,
+                "value": None,
+                "max_allowed_count": None,
+                "passed": None,
+                "sample_ids": [],
+                "details": [],
+            },
             "out_of_roster_in_major_entity_count": 0,
             "out_of_roster_in_major_details": [],
         }
@@ -257,11 +280,16 @@ def compute_subset_metrics(
             "b3_precision_on_linked": round(hard_b3_prec_sum / hard_linked_total, 6),
         }
 
-    # overmerges、major_entity_overmerges 与名册外人物并入主要实体计数
+    # overmerges、major_entity_overmerges、G5a major_entity_pair_overmerges、G5b major_mention_misassign_rate 与名册外人物并入主要实体计数
     overmerges = []
     major_overmerges = []
+    major_pair_overmerges = []
     oor_in_major_count = 0
     oor_in_major_details = []
+
+    by_pred_samples: dict[tuple[str, str], list[str]] = collections.defaultdict(list)
+    for g, _, pred_eid in matched_items:
+        by_pred_samples[(pred_eid, g["gold_id"])].append(g["sample_id"])
 
     for pred_eid, gids in sorted(by_pred.items()):
         real_gids = [g for g in gids if not g.startswith("__not_entity__")]
@@ -276,6 +304,7 @@ def compute_subset_metrics(
                         "gold_id": gid,
                         "canonical": all_entity_defs.get(gid, {}).get("canonical", gid),
                         "count_in_group": counts[gid],
+                        "sample_ids": list(by_pred_samples.get((pred_eid, gid), [])),
                         "is_major": gid in major_gold_ids,
                         "is_out_of_roster": gid.startswith("x"),
                     }
@@ -285,6 +314,8 @@ def compute_subset_metrics(
             overmerges.append(entry)
             if sum(1 for gid in distinct if gid in major_gold_ids) >= 2:
                 major_overmerges.append(entry)
+            if sum(1 for gid in distinct if gid in major_gold_ids and counts[gid] >= 2) >= 2:
+                major_pair_overmerges.append(entry)
             if any(gid in major_gold_ids for gid in distinct):
                 for gid in distinct:
                     if gid.startswith("x"):
@@ -296,7 +327,56 @@ def compute_subset_metrics(
                             "out_of_roster_gold_id": gid,
                             "out_of_roster_canonical": all_entity_defs.get(gid, {}).get("canonical", gid),
                             "count": c_x,
+                            "sample_ids": list(by_pred_samples.get((pred_eid, gid), [])),
                         })
+
+    # G5b：提及级跨主要实体误归率（该主要实体抽样提及被放入“多数金标准实体为另一主要实体”的预测组）
+    major_matched_items = [(g, pred, pred_eid) for (g, pred, pred_eid) in matched_items if g["gold_id"] in major_gold_ids]
+    major_matched_count = len(major_matched_items)
+    major_misassigned_details = []
+    for g, pred, pred_eid in major_matched_items:
+        dom_gid = infer_predicted_entity_gold_id(pred_eid, by_pred, pred_entity_by_id.get(pred_eid), alias_norm_to_unique_gid)
+        if dom_gid is not None and dom_gid in major_gold_ids and dom_gid != g["gold_id"]:
+            pent = pred_entity_by_id.get(pred_eid, {})
+            major_misassigned_details.append({
+                "sample_id": g["sample_id"],
+                "surface": g["surface"],
+                "start": g["start"],
+                "end": g["end"],
+                "chapter_index": g.get("chapter_index"),
+                "gold_id": g["gold_id"],
+                "gold_canonical": all_entity_defs.get(g["gold_id"], {}).get("canonical", g["gold_id"]),
+                "predicted_entity_id": pred_eid,
+                "predicted_entity_name": pent.get("name", ""),
+                "majority_gold_id": dom_gid,
+                "majority_gold_canonical": all_entity_defs.get(dom_gid, {}).get("canonical", dom_gid),
+            })
+
+    if major_matched_count == 0:
+        major_misassign_block = {
+            "status": "not_applicable",
+            "numerator": 0,
+            "denominator": 0,
+            "value": None,
+            "max_allowed_count": None,
+            "passed": None,
+            "sample_ids": [],
+            "details": [],
+        }
+    else:
+        max_allowed = max(1, int(0.03 * major_matched_count))
+        mis_cnt = len(major_misassigned_details)
+        mis_rate = round(mis_cnt / major_matched_count, 6)
+        major_misassign_block = {
+            "status": "ok",
+            "numerator": mis_cnt,
+            "denominator": major_matched_count,
+            "value": mis_rate,
+            "max_allowed_count": max_allowed,
+            "passed": mis_cnt <= max_allowed,
+            "sample_ids": [d["sample_id"] for d in major_misassigned_details],
+            "details": major_misassigned_details,
+        }
 
     return {
         "sample_total": len(gold_subset),
@@ -316,6 +396,8 @@ def compute_subset_metrics(
         "splits_per_entity": splits_per_entity,
         "overmerges": overmerges,
         "major_entity_overmerges": major_overmerges,
+        "major_entity_pair_overmerges": major_pair_overmerges,
+        "major_mention_misassign_rate": major_misassign_block,
         "out_of_roster_in_major_entity_count": oor_in_major_count,
         "out_of_roster_in_major_details": oor_in_major_details,
     }
@@ -596,6 +678,11 @@ def main() -> int:
         "hard_stratum_precision": report["primary_metrics"]["hard_stratum_precision"]["value"],
         "major_entity_coverage": report["primary_metrics"]["major_entity_coverage"]["value"],
         "major_entity_overmerges": len(report["primary_metrics"]["major_entity_overmerges"]),
+        "major_entity_pair_overmerges": len(report["primary_metrics"]["major_entity_pair_overmerges"]),
+        "major_mention_misassign_rate": report["primary_metrics"]["major_mention_misassign_rate"]["value"],
+        "major_mention_misassign_numerator": report["primary_metrics"]["major_mention_misassign_rate"]["numerator"],
+        "major_mention_misassign_denominator": report["primary_metrics"]["major_mention_misassign_rate"]["denominator"],
+        "major_mention_misassign_sample_ids": report["primary_metrics"]["major_mention_misassign_rate"]["sample_ids"],
         "out_of_roster_in_major": report["primary_metrics"]["out_of_roster_in_major_entity_count"],
         "not_entity_linked": report["primary_metrics"]["not_entity_linked_count"],
         "c3_rejected_name_mismatch": report["global_counts"]["c3_rejected_name_mismatch"],

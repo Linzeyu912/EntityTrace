@@ -93,6 +93,69 @@ class IdentityGoldEvaluationTests(unittest.TestCase):
         self.assertAlmostEqual(pm["major_entity_coverage"]["value"], 0.8, places=6)
         self.assertEqual(len(pm["overmerges"]), 1)
         self.assertEqual(len(pm["major_entity_overmerges"]), 1)
+        # G5a：e1 中含 g1(8处>=2) 与 g2(2处>=2)，触发实体级误合并 major_entity_pair_overmerges == 1
+        self.assertEqual(len(pm["major_entity_pair_overmerges"]), 1)
+        # G5b：共 20 处主要实体抽样提及，其中 g2 的 2 处（s_g2_0, s_g2_1）落入以 g1 为多数的 e1 -> 2/20 = 0.1
+        self.assertEqual(pm["major_mention_misassign_rate"]["numerator"], 2)
+        self.assertEqual(pm["major_mention_misassign_rate"]["denominator"], 20)
+        self.assertAlmostEqual(pm["major_mention_misassign_rate"]["value"], 0.1, places=6)
+        self.assertEqual(pm["major_mention_misassign_rate"]["sample_ids"], ["s_g2_0", "s_g2_1"])
+        self.assertFalse(pm["major_mention_misassign_rate"]["passed"])
+
+    def test_g5a_and_g5b_single_mention_noise_vs_entity_pair_overmerge(self):
+        roster = {
+            "book": "synthetic.txt",
+            "book_id": "synthetic",
+            "source_sha256": "abc",
+            "entities": [
+                {"gold_id": "g1", "kind": "person", "canonical": "Alice", "aliases": ["Alice"]},
+                {"gold_id": "g2", "kind": "person", "canonical": "Bob", "aliases": ["Bob"]},
+            ],
+        }
+        # g1 20 处全部在 e1；g2 20 处中仅 1 处（s_g2_0）误入 e1，其余 19 处在 e2
+        gold_mentions = []
+        pred_mentions = []
+        e1_mids, e2_mids = [], []
+        for i in range(20):
+            s = i * 10
+            sid = f"s_g1_{i}"
+            mid = f"m_g1_{i}"
+            gold_mentions.append({"sample_id": sid, "start": s, "end": s + 5, "surface": "Alice", "gold_id": "g1", "chapter_index": 1})
+            pred_mentions.append({"id": mid, "start": s, "end": s + 5, "text": "Alice"})
+            e1_mids.append(mid)
+        for i in range(20):
+            s = 300 + i * 10
+            sid = f"s_g2_{i}"
+            mid = f"m_g2_{i}"
+            gold_mentions.append({"sample_id": sid, "start": s, "end": s + 3, "surface": "Bob", "gold_id": "g2", "chapter_index": 1})
+            pred_mentions.append({"id": mid, "start": s, "end": s + 3, "text": "Bob"})
+            if i == 0:
+                e1_mids.append(mid)
+            else:
+                e2_mids.append(mid)
+
+        result_doc = {
+            "run_id": "r_g5",
+            "schema_version": 3,
+            "source": {"text_sha256": "abc"},
+            "mentions": pred_mentions,
+            "entities": [
+                {"id": "e1", "name": "Alice", "mention_ids": e1_mids},
+                {"id": "e2", "name": "Bob", "mention_ids": e2_mids},
+            ],
+        }
+        mentions_doc = {"mentions": gold_mentions, "major_entity_ids": ["g1", "g2"], "labeler": "test", "human_review": "pending"}
+        report = evaluate_result(result_doc, roster, mentions_doc)
+        pm = report["primary_metrics"]
+        # 旧字段仍记录 1 处，但 G5a 实体级误合并（各 >=2 处）为 0，G5b 提及级误归率为 1/40 = 0.025 <= 3% 通过
+        self.assertEqual(len(pm["major_entity_overmerges"]), 1)
+        self.assertEqual(len(pm["major_entity_pair_overmerges"]), 0)
+        self.assertEqual(pm["major_mention_misassign_rate"]["numerator"], 1)
+        self.assertEqual(pm["major_mention_misassign_rate"]["denominator"], 40)
+        self.assertAlmostEqual(pm["major_mention_misassign_rate"]["value"], 0.025, places=6)
+        self.assertEqual(pm["major_mention_misassign_rate"]["max_allowed_count"], 1)
+        self.assertTrue(pm["major_mention_misassign_rate"]["passed"])
+        self.assertEqual(pm["major_mention_misassign_rate"]["sample_ids"], ["s_g2_0"])
 
     def test_not_entity_linked_and_hard_stratum_and_out_of_roster(self):
         roster = {

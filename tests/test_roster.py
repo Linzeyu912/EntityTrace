@@ -201,7 +201,7 @@ class RosterAlgorithmTests(unittest.TestCase):
         })
 
         outcome = resolve_roster(self.store, models, source, run_id, concurrency=1, log=lambda _: None)
-        self.assertTrue(outcome["complete"])
+        self.assertTrue(outcome["complete"], outcome)
         out = self.store.records(run_id, "roster_output")[0]
         entities = out["entities"]
         # 林舟（2处）与阿舟（2处）归为同一实体（共4处提及），而三位“老夫人”各自独立，不因“老夫人”跨章合并
@@ -291,7 +291,7 @@ class RosterAlgorithmTests(unittest.TestCase):
         })
 
         outcome = resolve_roster(self.store, models, source, run_id, concurrency=1, log=lambda _: None)
-        self.assertTrue(outcome["complete"])
+        self.assertTrue(outcome["complete"], outcome)
         out = self.store.records(run_id, "roster_output")[0]
         # 李老夫人与张老夫人被拆开，苏沛之与沛之兄因 insufficient_evidence 不合并且生成待审
         self.assertEqual(len(out["entities"]), 4)
@@ -513,7 +513,7 @@ class RosterAlgorithmTests(unittest.TestCase):
         })
 
         outcome = resolve_roster(self.store, models, source, run_id, concurrency=1, log=lambda _: None)
-        self.assertTrue(outcome["complete"])
+        self.assertTrue(outcome["complete"], outcome)
         out = self.store.records(run_id, "roster_output")[0]
         wan = next(e for e in out["entities"] if "林婉" in e["names"])
         self.assertEqual(wan["mention_count"], 3)
@@ -632,7 +632,7 @@ class RosterAlgorithmTests(unittest.TestCase):
         })
 
         outcome = resolve_roster(self.store, models, source, run_id, concurrency=1, log=lambda _: None)
-        self.assertTrue(outcome["complete"])
+        self.assertTrue(outcome["complete"], outcome)
         self.assertEqual(c3_called["count"], 0)
         out = self.store.records(run_id, "roster_output")[0]
         shen = next(e for e in out["entities"] if "沈知远" in e["names"])
@@ -824,6 +824,155 @@ class RosterAlgorithmTests(unittest.TestCase):
         self.assertIn("云州县", by_local["e_place"]["proper_surfaces"])
         self.assertEqual(by_local["e_magistrate"]["proper_surfaces"], [])
         self.assertTrue(by_local["e_magistrate"]["only_non_proper"])
+
+    def test_a1_explicit_mention_assignment_beats_c2_0_separation_and_split_preserves_c1_kind(self):
+        # 合成文本（不取自 4 本测试书）：
+        # 1) 第一章“严知县”与“青州县”（地点）分属不同对象（产生 c_sep[("严知县", "青州县")] >= 1）；
+        #    第二章同一片段既有地点“青州县”，又有借代主官的“青州县”（C1 通过 assignments 按 mention_id 显式指派给 e1“严知县”），
+        #    验证 A1：C2.0 不会将该显式指派提及从 e1 剥离，最终该处借代提及留在“严知县”名册组内（chapter_local）。
+        # 2) 同时在第二章 e1 中放入一个发现阶段 provisional_kinds 误标为 "place" 的 description 称呼“那位县尊”，
+        #    验证 _split_mentions_to_new_local_obj 拆分出该 description 对象时保留 C1 的 kind="person"，不被 provisional_kinds("place") 覆写。
+        text = (
+            "第一章\n严知县抵达青州县履新。\n"
+            "第二章\n公文送至青州县。督宪传见严知县，只请青州县入内，那位县尊当即起身。\n"
+        )
+        path = self.root / "a1.txt"
+        path.write_bytes(text.encode("utf-8"))
+        source = import_text(self.store, path)
+        idx1, idx2 = text.index("第一章"), text.index("第二章")
+        _, chapters = build_chapters(
+            source,
+            [
+                {"start": idx1, "end": idx1 + 3, "title": "第一章", "kind": "chapter"},
+                {"start": idx2, "end": idx2 + 3, "title": "第二章", "kind": "chapter"},
+            ],
+        )
+        tasks = plan_tasks(source, chapters, 9000)
+        u1, u2 = tasks[0]["units"][0]["id"], tasks[1]["units"][0]["id"]
+        source, run_id, tasks = self._prepare_two_chapter_run(
+            text,
+            {
+                "mentions": [
+                    {"text": "严知县", "kind": "person", "refs": [u1]},
+                    {"text": "青州县", "kind": "place", "refs": [u1]},
+                ],
+                "links": [],
+            },
+            {
+                "mentions": [
+                    {"text": "青州县", "kind": "place", "refs": [u2]},
+                    {"text": "严知县", "kind": "person", "refs": [u2]},
+                    # 故意将发现阶段 provisional_kinds 标为 place，验证拆分时不覆写 C1 的 person
+                    {"text": "那位县尊", "kind": "place", "refs": [u2]},
+                ],
+                "links": [],
+            },
+        )
+
+        def handle_c1(state, n):
+            uid = state["units"][0]["id"]
+            if state["chapter_title"] == "第一章":
+                return {
+                    "entities": [
+                        {
+                            "local_id": "e1",
+                            "name": "严知县",
+                            "kind": "person",
+                            "surfaces": [{"surface": "严知县", "surface_type": "proper_name"}],
+                            "evidence_ref": uid,
+                        },
+                        {
+                            "local_id": "e2",
+                            "name": "青州县",
+                            "kind": "place",
+                            "surfaces": [{"surface": "青州县", "surface_type": "proper_name"}],
+                            "evidence_ref": uid,
+                        },
+                    ],
+                    "assignments": [],
+                    "not_entity": [],
+                }, f"c1_a1_{n}"
+
+            qing_mentions = next(r["mentions"] for r in state["surfaces"] if r["surface"] == "青州县")
+            self.assertEqual(len(qing_mentions), 2)
+            return {
+                "entities": [
+                    {
+                        "local_id": "e1",
+                        "name": "严知县",
+                        "kind": "person",
+                        "surfaces": [
+                            {"surface": "严知县", "surface_type": "proper_name"},
+                            {"surface": "那位县尊", "surface_type": "description"},
+                        ],
+                        "evidence_ref": uid,
+                    },
+                    {
+                        "local_id": "e2",
+                        "name": "青州县",
+                        "kind": "place",
+                        "surfaces": [{"surface": "青州县", "surface_type": "proper_name"}],
+                        "evidence_ref": uid,
+                    },
+                ],
+                "assignments": [
+                    {"mention_id": qing_mentions[0]["mention_id"], "surface": "青州县", "ref": uid, "local_id": "e2", "reason": "公文送至青州县指地点"},
+                    {"mention_id": qing_mentions[1]["mention_id"], "surface": "青州县", "ref": uid, "local_id": "e1", "reason": "请青州县入内借指严知县"},
+                ],
+                "not_entity": [],
+            }, f"c1_a1_{n}"
+
+        c3_seen_candidates = {}
+
+        def handle_c3(state, n):
+            # 被 _split_mentions_to_new_local_obj 拆出的 description 对象“那位县尊”因保留了 kind="person"，
+            # 召回的候选应当是 person（严知县），而非 place（青州县）
+            for it in state["items"]:
+                c3_seen_candidates[it["surface"]] = [
+                    next(c["kind"] for c in state["candidates"] if c["entity_id"] == cid)
+                    for cid in it["candidate_entity_ids"]
+                ]
+            yan_id = next(c["entity_id"] for c in state["candidates"] if c["name"] == "严知县")
+            return {
+                "links": [
+                    {"mention_id": it["mention_id"], "selected_entity_id": yan_id, "reason": "指代严知县"}
+                    for it in state["items"]
+                ]
+            }, f"c3_a1_{n}"
+
+        models = ScriptedRosterModels({
+            "roster-c1": handle_c1,
+            "roster-c2-review": lambda state, n: (
+                {
+                    "groups": [
+                        {
+                            "group_id": "g1",
+                            "name": state["rows"][0]["name"],
+                            "kind": state["rows"][0]["kind"],
+                            "row_ids": [r["row_id"] for r in state["rows"]],
+                            "reason": "同指青州县地点",
+                        }
+                    ],
+                    "unresolved_row_ids": [],
+                },
+                f"rev_a1_{n}",
+            ),
+            "roster-c2-propose": lambda state, n: ({"proposals": []}, f"prop_a1_{n}"),
+            "roster-c3-link": handle_c3,
+        })
+
+        outcome = resolve_roster(self.store, models, source, run_id, concurrency=1, log=lambda _: None)
+        self.assertTrue(outcome["complete"], outcome)
+        out = self.store.records(run_id, "roster_output")[0]
+        yan_ent = next(e for e in out["entities"] if e["name"] == "严知县")
+        qing_ent = next(e for e in out["entities"] if e["name"] == "青州县")
+        # 严知县：第一章1处 + 第二章“严知县”1处 + 第二章借代“青州县”1处（未被 C2.0 剥离） + “那位县尊”1处 = 4处
+        self.assertEqual(yan_ent["kind"], "person")
+        self.assertEqual(yan_ent["mention_count"], 4)
+        self.assertEqual(qing_ent["kind"], "place")
+        self.assertEqual(qing_ent["mention_count"], 2)
+        # 验证“那位县尊”被拆分后保持 person 粗类，仅召回 person 候选
+        self.assertEqual(c3_seen_candidates.get("那位县尊"), ["person"])
 
     def test_roster_module_does_not_import_gold(self):
         source = (ROOT / "entitytrace/roster.py").read_text(encoding="utf-8")

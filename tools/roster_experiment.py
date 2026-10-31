@@ -13,13 +13,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from entitytrace.chapters import detect_chapters
 from entitytrace.config import load_services
-from entitytrace.discovery import plan_tasks
+from entitytrace.discovery import discover, plan_tasks
 from entitytrace.models import Models
 from entitytrace.pipeline import metrics
 from entitytrace.roster import DIRECT_VERSION, VERSION, resolve_roster, resolve_surface_direct
 from entitytrace.storage import Store
-from entitytrace.text import validate_span
+from entitytrace.text import import_text, validate_span
 from entitytrace.util import digest, dumps, implementation_hash, utc_now, write_bytes, write_json
 from tools.bounded_identity_run import RequestBudget
 from tools.identity_calibration import ExperimentBudget
@@ -138,6 +139,9 @@ def export_experiment(
     budget: RequestBudget,
     invocation_id: str,
     error_msg: str | None,
+    chapters_seconds: float = 0.0,
+    discovery_seconds: float = 0.0,
+    full_cold_pipeline: bool = False,
 ) -> dict:
     source = src_bundle["source"]
     text, metadata = source["text"], source["metadata"]
@@ -221,11 +225,11 @@ def export_experiment(
     inv_record = {
         "id": invocation_id,
         "started": utc_now(),
-        "seconds": round(identity_seconds, 4),
+        "seconds": round(chapters_seconds + discovery_seconds + identity_seconds, 4),
         "wall_seconds": round(wall_seconds, 4),
         "stages": {
-            "chapters": {"seconds": 0.0, "resumed": True},
-            "discovery": {"seconds": 0.0, "resumed": True},
+            "chapters": {"seconds": round(chapters_seconds, 4), "resumed": not full_cold_pipeline},
+            "discovery": {"seconds": round(discovery_seconds, 4), "resumed": not full_cold_pipeline},
             "identity": {"seconds": round(identity_seconds, 4), "resumed": False, "complete": complete},
         },
         "model_metrics": metrics(store, exp_run_id, invocation_id),
@@ -281,31 +285,120 @@ def export_experiment(
 
 def run_experiment(args: argparse.Namespace) -> int:
     wall_begin = time.perf_counter()
-    src_bundle = read_source_run(args.source_db, args.source_run)
     services = load_services(args.config)
-
-    exp_config = {
-        "implementation": implementation_hash(),
-        "arm": args.arm,
-        "identity_algorithm": DIRECT_VERSION if args.arm == "B" else VERSION,
-        "source_run_id": args.source_run,
-        "task_chars": src_bundle["task_chars"],
-        "discovery_concurrency": args.concurrency,
-        "models": {k: v.public() for k, v in services.items()} if args.arm == "C" else {},
-        "budget": {"max_requests": args.max_requests, "max_seconds": args.max_seconds},
-    }
-    exp_run_id = digest(["roster-exp-v1", src_bundle["source"]["id"], args.source_run, args.arm])
-
     store = Store(args.db)
     budget = RequestBudget(args.max_requests, args.max_seconds)
     invocation_id = uuid.uuid4().hex
     error_msg = None
     complete = False
     roster_out = None
-    id_begin = time.perf_counter()
+    src_bundle = None
+    chapters_seconds = 0.0
+    discovery_seconds = 0.0
+    id_seconds = 0.0
+    full_cold_pipeline = args.source_file is not None
 
     try:
-        seed_experiment_store(store, src_bundle, exp_run_id, exp_config)
+        if args.source_file is not None:
+            source = import_text(store, args.source_file)
+            exp_config = {
+                "implementation": implementation_hash(),
+                "arm": args.arm,
+                "identity_algorithm": DIRECT_VERSION if args.arm == "B" else VERSION,
+                "source_run_id": None,
+                "task_chars": args.task_chars,
+                "discovery_concurrency": args.concurrency,
+                "models": {k: v.public() for k, v in services.items()},
+                "budget": {"max_requests": args.max_requests, "max_seconds": args.max_seconds},
+                "mode": "cold_full_pipeline",
+            }
+            exp_run_id = digest(["roster-full-v1", source["id"], args.arm])
+            started = utc_now()
+            store.execute(
+                "INSERT OR IGNORE INTO runs VALUES(?,?,?,?,?,?)",
+                (exp_run_id, source["id"], dumps(exp_config), "{}", started, started),
+            )
+            models = Models(
+                store,
+                exp_run_id,
+                invocation_id,
+                services,
+                discovery_concurrency=args.concurrency,
+                decision_concurrency=3,
+                opener=budget,
+            )
+            log_fn = lambda msg: print(msg, flush=True)
+            state = store.run(exp_run_id)["state"]
+            if not state.get("chapters", {}).get("complete", False) and not store.records(exp_run_id, "chapter"):
+                ch_t0 = time.perf_counter()
+                ch_out = detect_chapters(store, models, source, exp_run_id, log_fn)
+                ch_out.pop("chapters", None)
+                chapters_seconds = time.perf_counter() - ch_t0
+                store.state(exp_run_id, chapters=ch_out)
+                if not store.records(exp_run_id, "chapter") or ch_out.get("scanned_code_points") != len(source["text"]):
+                    raise RuntimeError("章节阶段未完成")
+            if not state.get("discovery", {}).get("complete", False):
+                disc_t0 = time.perf_counter()
+                disc_out = discover(
+                    store,
+                    models,
+                    source,
+                    exp_run_id,
+                    store.records(exp_run_id, "chapter"),
+                    args.task_chars,
+                    args.concurrency,
+                    log_fn,
+                )
+                discovery_seconds = time.perf_counter() - disc_t0
+                store.state(exp_run_id, discovery=disc_out)
+                if not disc_out.get("complete"):
+                    raise RuntimeError("发现阶段未完成")
+            src_bundle = {
+                "source": source,
+                "source_run_id": exp_run_id,
+                "source_config": exp_config,
+                "source_state": store.run(exp_run_id)["state"],
+                "task_chars": args.task_chars,
+                "chapters": store.records(exp_run_id, "chapter"),
+                "mentions": store.records(exp_run_id, "mention"),
+                "observations": store.records(exp_run_id, "observation"),
+                "links": store.records(exp_run_id, "link"),
+                "reviews": store.records(exp_run_id, "review"),
+            }
+        else:
+            src_bundle = read_source_run(args.source_db, args.source_run)
+            exp_config = {
+                "implementation": implementation_hash(),
+                "arm": args.arm,
+                "identity_algorithm": DIRECT_VERSION if args.arm == "B" else VERSION,
+                "source_run_id": args.source_run,
+                "task_chars": src_bundle["task_chars"],
+                "discovery_concurrency": args.concurrency,
+                "models": {k: v.public() for k, v in services.items()} if args.arm == "C" else {},
+                "budget": {"max_requests": args.max_requests, "max_seconds": args.max_seconds},
+                "mode": "recompute_from_cache" if args.recompute_from_cache else "experiment",
+            }
+            exp_run_id = digest(["roster-exp-v1", src_bundle["source"]["id"], args.source_run, args.arm])
+            seed_experiment_store(store, src_bundle, exp_run_id, exp_config)
+            if args.recompute_from_cache:
+                with store.lock, store.db:
+                    store.db.execute("DELETE FROM tasks WHERE run_id=? AND stage LIKE 'roster%'", (exp_run_id,))
+                    store.db.execute("DELETE FROM calls WHERE run_id=?", (exp_run_id,))
+                    store.db.execute(
+                        "DELETE FROM records WHERE run_id=? AND kind IN ('roster_output', 'invocation')",
+                        (exp_run_id,),
+                    )
+            models = Models(
+                store,
+                exp_run_id,
+                invocation_id,
+                services,
+                discovery_concurrency=args.concurrency,
+                decision_concurrency=3,
+                opener=budget,
+            )
+
+        id_begin = time.perf_counter()
         if args.arm == "B":
             roster_out = resolve_surface_direct(
                 src_bundle["source"],
@@ -316,15 +409,6 @@ def run_experiment(args: argparse.Namespace) -> int:
             )
             complete = True
         else:
-            models = Models(
-                store,
-                exp_run_id,
-                invocation_id,
-                services,
-                discovery_concurrency=args.concurrency,
-                decision_concurrency=3,
-                opener=budget,
-            )
             outcome = resolve_roster(
                 store,
                 models,
@@ -340,14 +424,15 @@ def run_experiment(args: argparse.Namespace) -> int:
                 roster_out = saved[0]
             else:
                 error_msg = f"阶段 {outcome.get('stage')} 未完成，失败数：{len(outcome.get('failures', []))}"
+        id_seconds = time.perf_counter() - id_begin
     except (ExperimentBudget, Exception) as exc:
         error_msg = str(exc)
         complete = False
-    finally:
-        id_seconds = time.perf_counter() - id_begin
+        if "id_begin" in locals() and id_seconds == 0.0:
+            id_seconds = time.perf_counter() - id_begin
 
     try:
-        if roster_out is None:
+        if roster_out is None and "src_bundle" in locals():
             # 未完成时按已完成部分或暂定单项导出 incomplete 快照，保留断点
             fallback = resolve_surface_direct(
                 src_bundle["source"],
@@ -371,6 +456,9 @@ def run_experiment(args: argparse.Namespace) -> int:
             budget,
             invocation_id,
             error_msg,
+            chapters_seconds=chapters_seconds,
+            discovery_seconds=discovery_seconds,
+            full_cold_pipeline=full_cold_pipeline,
         )
     finally:
         store.close()
@@ -384,7 +472,10 @@ def run_experiment(args: argparse.Namespace) -> int:
                 "entities": manifest["counts"]["entities"],
                 "identity_review_items": manifest["counts"]["identity_review_items"],
                 "total_review_items": manifest["counts"]["review_items"],
+                "chapters_seconds": round(chapters_seconds, 4),
+                "discovery_seconds": round(discovery_seconds, 4),
                 "identity_seconds": manifest["identity_seconds"],
+                "wall_seconds": round(wall_seconds, 4),
                 "network_attempts": manifest["total_model_metrics"]["network_attempts"],
                 "cache_hits": manifest["total_model_metrics"]["cache_hits"],
                 "budget_stop_reason": budget.stop_reason,
@@ -400,7 +491,10 @@ def run_experiment(args: argparse.Namespace) -> int:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source-db", type=Path, default=ROOT / "data/entitytrace.sqlite3")
-    parser.add_argument("--source-run", type=str, required=True)
+    parser.add_argument("--source-run", type=str, default=None)
+    parser.add_argument("--source-file", type=Path, default=None)
+    parser.add_argument("--task-chars", type=int, default=9000)
+    parser.add_argument("--recompute-from-cache", action="store_true")
     parser.add_argument("--arm", choices=["B", "C"], required=True)
     parser.add_argument("--db", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
@@ -409,6 +503,8 @@ def main() -> int:
     parser.add_argument("--max-requests", type=int, default=1000)
     parser.add_argument("--max-seconds", type=float, default=2400)
     args = parser.parse_args()
+    if not args.source_run and not args.source_file:
+        parser.error("必须提供 --source-run 或 --source-file")
     return run_experiment(args)
 
 

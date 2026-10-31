@@ -456,11 +456,12 @@ def apply_c1_task_result(
         if isinstance(mid_raw, str) and mid_raw in mention_by_key:
             m_target = mention_by_key[mid_raw]
             if not (isinstance(surf, str) and surf.strip() and normalize_surface(surf) != normalize_surface(m_target["text"])):
-                assign_by_mid[m_target["id"]] = {
-                    "local_id": lid,
-                    "reason": str(item.get("reason", "")),
-                    "kind": item.get("kind") if item.get("kind") in KINDS else None,
-                }
+                if m_target["id"] not in assign_by_mid:
+                    assign_by_mid[m_target["id"]] = {
+                        "local_id": lid,
+                        "reason": str(item.get("reason", "")),
+                        "kind": item.get("kind") if item.get("kind") in KINDS else None,
+                    }
                 assigned_surfaces.add(m_target["text"])
                 continue
         if not isinstance(surf, str) or surf not in allowed_surfaces:
@@ -577,6 +578,19 @@ def apply_c1_task_result(
                 only_lid = next(iter(real_lids_used))
                 if surf not in local_entities[only_lid]["surfaces"]:
                     weak_norms_in_task.add(normalize_surface(surf))
+            is_exception_assign = (
+                len(real_lids_used) > 1
+                or has_unresolved
+                or (len(real_lids_used) == 1 and surf not in local_entities[next(iter(real_lids_used))]["surfaces"])
+                or (
+                    len(real_lids_used) == 1
+                    and local_entities[next(iter(real_lids_used))]["surface_types"].get(surf) != "proper_name"
+                )
+            )
+            if is_exception_assign:
+                for m in ms:
+                    if m["id"] in assign_by_mid and mention_outcomes.get(m["id"], {}).get("status") == "assigned":
+                        mention_outcomes[m["id"]]["assigned_by_mention_id"] = True
             continue
 
         # 缺失称呼或多重强归属冲突：按“自成对象”修补并生成待审
@@ -624,6 +638,8 @@ def apply_c1_task_result(
     place_org_surfs: set[str] = set()
     person_surfs: set[str] = set()
     for ent in local_entities.values():
+        if ent["kind"] in {"place", "organization"}:
+            place_org_surfs.update(set(ent["surfaces"]) | {ent["name"]})
         if not ent["mention_ids"]:
             continue
         actual_surfs = {mention_by_key[mid]["text"] for mid in ent["mention_ids"] if mid in mention_by_key}
@@ -676,7 +692,9 @@ def apply_c1_task_result(
                 ent["proper_surfaces"] = [ent["name"]]
         ent["only_non_proper"] = bool(ent["surfaces"]) and not bool(ent["proper_surfaces"])
 
-    # 过滤没有实际关联任何提及的空章内对象
+    # 过滤没有实际关联任何提及的空章内对象，并按原文出现顺序排列 mention_ids
+    for ent in local_entities.values():
+        ent["mention_ids"].sort(key=lambda mid: (mention_by_key[mid]["start"], mention_by_key[mid]["end"], mid))
     active_entities = [ent for ent in local_entities.values() if ent["mention_ids"]]
     declared_proper_norms = sorted({
         normalize_surface(s)
@@ -981,11 +999,8 @@ def resolve_roster(
         first_m = by_mid[split_mids[0]]
         surf_cnt = collections.Counter(by_mid[mid]["text"] for mid in split_mids)
         chosen_name = _choose_display_name(surf_cnt)
-        if forced_kind:
-            k_val = forced_kind
-        else:
-            kc = collections.Counter(k for mid in split_mids for k in by_mid[mid].get("provisional_kinds", []))
-            k_val = _choose_majority_kind(kc) if kc else p_obj["kind"]
+        # A1 / D2.3：任何拆分不得用发现阶段 provisional_kinds 覆写 C1 给出的 kind
+        k_val = forced_kind if forced_kind else p_obj["kind"]
         psurfs = [s for s in split_surfs if split_stypes.get(s) == "proper_name"]
         local_objects[new_key] = {
             "task_id": p_obj["task_id"],
@@ -1029,6 +1044,7 @@ def resolve_roster(
         ns_main = normalize_surface(main_surf)
 
         detached_surfs: set[str] = set()
+        detached_mids: set[str] = set()
         newly_created_keys: list[tuple[str, str]] = []
         for s, s_mids in sorted(by_s.items()):
             if s == main_surf:
@@ -1054,19 +1070,29 @@ def resolve_roster(
             # 1) 关系/描述短语（description）从专名对象中剥离，交由 C3 按上下文候选链接（title_or_kinship 按 R2.2 在本任务内跟随所属对象链接）
             if prop_candidates and stype == "description":
                 detached_surfs.add(s)
+                detached_mids.update(s_mids)
                 nk = _split_mentions_to_new_local_obj(key, s_mids, [s], {s: stype}, forbid_merge_with_parent=False)
                 newly_created_keys.append(nk)
                 continue
 
             # 2) 跨任务分离保护：在全书其他任务中稳定分离（sep >= 2 且 sep >= 2*tog），或仅单次同组但有分离记录且无词干重叠
+            # A1：C1 通过 assignments 按 mention_id 显式指派的提及优先于 C2.0 跨任务确定性分离（c_sep 路径），不得被剥离
             if (sep >= 2 and sep >= 2 * tog) or (tog <= 1 and sep >= 1 and not shares_token):
-                detached_surfs.add(s)
-                nk = _split_mentions_to_new_local_obj(key, s_mids, [s], {s: stype}, forbid_merge_with_parent=True)
+                splittable_mids = [
+                    mid for mid in s_mids
+                    if not mention_c1.get(mid, {}).get("assigned_by_mention_id")
+                ]
+                if not splittable_mids:
+                    continue
+                if len(splittable_mids) == len(s_mids):
+                    detached_surfs.add(s)
+                detached_mids.update(splittable_mids)
+                nk = _split_mentions_to_new_local_obj(key, splittable_mids, [s], {s: stype}, forbid_merge_with_parent=True)
                 newly_created_keys.append(nk)
                 continue
 
-        if detached_surfs:
-            kept_mids = [mid for mid in mids if by_mid[mid]["text"] not in detached_surfs]
+        if detached_mids:
+            kept_mids = [mid for mid in mids if mid not in detached_mids]
             kept_surfs = [s for s in obj["surfaces"] if s not in detached_surfs]
             kept_stypes = {s: stypes[s] for s in kept_surfs if s in stypes}
             kept_psurfs = [s for s in kept_surfs if kept_stypes.get(s, "proper_name") == "proper_name"]
@@ -1711,11 +1737,6 @@ def resolve_roster(
         res = c1_results.get(dtask["id"])
         if res:
             c1_proper_norms_by_task[dtask["id"]].update(res.get("declared_proper_norms", []))
-    for (t_id, _), obj in local_objects.items():
-        for ps in obj.get("proper_surfaces", []):
-            pns = normalize_surface(ps)
-            if pns:
-                c1_proper_norms_by_task[t_id].add(pns)
 
     def _index_roster_entry(e: dict) -> None:
         roster_by_id[e["id"]] = e
@@ -1829,7 +1850,8 @@ def resolve_roster(
         if cands:
             item_id = f"obj:{k[0]}:{k[1]}"
             non_proper_cand_map[item_id] = cands
-            first_m = by_mid[obj["mention_ids"][0]]
+            name_mids = [mid for mid in obj["mention_ids"] if by_mid[mid]["text"] == obj["name"]]
+            first_m = by_mid[name_mids[0] if name_mids else obj["mention_ids"][0]]
             c3_by_task[obj["task_id"]].append({
                 "item_id": item_id,
                 "is_object": True,
