@@ -519,6 +519,312 @@ class RosterAlgorithmTests(unittest.TestCase):
         self.assertEqual(wan["mention_count"], 3)
         self.assertEqual(wan["link_methods"].get("c3_model"), 1)
 
+    def test_d1_c3_proper_name_consistency_and_post_model_rejection(self):
+        # 合成文本（不取自 4 本测试书）：测试 D1 含专名对象在 C3 的专名一致性硬约束（D1.1 无同名候选不调 C3、D1.2 模型越界返回异名被拦截为 c3_rejected_name_mismatch）及纯非专名对象保持不变
+        text = (
+            "第一章\n周牧野与沈知远在驿站饮茶，众人尊称周牧野为督办大人。\n"
+            "第二章\n韩子敬单独拜访督办大人，沈知远也在场。\n"
+        )
+        path = self.root / "d1.txt"
+        path.write_bytes(text.encode("utf-8"))
+        source = import_text(self.store, path)
+        idx1, idx2 = text.index("第一章"), text.index("第二章")
+        _, chapters = build_chapters(
+            source,
+            [
+                {"start": idx1, "end": idx1 + 3, "title": "第一章", "kind": "chapter"},
+                {"start": idx2, "end": idx2 + 3, "title": "第二章", "kind": "chapter"},
+            ],
+        )
+        tasks = plan_tasks(source, chapters, 9000)
+        u1, u2 = tasks[0]["units"][0]["id"], tasks[1]["units"][0]["id"]
+        source, run_id, tasks = self._prepare_two_chapter_run(
+            text,
+            {
+                "mentions": [
+                    {"text": "周牧野", "kind": "person", "refs": [u1]},
+                    {"text": "沈知远", "kind": "person", "refs": [u1]},
+                    {"text": "督办大人", "kind": "person", "refs": [u1]},
+                ],
+                "links": [],
+            },
+            {
+                "mentions": [
+                    {"text": "韩子敬", "kind": "person", "refs": [u2]},
+                    {"text": "督办大人", "kind": "person", "refs": [u2]},
+                    {"text": "沈知远", "kind": "person", "refs": [u2]},
+                ],
+                "links": [],
+            },
+        )
+
+        # 场景 A（D1.1）：第二章中“韩子敬”被 C1 标为 proper_name 但误挂入非专名对象 e2，由于名册中无“韩子敬”条目，
+        # e2 的候选池被 D1.1 过滤为空，不调用 C3 模型，直接留为未决/单列，绝不误链到同章的“沈知远”
+        def handle_c1_no_cand(state, n):
+            uid = state["units"][0]["id"]
+            if state["chapter_title"] == "第一章":
+                return {
+                    "entities": [
+                        {
+                            "local_id": "e1",
+                            "name": "周牧野",
+                            "kind": "person",
+                            "surfaces": [
+                                {"surface": "周牧野", "surface_type": "proper_name"},
+                                {"surface": "督办大人", "surface_type": "title_or_kinship"},
+                            ],
+                            "evidence_ref": uid,
+                        },
+                        {
+                            "local_id": "e2",
+                            "name": "沈知远",
+                            "kind": "person",
+                            "surfaces": [{"surface": "沈知远", "surface_type": "proper_name"}],
+                            "evidence_ref": uid,
+                        },
+                    ],
+                    "assignments": [],
+                    "not_entity": [],
+                }, f"c1_{n}"
+            m_han = next(r["mentions"][0]["mention_id"] for r in state["surfaces"] if r["surface"] == "韩子敬")
+            m_duban = next(r["mentions"][0]["mention_id"] for r in state["surfaces"] if r["surface"] == "督办大人")
+            return {
+                "entities": [
+                    {
+                        "local_id": "e1",
+                        "name": "韩子敬",
+                        "kind": "person",
+                        "surfaces": [{"surface": "韩子敬", "surface_type": "proper_name"}],
+                        "evidence_ref": uid,
+                    },
+                    {
+                        "local_id": "e2",
+                        "name": "督办大人",
+                        "kind": "person",
+                        "surfaces": [{"surface": "督办大人", "surface_type": "title_or_kinship"}],
+                        "evidence_ref": uid,
+                    },
+                    {
+                        "local_id": "e3",
+                        "name": "沈知远",
+                        "kind": "person",
+                        "surfaces": [{"surface": "沈知远", "surface_type": "proper_name"}],
+                        "evidence_ref": uid,
+                    },
+                ],
+                "assignments": [
+                    {"mention_id": m_han, "surface": "韩子敬", "ref": uid, "local_id": "e2", "reason": "误挂到非专名对象"},
+                    {"mention_id": m_duban, "surface": "督办大人", "ref": uid, "local_id": "e2", "reason": "称呼督办"},
+                ],
+                "not_entity": [],
+            }, f"c1_{n}"
+
+        c3_called = {"count": 0}
+
+        def handle_c3_should_not_be_called(state, n):
+            c3_called["count"] += 1
+            return {"links": []}, f"c3_{n}"
+
+        models = ScriptedRosterModels({
+            "roster-c1": handle_c1_no_cand,
+            "roster-c2-propose": lambda state, n: ({"proposals": []}, f"prop_{n}"),
+            "roster-c3-link": handle_c3_should_not_be_called,
+        })
+
+        outcome = resolve_roster(self.store, models, source, run_id, concurrency=1, log=lambda _: None)
+        self.assertTrue(outcome["complete"])
+        self.assertEqual(c3_called["count"], 0)
+        out = self.store.records(run_id, "roster_output")[0]
+        shen = next(e for e in out["entities"] if "沈知远" in e["names"])
+        self.assertNotIn("韩子敬", shen["names"])
+        self.assertEqual(shen["mention_count"], 2)
+
+        # 场景 B（D1.2 + 纯非专名对象不变）：当含专名未决项在名册中有同名候选从而进入 C3，但 C3 模型故意返回同任务另一异名候选时，
+        # 后验校验将其作废并记录 link_method="c3_rejected_name_mismatch"，而纯非专名对象“督办大人”仍正常 c3_model 链接
+        self.store.db.execute("DELETE FROM tasks WHERE run_id=? AND stage LIKE 'roster%'", (run_id,))
+        self.store.db.execute("DELETE FROM records WHERE run_id=? AND kind='roster_output'", (run_id,))
+        self.store.db.commit()
+
+        def handle_c1_for_post_check(state, n):
+            uid = state["units"][0]["id"]
+            if state["chapter_title"] == "第一章":
+                return {
+                    "entities": [
+                        {
+                            "local_id": "e1",
+                            "name": "周牧野",
+                            "kind": "person",
+                            "surfaces": [{"surface": "周牧野", "surface_type": "proper_name"}],
+                            "evidence_ref": uid,
+                        },
+                        {
+                            "local_id": "e2",
+                            "name": "沈知远",
+                            "kind": "person",
+                            "surfaces": [{"surface": "沈知远", "surface_type": "proper_name"}],
+                            "evidence_ref": uid,
+                        },
+                        {
+                            "local_id": "e3",
+                            "name": "督办大人",
+                            "kind": "person",
+                            "surfaces": [{"surface": "督办大人", "surface_type": "title_or_kinship"}],
+                            "evidence_ref": uid,
+                        },
+                    ],
+                    "assignments": [],
+                    "not_entity": [],
+                }, f"c1_b_{n}"
+            # 第二章：让“沈知远”作为未归属残余提及进入 C3（通过 assignments local_id=None），同时让“督办大人”作为纯非专名对象进入 C3
+            m_shen = next(r["mentions"][0]["mention_id"] for r in state["surfaces"] if r["surface"] == "沈知远")
+            return {
+                "entities": [
+                    {
+                        "local_id": "e1",
+                        "name": "韩子敬",
+                        "kind": "person",
+                        "surfaces": [{"surface": "韩子敬", "surface_type": "proper_name"}],
+                        "evidence_ref": uid,
+                    },
+                    {
+                        "local_id": "e2",
+                        "name": "督办大人",
+                        "kind": "person",
+                        "surfaces": [{"surface": "督办大人", "surface_type": "title_or_kinship"}],
+                        "evidence_ref": uid,
+                    },
+                ],
+                "assignments": [
+                    {"mention_id": m_shen, "surface": "沈知远", "ref": uid, "local_id": None, "reason": "模拟未决专名提及"},
+                ],
+                "not_entity": [],
+            }, f"c1_b_{n}"
+
+        def handle_c3_hijack(state, n):
+            # 将所有进入 C3 的项都故意链向异名条目“韩子敬”（若有）或第一个非沈知远条目
+            wrong_id = next(
+                c["entity_id"] for c in state["candidates"] if c["name"] != "沈知远"
+            )
+            return {
+                "links": [
+                    {"mention_id": it["mention_id"], "selected_entity_id": wrong_id, "reason": "故意返回异名候选测试后验拦截"}
+                    for it in state["items"]
+                ]
+            }, f"c3_b_{n}"
+
+        models2 = ScriptedRosterModels({
+            "roster-c1": handle_c1_for_post_check,
+            "roster-c2-propose": lambda state, n: ({"proposals": []}, f"prop_b_{n}"),
+            "roster-c3-link": handle_c3_hijack,
+        })
+        outcome2 = resolve_roster(self.store, models2, source, run_id, concurrency=1, log=lambda _: None)
+        self.assertTrue(outcome2["complete"])
+        out2 = self.store.records(run_id, "roster_output")[0]
+        self.assertGreaterEqual(out2["roster_summary"].get("c3_rejected_name_mismatch", 0), 1)
+        rejected_ents = [
+            e for e in out2["entities"] if e.get("link_methods", {}).get("c3_rejected_name_mismatch", 0) > 0
+        ]
+        self.assertTrue(rejected_ents)
+        # 同时验证场景 B 中纯非专名对象“督办大人”正常通过 c3_model 链接
+        han_b = next(e for e in out2["entities"] if "韩子敬" in e["names"])
+        self.assertGreaterEqual(han_b["link_methods"].get("c3_model", 0), 1)
+
+    def test_d2_metonymy_place_and_person_assignments_and_mention_surface_validation(self):
+        # 合成文本（不取自 4 本测试书）：同一任务内“云州县”既指辖区又借代该县知县，且验证 assignments 中 mention_id 与 surface 不一致时不污染专名提及
+        text = "第一章\n钦使到了云州县。总督只请臬司与云州县进内室议事，赵迁之叔正是那位钦使。\n第二章\n云州县城门紧闭。\n"
+        path = self.root / "d2.txt"
+        path.write_bytes(text.encode("utf-8"))
+        source = import_text(self.store, path)
+        _, chapters = build_chapters(source, [{"start": 0, "end": 3, "title": "第一章", "kind": "chapter"}])
+        task = plan_tasks(source, chapters, 9000)[0]
+        uid = task["units"][0]["id"]
+        grounded = ground_result(
+            source,
+            task,
+            {
+                "mentions": [
+                    {"text": "钦使", "kind": "person", "refs": [uid]},
+                    {"text": "云州县", "kind": "place", "refs": [uid]},
+                    {"text": "总督", "kind": "person", "refs": [uid]},
+                    {"text": "臬司", "kind": "person", "refs": [uid]},
+                    {"text": "赵迁", "kind": "person", "refs": [uid]},
+                ],
+                "links": [],
+            },
+            "req_d2",
+        )
+        yun_ms = [m for m in sorted(grounded["mentions"], key=lambda x: x["start"]) if m["text"] == "云州县"]
+        zhao_m = next(m for m in grounded["mentions"] if m["text"] == "赵迁")
+        self.assertEqual(len(yun_ms), 2)
+
+        raw = {
+            "entities": [
+                {
+                    "local_id": "e_place",
+                    "name": "云州县",
+                    "kind": "place",
+                    "surfaces": [],
+                    "evidence_ref": uid,
+                },
+                {
+                    "local_id": "e_magistrate",
+                    "name": "云州县",
+                    "kind": "person",
+                    "surfaces": [],
+                    "evidence_ref": uid,
+                },
+                {
+                    "local_id": "e_envoy",
+                    "name": "钦使",
+                    "kind": "person",
+                    "surfaces": [{"surface": "钦使", "surface_type": "title_or_kinship"}],
+                    "evidence_ref": uid,
+                },
+                {
+                    "local_id": "e_zhao",
+                    "name": "赵迁",
+                    "kind": "person",
+                    "surfaces": [{"surface": "赵迁", "surface_type": "proper_name"}],
+                    "evidence_ref": uid,
+                },
+                {
+                    "local_id": "e_gov",
+                    "name": "总督",
+                    "kind": "person",
+                    "surfaces": [{"surface": "总督", "surface_type": "title_or_kinship"}],
+                    "evidence_ref": uid,
+                },
+                {
+                    "local_id": "e_judge",
+                    "name": "臬司",
+                    "kind": "person",
+                    "surfaces": [{"surface": "臬司", "surface_type": "title_or_kinship"}],
+                    "evidence_ref": uid,
+                },
+            ],
+            "assignments": [
+                {"mention_id": yun_ms[0]["id"], "surface": "云州县", "ref": uid, "local_id": "e_place", "reason": "到了云州县指辖区地点"},
+                {"mention_id": yun_ms[1]["id"], "surface": "云州县", "ref": uid, "local_id": "e_magistrate", "reason": "与臬司并列进内室议事，借代云州县主官"},
+                # 模拟模型误将赵迁的 mention_id 填给上下文词“之叔”并指向 e_envoy
+                {"mention_id": zhao_m["id"], "surface": "之叔", "ref": uid, "local_id": "e_envoy", "reason": "赵迁之叔是钦使"},
+            ],
+            "not_entity": [],
+        }
+
+        res = apply_c1_task_result(source, task, grounded["mentions"], raw, "req_c1_d2", strict=True, require_surface_type=True)
+        outcomes = {o["mention_id"]: o for o in res["mention_outcomes"]}
+        # 第一个“云州县”归地点 e_place，第二个“云州县”归人物 e_magistrate
+        self.assertEqual(outcomes[yun_ms[0]["id"]]["local_id"], "e_place")
+        self.assertEqual(outcomes[yun_ms[1]["id"]]["local_id"], "e_magistrate")
+        # 赵迁不被错误挂入 e_envoy，而是归入 e_zhao
+        self.assertEqual(outcomes[zhao_m["id"]]["local_id"], "e_zhao")
+
+        by_local = {e["local_id"]: e for e in res["entities"]}
+        # 地点对象的“云州县”保持为专名，人物借代对象的“云州县”不能作为人物 proper_surfaces
+        self.assertIn("云州县", by_local["e_place"]["proper_surfaces"])
+        self.assertEqual(by_local["e_magistrate"]["proper_surfaces"], [])
+        self.assertTrue(by_local["e_magistrate"]["only_non_proper"])
+
     def test_roster_module_does_not_import_gold(self):
         source = (ROOT / "entitytrace/roster.py").read_text(encoding="utf-8")
         self.assertNotIn("entity-gold", source)

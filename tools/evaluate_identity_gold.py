@@ -504,6 +504,17 @@ def evaluate_result(
     entities = result_doc.get("entities", [])
     singletons = sum(1 for e in entities if len(e.get("mention_ids", [])) == 1)
     stage_info = extract_identity_stage_metrics(manifest_doc, review_doc)
+    roster_summary = result_doc.get("roster_summary") or {}
+    link_methods = roster_summary.get("link_methods") or {}
+    c3_rejected_name_mismatch = int(
+        roster_summary.get(
+            "c3_rejected_name_mismatch",
+            link_methods.get(
+                "c3_rejected_name_mismatch",
+                sum(1 for m in result_doc.get("mentions", []) if m.get("link_method") == "c3_rejected_name_mismatch"),
+            ),
+        )
+    )
 
     return {
         "book": roster_doc.get("book"),
@@ -527,6 +538,7 @@ def evaluate_result(
             "entities": len(entities),
             "singletons": singletons,
             "largest_group": max((len(e.get("mention_ids", [])) for e in entities), default=0),
+            "c3_rejected_name_mismatch": c3_rejected_name_mismatch,
             **stage_info,
         },
         "primary_metrics": strict_metrics,
@@ -586,6 +598,7 @@ def main() -> int:
         "major_entity_overmerges": len(report["primary_metrics"]["major_entity_overmerges"]),
         "out_of_roster_in_major": report["primary_metrics"]["out_of_roster_in_major_entity_count"],
         "not_entity_linked": report["primary_metrics"]["not_entity_linked_count"],
+        "c3_rejected_name_mismatch": report["global_counts"]["c3_rejected_name_mismatch"],
         "entities": report["global_counts"]["entities"],
         "total_review_items": report["global_counts"]["total_review_items"],
         "identity_review_items": report["global_counts"]["identity_review_items"],

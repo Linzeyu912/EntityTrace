@@ -24,10 +24,10 @@ C1_PROMPT = """你是小说章节内实体称呼归并器。输入小说原文�
    - description：关系描述短语或身份泛称（如 my father、his father、his sister、her sister、her daughter、her mother、his aunt、his friend、令尊翁、先父、他妹子、the waiter、小厮、书童、更夫）。
 2. surfaces 只作为“该称呼在本片段内默认全部同指该对象”的简写；assignments 采用 mention_id（或 surface + ref）作为例外分配的最小单位：
    - 若某称呼在本片段内全部指向同一对象，放入该对象的 surfaces。
-   - 若某称呼在本片段内大多数指向某对象，但个别出现位置（mention_id）是断词误切（如“我今天来”中的“天来”、“大有关系”中的“大有”）、地名借代官员（如以县名代指知县本人）或指向另一对象，可将该称呼保留在主对象的 surfaces 中，同时在 assignments 中针对该例外 mention_id 单独指定 local_id（另一对象的 local_id、"not_entity" 或 null）。
-   - 若某称呼（尤其是纯亲属称呼、纯官职或同姓称谓）在本片段内指代两个以上不同个体且无单一默认对象，则不要放入 surfaces，必须在 assignments 中按 mention_id（或 surface + ref）逐处分配；不确定时将 local_id 设为 null 并写明 reason，不得猜测。
+   - 若某称呼在本片段内大多数指向某对象，但个别出现位置（mention_id）是断词误切（如“我今天来”中的“天来”、“大有关系”中的“大有”）或指向另一同类型对象，可将该称呼保留在主对象的 surfaces 中，同时在 assignments 中针对该例外 mention_id 单独指定 local_id（另一对象的 local_id、"not_entity" 或 null）。
+   - 同一 surface 在同一片段内若既指代地点/官署/机构（place/organization）又指代人物（person），或者指代两个以上不同个体且无单一默认对象，严禁将该称呼写入地点对象或任何对象的 surfaces 简写，必须在 assignments 中按 mention_id（并附与 surfaces 清单完全一致的 surface）逐处分配；不确定具体指哪一人物时将 local_id 设为 null（标为人物未决）并写明 reason，不得猜测。assignments 中的 mention_id 与 surface 必须严格对应输入 surfaces 清单中的同一提及，严禁将未出现在清单中的邻文词语张冠李戴到其他 mention_id 上。
 3. 严禁把并列出现的不同人物、受害者、亲属、同僚或不同层级地点合并到同一 local_id：例如状词/名单中并列的多个被害人或亲属、同场共事的制台与中丞/抚台、知府与知县、省/府/县/村/具体房屋石室/店铺行号，必须各自建立独立 local_id。
-4. 严禁将地方官员（person）与所辖行政地名（place）合为同一对象；若个别句子以县名代指知县本人，用 assignments 将该处 mention_id 单独归入官员对象，切勿把地名称呼放入官员对象的 surfaces。
+4. 严禁将地方官员（person）与所辖行政地名/官署/机构（place/organization）合为同一对象。辖区名、官署名或机构名借代规则（中英文通用）：当辖区名、官署名或机构名在句中充当说话、询问、思考、担忧、行礼、下令、相见、会商等人物行为的施事，或与官员/人物称谓并列作为受请、传见、议事的对象时，该处指代该处主官或机构成员（person），而非行政地点或机构本身，必须通过 assignments 按 mention_id 逐处分配给本片段内对应的人物对象（若无法确定具体是谁，则将 local_id 设为 null 标为人物未决），严禁归入地点或机构对象，也不得作为该对象之外的地点对象或人物对象的 surfaces 称呼。
 5. 关系描述短语（如 my father、his father、his sister、her daughter、her mother、令尊翁、先父）指向的是该亲属本人，绝不可归入说话人或所有格代词所指代的人物名下；若该亲属本人在本片段无独立对象，在 assignments 中将 local_id 设为 null。
 6. 普通名词、泛指器物、科举功名/制度通称、泛指建筑/场所或复数群体泛称（如 library、the instrument、book、carriage、card-table、sofas、town、the river、举人、进士、乡试、秀才、鞭炮、船、票子、大匾、手钏、读书人、Lucases、Bingleys、officers、the ladies、两位钦差）以及全片段均为断词误切的词，必须放入 not_entity。
 7. 清单中的每个称呼必须被覆盖：在某对象的 surfaces 中、在 assignments 中分配，或在 not_entity 中。每个对象的 name 必须从其关联称呼中选择最完整、最具辨识度的称呼；kind 只能是 person、place、object、organization、ability、concept、unknown 之一；evidence_ref 必须是 units 中能体现该对象身份的单元 id。
@@ -388,6 +388,7 @@ def apply_c1_task_result(
 
     local_entities: dict[str, dict] = {}
     surface_to_strong_lids: dict[str, list[str]] = collections.defaultdict(list)
+    declared_proper_surfaces: set[str] = set()
     weak_norms_in_task: set[str] = set()
     reviews: list[dict] = []
 
@@ -400,6 +401,8 @@ def apply_c1_task_result(
             if s_str in allowed_surfaces:
                 valid_surfs.append(s_str)
                 surf_types[s_str] = s_type
+                if s_type == "proper_name":
+                    declared_proper_surfaces.add(s_str)
         name = ent["name"] if ent["name"] in allowed_surfaces else (
             sorted(valid_surfs, key=lambda s: (-len(s), s))[0] if valid_surfs else None
         )
@@ -452,19 +455,28 @@ def apply_c1_task_result(
             lid = None
         if isinstance(mid_raw, str) and mid_raw in mention_by_key:
             m_target = mention_by_key[mid_raw]
-            assign_by_mid[m_target["id"]] = {"local_id": lid, "reason": str(item.get("reason", ""))}
-            assigned_surfaces.add(m_target["text"])
-            continue
+            if not (isinstance(surf, str) and surf.strip() and normalize_surface(surf) != normalize_surface(m_target["text"])):
+                assign_by_mid[m_target["id"]] = {
+                    "local_id": lid,
+                    "reason": str(item.get("reason", "")),
+                    "kind": item.get("kind") if item.get("kind") in KINDS else None,
+                }
+                assigned_surfaces.add(m_target["text"])
+                continue
         if not isinstance(surf, str) or surf not in allowed_surfaces:
-            if strict:
+            if strict and not (isinstance(mid_raw, str) and mid_raw in mention_by_key):
                 raise ModelError(f"C1 assignment 包含未知称呼：{surf}")
             continue
         if not isinstance(ref, str) or ref not in allowed_refs:
-            if strict:
+            if strict and not (isinstance(mid_raw, str) and mid_raw in mention_by_key):
                 raise ModelError(f"C1 assignment 包含未知单元：{ref}")
             continue
         assigned_surfaces.add(surf)
-        assign_by_surf_ref[(surf, ref)].append({"local_id": lid, "reason": str(item.get("reason", ""))})
+        assign_by_surf_ref[(surf, ref)].append({
+            "local_id": lid,
+            "reason": str(item.get("reason", "")),
+            "kind": item.get("kind") if item.get("kind") in KINDS else None,
+        })
 
     # 检查同一任务内出现在两个对象下的称呼 -> 标记为弱称呼
     for surf, lids in surface_to_strong_lids.items():
@@ -549,6 +561,7 @@ def apply_c1_task_result(
                         }
                     else:
                         has_unresolved = True
+                        unres_kind = chosen.get("kind") if chosen.get("kind") in KINDS else None
                         mention_outcomes[m["id"]] = {
                             "mention_id": m["id"],
                             "task_id": task["id"],
@@ -556,6 +569,7 @@ def apply_c1_task_result(
                             "local_id": None,
                             "reason": chosen.get("reason") or "章内逐提及指派不确定",
                             "request_id": request_id,
+                            **({"unresolved_kind": unres_kind} if unres_kind else {}),
                         }
             if len(real_lids_used) > 1 or has_unresolved:
                 weak_norms_in_task.add(normalize_surface(surf))
@@ -606,14 +620,76 @@ def apply_c1_task_result(
             "status": "pending",
         })
 
+    # D2.2 校验：同一 surface 在同一任务内既指地点/机构又指人物时，走提及级分配，不得作为人物对象的专名或保留空地点称呼
+    place_org_surfs: set[str] = set()
+    person_surfs: set[str] = set()
+    for ent in local_entities.values():
+        if not ent["mention_ids"]:
+            continue
+        actual_surfs = {mention_by_key[mid]["text"] for mid in ent["mention_ids"] if mid in mention_by_key}
+        # 移除实际未分配到该对象的残留 surfaces
+        if ent["surfaces"]:
+            ent["surfaces"] = [s for s in ent["surfaces"] if s in actual_surfs]
+            ent["surface_types"] = {s: st for s, st in ent["surface_types"].items() if s in actual_surfs}
+            ent["proper_surfaces"] = [s for s in ent["proper_surfaces"] if s in actual_surfs]
+        if ent["kind"] in {"place", "organization"}:
+            place_org_surfs.update(actual_surfs | {ent["name"]})
+        elif ent["kind"] == "person":
+            person_surfs.update(actual_surfs)
+
+    for out in mention_outcomes.values():
+        if out["status"] == "unresolved":
+            m_surf = mention_by_key[out["mention_id"]]["text"]
+            if m_surf in place_org_surfs:
+                person_surfs.add(m_surf)
+                out.setdefault("unresolved_kind", "person")
+
+    mixed_place_person_surfs = place_org_surfs & person_surfs
+    for s in mixed_place_person_surfs:
+        weak_norms_in_task.add(normalize_surface(s))
+
+    for ent in local_entities.values():
+        if not ent["mention_ids"]:
+            continue
+        actual_surfs = {mention_by_key[mid]["text"] for mid in ent["mention_ids"] if mid in mention_by_key}
+        if ent["kind"] == "person" and mixed_place_person_surfs:
+            # 借代主官的辖区名/官署名不得作为人物对象的专名称呼
+            other_surfs = [s for s in ent["surfaces"] if s not in mixed_place_person_surfs]
+            if other_surfs or any(s not in mixed_place_person_surfs for s in actual_surfs):
+                ent["surfaces"] = other_surfs
+                ent["surface_types"] = {s: st for s, st in ent["surface_types"].items() if s not in mixed_place_person_surfs}
+                ent["proper_surfaces"] = [s for s in ent["proper_surfaces"] if s not in mixed_place_person_surfs]
+            else:
+                for ms in list(ent["surfaces"]):
+                    if ms in mixed_place_person_surfs:
+                        ent["surface_types"][ms] = "title_or_kinship"
+                ent["proper_surfaces"] = [s for s in ent["proper_surfaces"] if s not in mixed_place_person_surfs]
+        # 若模型按 D2.2 将同形辖区/借代提及写入 assignments 而留空了 surfaces，分别补齐地点专名与人物非专名属性
+        if not ent["surfaces"] and ent["name"] in actual_surfs and ent["name"] in mixed_place_person_surfs:
+            if ent["kind"] == "person":
+                ent["surfaces"] = [ent["name"]]
+                ent["surface_types"][ent["name"]] = "title_or_kinship"
+                ent["proper_surfaces"] = []
+            elif ent["kind"] in {"place", "organization"}:
+                ent["surfaces"] = [ent["name"]]
+                ent["surface_types"][ent["name"]] = "proper_name"
+                ent["proper_surfaces"] = [ent["name"]]
+        ent["only_non_proper"] = bool(ent["surfaces"]) and not bool(ent["proper_surfaces"])
+
     # 过滤没有实际关联任何提及的空章内对象
     active_entities = [ent for ent in local_entities.values() if ent["mention_ids"]]
+    declared_proper_norms = sorted({
+        normalize_surface(s)
+        for s in (declared_proper_surfaces - mixed_place_person_surfs)
+        if normalize_surface(s)
+    })
     return {
         "task_id": task["id"],
         "request_id": request_id,
         "entities": active_entities,
         "mention_outcomes": list(mention_outcomes.values()),
         "weak_norms": sorted(weak_norms_in_task),
+        "declared_proper_norms": declared_proper_norms,
         "repaired_surfaces": repaired_surfaces,
         "reviews": reviews,
     }
@@ -937,37 +1013,6 @@ def resolve_roster(
         if len(mids) <= 1:
             continue
 
-        # 0) 若地点对象（place）中混入了发现阶段明确标为人物（person 且不含 place，如以县名代指知县本人）的单处提及，将其拆为非专名人物对象交 C3
-        if obj["kind"] == "place":
-            person_only_mids = [
-                mid for mid in mids
-                if "person" in by_mid[mid].get("provisional_kinds", [])
-                and "place" not in by_mid[mid].get("provisional_kinds", [])
-            ]
-            if person_only_mids and len(person_only_mids) < len(mids):
-                by_ps: dict[str, list[str]] = collections.defaultdict(list)
-                for pmid in person_only_mids:
-                    by_ps[by_mid[pmid]["text"]].append(pmid)
-                for ps, ps_mids in sorted(by_ps.items()):
-                    _split_mentions_to_new_local_obj(
-                        key,
-                        ps_mids,
-                        [ps],
-                        {ps: "title_or_kinship"},
-                        forced_kind="person",
-                        forbid_merge_with_parent=True,
-                    )
-                mids = [mid for mid in mids if mid not in set(person_only_mids)]
-                rem_surfs = {by_mid[mid]["text"] for mid in mids}
-                obj["mention_ids"] = mids
-                obj["surfaces"] = [s for s in obj["surfaces"] if s in rem_surfs]
-                obj["surface_types"] = {s: v for s, v in obj["surface_types"].items() if s in rem_surfs}
-                obj["proper_surfaces"] = [s for s in obj["proper_surfaces"] if s in rem_surfs]
-                if obj["name"] not in rem_surfs and mids:
-                    obj["name"] = _choose_display_name(collections.Counter(by_mid[mid]["text"] for mid in mids))
-                if len(mids) <= 1:
-                    continue
-
         by_s: dict[str, list[str]] = collections.defaultdict(list)
         for mid in mids:
             by_s[by_mid[mid]["text"]].append(mid)
@@ -976,15 +1021,12 @@ def resolve_roster(
 
         stypes = obj["surface_types"]
         # 主称呼优先取提及最多的 proper_name，其次取提及最多的称呼
-        prop_candidates = [s for s in by_s if stypes.get(s, "proper_name") == "proper_name"]
+        prop_candidates = [s for s in by_s if stypes.get(s) == "proper_name"]
         if prop_candidates:
             main_surf = sorted(prop_candidates, key=lambda s: (-len(by_s[s]), -len(s), s))[0]
         else:
             main_surf = sorted(by_s, key=lambda s: (-len(by_s[s]), -len(s), s))[0]
         ns_main = normalize_surface(main_surf)
-        main_pk = prov_kinds_by_norm[ns_main]
-        main_is_person = main_pk["person"] >= 2 and main_pk["person"] >= max(1, main_pk["place"] * 3)
-        main_is_place = main_pk["place"] >= 2 and main_pk["place"] >= max(1, main_pk["person"] * 3)
 
         detached_surfs: set[str] = set()
         newly_created_keys: list[tuple[str, str]] = []
@@ -992,7 +1034,7 @@ def resolve_roster(
             if s == main_surf:
                 continue
             ns = normalize_surface(s)
-            stype = stypes.get(s, "proper_name")
+            stype = stypes.get(s, "proper_name" if s in obj.get("proper_surfaces", []) else "title_or_kinship")
             pair = (min(ns_main, ns), max(ns_main, ns))
             tog, sep = c_tog[pair], c_sep[pair]
             shares_cjk_surname = (
@@ -1008,9 +1050,6 @@ def resolve_roster(
                 or bool(_surface_tokens(ns) & _surface_tokens(ns_main))
                 or shares_cjk_surname
             )
-            spk = prov_kinds_by_norm[ns]
-            s_is_person = spk["person"] >= 2 and spk["person"] >= max(1, spk["place"] * 3)
-            s_is_place = spk["place"] >= 2 and spk["place"] >= max(1, spk["person"] * 3)
 
             # 1) 关系/描述短语（description）从专名对象中剥离，交由 C3 按上下文候选链接（title_or_kinship 按 R2.2 在本任务内跟随所属对象链接）
             if prop_candidates and stype == "description":
@@ -1019,15 +1058,7 @@ def resolve_roster(
                 newly_created_keys.append(nk)
                 continue
 
-            # 2) 人物与地点强粗类冲突剥离（如地方官员与所辖县名被混入同一章内对象）
-            if (main_is_person and s_is_place) or (main_is_place and s_is_person):
-                detached_surfs.add(s)
-                f_kind = "place" if s_is_place else "person"
-                nk = _split_mentions_to_new_local_obj(key, s_mids, [s], {s: stype}, forced_kind=f_kind, forbid_merge_with_parent=True)
-                newly_created_keys.append(nk)
-                continue
-
-            # 3) 跨任务分离保护：在全书其他任务中稳定分离（sep >= 2 且 sep >= 2*tog），或仅单次同组但有分离记录且无词干重叠
+            # 2) 跨任务分离保护：在全书其他任务中稳定分离（sep >= 2 且 sep >= 2*tog），或仅单次同组但有分离记录且无词干重叠
             if (sep >= 2 and sep >= 2 * tog) or (tog <= 1 and sep >= 1 and not shares_token):
                 detached_surfs.add(s)
                 nk = _split_mentions_to_new_local_obj(key, s_mids, [s], {s: stype}, forbid_merge_with_parent=True)
@@ -1670,20 +1701,38 @@ def resolve_roster(
     # 建立名册索引（供 C3 候选召回：精确称呼匹配 + 词干/子串重叠 + 同任务/同章同粗类候选）
     norm_to_roster_ids: dict[str, set[str]] = collections.defaultdict(set)
     proper_norm_to_roster_ids: dict[str, set[str]] = collections.defaultdict(set)
+    all_proper_norm_to_roster_ids: dict[str, set[str]] = collections.defaultdict(set)
     token_to_roster_ids: dict[str, set[str]] = collections.defaultdict(set)
     chapter_to_roster_counts: dict[str, collections.Counter[str]] = collections.defaultdict(collections.Counter)
     task_to_roster_counts: dict[str, collections.Counter[str]] = collections.defaultdict(collections.Counter)
 
+    c1_proper_norms_by_task: dict[str, set[str]] = collections.defaultdict(set)
+    for dtask in discovery_tasks:
+        res = c1_results.get(dtask["id"])
+        if res:
+            c1_proper_norms_by_task[dtask["id"]].update(res.get("declared_proper_norms", []))
+    for (t_id, _), obj in local_objects.items():
+        for ps in obj.get("proper_surfaces", []):
+            pns = normalize_surface(ps)
+            if pns:
+                c1_proper_norms_by_task[t_id].add(pns)
+
     def _index_roster_entry(e: dict) -> None:
         roster_by_id[e["id"]] = e
-        entry_proper_norms: set[str] = set()
+        entry_all_proper_norms: set[str] = set()
+        entry_unique_proper_norms: set[str] = set()
         for mk in e.get("member_keys", []):
             if mk in local_objects:
                 for ps in local_objects[mk].get("proper_surfaces", []):
                     pns = normalize_surface(ps)
-                    if pns and pns not in weak_proper_norms:
-                        entry_proper_norms.add(pns)
-        for pns in entry_proper_norms:
+                    if pns:
+                        entry_all_proper_norms.add(pns)
+                        if pns not in weak_proper_norms:
+                            entry_unique_proper_norms.add(pns)
+        e["proper_norms"] = set(entry_all_proper_norms)
+        for pns in entry_all_proper_norms:
+            all_proper_norm_to_roster_ids[pns].add(e["id"])
+        for pns in entry_unique_proper_norms:
             proper_norm_to_roster_ids[pns].add(e["id"])
         for s in e["strong_surfaces"]:
             norm_to_roster_ids[normalize_surface(s)].add(e["id"])
@@ -1704,6 +1753,7 @@ def resolve_roster(
         task_id: str,
         chapter_id: str,
         forbidden_obj_keys: set[tuple[str, str]] | None = None,
+        required_proper_norms: set[str] | None = None,
     ) -> list[str]:
         candidates: list[str] = []
         seen: set[str] = set()
@@ -1716,6 +1766,9 @@ def resolve_roster(
                 return
             if forbidden_obj_keys and any(mk in forbidden_obj_keys for mk in re.get("member_keys", [])):
                 return
+            if required_proper_norms:
+                if not (required_proper_norms <= re.get("proper_norms", set())):
+                    return
             seen.add(rid)
             candidates.append(rid)
 
@@ -1744,7 +1797,7 @@ def resolve_roster(
 
         return candidates[:5]
 
-    # ==================== C3：只含非专名章内对象与未决提及候选链接（R2.3） ====================
+    # ==================== C3：只含非专名章内对象与未决提及候选链接（R2.3 & D1 专名一致性硬约束） ====================
     mention_link: dict[str, dict] = {}
     unresolved_mentions: list[dict] = []
 
@@ -1756,7 +1809,23 @@ def resolve_roster(
     for k in non_proper_obj_keys:
         obj = local_objects[k]
         forb = {kb for (ka, kb) in cannot_merge_objs if ka == k} | {ka for (ka, kb) in cannot_merge_objs if kb == k}
-        cands = _recall_c3_candidates(obj["surfaces"], obj["kind"], obj["task_id"], obj["chapter_id"], forbidden_obj_keys=forb)
+        req_pnorms: set[str] = {normalize_surface(s) for s in obj.get("proper_surfaces", []) if normalize_surface(s)}
+        for s, st in obj.get("surface_types", {}).items():
+            if st == "proper_name" and normalize_surface(s):
+                req_pnorms.add(normalize_surface(s))
+        for mid in obj.get("mention_ids", []):
+            m_text = by_mid[mid]["text"]
+            m_ns = normalize_surface(m_text)
+            if m_text not in obj.get("surface_types", {}) and m_ns in c1_proper_norms_by_task.get(obj["task_id"], set()):
+                req_pnorms.add(m_ns)
+        cands = _recall_c3_candidates(
+            obj["surfaces"],
+            obj["kind"],
+            obj["task_id"],
+            obj["chapter_id"],
+            forbidden_obj_keys=forb,
+            required_proper_norms=req_pnorms or None,
+        )
         if cands:
             item_id = f"obj:{k[0]}:{k[1]}"
             non_proper_cand_map[item_id] = cands
@@ -1769,6 +1838,7 @@ def resolve_roster(
                 "start": first_m["start"],
                 "end": first_m["end"],
                 "candidate_ids": cands,
+                "required_proper_norms": req_pnorms,
             })
         else:
             non_proper_without_candidates.append(k)
@@ -1801,7 +1871,7 @@ def resolve_roster(
 
         # 章内未决的提及：仅当其称呼是全书唯一的非弱专名（proper_name）且粗类兼容时，才直接链接 surface_unique（R2.2）
         ns = normalize_surface(m["text"])
-        m_kind = _choose_majority_kind(collections.Counter(m.get("provisional_kinds", [])))
+        m_kind = (c1_out.get("unresolved_kind") if c1_out else None) or _choose_majority_kind(collections.Counter(m.get("provisional_kinds", [])))
         cand_rids = sorted(
             r for r in proper_norm_to_roster_ids.get(ns, set())
             if _kind_compatible(m_kind, roster_by_id[r]["kind"])
@@ -1822,8 +1892,22 @@ def resolve_roster(
     still_unresolved: list[dict] = []
     unresolved_cand_map: dict[str, list[str]] = {}
     for m in unresolved_mentions:
-        m_kind = _choose_majority_kind(collections.Counter(m.get("provisional_kinds", [])))
-        cand_rids = _recall_c3_candidates([m["text"]], m_kind, m["task_id"], m["chapter_id"])
+        c1_out = mention_c1.get(m["id"], {})
+        m_kind = c1_out.get("unresolved_kind") or _choose_majority_kind(collections.Counter(m.get("provisional_kinds", [])))
+        ns = normalize_surface(m["text"])
+        # D1.1：提及级未决项按其表面形式判断是否与任一名册条目的专名规范形式相同（或被本任务 C1 判为 proper_name）
+        is_proper_mention = bool(ns) and (
+            ns in all_proper_norm_to_roster_ids
+            or ns in c1_proper_norms_by_task.get(m["task_id"], set())
+        )
+        req_pnorms = {ns} if is_proper_mention else set()
+        cand_rids = _recall_c3_candidates(
+            [m["text"]],
+            m_kind,
+            m["task_id"],
+            m["chapter_id"],
+            required_proper_norms=req_pnorms or None,
+        )
         if cand_rids:
             unresolved_cand_map[m["id"]] = cand_rids
             c3_by_task[m["task_id"]].append({
@@ -1834,6 +1918,7 @@ def resolve_roster(
                 "start": m["start"],
                 "end": m["end"],
                 "candidate_ids": cand_rids,
+                "required_proper_norms": req_pnorms,
             })
         else:
             still_unresolved.append(m)
@@ -1874,7 +1959,7 @@ def resolve_roster(
                 "stage": "roster-c3-link",
                 "state": state,
                 "allowed_mids": {it["item_id"] for it in items},
-                "allowed_choices": set(all_cand_ids) | {"none", "uncertain"},
+                "allowed_choices": set(roster_by_id) | set(all_cand_ids) | {"none", "uncertain"},
             })
 
     def c3_worker(ct: dict) -> dict:
@@ -1904,7 +1989,7 @@ def resolve_roster(
             "failures": c3_failures,
         }
 
-    # 落地 C3 链接结果
+    # 落地 C3 链接结果（含 D1.2 模型返回后专名一致性硬约束二次校验）
     unmatched_title_objs: list[tuple[str, str]] = []
     unmatched_desc_objs: list[tuple[str, str]] = []
     uncertain_non_proper_objs: list[tuple[tuple[str, str], str, list[str]]] = []
@@ -1919,21 +2004,47 @@ def resolve_roster(
 
     for t_id, items in sorted(c3_by_task.items()):
         for it in items:
+            req_pnorms = it.get("required_proper_norms") or set()
             if it["is_object"]:
                 k = it["obj_key"]
                 obj = local_objects[k]
                 c3_out = c3_results.get(it["item_id"])
                 sel = c3_out["selected_entity_id"] if c3_out else "uncertain"
                 if sel in roster_by_id:
-                    refs = [r for r in [obj["request_id"], c3_out["request_id"]] if r]
-                    for mid in obj["mention_ids"]:
-                        roster_by_id[sel]["mention_ids"].append(mid)
-                        roster_by_id[sel]["link_methods"]["c3_model"] += 1
-                        mention_link[mid] = {
-                            "entity_id": sel,
-                            "link_method": "c3_model",
-                            "link_refs": list(dict.fromkeys(refs)),
-                        }
+                    sel_pnorms = roster_by_id[sel].get("proper_norms", set())
+                    if (req_pnorms and not (req_pnorms <= sel_pnorms)) or sel not in set(it["candidate_ids"]):
+                        req_id = c3_out["request_id"] if c3_out else ""
+                        refs = [r for r in [obj["request_id"], req_id] if r]
+                        e = _register_roster_cluster([k], [req_id] if req_id else [], default_method="c3_rejected_name_mismatch")
+                        e["identity_status"] = "unresolved_singleton" if len(obj["mention_ids"]) == 1 else "linked_by_roster"
+                        for mid in obj["mention_ids"]:
+                            mention_link[mid] = {
+                                "entity_id": e["id"],
+                                "link_method": "c3_rejected_name_mismatch",
+                                "link_refs": list(dict.fromkeys(refs)),
+                            }
+                        first_m = by_mid[obj["mention_ids"][0]]
+                        all_reviews.append({
+                            "id": digest(["c3-obj-name-mismatch", k]),
+                            "stage": "roster-c3-link",
+                            "reason": "C3 选中条目违反专名一致性硬约束，已作废转待审",
+                            "surface": obj["name"],
+                            "rejected_entity_id": sel,
+                            "impact": len(obj["mention_ids"]),
+                            "evidence": [first_m["address"]],
+                            "options": [*it["candidate_ids"], "new_entity", "not_entity"],
+                            "status": "pending",
+                        })
+                    else:
+                        refs = [r for r in [obj["request_id"], c3_out["request_id"]] if r]
+                        for mid in obj["mention_ids"]:
+                            roster_by_id[sel]["mention_ids"].append(mid)
+                            roster_by_id[sel]["link_methods"]["c3_model"] += 1
+                            mention_link[mid] = {
+                                "entity_id": sel,
+                                "link_method": "c3_model",
+                                "link_refs": list(dict.fromkeys(refs)),
+                            }
                 elif sel == "none":
                     has_title = any(st == "title_or_kinship" for st in obj["surface_types"].values())
                     if has_title:
@@ -1949,15 +2060,54 @@ def resolve_roster(
                 c3_out = c3_results.get(mid)
                 sel = c3_out["selected_entity_id"] if c3_out else "uncertain"
                 if sel in roster_by_id:
-                    roster_by_id[sel]["mention_ids"].append(mid)
-                    roster_by_id[sel]["link_methods"]["c3_model"] += 1
-                    c1_req = mention_c1.get(mid, {}).get("request_id")
-                    refs = [r for r in [c1_req, c3_out["request_id"]] if r]
-                    mention_link[mid] = {
-                        "entity_id": sel,
-                        "link_method": "c3_model",
-                        "link_refs": list(dict.fromkeys(refs)),
-                    }
+                    sel_pnorms = roster_by_id[sel].get("proper_norms", set())
+                    if (req_pnorms and not (req_pnorms <= sel_pnorms)) or sel not in set(it["candidate_ids"]):
+                        c1_out = mention_c1.get(mid, {})
+                        req_id = c3_out["request_id"] if c3_out else ""
+                        refs = [r for r in [c1_out.get("request_id"), req_id] if r]
+                        singleton_id = digest(["roster-singleton", source["id"], [m["start"], m["end"]], [m["text"]]])
+                        k_counts = collections.Counter(m.get("provisional_kinds", []))
+                        roster_entries.append({
+                            "id": singleton_id,
+                            "name": m["text"],
+                            "strong_surfaces": [],
+                            "kind": _choose_majority_kind(k_counts),
+                            "kind_counts": k_counts,
+                            "first_chapter_id": m["chapter_id"],
+                            "start": m["start"],
+                            "first_address": m["address"],
+                            "representative_evidence": "",
+                            "mention_ids": [mid],
+                            "link_methods": collections.Counter({"c3_rejected_name_mismatch": 1}),
+                            "identity_status": "unresolved_singleton",
+                        })
+                        mention_link[mid] = {
+                            "entity_id": singleton_id,
+                            "link_method": "c3_rejected_name_mismatch",
+                            "link_refs": list(dict.fromkeys(refs)),
+                        }
+                        all_reviews.append({
+                            "id": digest(["c3-mention-name-mismatch", mid]),
+                            "stage": "roster-c3-link",
+                            "reason": "C3 选中条目违反专名一致性硬约束，已作废转待审",
+                            "mention_id": mid,
+                            "surface": m["text"],
+                            "rejected_entity_id": sel,
+                            "impact": 1,
+                            "evidence": [m["address"]],
+                            "options": [*it["candidate_ids"], "new_entity", "not_entity"],
+                            "status": "pending",
+                        })
+                    else:
+                        roster_by_id[sel]["mention_ids"].append(mid)
+                        roster_by_id[sel]["link_methods"]["c3_model"] += 1
+                        c1_req = mention_c1.get(mid, {}).get("request_id")
+                        refs = [r for r in [c1_req, c3_out["request_id"]] if r]
+                        mention_link[mid] = {
+                            "entity_id": sel,
+                            "link_method": "c3_model",
+                            "link_refs": list(dict.fromkeys(refs)),
+                        }
                 else:
                     still_unresolved.append(m)
 
@@ -2185,6 +2335,7 @@ def resolve_roster(
         "active_entity_count": sum(1 for e in final_entities if e["identity_status"] != "not_entity_suggested"),
         "singleton_count": sum(1 for e in final_entities if e["mention_count"] == 1),
         "link_methods": dict(method_totals),
+        "c3_rejected_name_mismatch": method_totals.get("c3_rejected_name_mismatch", 0),
         "identity_review_count": len(all_reviews),
         "ambiguous_surface_count": len(ambiguous_surfaces),
     }
