@@ -11,7 +11,7 @@ from .config import load_services
 from .discovery import discover
 from .identity import group_entities
 from .resolution import VERSION as RESOLUTION_VERSION, annotate_groups, resolve_groups
-from .models import Models
+from .models import BudgetError, Models, RequestBudget
 from .storage import Store
 from .text import import_text, validate_span
 from .util import digest, dumps, implementation_hash, utc_now, write_bytes, write_json
@@ -119,20 +119,24 @@ def export_run(store: Store, run_id: str, output_root: Path) -> Path:
 def run_pipeline(input_path: Path, db_path: Path, output_root: Path, config_path: Path,
                  discovery_concurrency: int = 6, decision_concurrency: int = 3, task_chars: int = 9000,
                  encoding: str = "utf-8", stop_after: str = "identity", log=print,
-                 identity_rounds: int = 12, group_candidates: int = 3) -> tuple[str, Path, bool]:
+                 identity_rounds: int = 12, group_candidates: int = 3,
+                 max_requests: int | None = None, max_seconds: float | None = None,
+                 max_network_failures: int = 9) -> tuple[str, Path, bool]:
     wall_begin = time.monotonic()
     if not 1 <= discovery_concurrency <= 32 or not 1 <= decision_concurrency <= 16 or not 500 <= task_chars <= 20000:
         raise ValueError("并发数或任务长度超出本工具支持范围")
     if not 1 <= identity_rounds <= 24 or not 1 <= group_candidates <= 3:
         raise ValueError("身份轮次须为 1—24，候选组上限须为 1—3")
+    budget = RequestBudget(max_requests, max_seconds, max_network_failures=max_network_failures)
     store = Store(db_path)
     begin, invocation = time.monotonic(), uuid.uuid4().hex
     started, stages = utc_now(), {}
     run_id = None
-    error = None
+    caught_exc: Exception | None = None
     try:
         source = import_text(store, input_path, encoding)
         services = load_services(config_path)
+        # 预算参数（max_requests / max_seconds / max_network_failures）不写入 config 摘要，保证扩大预算可续跑同一 run_id
         config = {"implementation": implementation_hash(), "models": {k: v.public() for k, v in services.items()},
                   "discovery_concurrency": discovery_concurrency, "decision_concurrency": decision_concurrency,
                   "task_chars": task_chars, "offset_unit": "unicode_code_point", "scope": "entity-identity-v2",
@@ -140,7 +144,7 @@ def run_pipeline(input_path: Path, db_path: Path, output_root: Path, config_path
                   "group_candidates": group_candidates}
         run_id = digest([source["id"], config])
         store.execute("INSERT OR IGNORE INTO runs VALUES(?,?,?,?,?,?)", (run_id, source["id"], dumps(config), "{}", started, started))
-        models = Models(store, run_id, invocation, services, discovery_concurrency, decision_concurrency)
+        models = Models(store, run_id, invocation, services, discovery_concurrency, decision_concurrency, budget=budget)
         log(f"运行编号：{run_id}\n原文：{source['metadata']['code_points']} 个码点；开始处理 {input_path.name}")
         state = store.run(run_id)["state"]
         for name in ("chapters", "discovery", "identity"):
@@ -163,17 +167,42 @@ def run_pipeline(input_path: Path, db_path: Path, output_root: Path, config_path
             if not outcome["complete"] or name == stop_after:
                 break
     except Exception as exc:
-        error = str(exc) if isinstance(exc, (ValueError, RuntimeError)) else "本地运行错误：" + type(exc).__name__
-        if run_id:
-            store.state(run_id, last_error=error)
-        else:
+        caught_exc = exc
+        if not run_id:
             store.close()
             raise
     if run_id is None:
         store.close()
         raise ValueError("尚未建立运行")
+    if budget.stop_reason == "network_outage" or (isinstance(caught_exc, BudgetError) and caught_exc.category == "network"):
+        error: dict | str | None = {
+            "category": "network",
+            "stop_reason": "network_outage",
+            "message": f"连续网络失败停止（network_outage）：连续 {budget.consecutive_network_failures} 次传输失败；保留未完成断点以便恢复",
+            "retryable": True,
+        }
+    elif isinstance(caught_exc, RuntimeError) and getattr(caught_exc, "code", None) == "network_error":
+        error = {
+            "category": "network",
+            "stop_reason": "network_error",
+            "message": str(caught_exc),
+            "retryable": True,
+        }
+    elif budget.stop_reason in {"request_budget", "time_budget"} or isinstance(caught_exc, BudgetError):
+        reason = budget.stop_reason or getattr(caught_exc, "stop_reason", None) or "request_budget"
+        error = {
+            "category": "budget",
+            "stop_reason": reason,
+            "message": f"请求或时间预算停止（{reason}）：本次已发起 {budget.count} 次请求；保留未完成断点以便恢复",
+            "retryable": True,
+        }
+    elif caught_exc is not None:
+        error = str(caught_exc) if isinstance(caught_exc, (ValueError, RuntimeError)) else "本地运行错误：" + type(caught_exc).__name__
+    else:
+        error = None
     invocation_record = {"id": invocation, "started": started, "ended": utc_now(), "seconds": round(time.monotonic() - begin, 4),
                          "stages": stages, "model_metrics": metrics(store, run_id, invocation),
+                         "budget": budget.summary(),
                          "peak_active_requests": models.peaks if 'models' in locals() else {}, "error": error}
     store.put(run_id, "invocation", invocation_record)
     store.state(run_id, last_invocation=invocation, last_error=error)
@@ -189,10 +218,11 @@ def run_pipeline(input_path: Path, db_path: Path, output_root: Path, config_path
         manifest["invocations"] = store.records(run_id, "invocation")
         write_json(output / "manifest.json", manifest)
         state = store.run(run_id)["state"]
-        complete = all(state.get(name, {}).get("complete", False) for name in ("chapters", "discovery", "identity"))
+        complete = budget.stop_reason is None and all(state.get(name, {}).get("complete", False) for name in ("chapters", "discovery", "identity"))
         log(f"输出目录：{output.resolve()}\n本次主输出完成用时：{invocation_record['wall_seconds']:.2f} 秒；状态：{'流程完成，查看待审清单' if complete else '未完成，可恢复'}")
         if error:
-            log("错误：" + error)
+            msg = f"[{error['category']}] {error['message']}" if isinstance(error, dict) else str(error)
+            log("错误：" + msg)
         return run_id, output, complete
     finally:
         store.close()

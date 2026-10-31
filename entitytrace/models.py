@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import collections
+import io
 import json
 import math
 import socket
@@ -20,6 +22,87 @@ class ModelError(RuntimeError):
     def __init__(self, message: str, status: int | None = None, code: str | None = None):
         super().__init__(message)
         self.status, self.code = status, code
+
+
+class BudgetError(RuntimeError):
+    """在 HTTP 客户端之外传递预算或连续断网停止，不能变成格式错误或模型答案。"""
+
+    def __init__(self, message: str, category: str = "budget", stop_reason: str | None = None):
+        super().__init__(message)
+        self.category = category
+        self.stop_reason = stop_reason
+
+
+ExperimentBudget = BudgetError
+
+
+class RequestBudget:
+    def __init__(self, max_requests: int | None = None, max_seconds: float | None = None,
+                 opener=None, max_network_failures: int = 9):
+        if max_requests is not None and max_requests < 0:
+            raise ValueError("请求预算不能为负数")
+        if max_seconds is not None and max_seconds <= 0:
+            raise ValueError("时间预算必须大于 0")
+        if max_network_failures < 1:
+            raise ValueError("连续网络失败上限必须至少为 1")
+        self.max_requests, self.max_seconds = max_requests, max_seconds
+        self.started = time.perf_counter()
+        self.count = 0
+        self.stop_reason: str | None = None
+        self.max_network_failures = max_network_failures
+        self.consecutive_network_failures = 0
+        self.network_errors: collections.Counter[str] = collections.Counter()
+        self.lock = threading.Lock()
+        self.opener = opener or urllib.request.urlopen
+
+    def consume(self) -> float | None:
+        with self.lock:
+            remaining = None if self.max_seconds is None else self.max_seconds - (time.perf_counter() - self.started)
+            if self.stop_reason == "network_outage":
+                raise BudgetError("连续网络失败，停止新请求并保留断点", category="network", stop_reason="network_outage")
+            if (self.max_requests is not None and self.count >= self.max_requests) or (remaining is not None and remaining <= 0):
+                self.stop_reason = (
+                    "request_budget"
+                    if (self.max_requests is not None and self.count >= self.max_requests)
+                    else "time_budget"
+                )
+                raise BudgetError("全文请求数或时间预算耗尽；保留未完成任务以便恢复", category="budget", stop_reason=self.stop_reason)
+            self.count += 1
+            return remaining
+
+    def __call__(self, request, timeout: float | None = None):
+        remaining = self.consume()
+        effective_timeout = timeout if remaining is None else (remaining if timeout is None else min(timeout, remaining))
+        try:
+            # 在预算包装层读完响应，连接阶段和读取阶段失败都能计入停止条件。
+            with self.opener(request, timeout=effective_timeout) as response:
+                body = response.read()
+        except urllib.error.HTTPError:
+            # HTTP 错误由生产客户端解析、重试或触发硬额度保护。
+            with self.lock:
+                self.consecutive_network_failures = 0
+            raise
+        except OSError as exc:
+            with self.lock:
+                self.consecutive_network_failures += 1
+                self.network_errors[type(exc).__name__] += 1
+                if self.consecutive_network_failures >= self.max_network_failures:
+                    self.stop_reason = "network_outage"
+            raise
+        with self.lock:
+            self.consecutive_network_failures = 0
+        return io.BytesIO(body)
+
+    def summary(self) -> dict:
+        with self.lock:
+            return {
+                "max_requests": self.max_requests,
+                "max_seconds": self.max_seconds,
+                "max_network_failures": self.max_network_failures,
+                "network_attempts": self.count,
+                "stop_reason": self.stop_reason,
+                "network_errors": dict(self.network_errors),
+            }
 
 
 def choice_question(instructions: str, criteria: dict[str, str]) -> dict:
@@ -53,10 +136,17 @@ def check_choices(raw: dict, questions: dict, model: str) -> dict:
 class Models:
     def __init__(self, store: Store, run_id: str, invocation: str, services: dict[str, Service],
                  discovery_concurrency: int = 6, decision_concurrency: int = 3,
-                 timeout: float = 120, attempts: int = 3, opener=None):
+                 timeout: float = 120, attempts: int = 3, opener=None,
+                 budget: RequestBudget | None = None):
         self.store, self.run_id, self.invocation, self.services = store, run_id, invocation, services
         self.timeout, self.attempts = timeout, attempts
-        self.opener = opener or urllib.request.urlopen
+        self.budget = budget
+        if budget is not None:
+            if opener is not None and budget.opener is urllib.request.urlopen:
+                budget.opener = opener
+            self.opener = budget
+        else:
+            self.opener = opener or urllib.request.urlopen
         self.gates = {"discovery": threading.BoundedSemaphore(discovery_concurrency),
                       "decision": threading.BoundedSemaphore(decision_concurrency)}
         self.lock = threading.Lock()
@@ -75,6 +165,8 @@ class Models:
             return cached, request_id
         error = "模型请求失败"
         for attempt in range(1, self.attempts + 1):
+            if self.budget is not None and self.budget.stop_reason == "network_outage":
+                raise BudgetError("连续网络失败，停止新请求并保留断点", category="network", stop_reason="network_outage")
             error_status, error_code = None, None
             with self.lock:
                 if service_name in self.halted:
@@ -132,6 +224,7 @@ class Models:
                     raw = None
                 except (urllib.error.URLError, TimeoutError, socket.timeout, OSError):
                     error = f"{service_name} 网络失败或超时"
+                    error_code = "network_error"
                     raw = None
                 except (ValueError, KeyError, TypeError, ModelError) as exc:
                     error = f"{service_name} 返回格式不符合约定"
@@ -147,6 +240,8 @@ class Models:
                 self.store.execute("INSERT OR REPLACE INTO request_cache VALUES(?,?,?,?,?,?)",
                     (request_id, service_name, service.model, dumps(payload), dumps(raw), utc_now()))
                 return raw, request_id
+            if self.budget is not None and self.budget.stop_reason == "network_outage":
+                raise BudgetError("连续网络失败，停止新请求并保留断点", category="network", stop_reason="network_outage")
             if not retryable or attempt == self.attempts:
                 raise ModelError(error, error_status, error_code)
             wait = min(60.0, max(2 ** (attempt - 1), retry_after))

@@ -18,7 +18,7 @@ sys.path.insert(0, str(ROOT))
 
 from entitytrace.config import load_services
 from entitytrace.identity import group_entities, plan_pairs
-from entitytrace.models import ModelError, Models, check_choices
+from entitytrace.models import ExperimentBudget, ModelError, Models, check_choices
 from entitytrace.resolution import IDENTITY, ask_cases, identity_case
 from entitytrace.storage import Store
 from entitytrace.text import validate_span
@@ -27,10 +27,6 @@ from entitytrace.util import digest, implementation_hash, utc_now, write_json
 VERSION = 'identity-calibration-v1'
 MODES = {'narrow': ('identity-group', 180), 'wide': ('identity-group-expanded', 400)}
 POLICIES = [(p, c) for p in (.95, .90, .85, .80, 0.) for c in (.8, .7, 0.)]
-
-
-class ExperimentBudget(RuntimeError):
-    """在 HTTP 客户端之外传递预算停止，不能变成格式错误或模型答案。"""
 
 
 def load_inputs(path: Path):
