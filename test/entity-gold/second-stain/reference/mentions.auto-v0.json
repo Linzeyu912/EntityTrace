@@ -1,0 +1,1439 @@
+{
+  "book": "02_英文短篇_The_Adventure_of_the_Second_Stain.txt",
+  "book_id": "second-stain",
+  "source_sha256": "dc72af1c7296f9abd4aa6dba1e09f2845dca40bbeb900c6918a7c7542bd59e71",
+  "seed": 20261030,
+  "labeler": "agent:gemini-4-argon",
+  "human_review": "pending",
+  "annotation_seconds": 0.0069,
+  "total_mentions": 158,
+  "counts": {
+    "entity_mentions": 158,
+    "not_entity": 0,
+    "uncertain": 0
+  },
+  "mentions": [
+    {
+      "sample_id": "s001",
+      "start": 152,
+      "end": 171,
+      "surface": "Mr. Sherlock Holmes",
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "第1章/回原文上下文明确指 Sherlock Holmes（称呼 'Mr. Sherlock Holmes'）"
+    },
+    {
+      "sample_id": "s002",
+      "start": 539,
+      "end": 549,
+      "surface": "Mr. Holmes",
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "第1章/回原文上下文明确指 Sherlock Holmes（称呼 'Mr. Holmes'）"
+    },
+    {
+      "sample_id": "s003",
+      "start": 766,
+      "end": 772,
+      "surface": "London",
+      "chapter_index": 1,
+      "gold_id": "g015",
+      "note": "第1章/回原文上下文明确指 London（称呼 'London'）"
+    },
+    {
+      "sample_id": "s004",
+      "start": 1804,
+      "end": 1816,
+      "surface": "Baker Street",
+      "chapter_index": 1,
+      "gold_id": "g020",
+      "note": "第1章/回原文上下文明确指 Baker Street（称呼 'Baker Street'）"
+    },
+    {
+      "sample_id": "s005",
+      "start": 1910,
+      "end": 1924,
+      "surface": "Lord Bellinger",
+      "chapter_index": 1,
+      "gold_id": "g003",
+      "note": "第1章/回原文上下文明确指 Lord Bellinger（称呼 'Lord Bellinger'）"
+    },
+    {
+      "sample_id": "s006",
+      "start": 1932,
+      "end": 1939,
+      "surface": "Premier",
+      "chapter_index": 1,
+      "gold_id": "g003",
+      "note": "第1章/回原文上下文明确指 Lord Bellinger（称呼 'Premier'）"
+    },
+    {
+      "sample_id": "s007",
+      "start": 1943,
+      "end": 1950,
+      "surface": "Britain",
+      "chapter_index": 1,
+      "gold_id": "g024",
+      "note": "第1章/回原文上下文明确指 Britain（称呼 'Britain'）"
+    },
+    {
+      "sample_id": "s008",
+      "start": 2095,
+      "end": 2109,
+      "surface": "Trelawney Hope",
+      "chapter_index": 1,
+      "gold_id": "g004",
+      "note": "第1章/回原文上下文明确指 Trelawney Hope（称呼 'Trelawney Hope'）"
+    },
+    {
+      "sample_id": "s009",
+      "start": 2377,
+      "end": 2388,
+      "surface": "The Premier",
+      "chapter_index": 1,
+      "gold_id": "g003",
+      "note": "第1章/回原文上下文明确指 Lord Bellinger（称呼 'The Premier'）"
+    },
+    {
+      "sample_id": "s010",
+      "start": 2522,
+      "end": 2528,
+      "surface": "Holmes",
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "第1章/回原文上下文明确指 Sherlock Holmes（称呼 'Holmes'）"
+    },
+    {
+      "sample_id": "s011",
+      "start": 2536,
+      "end": 2558,
+      "surface": "The European Secretary",
+      "chapter_index": 1,
+      "gold_id": "g004",
+      "note": "第1章/回原文上下文明确指 Trelawney Hope（称呼 'The European Secretary'）"
+    },
+    {
+      "sample_id": "s012",
+      "start": 2746,
+      "end": 2760,
+      "surface": "Prime Minister",
+      "chapter_index": 1,
+      "gold_id": "g003",
+      "note": "第1章/回原文上下文明确指 Lord Bellinger（称呼 'Prime Minister'）"
+    },
+    {
+      "sample_id": "s013",
+      "start": 2873,
+      "end": 2887,
+      "surface": "Prime Minister",
+      "chapter_index": 1,
+      "gold_id": "g003",
+      "note": "第1章/回原文上下文明确指 Lord Bellinger（称呼 'Prime Minister'）"
+    },
+    {
+      "sample_id": "s014",
+      "start": 3626,
+      "end": 3644,
+      "surface": "Mr. Trelawney Hope",
+      "chapter_index": 1,
+      "gold_id": "g004",
+      "note": "第1章/回原文上下文明确指 Trelawney Hope（称呼 'Mr. Trelawney Hope'）"
+    },
+    {
+      "sample_id": "s015",
+      "start": 3798,
+      "end": 3808,
+      "surface": "Mr. Holmes",
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "第1章/回原文上下文明确指 Sherlock Holmes（称呼 'Mr. Holmes'）"
+    },
+    {
+      "sample_id": "s016",
+      "start": 4010,
+      "end": 4027,
+      "surface": "Whitehall Terrace",
+      "chapter_index": 1,
+      "gold_id": "g018",
+      "note": "第1章/回原文上下文明确指 Whitehall Terrace（称呼 'Whitehall Terrace'）"
+    },
+    {
+      "sample_id": "s017",
+      "start": 5288,
+      "end": 5299,
+      "surface": "The Premier",
+      "chapter_index": 1,
+      "gold_id": "g003",
+      "note": "第1章/回原文上下文明确指 Lord Bellinger（称呼 'The Premier'）"
+    },
+    {
+      "sample_id": "s018",
+      "start": 5520,
+      "end": 5542,
+      "surface": "The European Secretary",
+      "chapter_index": 1,
+      "gold_id": "g004",
+      "note": "第1章/回原文上下文明确指 Trelawney Hope（称呼 'The European Secretary'）"
+    },
+    {
+      "sample_id": "s019",
+      "start": 6077,
+      "end": 6091,
+      "surface": "Prime Minister",
+      "chapter_index": 1,
+      "gold_id": "g003",
+      "note": "第1章/回原文上下文明确指 Lord Bellinger（称呼 'Prime Minister'）"
+    },
+    {
+      "sample_id": "s020",
+      "start": 7009,
+      "end": 7016,
+      "surface": "Premier",
+      "chapter_index": 1,
+      "gold_id": "g003",
+      "note": "第1章/回原文上下文明确指 Lord Bellinger（称呼 'Premier'）"
+    },
+    {
+      "sample_id": "s021",
+      "start": 7252,
+      "end": 7258,
+      "surface": "Holmes",
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "第1章/回原文上下文明确指 Sherlock Holmes（称呼 'Holmes'）"
+    },
+    {
+      "sample_id": "s022",
+      "start": 7745,
+      "end": 7760,
+      "surface": "Sherlock Holmes",
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "第1章/回原文上下文明确指 Sherlock Holmes（称呼 'Sherlock Holmes'）"
+    },
+    {
+      "sample_id": "s023",
+      "start": 8032,
+      "end": 8043,
+      "surface": "The Premier",
+      "chapter_index": 1,
+      "gold_id": "g003",
+      "note": "第1章/回原文上下文明确指 Lord Bellinger（称呼 'The Premier'）"
+    },
+    {
+      "sample_id": "s024",
+      "start": 8618,
+      "end": 8628,
+      "surface": "Dr. Watson",
+      "chapter_index": 1,
+      "gold_id": "g002",
+      "note": "第1章/回原文上下文明确指 Dr. John Watson（称呼 'Dr. Watson'）"
+    },
+    {
+      "sample_id": "s025",
+      "start": 9454,
+      "end": 9460,
+      "surface": "Holmes",
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "第1章/回原文上下文明确指 Sherlock Holmes（称呼 'Holmes'）"
+    },
+    {
+      "sample_id": "s026",
+      "start": 9516,
+      "end": 9523,
+      "surface": "Premier",
+      "chapter_index": 1,
+      "gold_id": "g003",
+      "note": "第1章/回原文上下文明确指 Lord Bellinger（称呼 'Premier'）"
+    },
+    {
+      "sample_id": "s027",
+      "start": 10415,
+      "end": 10421,
+      "surface": "Europe",
+      "chapter_index": 1,
+      "gold_id": "g023",
+      "note": "第1章/回原文上下文明确指 Europe（称呼 'Europe'）"
+    },
+    {
+      "sample_id": "s028",
+      "start": 10517,
+      "end": 10524,
+      "surface": "Britain",
+      "chapter_index": 1,
+      "gold_id": "g024",
+      "note": "第1章/回原文上下文明确指 Britain（称呼 'Britain'）"
+    },
+    {
+      "sample_id": "s029",
+      "start": 10546,
+      "end": 10553,
+      "surface": "Britain",
+      "chapter_index": 1,
+      "gold_id": "g024",
+      "note": "第1章/回原文上下文明确指 Britain（称呼 'Britain'）"
+    },
+    {
+      "sample_id": "s030",
+      "start": 11004,
+      "end": 11010,
+      "surface": "Europe",
+      "chapter_index": 1,
+      "gold_id": "g023",
+      "note": "第1章/回原文上下文明确指 Europe（称呼 'Europe'）"
+    },
+    {
+      "sample_id": "s031",
+      "start": 11110,
+      "end": 11128,
+      "surface": "Mr. Trelawney Hope",
+      "chapter_index": 1,
+      "gold_id": "g004",
+      "note": "第1章/回原文上下文明确指 Trelawney Hope（称呼 'Mr. Trelawney Hope'）"
+    },
+    {
+      "sample_id": "s032",
+      "start": 11178,
+      "end": 11189,
+      "surface": "The Premier",
+      "chapter_index": 1,
+      "gold_id": "g003",
+      "note": "第1章/回原文上下文明确指 Lord Bellinger（称呼 'The Premier'）"
+    },
+    {
+      "sample_id": "s033",
+      "start": 11633,
+      "end": 11643,
+      "surface": "Mr. Holmes",
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "第1章/回原文上下文明确指 Sherlock Holmes（称呼 'Mr. Holmes'）"
+    },
+    {
+      "sample_id": "s034",
+      "start": 11769,
+      "end": 11773,
+      "surface": "Hope",
+      "chapter_index": 1,
+      "gold_id": "g004",
+      "note": "指欧洲事务大臣特里劳尼·霍普（Trelawney Hope）"
+    },
+    {
+      "sample_id": "s035",
+      "start": 12331,
+      "end": 12349,
+      "surface": "The Prime Minister",
+      "chapter_index": 1,
+      "gold_id": "g003",
+      "note": "第1章/回原文上下文明确指 Lord Bellinger（称呼 'The Prime Minister'）"
+    },
+    {
+      "sample_id": "s036",
+      "start": 13284,
+      "end": 13302,
+      "surface": "European Secretary",
+      "chapter_index": 1,
+      "gold_id": "g004",
+      "note": "第1章/回原文上下文明确指 Trelawney Hope（称呼 'European Secretary'）"
+    },
+    {
+      "sample_id": "s037",
+      "start": 13347,
+      "end": 13353,
+      "surface": "London",
+      "chapter_index": 1,
+      "gold_id": "g015",
+      "note": "第1章/回原文上下文明确指 London（称呼 'London'）"
+    },
+    {
+      "sample_id": "s038",
+      "start": 13483,
+      "end": 13501,
+      "surface": "The Prime Minister",
+      "chapter_index": 1,
+      "gold_id": "g003",
+      "note": "第1章/回原文上下文明确指 Lord Bellinger（称呼 'The Prime Minister'）"
+    },
+    {
+      "sample_id": "s039",
+      "start": 13703,
+      "end": 13707,
+      "surface": "Hope",
+      "chapter_index": 1,
+      "gold_id": "g004",
+      "note": "指欧洲事务大臣特里劳尼·霍普（Trelawney Hope）"
+    },
+    {
+      "sample_id": "s040",
+      "start": 14216,
+      "end": 14222,
+      "surface": "London",
+      "chapter_index": 1,
+      "gold_id": "g015",
+      "note": "第1章/回原文上下文明确指 London（称呼 'London'）"
+    },
+    {
+      "sample_id": "s041",
+      "start": 14950,
+      "end": 14959,
+      "surface": "Oberstein",
+      "chapter_index": 1,
+      "gold_id": "g013",
+      "note": "第1章/回原文上下文明确指 Hugo Oberstein（称呼 'Oberstein'）"
+    },
+    {
+      "sample_id": "s042",
+      "start": 14961,
+      "end": 14972,
+      "surface": "La Rothiere",
+      "chapter_index": 1,
+      "gold_id": "g014",
+      "note": "第1章/回原文上下文明确指 Louis La Rothiere（称呼 'La Rothiere'）"
+    },
+    {
+      "sample_id": "s043",
+      "start": 14978,
+      "end": 14991,
+      "surface": "Eduardo Lucas",
+      "chapter_index": 1,
+      "gold_id": "g006",
+      "note": "第1章/回原文上下文明确指 Eduardo Lucas (Henri Fournaye)（称呼 'Eduardo Lucas'）"
+    },
+    {
+      "sample_id": "s044",
+      "start": 15061,
+      "end": 15074,
+      "surface": "Eduardo Lucas",
+      "chapter_index": 1,
+      "gold_id": "g006",
+      "note": "第1章/回原文上下文明确指 Eduardo Lucas (Henri Fournaye)（称呼 'Eduardo Lucas'）"
+    },
+    {
+      "sample_id": "s045",
+      "start": 15078,
+      "end": 15094,
+      "surface": "Godolphin Street",
+      "chapter_index": 1,
+      "gold_id": "g017",
+      "note": "第1章/回原文上下文明确指 Godolphin Street（称呼 'Godolphin Street'）"
+    },
+    {
+      "sample_id": "s046",
+      "start": 15860,
+      "end": 15877,
+      "surface": "Mr. Eduardo Lucas",
+      "chapter_index": 1,
+      "gold_id": "g006",
+      "note": "第1章/回原文上下文明确指 Eduardo Lucas (Henri Fournaye)（称呼 'Mr. Eduardo Lucas'）"
+    },
+    {
+      "sample_id": "s047",
+      "start": 16061,
+      "end": 16066,
+      "surface": "Lucas",
+      "chapter_index": 1,
+      "gold_id": "g006",
+      "note": "第1章/回原文上下文明确指 Eduardo Lucas (Henri Fournaye)（称呼 'Lucas'）"
+    },
+    {
+      "sample_id": "s048",
+      "start": 16193,
+      "end": 16199,
+      "surface": "Mitton",
+      "chapter_index": 1,
+      "gold_id": "g011",
+      "note": "第1章/回原文上下文明确指 John Mitton（称呼 'Mitton'）"
+    },
+    {
+      "sample_id": "s049",
+      "start": 16370,
+      "end": 16375,
+      "surface": "Lucas",
+      "chapter_index": 1,
+      "gold_id": "g006",
+      "note": "第1章/回原文上下文明确指 Eduardo Lucas (Henri Fournaye)（称呼 'Lucas'）"
+    },
+    {
+      "sample_id": "s050",
+      "start": 16501,
+      "end": 16508,
+      "surface": "Barrett",
+      "chapter_index": 1,
+      "gold_id": "g010",
+      "note": "第1章/回原文上下文明确指 Constable Barrett（称呼 'Barrett'）"
+    },
+    {
+      "sample_id": "s051",
+      "start": 16524,
+      "end": 16540,
+      "surface": "Godolphin Street",
+      "chapter_index": 1,
+      "gold_id": "g017",
+      "note": "第1章/回原文上下文明确指 Godolphin Street（称呼 'Godolphin Street'）"
+    },
+    {
+      "sample_id": "s052",
+      "start": 17349,
+      "end": 17366,
+      "surface": "Mr. Eduardo Lucas",
+      "chapter_index": 1,
+      "gold_id": "g006",
+      "note": "第1章/回原文上下文明确指 Eduardo Lucas (Henri Fournaye)（称呼 'Mr. Eduardo Lucas'）"
+    },
+    {
+      "sample_id": "s053",
+      "start": 17527,
+      "end": 17533,
+      "surface": "Watson",
+      "chapter_index": 1,
+      "gold_id": "g002",
+      "note": "第1章/回原文上下文明确指 Dr. John Watson（称呼 'Watson'）"
+    },
+    {
+      "sample_id": "s054",
+      "start": 17922,
+      "end": 17928,
+      "surface": "Watson",
+      "chapter_index": 1,
+      "gold_id": "g002",
+      "note": "第1章/回原文上下文明确指 Dr. John Watson（称呼 'Watson'）"
+    },
+    {
+      "sample_id": "s055",
+      "start": 18104,
+      "end": 18120,
+      "surface": "Godolphin Street",
+      "chapter_index": 1,
+      "gold_id": "g017",
+      "note": "第1章/回原文上下文明确指 Godolphin Street（称呼 'Godolphin Street'）"
+    },
+    {
+      "sample_id": "s056",
+      "start": 18158,
+      "end": 18175,
+      "surface": "Whitehall Terrace",
+      "chapter_index": 1,
+      "gold_id": "g018",
+      "note": "第1章/回原文上下文明确指 Whitehall Terrace（称呼 'Whitehall Terrace'）"
+    },
+    {
+      "sample_id": "s057",
+      "start": 18336,
+      "end": 18341,
+      "surface": "Lucas",
+      "chapter_index": 1,
+      "gold_id": "g006",
+      "note": "第1章/回原文上下文明确指 Eduardo Lucas (Henri Fournaye)（称呼 'Lucas'）"
+    },
+    {
+      "sample_id": "s058",
+      "start": 18361,
+      "end": 18372,
+      "surface": "Westminster",
+      "chapter_index": 1,
+      "gold_id": "g019",
+      "note": "第1章/回原文上下文明确指 Westminster（称呼 'Westminster'）"
+    },
+    {
+      "sample_id": "s059",
+      "start": 18407,
+      "end": 18424,
+      "surface": "Whitehall Terrace",
+      "chapter_index": 1,
+      "gold_id": "g018",
+      "note": "第1章/回原文上下文明确指 Whitehall Terrace（称呼 'Whitehall Terrace'）"
+    },
+    {
+      "sample_id": "s060",
+      "start": 18528,
+      "end": 18533,
+      "surface": "Lucas",
+      "chapter_index": 1,
+      "gold_id": "g006",
+      "note": "第1章/回原文上下文明确指 Eduardo Lucas (Henri Fournaye)（称呼 'Lucas'）"
+    },
+    {
+      "sample_id": "s061",
+      "start": 18610,
+      "end": 18628,
+      "surface": "European Secretary",
+      "chapter_index": 1,
+      "gold_id": "g004",
+      "note": "第1章/回原文上下文明确指 Trelawney Hope（称呼 'European Secretary'）"
+    },
+    {
+      "sample_id": "s062",
+      "start": 18762,
+      "end": 18773,
+      "surface": "Mrs. Hudson",
+      "chapter_index": 1,
+      "gold_id": "g012",
+      "note": "第1章/回原文上下文明确指 Mrs. Hudson（称呼 'Mrs. Hudson'）"
+    },
+    {
+      "sample_id": "s063",
+      "start": 18898,
+      "end": 18923,
+      "surface": "Lady Hilda Trelawney Hope",
+      "chapter_index": 1,
+      "gold_id": "g005",
+      "note": "第1章/回原文上下文明确指 Lady Hilda Trelawney Hope（称呼 'Lady Hilda Trelawney Hope'）"
+    },
+    {
+      "sample_id": "s064",
+      "start": 19115,
+      "end": 19121,
+      "surface": "London",
+      "chapter_index": 1,
+      "gold_id": "g015",
+      "note": "第1章/回原文上下文明确指 London（称呼 'London'）"
+    },
+    {
+      "sample_id": "s065",
+      "start": 19827,
+      "end": 19837,
+      "surface": "Mr. Holmes",
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "第1章/回原文上下文明确指 Sherlock Holmes（称呼 'Mr. Holmes'）"
+    },
+    {
+      "sample_id": "s066",
+      "start": 19936,
+      "end": 19942,
+      "surface": "Holmes",
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "第1章/回原文上下文明确指 Sherlock Holmes（称呼 'Holmes'）"
+    },
+    {
+      "sample_id": "s067",
+      "start": 23685,
+      "end": 23691,
+      "surface": "Watson",
+      "chapter_index": 1,
+      "gold_id": "g002",
+      "note": "第1章/回原文上下文明确指 Dr. John Watson（称呼 'Watson'）"
+    },
+    {
+      "sample_id": "s068",
+      "start": 24261,
+      "end": 24277,
+      "surface": "Godolphin Street",
+      "chapter_index": 1,
+      "gold_id": "g017",
+      "note": "第1章/回原文上下文明确指 Godolphin Street（称呼 'Godolphin Street'）"
+    },
+    {
+      "sample_id": "s069",
+      "start": 24330,
+      "end": 24343,
+      "surface": "Eduardo Lucas",
+      "chapter_index": 1,
+      "gold_id": "g006",
+      "note": "第1章/回原文上下文明确指 Eduardo Lucas (Henri Fournaye)（称呼 'Eduardo Lucas'）"
+    },
+    {
+      "sample_id": "s070",
+      "start": 24545,
+      "end": 24551,
+      "surface": "Watson",
+      "chapter_index": 1,
+      "gold_id": "g002",
+      "note": "第1章/回原文上下文明确指 Dr. John Watson（称呼 'Watson'）"
+    },
+    {
+      "sample_id": "s071",
+      "start": 25167,
+      "end": 25178,
+      "surface": "John Mitton",
+      "chapter_index": 1,
+      "gold_id": "g011",
+      "note": "第1章/回原文上下文明确指 John Mitton（称呼 'John Mitton'）"
+    },
+    {
+      "sample_id": "s072",
+      "start": 26088,
+      "end": 26099,
+      "surface": "John Mitton",
+      "chapter_index": 1,
+      "gold_id": "g011",
+      "note": "第1章/回原文上下文明确指 John Mitton（称呼 'John Mitton'）"
+    },
+    {
+      "sample_id": "s073",
+      "start": 26376,
+      "end": 26387,
+      "surface": "Westminster",
+      "chapter_index": 1,
+      "gold_id": "g019",
+      "note": "第1章/回原文上下文明确指 Westminster（称呼 'Westminster'）"
+    },
+    {
+      "sample_id": "s074",
+      "start": 26931,
+      "end": 26937,
+      "surface": "Mitton",
+      "chapter_index": 1,
+      "gold_id": "g011",
+      "note": "第1章/回原文上下文明确指 John Mitton（称呼 'Mitton'）"
+    },
+    {
+      "sample_id": "s075",
+      "start": 26950,
+      "end": 26955,
+      "surface": "Lucas",
+      "chapter_index": 1,
+      "gold_id": "g006",
+      "note": "第1章/回原文上下文明确指 Eduardo Lucas (Henri Fournaye)（称呼 'Lucas'）"
+    },
+    {
+      "sample_id": "s076",
+      "start": 27028,
+      "end": 27034,
+      "surface": "Mitton",
+      "chapter_index": 1,
+      "gold_id": "g011",
+      "note": "第1章/回原文上下文明确指 John Mitton（称呼 'Mitton'）"
+    },
+    {
+      "sample_id": "s077",
+      "start": 27083,
+      "end": 27088,
+      "surface": "Paris",
+      "chapter_index": 1,
+      "gold_id": "g016",
+      "note": "第1章/回原文上下文明确指 Paris（称呼 'Paris'）"
+    },
+    {
+      "sample_id": "s078",
+      "start": 27118,
+      "end": 27124,
+      "surface": "Mitton",
+      "chapter_index": 1,
+      "gold_id": "g011",
+      "note": "第1章/回原文上下文明确指 John Mitton（称呼 'Mitton'）"
+    },
+    {
+      "sample_id": "s079",
+      "start": 27151,
+      "end": 27167,
+      "surface": "Godolphin Street",
+      "chapter_index": 1,
+      "gold_id": "g017",
+      "note": "第1章/回原文上下文明确指 Godolphin Street（称呼 'Godolphin Street'）"
+    },
+    {
+      "sample_id": "s080",
+      "start": 27462,
+      "end": 27480,
+      "surface": "Inspector Lestrade",
+      "chapter_index": 1,
+      "gold_id": "g008",
+      "note": "第1章/回原文上下文明确指 Inspector Lestrade（称呼 'Inspector Lestrade'）"
+    },
+    {
+      "sample_id": "s081",
+      "start": 27642,
+      "end": 27647,
+      "surface": "Paris",
+      "chapter_index": 1,
+      "gold_id": "g016",
+      "note": "第1章/回原文上下文明确指 Paris（称呼 'Paris'）"
+    },
+    {
+      "sample_id": "s082",
+      "start": 27832,
+      "end": 27849,
+      "surface": "Mr. Eduardo Lucas",
+      "chapter_index": 1,
+      "gold_id": "g006",
+      "note": "第1章/回原文上下文明确指 Eduardo Lucas (Henri Fournaye)（称呼 'Mr. Eduardo Lucas'）"
+    },
+    {
+      "sample_id": "s083",
+      "start": 27902,
+      "end": 27918,
+      "surface": "Godolphin Street",
+      "chapter_index": 1,
+      "gold_id": "g017",
+      "note": "第1章/回原文上下文明确指 Godolphin Street（称呼 'Godolphin Street'）"
+    },
+    {
+      "sample_id": "s084",
+      "start": 27920,
+      "end": 27931,
+      "surface": "Westminster",
+      "chapter_index": 1,
+      "gold_id": "g019",
+      "note": "第1章/回原文上下文明确指 Westminster（称呼 'Westminster'）"
+    },
+    {
+      "sample_id": "s085",
+      "start": 28149,
+      "end": 28168,
+      "surface": "Mme. Henri Fournaye",
+      "chapter_index": 1,
+      "gold_id": "g007",
+      "note": "第1章/回原文上下文明确指 Mme. Henri Fournaye（称呼 'Mme. Henri Fournaye'）"
+    },
+    {
+      "sample_id": "s086",
+      "start": 28201,
+      "end": 28215,
+      "surface": "Rue Austerlitz",
+      "chapter_index": 1,
+      "gold_id": "g021",
+      "note": "第1章/回原文上下文明确指 Rue Austerlitz（称呼 'Rue Austerlitz'）"
+    },
+    {
+      "sample_id": "s087",
+      "start": 28414,
+      "end": 28433,
+      "surface": "Mme. Henri Fournaye",
+      "chapter_index": 1,
+      "gold_id": "g007",
+      "note": "第1章/回原文上下文明确指 Mme. Henri Fournaye（称呼 'Mme. Henri Fournaye'）"
+    },
+    {
+      "sample_id": "s088",
+      "start": 28466,
+      "end": 28472,
+      "surface": "London",
+      "chapter_index": 1,
+      "gold_id": "g015",
+      "note": "第1章/回原文上下文明确指 London（称呼 'London'）"
+    },
+    {
+      "sample_id": "s089",
+      "start": 28545,
+      "end": 28556,
+      "surface": "Westminster",
+      "chapter_index": 1,
+      "gold_id": "g019",
+      "note": "第1章/回原文上下文明确指 Westminster（称呼 'Westminster'）"
+    },
+    {
+      "sample_id": "s090",
+      "start": 28618,
+      "end": 28632,
+      "surface": "Henri Fournaye",
+      "chapter_index": 1,
+      "gold_id": "g006",
+      "note": "第1章/回原文上下文明确指 Eduardo Lucas (Henri Fournaye)（称呼 'Henri Fournaye'）"
+    },
+    {
+      "sample_id": "s091",
+      "start": 28637,
+      "end": 28650,
+      "surface": "Eduardo Lucas",
+      "chapter_index": 1,
+      "gold_id": "g006",
+      "note": "第1章/回原文上下文明确指 Eduardo Lucas (Henri Fournaye)（称呼 'Eduardo Lucas'）"
+    },
+    {
+      "sample_id": "s092",
+      "start": 28753,
+      "end": 28759,
+      "surface": "London",
+      "chapter_index": 1,
+      "gold_id": "g015",
+      "note": "第1章/回原文上下文明确指 London（称呼 'London'）"
+    },
+    {
+      "sample_id": "s093",
+      "start": 28764,
+      "end": 28769,
+      "surface": "Paris",
+      "chapter_index": 1,
+      "gold_id": "g016",
+      "note": "第1章/回原文上下文明确指 Paris（称呼 'Paris'）"
+    },
+    {
+      "sample_id": "s094",
+      "start": 28771,
+      "end": 28784,
+      "surface": "Mme. Fournaye",
+      "chapter_index": 1,
+      "gold_id": "g007",
+      "note": "第1章/回原文上下文明确指 Mme. Henri Fournaye（称呼 'Mme. Fournaye'）"
+    },
+    {
+      "sample_id": "s095",
+      "start": 29054,
+      "end": 29060,
+      "surface": "London",
+      "chapter_index": 1,
+      "gold_id": "g015",
+      "note": "第1章/回原文上下文明确指 London（称呼 'London'）"
+    },
+    {
+      "sample_id": "s096",
+      "start": 29214,
+      "end": 29227,
+      "surface": "Charing Cross",
+      "chapter_index": 1,
+      "gold_id": "g022",
+      "note": "第1章/回原文上下文明确指 Charing Cross（称呼 'Charing Cross'）"
+    },
+    {
+      "sample_id": "s097",
+      "start": 29667,
+      "end": 29680,
+      "surface": "Mme. Fournaye",
+      "chapter_index": 1,
+      "gold_id": "g007",
+      "note": "第1章/回原文上下文明确指 Mme. Henri Fournaye（称呼 'Mme. Fournaye'）"
+    },
+    {
+      "sample_id": "s098",
+      "start": 29746,
+      "end": 29762,
+      "surface": "Godolphin Street",
+      "chapter_index": 1,
+      "gold_id": "g017",
+      "note": "第1章/回原文上下文明确指 Godolphin Street（称呼 'Godolphin Street'）"
+    },
+    {
+      "sample_id": "s099",
+      "start": 29882,
+      "end": 29888,
+      "surface": "Watson",
+      "chapter_index": 1,
+      "gold_id": "g002",
+      "note": "第1章/回原文上下文明确指 Dr. John Watson（称呼 'Watson'）"
+    },
+    {
+      "sample_id": "s100",
+      "start": 30109,
+      "end": 30114,
+      "surface": "Paris",
+      "chapter_index": 1,
+      "gold_id": "g016",
+      "note": "第1章/回原文上下文明确指 Paris（称呼 'Paris'）"
+    },
+    {
+      "sample_id": "s101",
+      "start": 30527,
+      "end": 30533,
+      "surface": "Europe",
+      "chapter_index": 1,
+      "gold_id": "g023",
+      "note": "第1章/回原文上下文明确指 Europe（称呼 'Europe'）"
+    },
+    {
+      "sample_id": "s102",
+      "start": 30785,
+      "end": 30790,
+      "surface": "Lucas",
+      "chapter_index": 1,
+      "gold_id": "g006",
+      "note": "第1章/回原文上下文明确指 Eduardo Lucas (Henri Fournaye)（称呼 'Lucas'）"
+    },
+    {
+      "sample_id": "s103",
+      "start": 31002,
+      "end": 31007,
+      "surface": "Paris",
+      "chapter_index": 1,
+      "gold_id": "g016",
+      "note": "第1章/回原文上下文明确指 Paris（称呼 'Paris'）"
+    },
+    {
+      "sample_id": "s104",
+      "start": 31545,
+      "end": 31551,
+      "surface": "Watson",
+      "chapter_index": 1,
+      "gold_id": "g002",
+      "note": "第1章/回原文上下文明确指 Dr. John Watson（称呼 'Watson'）"
+    },
+    {
+      "sample_id": "s105",
+      "start": 31589,
+      "end": 31600,
+      "surface": "Westminster",
+      "chapter_index": 1,
+      "gold_id": "g019",
+      "note": "第1章/回原文上下文明确指 Westminster（称呼 'Westminster'）"
+    },
+    {
+      "sample_id": "s106",
+      "start": 31752,
+      "end": 31760,
+      "surface": "Lestrade",
+      "chapter_index": 1,
+      "gold_id": "g008",
+      "note": "第1章/回原文上下文明确指 Inspector Lestrade（称呼 'Lestrade'）"
+    },
+    {
+      "sample_id": "s107",
+      "start": 32542,
+      "end": 32547,
+      "surface": "Paris",
+      "chapter_index": 1,
+      "gold_id": "g016",
+      "note": "第1章/回原文上下文明确指 Paris（称呼 'Paris'）"
+    },
+    {
+      "sample_id": "s108",
+      "start": 32561,
+      "end": 32569,
+      "surface": "Lestrade",
+      "chapter_index": 1,
+      "gold_id": "g008",
+      "note": "第1章/回原文上下文明确指 Inspector Lestrade（称呼 'Lestrade'）"
+    },
+    {
+      "sample_id": "s109",
+      "start": 34499,
+      "end": 34507,
+      "surface": "Lestrade",
+      "chapter_index": 1,
+      "gold_id": "g008",
+      "note": "第1章/回原文上下文明确指 Inspector Lestrade（称呼 'Lestrade'）"
+    },
+    {
+      "sample_id": "s110",
+      "start": 35402,
+      "end": 35410,
+      "surface": "Lestrade",
+      "chapter_index": 1,
+      "gold_id": "g008",
+      "note": "第1章/回原文上下文明确指 Inspector Lestrade（称呼 'Lestrade'）"
+    },
+    {
+      "sample_id": "s111",
+      "start": 36029,
+      "end": 36037,
+      "surface": "Lestrade",
+      "chapter_index": 1,
+      "gold_id": "g008",
+      "note": "第1章/回原文上下文明确指 Inspector Lestrade（称呼 'Lestrade'）"
+    },
+    {
+      "sample_id": "s112",
+      "start": 36142,
+      "end": 36148,
+      "surface": "Watson",
+      "chapter_index": 1,
+      "gold_id": "g002",
+      "note": "第1章/回原文上下文明确指 Dr. John Watson（称呼 'Watson'）"
+    },
+    {
+      "sample_id": "s113",
+      "start": 36702,
+      "end": 36708,
+      "surface": "Watson",
+      "chapter_index": 1,
+      "gold_id": "g002",
+      "note": "第1章/回原文上下文明确指 Dr. John Watson（称呼 'Watson'）"
+    },
+    {
+      "sample_id": "s114",
+      "start": 36821,
+      "end": 36829,
+      "surface": "Lestrade",
+      "chapter_index": 1,
+      "gold_id": "g008",
+      "note": "第1章/回原文上下文明确指 Inspector Lestrade（称呼 'Lestrade'）"
+    },
+    {
+      "sample_id": "s115",
+      "start": 37145,
+      "end": 37155,
+      "surface": "MacPherson",
+      "chapter_index": 1,
+      "gold_id": "g009",
+      "note": "第1章/回原文上下文明确指 Constable MacPherson（称呼 'MacPherson'）"
+    },
+    {
+      "sample_id": "s116",
+      "start": 38323,
+      "end": 38343,
+      "surface": "Constable MacPherson",
+      "chapter_index": 1,
+      "gold_id": "g009",
+      "note": "第1章/回原文上下文明确指 Constable MacPherson（称呼 'Constable MacPherson'）"
+    },
+    {
+      "sample_id": "s117",
+      "start": 38351,
+      "end": 38359,
+      "surface": "Lestrade",
+      "chapter_index": 1,
+      "gold_id": "g008",
+      "note": "第1章/回原文上下文明确指 Inspector Lestrade（称呼 'Lestrade'）"
+    },
+    {
+      "sample_id": "s118",
+      "start": 39743,
+      "end": 39751,
+      "surface": "Lestrade",
+      "chapter_index": 1,
+      "gold_id": "g008",
+      "note": "第1章/回原文上下文明确指 Inspector Lestrade（称呼 'Lestrade'）"
+    },
+    {
+      "sample_id": "s119",
+      "start": 40283,
+      "end": 40297,
+      "surface": "Trelawney Hope",
+      "chapter_index": 1,
+      "gold_id": "g004",
+      "note": "第1章/回原文上下文明确指 Trelawney Hope（称呼 'Trelawney Hope'）"
+    },
+    {
+      "sample_id": "s120",
+      "start": 40434,
+      "end": 40448,
+      "surface": "Prime Minister",
+      "chapter_index": 1,
+      "gold_id": "g003",
+      "note": "第1章/回原文上下文明确指 Lord Bellinger（称呼 'Prime Minister'）"
+    },
+    {
+      "sample_id": "s121",
+      "start": 40900,
+      "end": 40917,
+      "surface": "Whitehall Terrace",
+      "chapter_index": 1,
+      "gold_id": "g018",
+      "note": "第1章/回原文上下文明确指 Whitehall Terrace（称呼 'Whitehall Terrace'）"
+    },
+    {
+      "sample_id": "s122",
+      "start": 40992,
+      "end": 41010,
+      "surface": "European Secretary",
+      "chapter_index": 1,
+      "gold_id": "g004",
+      "note": "第1章/回原文上下文明确指 Trelawney Hope（称呼 'European Secretary'）"
+    },
+    {
+      "sample_id": "s123",
+      "start": 41022,
+      "end": 41047,
+      "surface": "Lady Hilda Trelawney Hope",
+      "chapter_index": 1,
+      "gold_id": "g005",
+      "note": "第1章/回原文上下文明确指 Lady Hilda Trelawney Hope（称呼 'Lady Hilda Trelawney Hope'）"
+    },
+    {
+      "sample_id": "s124",
+      "start": 41053,
+      "end": 41068,
+      "surface": "Sherlock Holmes",
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "第1章/回原文上下文明确指 Sherlock Holmes（称呼 'Sherlock Holmes'）"
+    },
+    {
+      "sample_id": "s125",
+      "start": 41118,
+      "end": 41128,
+      "surface": "Mr. Holmes",
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "第1章/回原文上下文明确指 Sherlock Holmes（称呼 'Mr. Holmes'）"
+    },
+    {
+      "sample_id": "s126",
+      "start": 42153,
+      "end": 42163,
+      "surface": "Lady Hilda",
+      "chapter_index": 1,
+      "gold_id": "g005",
+      "note": "第1章/回原文上下文明确指 Lady Hilda Trelawney Hope（称呼 'Lady Hilda'）"
+    },
+    {
+      "sample_id": "s127",
+      "start": 42860,
+      "end": 42870,
+      "surface": "Mr. Holmes",
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "第1章/回原文上下文明确指 Sherlock Holmes（称呼 'Mr. Holmes'）"
+    },
+    {
+      "sample_id": "s128",
+      "start": 42890,
+      "end": 42900,
+      "surface": "Lady Hilda",
+      "chapter_index": 1,
+      "gold_id": "g005",
+      "note": "第1章/回原文上下文明确指 Lady Hilda Trelawney Hope（称呼 'Lady Hilda'）"
+    },
+    {
+      "sample_id": "s129",
+      "start": 42926,
+      "end": 42939,
+      "surface": "Eduardo Lucas",
+      "chapter_index": 1,
+      "gold_id": "g006",
+      "note": "第1章/回原文上下文明确指 Eduardo Lucas (Henri Fournaye)（称呼 'Eduardo Lucas'）"
+    },
+    {
+      "sample_id": "s130",
+      "start": 43525,
+      "end": 43535,
+      "surface": "Lady Hilda",
+      "chapter_index": 1,
+      "gold_id": "g005",
+      "note": "第1章/回原文上下文明确指 Lady Hilda Trelawney Hope（称呼 'Lady Hilda'）"
+    },
+    {
+      "sample_id": "s131",
+      "start": 43951,
+      "end": 43961,
+      "surface": "Lady Hilda",
+      "chapter_index": 1,
+      "gold_id": "g005",
+      "note": "第1章/回原文上下文明确指 Lady Hilda Trelawney Hope（称呼 'Lady Hilda'）"
+    },
+    {
+      "sample_id": "s132",
+      "start": 44071,
+      "end": 44089,
+      "surface": "Mr. Trelawney Hope",
+      "chapter_index": 1,
+      "gold_id": "g004",
+      "note": "第1章/回原文上下文明确指 Trelawney Hope（称呼 'Mr. Trelawney Hope'）"
+    },
+    {
+      "sample_id": "s133",
+      "start": 44298,
+      "end": 44308,
+      "surface": "Lady Hilda",
+      "chapter_index": 1,
+      "gold_id": "g005",
+      "note": "第1章/回原文上下文明确指 Lady Hilda Trelawney Hope（称呼 'Lady Hilda'）"
+    },
+    {
+      "sample_id": "s134",
+      "start": 44646,
+      "end": 44652,
+      "surface": "Holmes",
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "第1章/回原文上下文明确指 Sherlock Holmes（称呼 'Holmes'）"
+    },
+    {
+      "sample_id": "s135",
+      "start": 44983,
+      "end": 44989,
+      "surface": "Holmes",
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "第1章/回原文上下文明确指 Sherlock Holmes（称呼 'Holmes'）"
+    },
+    {
+      "sample_id": "s136",
+      "start": 45329,
+      "end": 45339,
+      "surface": "Lady Hilda",
+      "chapter_index": 1,
+      "gold_id": "g005",
+      "note": "第1章/回原文上下文明确指 Lady Hilda Trelawney Hope（称呼 'Lady Hilda'）"
+    },
+    {
+      "sample_id": "s137",
+      "start": 45410,
+      "end": 45416,
+      "surface": "Holmes",
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "第1章/回原文上下文明确指 Sherlock Holmes（称呼 'Holmes'）"
+    },
+    {
+      "sample_id": "s138",
+      "start": 45674,
+      "end": 45684,
+      "surface": "Lady Hilda",
+      "chapter_index": 1,
+      "gold_id": "g005",
+      "note": "第1章/回原文上下文明确指 Lady Hilda Trelawney Hope（称呼 'Lady Hilda'）"
+    },
+    {
+      "sample_id": "s139",
+      "start": 45792,
+      "end": 45802,
+      "surface": "Mr. Holmes",
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "第1章/回原文上下文明确指 Sherlock Holmes（称呼 'Mr. Holmes'）"
+    },
+    {
+      "sample_id": "s140",
+      "start": 45959,
+      "end": 45965,
+      "surface": "London",
+      "chapter_index": 1,
+      "gold_id": "g015",
+      "note": "第1章/回原文上下文明确指 London（称呼 'London'）"
+    },
+    {
+      "sample_id": "s141",
+      "start": 46328,
+      "end": 46338,
+      "surface": "Mr. Holmes",
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "第1章/回原文上下文明确指 Sherlock Holmes（称呼 'Mr. Holmes'）"
+    },
+    {
+      "sample_id": "s142",
+      "start": 47498,
+      "end": 47503,
+      "surface": "Lucas",
+      "chapter_index": 1,
+      "gold_id": "g006",
+      "note": "第1章/回原文上下文明确指 Eduardo Lucas (Henri Fournaye)（称呼 'Lucas'）"
+    },
+    {
+      "sample_id": "s143",
+      "start": 47590,
+      "end": 47606,
+      "surface": "Godolphin Street",
+      "chapter_index": 1,
+      "gold_id": "g017",
+      "note": "第1章/回原文上下文明确指 Godolphin Street（称呼 'Godolphin Street'）"
+    },
+    {
+      "sample_id": "s144",
+      "start": 47674,
+      "end": 47679,
+      "surface": "Lucas",
+      "chapter_index": 1,
+      "gold_id": "g006",
+      "note": "第1章/回原文上下文明确指 Eduardo Lucas (Henri Fournaye)（称呼 'Lucas'）"
+    },
+    {
+      "sample_id": "s145",
+      "start": 49772,
+      "end": 49794,
+      "surface": "The European Secretary",
+      "chapter_index": 1,
+      "gold_id": "g004",
+      "note": "第1章/回原文上下文明确指 Trelawney Hope（称呼 'The European Secretary'）"
+    },
+    {
+      "sample_id": "s146",
+      "start": 49939,
+      "end": 49957,
+      "surface": "The Prime Minister",
+      "chapter_index": 1,
+      "gold_id": "g003",
+      "note": "第1章/回原文上下文明确指 Lord Bellinger（称呼 'The Prime Minister'）"
+    },
+    {
+      "sample_id": "s147",
+      "start": 50120,
+      "end": 50134,
+      "surface": "Prime Minister",
+      "chapter_index": 1,
+      "gold_id": "g003",
+      "note": "第1章/回原文上下文明确指 Lord Bellinger（称呼 'Prime Minister'）"
+    },
+    {
+      "sample_id": "s148",
+      "start": 50262,
+      "end": 50280,
+      "surface": "The Prime Minister",
+      "chapter_index": 1,
+      "gold_id": "g003",
+      "note": "第1章/回原文上下文明确指 Lord Bellinger（称呼 'The Prime Minister'）"
+    },
+    {
+      "sample_id": "s149",
+      "start": 51738,
+      "end": 51742,
+      "surface": "Hope",
+      "chapter_index": 1,
+      "gold_id": "g004",
+      "note": "指欧洲事务大臣特里劳尼·霍普（Trelawney Hope）"
+    },
+    {
+      "sample_id": "s150",
+      "start": 51754,
+      "end": 51761,
+      "surface": "Premier",
+      "chapter_index": 1,
+      "gold_id": "g003",
+      "note": "第1章/回原文上下文明确指 Lord Bellinger（称呼 'Premier'）"
+    },
+    {
+      "sample_id": "s151",
+      "start": 52270,
+      "end": 52284,
+      "surface": "Lord Bellinger",
+      "chapter_index": 1,
+      "gold_id": "g003",
+      "note": "第1章/回原文上下文明确指 Lord Bellinger（称呼 'Lord Bellinger'）"
+    },
+    {
+      "sample_id": "s152",
+      "start": 52286,
+      "end": 52300,
+      "surface": "Lord Bellinger",
+      "chapter_index": 1,
+      "gold_id": "g003",
+      "note": "第1章/回原文上下文明确指 Lord Bellinger（称呼 'Lord Bellinger'）"
+    },
+    {
+      "sample_id": "s153",
+      "start": 52304,
+      "end": 52315,
+      "surface": "The Premier",
+      "chapter_index": 1,
+      "gold_id": "g003",
+      "note": "第1章/回原文上下文明确指 Lord Bellinger（称呼 'The Premier'）"
+    },
+    {
+      "sample_id": "s154",
+      "start": 52400,
+      "end": 52404,
+      "surface": "Hope",
+      "chapter_index": 1,
+      "gold_id": "g004",
+      "note": "指欧洲事务大臣特里劳尼·霍普（Trelawney Hope）"
+    },
+    {
+      "sample_id": "s155",
+      "start": 52740,
+      "end": 52745,
+      "surface": "Hilda",
+      "chapter_index": 1,
+      "gold_id": "g005",
+      "note": "第1章/回原文上下文明确指 Lady Hilda Trelawney Hope（称呼 'Hilda'）"
+    },
+    {
+      "sample_id": "s156",
+      "start": 52747,
+      "end": 52752,
+      "surface": "Hilda",
+      "chapter_index": 1,
+      "gold_id": "g005",
+      "note": "第1章/回原文上下文明确指 Lady Hilda Trelawney Hope（称呼 'Hilda'）"
+    },
+    {
+      "sample_id": "s157",
+      "start": 52790,
+      "end": 52801,
+      "surface": "The Premier",
+      "chapter_index": 1,
+      "gold_id": "g003",
+      "note": "第1章/回原文上下文明确指 Lord Bellinger（称呼 'The Premier'）"
+    },
+    {
+      "sample_id": "s158",
+      "start": 52812,
+      "end": 52818,
+      "surface": "Holmes",
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "第1章/回原文上下文明确指 Sherlock Holmes（称呼 'Holmes'）"
+    }
+  ]
+}

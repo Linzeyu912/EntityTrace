@@ -1,0 +1,137 @@
+{
+  "book": "01_中文短篇_伤逝_鲁迅.txt",
+  "book_id": "shangshi",
+  "source_sha256": "6ccb298c0be472a096ca111c5f30b40b51ffd7ef97722c852ea4c3158db53ecd",
+  "labeler": "agent:gemini-4-argon",
+  "human_review": "pending",
+  "entities": [
+    {
+      "gold_id": "g001",
+      "kind": "person",
+      "canonical": "子君",
+      "aliases": [
+        "子君"
+      ],
+      "note": "女主人公子君；首见原文码点 [26,28) '子君'"
+    },
+    {
+      "gold_id": "g002",
+      "kind": "person",
+      "canonical": "史涓生",
+      "aliases": [
+        "史涓生",
+        "涓生"
+      ],
+      "note": "男主人公（叙述者）史涓生；首见原文码点 [3660,3663) '史涓生'"
+    },
+    {
+      "gold_id": "g003",
+      "kind": "person",
+      "canonical": "小东西",
+      "aliases": [
+        "小东西"
+      ],
+      "note": "吉兆胡同邻院搽雪花膏的年轻女子‘小东西’；首见原文码点 [654,657) '小东西'"
+    },
+    {
+      "gold_id": "g004",
+      "kind": "person",
+      "canonical": "局长",
+      "aliases": [
+        "局长"
+      ],
+      "note": "免去涓生职务的局里局长；首见原文码点 [3657,3659) '局长'"
+    },
+    {
+      "gold_id": "g005",
+      "kind": "person",
+      "canonical": "伊孛生",
+      "aliases": [
+        "伊孛生"
+      ],
+      "note": "挪威剧作家易卜生（文中作伊孛生）；首见原文码点 [820,823) '伊孛生'"
+    },
+    {
+      "gold_id": "g006",
+      "kind": "person",
+      "canonical": "泰戈尔",
+      "aliases": [
+        "泰戈尔"
+      ],
+      "note": "印度诗人泰戈尔；首见原文码点 [825,828) '泰戈尔'"
+    },
+    {
+      "gold_id": "g007",
+      "kind": "person",
+      "canonical": "雪莱",
+      "aliases": [
+        "雪莱"
+      ],
+      "note": "英国诗人雪莱；首见原文码点 [830,832) '雪莱'"
+    },
+    {
+      "gold_id": "g008",
+      "kind": "person",
+      "canonical": "诺拉",
+      "aliases": [
+        "诺拉"
+      ],
+      "note": "《娜拉》（文中作《诺拉》）中的人物诺拉；首见原文码点 [7296,7298) '诺拉'"
+    },
+    {
+      "gold_id": "g009",
+      "kind": "object",
+      "canonical": "阿随",
+      "aliases": [
+        "阿随"
+      ],
+      "note": "涓生与子君饲养的狗阿随；首见原文码点 [2921,2923) '阿随'"
+    },
+    {
+      "gold_id": "g010",
+      "kind": "place",
+      "canonical": "会馆",
+      "aliases": [
+        "会馆"
+      ],
+      "note": "涓生独居及重回的会馆；首见原文码点 [35,37) '会馆'"
+    },
+    {
+      "gold_id": "g011",
+      "kind": "place",
+      "canonical": "吉兆胡同",
+      "aliases": [
+        "吉兆胡同"
+      ],
+      "note": "涓生与子君同居的吉兆胡同；首见原文码点 [224,228) '吉兆胡同'"
+    },
+    {
+      "gold_id": "g012",
+      "kind": "place",
+      "canonical": "通俗图书馆",
+      "aliases": [
+        "通俗图书馆"
+      ],
+      "note": "涓生失职后常去取暖写信的通俗图书馆；首见原文码点 [6003,6008) '通俗图书馆'"
+    },
+    {
+      "gold_id": "g013",
+      "kind": "place",
+      "canonical": "公园",
+      "aliases": [
+        "公园"
+      ],
+      "note": "涓生与子君曾同游的公园；首见原文码点 [2139,2141) '公园'"
+    },
+    {
+      "gold_id": "g014",
+      "kind": "place",
+      "canonical": "北京",
+      "aliases": [
+        "北京"
+      ],
+      "note": "故事发生地北京；首见原文码点 [8137,8139) '北京'"
+    }
+  ],
+  "ambiguous_surfaces": []
+}

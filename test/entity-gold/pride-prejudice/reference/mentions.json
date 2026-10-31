@@ -1,0 +1,6570 @@
+{
+  "book": "04_英文长篇_Pride_and_Prejudice_61章.txt",
+  "book_id": "pride-prejudice",
+  "source_sha256": "bef40b0773f5f1857216fa56233e8a4851ab3a98c86b94d4356b005501e912ff",
+  "labeler": "agent:gemini-manual-context-r3",
+  "human_review": "pending",
+  "sampling_version": "r3-stratified-v1",
+  "seed": 20261030,
+  "major_entity_min_occurrences": 20,
+  "major_entity_ids": [
+    "g001",
+    "g002",
+    "g003",
+    "g004",
+    "g005",
+    "g006",
+    "g007",
+    "g008",
+    "g009",
+    "g010",
+    "g011",
+    "g012",
+    "g013",
+    "g014",
+    "g015",
+    "g016",
+    "g017",
+    "g018",
+    "g019",
+    "g021",
+    "g023",
+    "g024",
+    "g027",
+    "g035",
+    "g036",
+    "g037",
+    "g038",
+    "g039",
+    "g040",
+    "g041",
+    "g042",
+    "g044",
+    "g045"
+  ],
+  "entity_occurrence_counts": {
+    "g001": 752,
+    "g002": 294,
+    "g003": 377,
+    "g004": 224,
+    "g005": 89,
+    "g006": 154,
+    "g007": 173,
+    "g008": 191,
+    "g009": 149,
+    "g010": 139,
+    "g011": 81,
+    "g012": 37,
+    "g013": 116,
+    "g014": 54,
+    "g015": 34,
+    "g016": 57,
+    "g017": 35,
+    "g018": 103,
+    "g019": 27,
+    "g020": 12,
+    "g021": 44,
+    "g022": 18,
+    "g023": 20,
+    "g024": 20,
+    "g025": 5,
+    "g026": 11,
+    "g027": 27,
+    "g028": 14,
+    "g029": 10,
+    "g030": 12,
+    "g031": 4,
+    "g032": 14,
+    "g033": 7,
+    "g034": 8,
+    "g035": 88,
+    "g036": 73,
+    "g037": 57,
+    "g038": 55,
+    "g039": 53,
+    "g040": 49,
+    "g041": 25,
+    "g042": 24,
+    "g043": 10,
+    "g044": 24,
+    "g045": 41,
+    "g046": 14,
+    "g047": 9,
+    "g048": 6
+  },
+  "out_of_roster_entities": [
+    {
+      "gold_id": "x001",
+      "kind": "person",
+      "canonical": "The late Mr. Darcy",
+      "note": "达西先生已故的父亲（老达西先生），如 s358 'his father'"
+    },
+    {
+      "gold_id": "x002",
+      "kind": "person",
+      "canonical": "Mr. Wickham's father",
+      "note": "彭伯里已故老管事、乔治·威克姆之父，如 s349 'her late master’s steward'"
+    },
+    {
+      "gold_id": "x003",
+      "kind": "person",
+      "canonical": "Mrs. Jenkinson",
+      "note": "罗新斯庄园陪伴德·包尔小姐的詹金森太太"
+    },
+    {
+      "gold_id": "x004",
+      "kind": "person",
+      "canonical": "Mr. Jones",
+      "note": "麦里屯/浪博恩一带的药剂师琼斯先生"
+    },
+    {
+      "gold_id": "x005",
+      "kind": "person",
+      "canonical": "Sarah",
+      "note": "浪博恩班纳特家的女仆萨拉，如 s496 'Sarah'"
+    },
+    {
+      "gold_id": "x006",
+      "kind": "person",
+      "canonical": "Sally",
+      "note": "莉迪亚信中提到替她修补裙子的萨莉，如 s425 'Sally'"
+    },
+    {
+      "gold_id": "x007",
+      "kind": "person",
+      "canonical": "William Goulding",
+      "note": "浪博恩附近的邻居威廉·古尔丁，如 s459 'William Goulding'"
+    },
+    {
+      "gold_id": "x008",
+      "kind": "place",
+      "canonical": "Blenheim",
+      "note": "北上德比郡旅途中经过的布莱尼姆，如 s343 'Blenheim'"
+    },
+    {
+      "gold_id": "x009",
+      "kind": "place",
+      "canonical": "Eastbourne",
+      "note": "苏塞克斯郡海滨小镇伊斯特本，如 s444 'Eastbourne'"
+    },
+    {
+      "gold_id": "x010",
+      "kind": "place",
+      "canonical": "Gretna Green",
+      "note": "苏格兰边境私奔结婚小镇格雷特纳格林，如 s390 'Gretna Green'"
+    },
+    {
+      "gold_id": "x011",
+      "kind": "place",
+      "canonical": "Scotland",
+      "note": "苏格兰，如 s396 'Scotland'"
+    },
+    {
+      "gold_id": "x012",
+      "kind": "place",
+      "canonical": "St. Clement’s",
+      "note": "伦敦圣克莱门特教堂（威克姆与莉迪亚完婚处），如 s463 'St. Clement’s'"
+    },
+    {
+      "gold_id": "x013",
+      "kind": "place",
+      "canonical": "----shire",
+      "note": "民兵团所属的某郡（----shire）"
+    },
+    {
+      "gold_id": "x014",
+      "kind": "person",
+      "canonical": "The late Mr. Bingley",
+      "note": "宾利兄妹已故的父亲（老宾利先生），第8章Miss Bingley提及‘my father should have left so small a collection of books’"
+    },
+    {
+      "gold_id": "x026",
+      "kind": "person",
+      "canonical": "Mrs. Wickham (senior)",
+      "note": "老威克姆之妻、乔治·威克姆之母（因挥霍导致丈夫贫困），如 s274 'his wife'"
+    }
+  ],
+  "annotation_started_at": "2026-10-30T06:53:50Z",
+  "annotation_finished_at": "2026-10-30T07:00:50Z",
+  "annotation_seconds": 650.3,
+  "entity_stratum_count": 396,
+  "hard_stratum_count": 150,
+  "total_mentions": 546,
+  "mentions": [
+    {
+      "sample_id": "s001",
+      "start": 1494,
+      "end": 1504,
+      "surface": "Mr. Bennet",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g005",
+      "note": "第1章班纳特太太就Bingley是年入四五千镑的单身汉与丈夫对话，称呼“My dear Mr. Bennet”，指班纳特先生"
+    },
+    {
+      "sample_id": "s002",
+      "start": 2560,
+      "end": 2571,
+      "surface": "Sir William",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g021",
+      "note": "第1章班纳特太太劝丈夫去拜访Bingley时提到“Sir William and Lady Lucas are determined to go”，指威廉·卢卡斯爵士"
+    },
+    {
+      "sample_id": "s003",
+      "start": 3197,
+      "end": 3202,
+      "surface": "Lydia",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g007",
+      "note": "第1章班纳特太太反驳丈夫偏爱Lizzy时说她“not half so good-humoured as Lydia”，指幼女莉迪亚·班纳特"
+    },
+    {
+      "sample_id": "s004",
+      "start": 4852,
+      "end": 4871,
+      "surface": "his second daughter",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster"
+      ],
+      "chapter_index": 2,
+      "gold_id": "g001",
+      "note": "第2章班纳特先生看到“his second daughter employed in trimming a hat”，随后直呼其“Lizzy”，指次女伊丽莎白·班纳特"
+    },
+    {
+      "sample_id": "s005",
+      "start": 5014,
+      "end": 5025,
+      "surface": "Mr. Bingley",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 2,
+      "gold_id": "g004",
+      "note": "第2章班纳特太太赌气说既然不去拜访，就无从知道“_what_ Mr. Bingley likes”，指新搬来的查尔斯·宾利先生"
+    },
+    {
+      "sample_id": "s006",
+      "start": 5124,
+      "end": 5133,
+      "surface": "Elizabeth",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 2,
+      "gold_id": "g001",
+      "note": "第2章劝慰母亲说会在舞会上遇到Bingley并由Mrs. Long介绍的“Elizabeth”，指伊丽莎白·班纳特"
+    },
+    {
+      "sample_id": "s007",
+      "start": 5406,
+      "end": 5416,
+      "surface": "Mr. Bennet",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 2,
+      "gold_id": "g005",
+      "note": "第2章附和妻子对Mrs. Long的负面评价说“No more have I”的“Mr. Bennet”，指班纳特先生"
+    },
+    {
+      "sample_id": "s008",
+      "start": 5844,
+      "end": 5849,
+      "surface": "Kitty",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 2,
+      "gold_id": "g011",
+      "note": "第2章因不停咳嗽被母亲责备、愤愤回答“I do not cough for my own amusement”的“Kitty”，指四女基蒂·班纳特"
+    },
+    {
+      "sample_id": "s009",
+      "start": 9292,
+      "end": 9302,
+      "surface": "Lady Lucas",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 3,
+      "gold_id": "g022",
+      "note": "第3章班纳特母女从邻居处打听到Bingley的第二手消息，即“their neighbour, Lady Lucas”，指卢卡斯夫人"
+    },
+    {
+      "sample_id": "s010",
+      "start": 9338,
+      "end": 9349,
+      "surface": "Sir William",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 3,
+      "gold_id": "g021",
+      "note": "第3章Lady Lucas转述丈夫拜访Bingley后的好评：“Sir William had been delighted with him”，指威廉·卢卡斯爵士"
+    },
+    {
+      "sample_id": "s011",
+      "start": 9883,
+      "end": 9894,
+      "surface": "Mr. Bingley",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 3,
+      "gold_id": "g004",
+      "note": "第3章几天后回访班纳特先生并在书房坐了十分钟的“Mr. Bingley”，指查尔斯·宾利先生"
+    },
+    {
+      "sample_id": "s012",
+      "start": 10837,
+      "end": 10848,
+      "surface": "Netherfield",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 3,
+      "gold_id": "g036",
+      "note": "第3章班纳特太太担心Bingley刚来赫特福德郡就去伦敦，永远不会在“Netherfield”安顿下来，指尼日斐花园"
+    },
+    {
+      "sample_id": "s013",
+      "start": 12334,
+      "end": 12344,
+      "surface": "Derbyshire",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 3,
+      "gold_id": "g044",
+      "note": "第3章舞会上众人发现达西傲慢冷漠，即便他在“Derbyshire”拥有庞大产业也无法挽回坏印象，指德比郡"
+    },
+    {
+      "sample_id": "s014",
+      "start": 12684,
+      "end": 12695,
+      "surface": "Netherfield",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 3,
+      "gold_id": "g036",
+      "note": "第3章Bingley在舞会上跳了每一支舞，还谈到要在“Netherfield”自己举办一场舞会，指尼日斐花园"
+    },
+    {
+      "sample_id": "s015",
+      "start": 13337,
+      "end": 13353,
+      "surface": "Elizabeth Bennet",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster"
+      ],
+      "chapter_index": 3,
+      "gold_id": "g001",
+      "note": "第3章因男宾不足而坐下歇了两支舞、无意听见Darcy与Bingley对话的“Elizabeth Bennet”，指伊丽莎白·班纳特"
+    },
+    {
+      "sample_id": "s016",
+      "start": 13646,
+      "end": 13651,
+      "surface": "Darcy",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 3,
+      "gold_id": "g003",
+      "note": "第3章Bingley从舞池走过来劝朋友跳舞时呼唤“Come, Darcy”，指费茨威廉·达西先生"
+    },
+    {
+      "sample_id": "s017",
+      "start": 15055,
+      "end": 15064,
+      "surface": "Mr. Darcy",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 3,
+      "gold_id": "g003",
+      "note": "第3章说出伊丽莎白不够漂亮无法打动自己后转身走开的“Mr. Darcy”，指费茨威廉·达西先生"
+    },
+    {
+      "sample_id": "s018",
+      "start": 15624,
+      "end": 15628,
+      "surface": "Jane",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 3,
+      "gold_id": "g002",
+      "note": "第3章看到长姐受尼日斐一行人赞赏，伊丽莎白为“Jane’s pleasure”感到高兴，指简·班纳特"
+    },
+    {
+      "sample_id": "s019",
+      "start": 17182,
+      "end": 17193,
+      "surface": "Maria Lucas",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 3,
+      "gold_id": "g023",
+      "note": "第3章班纳特太太向丈夫数算Bingley的舞伴顺序：第四支舞与“Maria Lucas”跳，指玛丽亚·卢卡斯"
+    },
+    {
+      "sample_id": "s020",
+      "start": 17725,
+      "end": 17735,
+      "surface": "Mrs. Hurst",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 3,
+      "gold_id": "g019",
+      "note": "第3章班纳特太太向丈夫夸赞Bingley姐妹的礼服并提到“the lace upon Mrs. Hurst’s gown”，指赫斯特太太"
+    },
+    {
+      "sample_id": "s021",
+      "start": 19474,
+      "end": 19479,
+      "surface": "Lizzy",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 4,
+      "gold_id": "g001",
+      "note": "第4章简听到妹妹调侃自己喜欢过更蠢的人后惊呼“Dear Lizzy!”，指伊丽莎白·班纳特"
+    },
+    {
+      "sample_id": "s022",
+      "start": 22121,
+      "end": 22133,
+      "surface": "Miss Bingley",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 4,
+      "gold_id": "g018",
+      "note": "第4章介绍Bingley姐妹时提到，虽他只是租客，“Miss Bingley”却很乐意为他主持家务，指卡罗琳·宾利"
+    },
+    {
+      "sample_id": "s023",
+      "start": 23450,
+      "end": 23457,
+      "surface": "Meryton",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 4,
+      "gold_id": "g037",
+      "note": "第4章对比Bingley与Darcy两人谈论“the Meryton assembly”（麦里屯舞会）时的截然不同态度，指麦里屯"
+    },
+    {
+      "sample_id": "s024",
+      "start": 23996,
+      "end": 24007,
+      "surface": "Miss Bennet",
+      "stratum": "hard",
+      "hard_features": [
+        "ambiguous_surface",
+        "out_of_roster",
+        "title_or_official"
+      ],
+      "chapter_index": 4,
+      "gold_id": "g002",
+      "note": "第4章Bingley认为长女如天使般美丽，而Darcy只承认“Miss Bennet”漂亮但笑得太多，指简·班纳特"
+    },
+    {
+      "sample_id": "s025",
+      "start": 24064,
+      "end": 24074,
+      "surface": "Mrs. Hurst",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 4,
+      "gold_id": "g019",
+      "note": "第4章紧接上句，“Mrs. Hurst and her sister”也认同简笑得太多但仍称赞她是可爱的姑娘，指赫斯特太太"
+    },
+    {
+      "sample_id": "s026",
+      "start": 25787,
+      "end": 25796,
+      "surface": "Charlotte",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 5,
+      "gold_id": "g010",
+      "note": "第5章舞会次日卢卡斯小姐们来访，班纳特太太对Miss Lucas说“_You_ began the evening well, Charlotte”，指夏洛特·卢卡斯"
+    },
+    {
+      "sample_id": "s027",
+      "start": 26318,
+      "end": 26325,
+      "surface": "Meryton",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 5,
+      "gold_id": "g037",
+      "note": "第5章夏洛特提及听到Mr. Robinson问Bingley觉得他们的“Meryton assemblies”如何，指麦里屯"
+    },
+    {
+      "sample_id": "s028",
+      "start": 27357,
+      "end": 27368,
+      "surface": "Netherfield",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 5,
+      "gold_id": "g036",
+      "note": "第5章班纳特太太说Mrs. Long最后问Darcy喜不喜欢“Netherfield”，他才不得不答话，指尼日斐花园"
+    },
+    {
+      "sample_id": "s029",
+      "start": 27965,
+      "end": 27975,
+      "surface": "Miss Lucas",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 5,
+      "gold_id": "g010",
+      "note": "第5章回应班纳特太太关于Mrs. Long的话题、说希望Darcy曾与Eliza跳舞的“Miss Lucas”，指夏洛特·卢卡斯"
+    },
+    {
+      "sample_id": "s030",
+      "start": 28612,
+      "end": 28616,
+      "surface": "Mary",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 5,
+      "gold_id": "g012",
+      "note": "第5章自诩见解深刻、发表关于骄傲是人性通病议论的“Mary”，指三女玛丽·班纳特"
+    },
+    {
+      "sample_id": "s031",
+      "start": 29781,
+      "end": 29792,
+      "surface": "Miss Bennet",
+      "stratum": "hard",
+      "hard_features": [
+        "ambiguous_surface",
+        "out_of_roster",
+        "title_or_official"
+      ],
+      "chapter_index": 6,
+      "gold_id": "g002",
+      "note": "第6章浪博恩与尼日斐女眷互访，“Miss Bennet’s pleasing manners”赢得了Mrs. Hurst和Miss Bingley的好感，后文以“By Jane”承接，指简·班纳特"
+    },
+    {
+      "sample_id": "s032",
+      "start": 29852,
+      "end": 29864,
+      "surface": "Miss Bingley",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 6,
+      "gold_id": "g018",
+      "note": "第6章紧接上文，简的宜人举止赢得了Mrs. Hurst与“Miss Bingley”的好感，指卡罗琳·宾利"
+    },
+    {
+      "sample_id": "s033",
+      "start": 35634,
+      "end": 35651,
+      "surface": "Sir William Lucas",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 6,
+      "gold_id": "g021",
+      "note": "第6章达西开始留意伊丽莎白与他人的交谈，当时大型聚会是在“Sir William Lucas’s”举行，指威廉·卢卡斯爵士"
+    },
+    {
+      "sample_id": "s034",
+      "start": 35781,
+      "end": 35796,
+      "surface": "Colonel Forster",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 6,
+      "gold_id": "g027",
+      "note": "第6章伊丽莎白在卢卡斯家聚会上问夏洛特：达西为何偷听她与“Colonel Forster”的谈话，指福斯特上校"
+    },
+    {
+      "sample_id": "s035",
+      "start": 36400,
+      "end": 36415,
+      "surface": "Colonel Forster",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 6,
+      "gold_id": "g027",
+      "note": "第6章伊丽莎白主动转向达西，问他刚才自己纠缠“Colonel Forster”在麦里屯办舞会时是否表达得很好，指福斯特上校"
+    },
+    {
+      "sample_id": "s036",
+      "start": 39055,
+      "end": 39062,
+      "surface": "Meryton",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 6,
+      "gold_id": "g037",
+      "note": "第6章威廉爵士恭维达西善舞，达西回答“You saw me dance at Meryton, I believe, sir”，指麦里屯"
+    },
+    {
+      "sample_id": "s037",
+      "start": 39537,
+      "end": 39543,
+      "surface": "London",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 6,
+      "gold_id": "g038",
+      "note": "第6章威廉爵士对达西说自己曾想在城里定居，但不确定“the air of London”是否适合卢卡斯夫人，指伦敦"
+    },
+    {
+      "sample_id": "s038",
+      "start": 40482,
+      "end": 40493,
+      "surface": "Sir William",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 6,
+      "gold_id": "g021",
+      "note": "第6章伊丽莎白坚决拒绝与达西跳舞，“Sir William”试图劝说也未能动摇她的决心，指威廉·卢卡斯爵士"
+    },
+    {
+      "sample_id": "s039",
+      "start": 42728,
+      "end": 42738,
+      "surface": "Mr. Bennet",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 7,
+      "gold_id": "g005",
+      "note": "第7章开头介绍“Mr. Bennet’s property”几乎全是一处年入两千镑但限定继承的地产，指班纳特先生"
+    },
+    {
+      "sample_id": "s040",
+      "start": 43307,
+      "end": 43316,
+      "surface": "Longbourn",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 7,
+      "gold_id": "g035",
+      "note": "第7章介绍“The village of Longbourn”距离麦里屯仅一英里，班纳特家姑娘们常去那里看望姨妈，指浪博恩"
+    },
+    {
+      "sample_id": "s041",
+      "start": 43568,
+      "end": 43577,
+      "surface": "Catherine",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 7,
+      "gold_id": "g011",
+      "note": "第7章提到班纳特家最小的两个女儿“Catherine and Lydia”尤其常去麦里屯看望姨妈和打听军官消息，指四女基蒂（凯瑟琳）·班纳特"
+    },
+    {
+      "sample_id": "s042",
+      "start": 44161,
+      "end": 44173,
+      "surface": "Mrs. Philips",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 7,
+      "gold_id": "g024",
+      "note": "第7章民兵团进驻麦里屯后，姑娘们拜访“Mrs. Philips”总能得到最有趣的军官消息，指菲利普斯太太"
+    },
+    {
+      "sample_id": "s043",
+      "start": 47038,
+      "end": 47044,
+      "surface": "Louisa",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 7,
+      "gold_id": "g019",
+      "note": "第7章简朗读卡罗琳·宾利的来信，信中邀请简今天来与“Louisa and me”共进晚餐，指卡罗琳之姊路易莎·赫斯特太太"
+    },
+    {
+      "sample_id": "s044",
+      "start": 50940,
+      "end": 50947,
+      "surface": "Meryton",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 7,
+      "gold_id": "g037",
+      "note": "第7章基蒂和莉迪亚陪伊丽莎白走到“Meryton”后分手，两个妹妹去找军官太太，伊丽莎白独自步行前往尼日斐，指麦里屯"
+    },
+    {
+      "sample_id": "s045",
+      "start": 51847,
+      "end": 51856,
+      "surface": "Mr. Darcy",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 7,
+      "gold_id": "g003",
+      "note": "第7章伊丽莎白步行抵达尼日斐后，“Mr. Darcy said very little”，一面赞叹她因运动而焕发的气色一面怀疑她独自走这么远是否妥当，指达西先生"
+    },
+    {
+      "sample_id": "s046",
+      "start": 53740,
+      "end": 53751,
+      "surface": "Netherfield",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 7,
+      "gold_id": "g036",
+      "note": "第7章简因病不舍妹妹离开，宾利小姐只好将派马车送行的提议改为邀请伊丽莎白留在“Netherfield”，指尼日斐花园"
+    },
+    {
+      "sample_id": "s047",
+      "start": 54737,
+      "end": 54741,
+      "surface": "Jane",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 8,
+      "gold_id": "g002",
+      "note": "第8章晚饭时伊丽莎白觉得只有Bingley令人满意，“His anxiety for Jane was evident”，指卧病在楼上的简·班纳特"
+    },
+    {
+      "sample_id": "s048",
+      "start": 55035,
+      "end": 55044,
+      "surface": "Mr. Hurst",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 8,
+      "gold_id": "g020",
+      "note": "第8章晚饭时坐在伊丽莎白身旁、只知吃喝打牌的懒散男人“Mr. Hurst”，指赫斯特先生"
+    },
+    {
+      "sample_id": "s049",
+      "start": 56360,
+      "end": 56372,
+      "surface": "Miss Bingley",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 8,
+      "gold_id": "g018",
+      "note": "第8章Bingley说没注意到伊丽莎白弄脏的衬裙后，转头对达西说“_You_ observed it, Mr. Darcy, I am sure”的“Miss Bingley”，指卡罗琳·宾利"
+    },
+    {
+      "sample_id": "s050",
+      "start": 59600,
+      "end": 59609,
+      "surface": "my father",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster"
+      ],
+      "chapter_index": 8,
+      "gold_id": "x014",
+      "note": "第8章在尼日斐探讨读书时，Miss Bingley惊讶于“my father should have left so small a collection of books”，此处指Bingley兄妹已故的父亲老宾利先生"
+    },
+    {
+      "sample_id": "s051",
+      "start": 59697,
+      "end": 59706,
+      "surface": "Pemberley",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 8,
+      "gold_id": "g039",
+      "note": "第8章紧接上文，宾利小姐恭维达西在“Pemberley”拥有令人愉快的藏书室，指彭伯里庄园"
+    },
+    {
+      "sample_id": "s052",
+      "start": 60242,
+      "end": 60251,
+      "surface": "Pemberley",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 8,
+      "gold_id": "g039",
+      "note": "第8章宾利小姐劝哥哥Charles在彭伯里附近置产并以“Pemberley”为榜样建房，指彭伯里庄园"
+    },
+    {
+      "sample_id": "s053",
+      "start": 60317,
+      "end": 60327,
+      "surface": "Derbyshire",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 8,
+      "gold_id": "g044",
+      "note": "第8章宾利小姐紧接着称赞英格兰没有哪个郡比“Derbyshire”更美，指彭伯里所在的德比郡"
+    },
+    {
+      "sample_id": "s054",
+      "start": 60362,
+      "end": 60371,
+      "surface": "Pemberley",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 8,
+      "gold_id": "g039",
+      "note": "第8章Charles回应妹妹说如果达西愿意卖，他很乐意直接买下“Pemberley itself”，指彭伯里庄园"
+    },
+    {
+      "sample_id": "s055",
+      "start": 63160,
+      "end": 63170,
+      "surface": "Mrs. Hurst",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 8,
+      "gold_id": "g019",
+      "note": "第8章伊丽莎白怀疑世上是否有集才华、品味、勤勉与优雅于一身的女性，“Mrs. Hurst and Miss Bingley”双双抗议，指赫斯特太太"
+    },
+    {
+      "sample_id": "s056",
+      "start": 64025,
+      "end": 64037,
+      "surface": "Miss Bingley",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 8,
+      "gold_id": "g018",
+      "note": "第8章达西回应说女性为迷住男人而耍弄心机皆属卑劣，“Miss Bingley”对此回答不够满意而未继续话题，指卡罗琳·宾利"
+    },
+    {
+      "sample_id": "s057",
+      "start": 65335,
+      "end": 65344,
+      "surface": "Longbourn",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 9,
+      "gold_id": "g035",
+      "note": "第9章简病情虽有好转，伊丽莎白仍要求派人送信回“Longbourn”请母亲来看望简，指浪博恩"
+    },
+    {
+      "sample_id": "s058",
+      "start": 66396,
+      "end": 66405,
+      "surface": "Mr. Jones",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "title_or_official"
+      ],
+      "chapter_index": 9,
+      "gold_id": "x004",
+      "note": "第9章班纳特太太对Bingley说简病得太重不能挪动，“Mr. Jones says we must not think of moving her”，指药剂师琼斯先生"
+    },
+    {
+      "sample_id": "s059",
+      "start": 69203,
+      "end": 69214,
+      "surface": "Mr. Bingley",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 9,
+      "gold_id": "g004",
+      "note": "第9章班纳特太太争辩乡下比伦敦愉快得多，并向主人发问“is not it, Mr. Bingley?”，指查尔斯·宾利先生"
+    },
+    {
+      "sample_id": "s060",
+      "start": 72816,
+      "end": 72827,
+      "surface": "Mrs. Bennet",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 9,
+      "gold_id": "g006",
+      "note": "第9章Bingley向班纳特太太礼貌致答并让妹妹也客气说话，“Mrs. Bennet was satisfied”随后叫了马车准备离开，指班纳特太太"
+    },
+    {
+      "sample_id": "s061",
+      "start": 74347,
+      "end": 74362,
+      "surface": "Colonel Forster",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 9,
+      "gold_id": "g027",
+      "note": "第9章莉迪亚要求Bingley办舞会后还说要让军官们也办一场，并说“I shall tell Colonel Forster it will be quite a shame if he does not”，指福斯特上校"
+    },
+    {
+      "sample_id": "s062",
+      "start": 74795,
+      "end": 74805,
+      "surface": "Mrs. Hurst",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 10,
+      "gold_id": "g019",
+      "note": "第10章早上“Mrs. Hurst and Miss Bingley”陪病人简待了几个小时，晚上伊丽莎白来到客厅，指赫斯特太太"
+    },
+    {
+      "sample_id": "s063",
+      "start": 75695,
+      "end": 75705,
+      "surface": "Miss Darcy",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 10,
+      "gold_id": "g014",
+      "note": "第10章达西正在给妹妹写信，在旁观看的宾利小姐不断夸赞并感叹“How delighted Miss Darcy will be to receive such a letter!”，指乔治安娜·达西"
+    },
+    {
+      "sample_id": "s064",
+      "start": 81518,
+      "end": 81525,
+      "surface": "Bingley",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 10,
+      "gold_id": "g004",
+      "note": "第10章伊丽莎白与达西就朋友劝说问题争辩时，“Bingley”插话打趣说还要考虑双方的身高体型，指查尔斯·宾利先生"
+    },
+    {
+      "sample_id": "s065",
+      "start": 82432,
+      "end": 82443,
+      "surface": "Miss Bennet",
+      "stratum": "hard",
+      "hard_features": [
+        "ambiguous_surface",
+        "out_of_roster",
+        "title_or_official"
+      ],
+      "chapter_index": 10,
+      "gold_id": "g001",
+      "note": "第10章在尼日斐客厅（简卧病在楼上未出场），Bingley对达西说“If you and Miss Bennet will defer yours...”，下句紧接“‘What you ask,’ said Elizabeth”，此处Miss Bennet指在场的伊丽莎白·班纳特"
+    },
+    {
+      "sample_id": "s066",
+      "start": 83178,
+      "end": 83192,
+      "surface": "the instrument",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster"
+      ],
+      "chapter_index": 10,
+      "gold_id": "not_entity",
+      "note": "第10章Mrs. Hurst与妹妹唱歌时，伊丽莎白翻看放在“the instrument”（钢琴）上的乐谱，属普通器物名词而非专名实体"
+    },
+    {
+      "sample_id": "s067",
+      "start": 85825,
+      "end": 85834,
+      "surface": "Pemberley",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 10,
+      "gold_id": "g039",
+      "note": "第10章宾利小姐讽刺达西若娶伊丽莎白，可把菲利普斯姨父姨妈的画像挂在“Pemberley”的画廊里，指彭伯里庄园"
+    },
+    {
+      "sample_id": "s068",
+      "start": 88625,
+      "end": 88635,
+      "surface": "card-table",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 11,
+      "gold_id": "not_entity",
+      "note": "第11章茶后Mr. Hurst提醒小姨子摆设“card-table”（牌桌），属普通家具名词而非专名实体"
+    },
+    {
+      "sample_id": "s069",
+      "start": 88981,
+      "end": 88986,
+      "surface": "sofas",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 11,
+      "gold_id": "not_entity",
+      "note": "第11章没人愿意打牌，Mr. Hurst只好躺倒在其中一张“sofas”（沙发）上睡觉，属普通家具复数名词而非专名实体"
+    },
+    {
+      "sample_id": "s070",
+      "start": 89026,
+      "end": 89038,
+      "surface": "Miss Bingley",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 11,
+      "gold_id": "g018",
+      "note": "第11章Mr. Hurst睡着后，达西拿起一本书，“Miss Bingley did the same”，指卡罗琳·宾利"
+    },
+    {
+      "sample_id": "s071",
+      "start": 91800,
+      "end": 91804,
+      "surface": "book",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 11,
+      "gold_id": "not_entity",
+      "note": "第11章宾利小姐邀伊丽莎白在房里散步成功吸引了达西注意，达西不自觉地合上了他的“book”（书），属普通物品名词而非专名实体"
+    },
+    {
+      "sample_id": "s072",
+      "start": 95953,
+      "end": 95959,
+      "surface": "Louisa",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 11,
+      "gold_id": "g019",
+      "note": "第11章宾利小姐厌倦了达西与伊丽莎白的斗嘴，提议弹琴并对姐姐说“Louisa, you will not mind my waking Mr. Hurst”，指赫斯特太太"
+    },
+    {
+      "sample_id": "s073",
+      "start": 100941,
+      "end": 100946,
+      "surface": "Lydia",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 13,
+      "gold_id": "g007",
+      "note": "第13章班纳特太太误以为要来访的陌生绅士是Bingley，苦恼今天没鱼并喊道“Lydia, my love, ring the bell”，指莉迪亚·班纳特"
+    },
+    {
+      "sample_id": "s074",
+      "start": 102853,
+      "end": 102861,
+      "surface": "Hunsford",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 13,
+      "gold_id": "g041",
+      "note": "第13章柯林斯先生来信右上角标注的发信地址“Hunsford, near Westerham, Kent”，指汉斯福教区"
+    },
+    {
+      "sample_id": "s075",
+      "start": 105071,
+      "end": 105086,
+      "surface": "WILLIAM COLLINS",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster"
+      ],
+      "chapter_index": 13,
+      "gold_id": "g009",
+      "note": "第13章柯林斯先生来信末尾的落款署名“WILLIAM COLLINS”，指威廉·柯林斯先生"
+    },
+    {
+      "sample_id": "s076",
+      "start": 105799,
+      "end": 105813,
+      "surface": "Lady Catherine",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 13,
+      "gold_id": "g013",
+      "note": "第13章听完来信后，伊丽莎白尤其惊讶于柯林斯对“Lady Catherine”异乎寻常的顺从，指凯瑟琳·德·包尔夫人"
+    },
+    {
+      "sample_id": "s077",
+      "start": 106548,
+      "end": 106557,
+      "surface": "Catherine",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 13,
+      "gold_id": "g011",
+      "note": "第13章对“Catherine and Lydia”来说，这封信和写信人毫无趣味，因为表兄不可能穿红制服，指四女基蒂（凯瑟琳）·班纳特"
+    },
+    {
+      "sample_id": "s078",
+      "start": 111474,
+      "end": 111486,
+      "surface": "Rosings Park",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 14,
+      "gold_id": "g040",
+      "note": "第14章柯林斯向班纳特太太介绍自己住处的花园仅隔一条小巷与夫人宅邸“Rosings Park”相邻，指罗新斯庄园"
+    },
+    {
+      "sample_id": "s079",
+      "start": 111621,
+      "end": 111628,
+      "surface": "Rosings",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 14,
+      "gold_id": "g040",
+      "note": "第14章柯林斯紧接着回答凯瑟琳夫人只有一个独生女，是“Rosings”及庞大产业的继承人，指罗新斯庄园"
+    },
+    {
+      "sample_id": "s080",
+      "start": 114457,
+      "end": 114462,
+      "surface": "Lydia",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 14,
+      "gold_id": "g007",
+      "note": "第14章柯林斯看到循环图书馆的小说后退却并表示从不读小说，Kitty瞪眼看着他，而“Lydia exclaimed”，指莉迪亚·班纳特"
+    },
+    {
+      "sample_id": "s081",
+      "start": 114784,
+      "end": 114799,
+      "surface": "Colonel Forster",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 14,
+      "gold_id": "g027",
+      "note": "第14章莉迪亚打断柯林斯朗读《福代斯布道集》，说起菲利普斯姨父若辞退仆人Richard，“Colonel Forster will hire him”，指福斯特上校"
+    },
+    {
+      "sample_id": "s082",
+      "start": 117794,
+      "end": 117805,
+      "surface": "Mrs. Bennet",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 15,
+      "gold_id": "g006",
+      "note": "第15章柯林斯原本看中长女简，但次日早餐前与“Mrs. Bennet”单独密谈一刻钟后得知简已有意中人而改变目标，指班纳特太太"
+    },
+    {
+      "sample_id": "s083",
+      "start": 119249,
+      "end": 119257,
+      "surface": "Hunsford",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 15,
+      "gold_id": "g041",
+      "note": "第15章早餐后柯林斯跟进书房，喋喋不休地向班纳特先生谈论他在“Hunsford”的房子和花园，指汉斯福"
+    },
+    {
+      "sample_id": "s084",
+      "start": 119314,
+      "end": 119321,
+      "surface": "library",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 15,
+      "gold_id": "not_entity",
+      "note": "第15章班纳特先生在自己的“library”（书房）里一向享有清静闲暇，属房间普通名词而非专名实体"
+    },
+    {
+      "sample_id": "s085",
+      "start": 121807,
+      "end": 121816,
+      "surface": "Longbourn",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 15,
+      "gold_id": "g035",
+      "note": "第15章在麦里屯街上偶遇时，Bingley表示自己正要前往“Longbourn”专程问候简，指浪博恩"
+    },
+    {
+      "sample_id": "s086",
+      "start": 122276,
+      "end": 122285,
+      "surface": "Mr. Darcy",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 15,
+      "gold_id": "g003",
+      "note": "第15章Wickham与达西相遇时脸色大变，Wickham碰帽致意，“Mr. Darcy just deigned to return”，指达西先生"
+    },
+    {
+      "sample_id": "s087",
+      "start": 122742,
+      "end": 122754,
+      "surface": "Mrs. Philips",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 15,
+      "gold_id": "g024",
+      "note": "第15章Denny与Wickham送姑娘们到菲利普斯家门口后告辞，尽管莉迪亚极力挽留且“Mrs. Philips”推开客厅窗户大声附和邀请，指菲利普斯太太"
+    },
+    {
+      "sample_id": "s088",
+      "start": 123241,
+      "end": 123252,
+      "surface": "Netherfield",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 15,
+      "gold_id": "g036",
+      "note": "第15章菲利普斯太太从药房学徒口中得知不必再往“Netherfield”送药了，因为班纳特家小姐们已经回家，指尼日斐花园"
+    },
+    {
+      "sample_id": "s089",
+      "start": 124158,
+      "end": 124163,
+      "surface": "Kitty",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 15,
+      "gold_id": "g011",
+      "note": "第15章菲利普斯太太说她看Wickham在街上走了一个小时，若是Wickham此时再出现，“Kitty and Lydia”定会继续盯着看，指四女基蒂·班纳特"
+    },
+    {
+      "sample_id": "s090",
+      "start": 125282,
+      "end": 125294,
+      "surface": "Mrs. Philips",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 15,
+      "gold_id": "g024",
+      "note": "第15章从麦里屯回来后，柯林斯大力称赞“Mrs. Philips’s manners and politeness”，令班纳特太太十分高兴，指菲利普斯太太"
+    },
+    {
+      "sample_id": "s091",
+      "start": 126500,
+      "end": 126507,
+      "surface": "Rosings",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 16,
+      "gold_id": "g040",
+      "note": "第16章在菲利普斯家晚宴上，柯林斯打量房间家具后宣称几乎以为自己置身于“Rosings”的小夏季早餐厅，指罗新斯庄园"
+    },
+    {
+      "sample_id": "s092",
+      "start": 126580,
+      "end": 126592,
+      "surface": "Mrs. Philips",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 16,
+      "gold_id": "g024",
+      "note": "第16章当“Mrs. Philips”从柯林斯口中了解到罗新斯是什么地方及烟囱架价值八百镑后，深感这一比喻的恭维分量，指菲利普斯太太"
+    },
+    {
+      "sample_id": "s093",
+      "start": 126618,
+      "end": 126625,
+      "surface": "Rosings",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 16,
+      "gold_id": "g040",
+      "note": "第16章紧接上文，菲利普斯太太从柯林斯那里了解到“Rosings”是什么地方及其主人是谁，指罗新斯庄园"
+    },
+    {
+      "sample_id": "s094",
+      "start": 126974,
+      "end": 126988,
+      "surface": "Lady Catherine",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 16,
+      "gold_id": "g013",
+      "note": "第16章柯林斯在男士们加入前一直向菲利普斯太太描绘“Lady Catherine and her mansion”的宏伟气派，指凯瑟琳·德·包尔夫人"
+    },
+    {
+      "sample_id": "s095",
+      "start": 128679,
+      "end": 128690,
+      "surface": "Mr. Collins",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 16,
+      "gold_id": "g009",
+      "note": "第16章有Wickham和军官们吸引年轻姑娘的注意，“Mr. Collins”显得微不足道，只能靠菲利普斯太太提供咖啡和松饼，指柯林斯先生"
+    },
+    {
+      "sample_id": "s096",
+      "start": 128822,
+      "end": 128834,
+      "surface": "Mrs. Philips",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 16,
+      "gold_id": "g024",
+      "note": "第16章紧接上句，柯林斯在年轻小姐们眼中算不上什么，但仍不时有“Mrs. Philips”这位善意的听众，指菲利普斯太太"
+    },
+    {
+      "sample_id": "s097",
+      "start": 129236,
+      "end": 129247,
+      "surface": "Mr. Wickham",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 16,
+      "gold_id": "g008",
+      "note": "第16章柯林斯坐下打惠斯特牌，而“Mr. Wickham did not play at whist”，被愉快地安排在另一桌坐于伊丽莎白和莉迪亚之间，指乔治·威克姆"
+    },
+    {
+      "sample_id": "s098",
+      "start": 130094,
+      "end": 130101,
+      "surface": "Meryton",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 16,
+      "gold_id": "g037",
+      "note": "第16章Wickham主动向伊丽莎白打听尼日斐离“Meryton”有多远，以及达西在那里住了多久，指麦里屯"
+    },
+    {
+      "sample_id": "s099",
+      "start": 130333,
+      "end": 130343,
+      "surface": "Derbyshire",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 16,
+      "gold_id": "g044",
+      "note": "第16章伊丽莎白答说达西住了约一个月，并试探补充说听说他在“Derbyshire”拥有很大产业，指德比郡"
+    },
+    {
+      "sample_id": "s100",
+      "start": 133703,
+      "end": 133712,
+      "surface": "----shire",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 16,
+      "gold_id": "x013",
+      "note": "第16章Wickham向伊丽莎白解释说，对良好社交的期盼是他加入“----shire”民兵团的主要诱因，指民兵团所属的某郡（----shire）"
+    },
+    {
+      "sample_id": "s101",
+      "start": 139566,
+      "end": 139576,
+      "surface": "Miss Darcy",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 16,
+      "gold_id": "g014",
+      "note": "第16章听Wickham说达西因兄长式的骄傲而善待妹妹后，伊丽莎白问“What sort of a girl is Miss Darcy?”，指乔治安娜·达西"
+    },
+    {
+      "sample_id": "s102",
+      "start": 140021,
+      "end": 140027,
+      "surface": "London",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 16,
+      "gold_id": "g038",
+      "note": "第16章Wickham介绍达西小姐约十五六岁，自父亲去世后一直住在“London”，由一位女士陪伴并督导学业，指伦敦"
+    },
+    {
+      "sample_id": "s103",
+      "start": 141158,
+      "end": 141170,
+      "surface": "Mrs. Philips",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 16,
+      "gold_id": "g024",
+      "note": "第16章惠斯特牌局结束后，柯林斯走到另一桌，站在表妹伊丽莎白与“Mrs. Philips”之间，后者向他询问打牌战果，指菲利普斯太太"
+    },
+    {
+      "sample_id": "s104",
+      "start": 142109,
+      "end": 142133,
+      "surface": "Lady Catherine de Bourgh",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 16,
+      "gold_id": "g013",
+      "note": "第16章Wickham低声询问伊丽莎白她亲戚是否与De Bourgh家族熟识，伊丽莎白回答“Lady Catherine de Bourgh has very lately given him a living”，指凯瑟琳·德·包尔夫人"
+    },
+    {
+      "sample_id": "s105",
+      "start": 142320,
+      "end": 142344,
+      "surface": "Lady Catherine de Bourgh",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 16,
+      "gold_id": "g013",
+      "note": "第16章Wickham紧接着告诉伊丽莎白：“Lady Catherine de Bourgh and Lady Anne Darcy were sisters”，因此她是达西的姨妈，指凯瑟琳·德·包尔夫人"
+    },
+    {
+      "sample_id": "s106",
+      "start": 142486,
+      "end": 142500,
+      "surface": "Lady Catherine",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 16,
+      "gold_id": "g013",
+      "note": "第16章伊丽莎白惊讶地回答自己此前对“Lady Catherine’s connections”一无所知，前天才听说有这么个人，指凯瑟琳·德·包尔夫人"
+    },
+    {
+      "sample_id": "s107",
+      "start": 142778,
+      "end": 142790,
+      "surface": "Miss Bingley",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 16,
+      "gold_id": "g018",
+      "note": "第16章听说达西将与表妹德·包尔小姐联姻后，伊丽莎白不禁微笑，想到了可怜的“Miss Bingley”一切讨好都将白费，指卡罗琳·宾利"
+    },
+    {
+      "sample_id": "s108",
+      "start": 143950,
+      "end": 143961,
+      "surface": "Mr. Wickham",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 16,
+      "gold_id": "g008",
+      "note": "第16章晚饭结束了打牌，让其余女士也有机会分享“Mr. Wickham’s attentions”，伊丽莎白回家一路脑中全是他，指乔治·威克姆"
+    },
+    {
+      "sample_id": "s109",
+      "start": 144023,
+      "end": 144035,
+      "surface": "Mrs. Philips",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 16,
+      "gold_id": "g024",
+      "note": "第16章紧接上句，在“Mrs. Philips’s supper party”的嘈杂声中无法深谈，但Wickham的风度赢得了所有人好感，指菲利普斯太太"
+    },
+    {
+      "sample_id": "s110",
+      "start": 144926,
+      "end": 144937,
+      "surface": "Mr. Wickham",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 17,
+      "gold_id": "g008",
+      "note": "第17章次日伊丽莎白向简复述了昨晚“Mr. Wickham and herself”之间的谈话，简听后惊讶而忧虑，指乔治·威克姆"
+    },
+    {
+      "sample_id": "s111",
+      "start": 146534,
+      "end": 146545,
+      "surface": "Mr. Bingley",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 17,
+      "gold_id": "g004",
+      "note": "第17章简难以相信达西朋友会被蒙蔽，伊丽莎白则说她更容易相信“Mr. Bingley’s being imposed on”，也不信Wickham会编造身世，指查尔斯·宾利先生"
+    },
+    {
+      "sample_id": "s112",
+      "start": 147349,
+      "end": 147360,
+      "surface": "Netherfield",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 17,
+      "gold_id": "g036",
+      "note": "第17章Bingley与姐妹们亲自来浪博恩发出期盼已久的“the long expected ball at Netherfield”邀请，定于下周二举行，指尼日斐花园"
+    },
+    {
+      "sample_id": "s113",
+      "start": 153381,
+      "end": 153386,
+      "surface": "Darcy",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 18,
+      "gold_id": "g003",
+      "note": "第18章尼日斐舞会上Denny暗示Wickham为避开某位绅士才进城，伊丽莎白听出这证实了“Darcy”对Wickham缺席负有责任，指达西先生"
+    },
+    {
+      "sample_id": "s114",
+      "start": 155605,
+      "end": 155612,
+      "surface": "Wickham",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 18,
+      "gold_id": "g008",
+      "note": "第18章达西走来邀伊丽莎白跳舞时，夏洛特低声提醒她别犯傻、别让对“Wickham”的好感使自己在更有地位的人面前失态，指乔治·威克姆"
+    },
+    {
+      "sample_id": "s115",
+      "start": 155835,
+      "end": 155844,
+      "surface": "Mr. Darcy",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 18,
+      "gold_id": "g003",
+      "note": "第18章伊丽莎白就位准备跳舞，惊讶于自己竟获准站在“Mr. Darcy”对面，并与他沉默对立，指达西先生"
+    },
+    {
+      "sample_id": "s116",
+      "start": 159261,
+      "end": 159271,
+      "surface": "Miss Eliza",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "title_or_official"
+      ],
+      "chapter_index": 18,
+      "gold_id": "g001",
+      "note": "第18章威廉爵士走过舞池，朝Bingley和简看了一眼，对正在与达西跳舞的伊丽莎白说“my dear Miss Eliza”，指伊丽莎白·班纳特"
+    },
+    {
+      "sample_id": "s117",
+      "start": 162126,
+      "end": 162131,
+      "surface": "Darcy",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 18,
+      "gold_id": "g003",
+      "note": "第18章两人跳完第二支舞沉默分开，双方都不满意，但在“Darcy’s breast”里对她有一股强烈感情，很快原谅了她，指达西先生"
+    },
+    {
+      "sample_id": "s118",
+      "start": 162303,
+      "end": 162315,
+      "surface": "Miss Bingley",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 18,
+      "gold_id": "g018",
+      "note": "第18章与达西刚分开不久，“Miss Bingley”带着礼貌的轻蔑走过来向伊丽莎白搭话，讽刺她喜欢George Wickham，指卡罗琳·宾利"
+    },
+    {
+      "sample_id": "s119",
+      "start": 163451,
+      "end": 163461,
+      "surface": "Miss Eliza",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "title_or_official"
+      ],
+      "chapter_index": 18,
+      "gold_id": "g001",
+      "note": "第18章宾利小姐继续对伊丽莎白冷嘲热讽说“I pity you, Miss Eliza, for this discovery of your favourite’s guilt”，指伊丽莎白·班纳特"
+    },
+    {
+      "sample_id": "s120",
+      "start": 163751,
+      "end": 163770,
+      "surface": "Mr. Darcy’s steward",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "title_or_official"
+      ],
+      "chapter_index": 18,
+      "gold_id": "x002",
+      "note": "第18章伊丽莎白愤怒反驳宾利小姐：我只听到你指控他是“the son of Mr. Darcy’s steward”，指威克姆的父亲（老达西的已故管事）"
+    },
+    {
+      "sample_id": "s121",
+      "start": 164911,
+      "end": 164915,
+      "surface": "Jane",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 18,
+      "gold_id": "g002",
+      "note": "第18章伊丽莎白向姐姐打听从Bingley处问到了什么关于Wickham的事，“Jane”回答说Bingley并不清楚全部原委但担保达西的品行，指简·班纳特"
+    },
+    {
+      "sample_id": "s122",
+      "start": 165554,
+      "end": 165565,
+      "surface": "Mr. Wickham",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 18,
+      "gold_id": "g008",
+      "note": "第18章听简转述Bingley的话后，伊丽莎白指出“Mr. Bingley does not know Mr. Wickham himself”，简证实Bingley直到前几天在麦里屯才见过他，指乔治·威克姆"
+    },
+    {
+      "sample_id": "s123",
+      "start": 166631,
+      "end": 166638,
+      "surface": "Bingley",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 18,
+      "gold_id": "g004",
+      "note": "第18章两姐妹正谈论简对Bingley情意的希望时，“On their being joined by Mr. Bingley himself”，伊丽莎白便退开去找夏洛特，指查尔斯·宾利先生"
+    },
+    {
+      "sample_id": "s124",
+      "start": 168405,
+      "end": 168419,
+      "surface": "Miss Elizabeth",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "title_or_official"
+      ],
+      "chapter_index": 18,
+      "gold_id": "g001",
+      "note": "第18章伊丽莎白劝阻表兄别去向达西自报家门，柯林斯却固执己见地回答“My dear Miss Elizabeth, I have the highest opinion...”，指伊丽莎白·班纳特"
+    },
+    {
+      "sample_id": "s125",
+      "start": 169665,
+      "end": 169673,
+      "surface": "Hunsford",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 18,
+      "gold_id": "g041",
+      "note": "第18章柯林斯向达西鞠躬搭话，伊丽莎白虽听不见，但从他嘴唇动作看出他在说“apology”、“Hunsford”和“Lady Catherine de Bourgh”，指汉斯福"
+    },
+    {
+      "sample_id": "s126",
+      "start": 170135,
+      "end": 170146,
+      "surface": "Mr. Collins",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 18,
+      "gold_id": "g009",
+      "note": "第18章达西对柯林斯的第二段长篇大论只微微欠身便走开，“Mr. Collins then returned to Elizabeth”并自鸣得意地汇报，指柯林斯先生"
+    },
+    {
+      "sample_id": "s127",
+      "start": 172428,
+      "end": 172439,
+      "surface": "Mrs. Bennet",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 18,
+      "gold_id": "g006",
+      "note": "第18章晚宴上高谈阔论女儿嫁入尼日斐后自己便可把未婚女儿托付给姐姐照看的“Mrs. Bennet”，还假惺惺祝卢卡斯夫人也有此好运，指班纳特太太"
+    },
+    {
+      "sample_id": "s128",
+      "start": 174049,
+      "end": 174058,
+      "surface": "Elizabeth",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 18,
+      "gold_id": "g001",
+      "note": "第18章班纳特太太终于不再说话后，“Elizabeth now began to revive”，但晚饭后很快又因玛丽准备献唱而难堪，指伊丽莎白·班纳特"
+    },
+    {
+      "sample_id": "s129",
+      "start": 174216,
+      "end": 174220,
+      "surface": "Mary",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 18,
+      "gold_id": "g012",
+      "note": "第18章晚饭后谈起唱歌，伊丽莎白难堪地看到“Mary”稍受请求便准备献唱，且不理会姐姐阻止的眼色，指玛丽·班纳特"
+    },
+    {
+      "sample_id": "s130",
+      "start": 175362,
+      "end": 175366,
+      "surface": "Mary",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 18,
+      "gold_id": "g012",
+      "note": "第18章伊丽莎白向父亲使眼色请求阻止，班纳特先生会意，等“Mary had finished her second song”便出声叫停，指玛丽·班纳特"
+    },
+    {
+      "sample_id": "s131",
+      "start": 175535,
+      "end": 175539,
+      "surface": "Mary",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 18,
+      "gold_id": "g012",
+      "note": "第18章被父亲公开叫停后，“Mary, though pretending not to hear, was somewhat disconcerted”，指玛丽·班纳特"
+    },
+    {
+      "sample_id": "s132",
+      "start": 179108,
+      "end": 179119,
+      "surface": "Mrs. Bennet",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 18,
+      "gold_id": "g006",
+      "note": "第18章浪博恩一行最后离开，因“a manœuvre of Mrs. Bennet”在别人走后还多等了一刻钟马车，指班纳特太太"
+    },
+    {
+      "sample_id": "s133",
+      "start": 179304,
+      "end": 179314,
+      "surface": "her sister",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster"
+      ],
+      "chapter_index": 18,
+      "gold_id": "g018",
+      "note": "第18章等待马车时，“Mrs. Hurst and her sister”除了抱怨疲倦几乎不开口，下段明确并列“Mrs. Hurst or Miss Bingley”，指赫斯特太太的妹妹卡罗琳·宾利"
+    },
+    {
+      "sample_id": "s134",
+      "start": 179823,
+      "end": 179833,
+      "surface": "Mr. Bennet",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 18,
+      "gold_id": "g005",
+      "note": "第18章面对柯林斯的冗长恭维，达西一言不发，而“Mr. Bennet, in equal silence, was enjoying the scene”，指班纳特先生"
+    },
+    {
+      "sample_id": "s135",
+      "start": 180035,
+      "end": 180045,
+      "surface": "Mrs. Hurst",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 18,
+      "gold_id": "g019",
+      "note": "第18章紧接上文，伊丽莎白保持着与“either Mrs. Hurst or Miss Bingley”同样坚定的沉默，指赫斯特太太"
+    },
+    {
+      "sample_id": "s136",
+      "start": 181063,
+      "end": 181074,
+      "surface": "Mr. Collins",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 18,
+      "gold_id": "g009",
+      "note": "第18章班纳特太太深信长女三四个月内将嫁入尼日斐，并同样确信会有另一个女儿嫁给“Mr. Collins”，指柯林斯先生"
+    },
+    {
+      "sample_id": "s137",
+      "start": 182140,
+      "end": 182151,
+      "surface": "Mrs. Bennet",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 19,
+      "gold_id": "g006",
+      "note": "第19章早饭后柯林斯请求允许今早与伊丽莎白单独谈话，“Mrs. Bennet instantly answered”满口答应并带走Kitty，指班纳特太太"
+    },
+    {
+      "sample_id": "s138",
+      "start": 182280,
+      "end": 182285,
+      "surface": "Kitty",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 19,
+      "gold_id": "g011",
+      "note": "第19章班纳特太太为给柯林斯和伊丽莎白腾出独处空间，喊道“Come, Kitty, I want you upstairs”，指基蒂·班纳特"
+    },
+    {
+      "sample_id": "s139",
+      "start": 184775,
+      "end": 184783,
+      "surface": "Hunsford",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 19,
+      "gold_id": "g041",
+      "note": "第19章柯林斯求婚时陈述理由，提到离开“Hunsford”前那个周六晚上在罗新斯打牌时凯瑟琳夫人劝他结婚，指汉斯福"
+    },
+    {
+      "sample_id": "s140",
+      "start": 184824,
+      "end": 184838,
+      "surface": "Mrs. Jenkinson",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "title_or_official"
+      ],
+      "chapter_index": 19,
+      "gold_id": "x003",
+      "note": "第19章柯林斯回忆周六晚打牌间隙，“while Mrs. Jenkinson was arranging Miss De Bourgh’s footstool”，凯瑟琳夫人劝他娶妻，指陪伴德·包尔小姐的詹金森太太"
+    },
+    {
+      "sample_id": "s141",
+      "start": 189953,
+      "end": 189959,
+      "surface": "cousin",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 19,
+      "gold_id": "g001",
+      "note": "第19章伊丽莎白明确拒绝求婚后，柯林斯仍自鸣得意地回答“You must give me leave to flatter myself, my dear cousin”，指表妹伊丽莎白·班纳特"
+    },
+    {
+      "sample_id": "s142",
+      "start": 195042,
+      "end": 195056,
+      "surface": "Miss Elizabeth",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "title_or_official"
+      ],
+      "chapter_index": 20,
+      "gold_id": "g001",
+      "note": "第20章班纳特太太向丈夫告状说Lizzy拒婚，按铃后“Miss Elizabeth was summoned to the library”，指伊丽莎白·班纳特"
+    },
+    {
+      "sample_id": "s143",
+      "start": 195696,
+      "end": 195707,
+      "surface": "Mr. Collins",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 20,
+      "gold_id": "g009",
+      "note": "第20章班纳特先生对伊丽莎白说出了著名的二选一：如果你不嫁给“Mr. Collins”，你母亲就再也不见你；如果你嫁给他，我就再也不见你，指柯林斯先生"
+    },
+    {
+      "sample_id": "s144",
+      "start": 195972,
+      "end": 195982,
+      "surface": "Mr. Bennet",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 20,
+      "gold_id": "g005",
+      "note": "第20章班纳特太太对丈夫的话大失所望，质问道“What do you mean, Mr. Bennet, by talking in this way?”，指班纳特先生"
+    },
+    {
+      "sample_id": "s145",
+      "start": 196274,
+      "end": 196281,
+      "surface": "library",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 20,
+      "gold_id": "not_entity",
+      "note": "第20章班纳特先生请妻子允许他自由使用自己的理智和房间，希望尽快把“the library”（书房）留给自己，属房间普通名词而非专名实体"
+    },
+    {
+      "sample_id": "s146",
+      "start": 199497,
+      "end": 199501,
+      "surface": "Jane",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 20,
+      "gold_id": "g002",
+      "note": "第20章班纳特太太要与柯林斯单聊并让姑娘们闭嘴，伊丽莎白悄悄走出房间，“Jane and Kitty followed”，指简·班纳特"
+    },
+    {
+      "sample_id": "s147",
+      "start": 204709,
+      "end": 204722,
+      "surface": "Hertfordshire",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 21,
+      "gold_id": "g045",
+      "note": "第21章简朗读卡罗琳·宾利来信，信中说除了简的陪伴外，她对离开“Hertfordshire”毫不遗憾，指赫特福德郡"
+    },
+    {
+      "sample_id": "s148",
+      "start": 205921,
+      "end": 205934,
+      "surface": "Hertfordshire",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 21,
+      "gold_id": "g045",
+      "note": "第21章简对伊丽莎白说，卡罗琳在信中明确表示他们一行人今年冬天都不会回“Hertfordshire”了，指赫特福德郡"
+    },
+    {
+      "sample_id": "s149",
+      "start": 206057,
+      "end": 206063,
+      "surface": "London",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 21,
+      "gold_id": "g038",
+      "note": "第21章简继续读卡罗琳的信：哥哥昨天离开时以为带他去“London”的事务三四天就能办完，但她们决定跟去城里，指伦敦"
+    },
+    {
+      "sample_id": "s150",
+      "start": 207260,
+      "end": 207275,
+      "surface": "Georgiana Darcy",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 21,
+      "gold_id": "g014",
+      "note": "第21章简读信中令她伤心的一段：达西急于见到妹妹，卡罗琳盛赞“Georgiana Darcy”的美貌才艺无与伦比，并希望她成为自己的嫂子，指乔治安娜·达西"
+    },
+    {
+      "sample_id": "s151",
+      "start": 208805,
+      "end": 208815,
+      "surface": "Miss Darcy",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 21,
+      "gold_id": "g014",
+      "note": "第21章伊丽莎白一针见血地向简剖析：宾利小姐看出哥哥爱上了你，却想让他娶“Miss Darcy”，指乔治安娜·达西"
+    },
+    {
+      "sample_id": "s152",
+      "start": 209338,
+      "end": 209348,
+      "surface": "Miss Darcy",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 21,
+      "gold_id": "g014",
+      "note": "第21章伊丽莎白继续分析：宾利小姐之所以更急于为哥哥撮合“Miss Darcy”，是因为觉得两家有了一桩联姻后自己就更容易嫁给达西，指乔治安娜·达西"
+    },
+    {
+      "sample_id": "s153",
+      "start": 213377,
+      "end": 213390,
+      "surface": "Hertfordshire",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 22,
+      "gold_id": "g045",
+      "note": "第22章夏洛特实施吸引柯林斯求婚的计划，若非柯林斯即将离开“Hertfordshire”，她当晚就几乎确信成功了，指赫特福德郡"
+    },
+    {
+      "sample_id": "s154",
+      "start": 214814,
+      "end": 214824,
+      "surface": "Miss Lucas",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 22,
+      "gold_id": "g010",
+      "note": "第22章柯林斯次日一早溜去卢卡斯山庄求婚，纯粹为了获得安身立命家业而接受他的“Miss Lucas”不在乎婚期多快，指夏洛特·卢卡斯"
+    },
+    {
+      "sample_id": "s155",
+      "start": 215389,
+      "end": 215399,
+      "surface": "Mr. Bennet",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 22,
+      "gold_id": "g005",
+      "note": "第22章卢卡斯夫妇欣然同意婚事，卢卡斯夫人立即开始盘算“Mr. Bennet”还能活多少年以便女婿继承产业，指班纳特先生"
+    },
+    {
+      "sample_id": "s156",
+      "start": 215525,
+      "end": 215541,
+      "surface": "Longbourn estate",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster"
+      ],
+      "chapter_index": 22,
+      "gold_id": "g035",
+      "note": "第22章威廉爵士紧接着断言，一旦柯林斯继承占有“the Longbourn estate”，夫妻俩就该去圣詹姆斯宫觐见，指浪博恩庄园产业"
+    },
+    {
+      "sample_id": "s157",
+      "start": 218332,
+      "end": 218343,
+      "surface": "Mr. Collins",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 22,
+      "gold_id": "g009",
+      "note": "第22章班纳特先生讽刺柯林斯这么快再来是否会惹凯瑟琳夫人不快，“Mr. Collins”一本正经地感谢提醒并说绝不会不经夫人同意行事，指柯林斯先生"
+    },
+    {
+      "sample_id": "s158",
+      "start": 219004,
+      "end": 219017,
+      "surface": "Hertfordshire",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 22,
+      "gold_id": "g045",
+      "note": "第22章柯林斯向班纳特先生道别，保证回去后会很快写信感谢他在“Hertfordshire”逗留期间受到的款待，指赫特福德郡"
+    },
+    {
+      "sample_id": "s159",
+      "start": 219446,
+      "end": 219450,
+      "surface": "Mary",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 22,
+      "gold_id": "g012",
+      "note": "第22章班纳特太太原以为柯林斯很快回来是要向某个小女儿求婚，而“Mary”本可能被说服接受他，因为她很看重他沉稳的议论，指玛丽·班纳特"
+    },
+    {
+      "sample_id": "s160",
+      "start": 220004,
+      "end": 220015,
+      "surface": "Mr. Collins",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 22,
+      "gold_id": "g009",
+      "note": "第22章夏洛特向伊丽莎白告知订婚消息，虽然伊丽莎白前两天曾闪过“Mr. Collins’s fancying himself in love with her friend”的念头，但仍震惊于夏洛特会答应，指柯林斯先生"
+    },
+    {
+      "sample_id": "s161",
+      "start": 220127,
+      "end": 220136,
+      "surface": "Charlotte",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 22,
+      "gold_id": "g010",
+      "note": "第22章紧接上句，伊丽莎白觉得“that Charlotte could encourage him”几乎像自己接受他一样不可思议，忍不住惊呼，指夏洛特·卢卡斯"
+    },
+    {
+      "sample_id": "s162",
+      "start": 223121,
+      "end": 223126,
+      "surface": "Lydia",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 23,
+      "gold_id": "g007",
+      "note": "第23章威廉爵士来浪博恩宣布女儿婚事，班纳特太太不信，而一向口无遮拦的“Lydia”大喊大叫说柯林斯想娶的是Lizzy，指莉迪亚·班纳特"
+    },
+    {
+      "sample_id": "s163",
+      "start": 223612,
+      "end": 223621,
+      "surface": "Elizabeth",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 23,
+      "gold_id": "g001",
+      "note": "第23章为解救处于尴尬境地的威廉爵士，“Elizabeth”走上前证实自己已从夏洛特处获知此事，并真诚道贺，指伊丽莎白·班纳特"
+    },
+    {
+      "sample_id": "s164",
+      "start": 224148,
+      "end": 224156,
+      "surface": "Hunsford",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 23,
+      "gold_id": "g041",
+      "note": "第23章伊丽莎白与简向威廉爵士道贺，称赞柯林斯的品格以及“Hunsford”距离伦敦交通便利，指汉斯福"
+    },
+    {
+      "sample_id": "s165",
+      "start": 224162,
+      "end": 224168,
+      "surface": "London",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 23,
+      "gold_id": "g038",
+      "note": "第23章紧接上句，称赞汉斯福距离“London”很方便，指伦敦"
+    },
+    {
+      "sample_id": "s166",
+      "start": 224244,
+      "end": 224255,
+      "surface": "Sir William",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 23,
+      "gold_id": "g021",
+      "note": "第23章当“Sir William”还在场时班纳特太太气得说不出多少话，但他一离开她就迅速爆发了，指威廉·卢卡斯爵士"
+    },
+    {
+      "sample_id": "s167",
+      "start": 225498,
+      "end": 225502,
+      "surface": "Jane",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 23,
+      "gold_id": "g002",
+      "note": "第23章对于这桩婚事，“Jane confessed herself a little surprised”，但更多是衷心祝愿他们幸福，指简·班纳特"
+    },
+    {
+      "sample_id": "s168",
+      "start": 225948,
+      "end": 225959,
+      "surface": "Mrs. Bennet",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 23,
+      "gold_id": "g006",
+      "note": "第23章卢卡斯夫人得意于能向“Mrs. Bennet”回敬女儿嫁得好的快慰，比平时更频繁地造访浪博恩，指班纳特太太"
+    },
+    {
+      "sample_id": "s169",
+      "start": 226025,
+      "end": 226034,
+      "surface": "Longbourn",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 23,
+      "gold_id": "g035",
+      "note": "第23章紧接上句，卢卡斯夫人比平时更频繁地造访“Longbourn”炫耀自己多么幸福，指浪博恩"
+    },
+    {
+      "sample_id": "s170",
+      "start": 227617,
+      "end": 227626,
+      "surface": "Charlotte",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 23,
+      "gold_id": "g010",
+      "note": "第23章柯林斯转述凯瑟琳夫人非常赞成婚事并希望尽快完婚，他相信这对他可爱的“Charlotte”是无可辩驳的理由以尽早定下婚期，指夏洛特·卢卡斯"
+    },
+    {
+      "sample_id": "s171",
+      "start": 227711,
+      "end": 227724,
+      "surface": "Hertfordshire",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 23,
+      "gold_id": "g045",
+      "note": "第23章柯林斯重返“Hertfordshire”对班纳特太太来说不再是乐事，她和丈夫一样抱怨不已，指赫特福德郡"
+    },
+    {
+      "sample_id": "s172",
+      "start": 227763,
+      "end": 227774,
+      "surface": "Mrs. Bennet",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 23,
+      "gold_id": "g006",
+      "note": "第23章紧接上句，柯林斯重返赫特福德郡对“Mrs. Bennet”而言不再是愉快的事，她抱怨他为何住浪博恩不住卢卡斯山庄，指班纳特太太"
+    },
+    {
+      "sample_id": "s173",
+      "start": 229449,
+      "end": 229456,
+      "surface": "Bingley",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 23,
+      "gold_id": "g004",
+      "note": "第23章简隐忍着等待的痛苦，但班纳特太太毫无顾忌，几乎每小时都在谈论“Bingley”并焦急盼他回来，指查尔斯·宾利先生"
+    },
+    {
+      "sample_id": "s174",
+      "start": 230868,
+      "end": 230878,
+      "surface": "Mr. Bennet",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 23,
+      "gold_id": "g005",
+      "note": "第23章班纳特太太怀疑夏洛特和柯林斯在密谋等丈夫死后把她们母女赶出家门，向丈夫哭诉道“Indeed, Mr. Bennet...”，指班纳特先生"
+    },
+    {
+      "sample_id": "s175",
+      "start": 232409,
+      "end": 232419,
+      "surface": "Miss Darcy",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 24,
+      "gold_id": "g014",
+      "note": "第24章卡罗琳回信宣告Bingley今冬不回，信中大部分篇幅都在夸赞“Miss Darcy”，吹嘘她们日益亲密，指乔治安娜·达西"
+    },
+    {
+      "sample_id": "s176",
+      "start": 232731,
+      "end": 232740,
+      "surface": "Mr. Darcy",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 24,
+      "gold_id": "g003",
+      "note": "第24章卡罗琳在信中还高兴地写道，她哥哥常出入“Mr. Darcy’s house”，并狂热提起达西添置新家具的计划，指达西先生"
+    },
+    {
+      "sample_id": "s177",
+      "start": 233027,
+      "end": 233035,
+      "surface": "Caroline",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 24,
+      "gold_id": "g018",
+      "note": "第24章伊丽莎白听简转述信件内容后愤慨不已，对“Caroline’s assertion”说哥哥偏爱达西小姐毫不采信，指卡罗琳·宾利"
+    },
+    {
+      "sample_id": "s178",
+      "start": 236343,
+      "end": 236352,
+      "surface": "Charlotte",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 24,
+      "gold_id": "g010",
+      "note": "第24章伊丽莎白向简感叹世人性格反复无常，最近遇到两个例子：一个不提（指Bingley），另一个就是“Charlotte’s marriage”，指夏洛特·卢卡斯"
+    },
+    {
+      "sample_id": "s179",
+      "start": 239473,
+      "end": 239477,
+      "surface": "Jane",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 24,
+      "gold_id": "g002",
+      "note": "第24章伊丽莎白认为Bingley姐妹希望他娶达西小姐是为了财富地位，“Jane”回答说这也可能是出于更好的感情，因为她们认识达西小姐更久，指简·班纳特"
+    },
+    {
+      "sample_id": "s180",
+      "start": 240987,
+      "end": 240998,
+      "surface": "Mrs. Bennet",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 24,
+      "gold_id": "g006",
+      "note": "第24章简每天重申Bingley对她只是一时好感，而“Mrs. Bennet’s best comfort”则是Bingley夏天一定会再回来，指班纳特太太"
+    },
+    {
+      "sample_id": "s181",
+      "start": 241071,
+      "end": 241081,
+      "surface": "Mr. Bennet",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 24,
+      "gold_id": "g005",
+      "note": "第24章与妻子不同，“Mr. Bennet treated the matter differently”，对Lizzy打趣祝贺简失恋，指班纳特先生"
+    },
+    {
+      "sample_id": "s182",
+      "start": 241496,
+      "end": 241503,
+      "surface": "Meryton",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 24,
+      "gold_id": "g037",
+      "note": "第24章班纳特先生跟伊丽莎白开玩笑说，现在轮到你失恋了，“Meryton”有足够多的军官让全郡年轻姑娘失望，让Wickham做你的对象吧，指麦里屯"
+    },
+    {
+      "sample_id": "s183",
+      "start": 243630,
+      "end": 243641,
+      "surface": "Netherfield",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 25,
+      "gold_id": "g036",
+      "note": "第25章嘉丁纳夫妇来浪博恩过圣诞，作者评论嘉丁纳先生风度翩翩，“The Netherfield ladies”很难相信一个靠经商为生的人会如此有教养，指尼日斐花园"
+    },
+    {
+      "sample_id": "s184",
+      "start": 243868,
+      "end": 243880,
+      "surface": "Mrs. Philips",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 25,
+      "gold_id": "g024",
+      "note": "第25章介绍嘉丁纳太太比班纳特太太和“Mrs. Philips”年轻几岁，性情温和聪慧优雅，深得浪博恩外甥女们喜爱，指菲利普斯太太"
+    },
+    {
+      "sample_id": "s185",
+      "start": 244134,
+      "end": 244147,
+      "surface": "Mrs. Gardiner",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 25,
+      "gold_id": "g016",
+      "note": "第25章抵达浪博恩后，“Mrs. Gardiner’s business”首先是分发礼物并介绍最新时尚，随后听班纳特太太大倒苦水，指嘉丁纳太太"
+    },
+    {
+      "sample_id": "s186",
+      "start": 244613,
+      "end": 244624,
+      "surface": "Mr. Bingley",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 25,
+      "gold_id": "g004",
+      "note": "第25章班纳特太太向弟媳抱怨两个女儿婚事告吹，说她不怪简，因为简如果能留住“Mr. Bingley”一定会留住，指查尔斯·宾利先生"
+    },
+    {
+      "sample_id": "s187",
+      "start": 244999,
+      "end": 245006,
+      "surface": "Lucases",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 25,
+      "gold_id": "not_entity",
+      "note": "第25章班纳特太太抱怨卢卡斯夫人女儿先出嫁，骂道“The Lucases are very artful people”（卢卡斯一家），属姓氏复数家族群体而非单一个体"
+    },
+    {
+      "sample_id": "s188",
+      "start": 248050,
+      "end": 248056,
+      "surface": "London",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 25,
+      "gold_id": "g038",
+      "note": "第25章嘉丁纳太太邀简同回伦敦，伊丽莎白说达西绝不会容许Bingley到“London”格雷斯丘奇街那种地方拜访简，指伦敦"
+    },
+    {
+      "sample_id": "s189",
+      "start": 249414,
+      "end": 249422,
+      "surface": "officers",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 25,
+      "gold_id": "not_entity",
+      "note": "第25章嘉丁纳夫妇在浪博恩住了一周，与菲利普斯夫妇、卢卡斯一家和“the officers”（军官们）每天都有应酬，属复数群体普通名词而非专名实体"
+    },
+    {
+      "sample_id": "s190",
+      "start": 249759,
+      "end": 249772,
+      "surface": "Mrs. Gardiner",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 25,
+      "gold_id": "g016",
+      "note": "第25章在家庭聚会中Wickham总是在场，因伊丽莎白的热烈称赞而起疑的“Mrs. Gardiner”仔细观察两人并决定离开前提醒外甥女，指嘉丁纳太太"
+    },
+    {
+      "sample_id": "s191",
+      "start": 250379,
+      "end": 250389,
+      "surface": "Derbyshire",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 25,
+      "gold_id": "g044",
+      "note": "第25章Wickham能给嘉丁纳太太带来额外愉快，因为她婚前曾在Wickham所属的“Derbyshire”那一带住过很长时间，指德比郡"
+    },
+    {
+      "sample_id": "s192",
+      "start": 251396,
+      "end": 251409,
+      "surface": "Mrs. Gardiner",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 26,
+      "gold_id": "g016",
+      "note": "第26章一有机会单独交谈，“Mrs. Gardiner’s caution to Elizabeth”便温和而准时地向伊丽莎白提出，劝她别贸然爱上没钱的Wickham，指嘉丁纳太太"
+    },
+    {
+      "sample_id": "s193",
+      "start": 252478,
+      "end": 252489,
+      "surface": "Mr. Wickham",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 26,
+      "gold_id": "g008",
+      "note": "第26章面对舅妈的严肃劝告，伊丽莎白半开玩笑地回答我会照顾好自己，也会照顾好“Mr. Wickham”，能阻止的话绝不让他爱上我，指乔治·威克姆"
+    },
+    {
+      "sample_id": "s194",
+      "start": 253849,
+      "end": 253858,
+      "surface": "Elizabeth",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 26,
+      "gold_id": "g001",
+      "note": "第26章舅妈劝她至少别提醒母亲邀请Wickham，“Elizabeth”带着会心的微笑承认自己前几天确实这么做了，指伊丽莎白·班纳特"
+    },
+    {
+      "sample_id": "s195",
+      "start": 255152,
+      "end": 255161,
+      "surface": "Charlotte",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 26,
+      "gold_id": "g010",
+      "note": "第26章周四是婚礼日，周三Miss Lucas来辞行，伊丽莎白送她下楼时“Charlotte”请她常来信并去汉斯福看望自己，指夏洛特·卢卡斯"
+    },
+    {
+      "sample_id": "s196",
+      "start": 255557,
+      "end": 255562,
+      "surface": "Maria",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 26,
+      "gold_id": "g023",
+      "note": "第26章夏洛特邀请伊丽莎白三月与“My father and Maria”一起来汉斯福做客，指妹妹玛丽亚·卢卡斯"
+    },
+    {
+      "sample_id": "s197",
+      "start": 256899,
+      "end": 256907,
+      "surface": "Hunsford",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 26,
+      "gold_id": "g041",
+      "note": "第26章夏洛特婚后从汉斯福来信赞美一切，这正是被理性柔化后的柯林斯所描绘的“Hunsford and Rosings”图景，指汉斯福"
+    },
+    {
+      "sample_id": "s198",
+      "start": 257473,
+      "end": 257482,
+      "surface": "Longbourn",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 26,
+      "gold_id": "g035",
+      "note": "第26章简到伦敦一周没收到卡罗琳音信，她原谅朋友，猜测自己从“Longbourn”寄给她的最后一封信意外寄丢了，指浪博恩"
+    },
+    {
+      "sample_id": "s199",
+      "start": 258182,
+      "end": 258192,
+      "surface": "Mrs. Hurst",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 26,
+      "gold_id": "g019",
+      "note": "第26章简去格罗夫纳街拜访宾利小姐后写信说，她坐了不长时间，因为“Caroline and Mrs. Hurst were going out”，指赫斯特太太"
+    },
+    {
+      "sample_id": "s200",
+      "start": 259073,
+      "end": 259085,
+      "surface": "Miss Bingley",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 26,
+      "gold_id": "g018",
+      "note": "第26章简在给妹妹的信中坦承自己此前完全看错了“Miss Bingley’s regard for me”，指卡罗琳·宾利"
+    },
+    {
+      "sample_id": "s201",
+      "start": 259462,
+      "end": 259470,
+      "surface": "Caroline",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 26,
+      "gold_id": "g018",
+      "note": "第26章简在信中继续叙述：“Caroline did not return my visit till yesterday”，且来访时态度冷淡敷衍，指卡罗琳·宾利"
+    },
+    {
+      "sample_id": "s202",
+      "start": 260794,
+      "end": 260804,
+      "surface": "Miss Darcy",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 26,
+      "gold_id": "g014",
+      "note": "第26章简在信中说，从宾利小姐的谈吐看，她似乎想说服自己相信哥哥真的偏爱“Miss Darcy”，指乔治安娜·达西"
+    },
+    {
+      "sample_id": "s203",
+      "start": 261446,
+      "end": 261451,
+      "surface": "Maria",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 26,
+      "gold_id": "g023",
+      "note": "第26章简在信末祝伊丽莎白同“Sir William and Maria”一起去汉斯福看望朋友一切顺心，指玛丽亚·卢卡斯"
+    },
+    {
+      "sample_id": "s204",
+      "start": 264306,
+      "end": 264313,
+      "surface": "Meryton",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 27,
+      "gold_id": "g037",
+      "note": "第27章一月和二月里浪博恩家里没什么大事，平时除了冒着严寒泥泞步行去“Meryton”外少有消遣，指麦里屯"
+    },
+    {
+      "sample_id": "s205",
+      "start": 264418,
+      "end": 264426,
+      "surface": "Hunsford",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 27,
+      "gold_id": "g041",
+      "note": "第27章紧接上句，三月将带伊丽莎白前往“Hunsford”探望夏洛特，指汉斯福"
+    },
+    {
+      "sample_id": "s206",
+      "start": 265262,
+      "end": 265268,
+      "surface": "London",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 27,
+      "gold_id": "g038",
+      "note": "第27章伊丽莎白将陪同威廉爵士和他的次女出行，行程中及时增加了在“London”住一晚看望简的安排，指伦敦"
+    },
+    {
+      "sample_id": "s207",
+      "start": 267876,
+      "end": 267889,
+      "surface": "Mrs. Gardiner",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 27,
+      "gold_id": "g016",
+      "note": "第27章伊丽莎白途经伦敦格雷斯丘奇街时，“Mrs. Gardiner”向她详细讲述了宾利小姐来访的经过以及她与简的谈话，指嘉丁纳太太"
+    },
+    {
+      "sample_id": "s208",
+      "start": 269806,
+      "end": 269816,
+      "surface": "Derbyshire",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 27,
+      "gold_id": "g044",
+      "note": "第27章谈到Wickham转而追求玛丽·金小姐时，嘉丁纳太太打趣说不愿把在“Derbyshire”住过那么久的年轻人想得太坏，指德比郡"
+    },
+    {
+      "sample_id": "s209",
+      "start": 271758,
+      "end": 271766,
+      "surface": "Hunsford",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 28,
+      "gold_id": "g041",
+      "note": "第28章当马车离开大路拐进通往“Hunsford”的小巷时，人人都伸长脖子寻找牧师住宅，指汉斯福"
+    },
+    {
+      "sample_id": "s210",
+      "start": 272178,
+      "end": 272189,
+      "surface": "Mr. Collins",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 28,
+      "gold_id": "g009",
+      "note": "第28章马车抵达汉斯福牧师住宅小门时，“Mr. Collins and Charlotte appeared at the door”迎接他们，指柯林斯先生"
+    },
+    {
+      "sample_id": "s211",
+      "start": 273771,
+      "end": 273780,
+      "surface": "Charlotte",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 28,
+      "gold_id": "g010",
+      "note": "第28章每当柯林斯说出让妻子难堪的话时，伊丽莎白都会不由自主地把目光转向“Charlotte”，看她微微脸红或明智地装作没听见，指夏洛特·卢卡斯（柯林斯太太）"
+    },
+    {
+      "sample_id": "s212",
+      "start": 275243,
+      "end": 275254,
+      "surface": "Sir William",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 28,
+      "gold_id": "g021",
+      "note": "第28章女士们因鞋薄不便踩霜而返回屋内，当“Sir William accompanied him”（陪柯林斯逛草地）时，夏洛特带妹妹和朋友参观房子，指威廉·卢卡斯爵士"
+    },
+    {
+      "sample_id": "s213",
+      "start": 277788,
+      "end": 277793,
+      "surface": "Maria",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 28,
+      "gold_id": "g023",
+      "note": "第28章次日中午楼下突然一阵喧哗，伊丽莎白打开房门，在楼梯平台上遇到了气喘吁吁跑上来叫她的“Maria”，指玛丽亚·卢卡斯"
+    },
+    {
+      "sample_id": "s214",
+      "start": 278440,
+      "end": 278445,
+      "surface": "Maria",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 28,
+      "gold_id": "g023",
+      "note": "第28章伊丽莎白下楼看到小马车里的两位女士，以为是凯瑟琳夫人母女，大吃一惊的“Maria”连忙纠正说老太太是Mrs. Jenkinson，指玛丽亚·卢卡斯"
+    },
+    {
+      "sample_id": "s215",
+      "start": 278725,
+      "end": 278734,
+      "surface": "Charlotte",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 28,
+      "gold_id": "g010",
+      "note": "第28章伊丽莎白见德·包尔小姐停车在门外，批评她竟如此无礼地让“Charlotte”顶着大风站在门外，指夏洛特·卢卡斯（柯林斯太太）"
+    },
+    {
+      "sample_id": "s216",
+      "start": 279085,
+      "end": 279094,
+      "surface": "Charlotte",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 28,
+      "gold_id": "g010",
+      "note": "第28章此时“Mr. Collins and Charlotte”正一起站在花园大门口与车里的女士交谈，指夏洛特·卢卡斯（柯林斯太太）"
+    },
+    {
+      "sample_id": "s217",
+      "start": 279163,
+      "end": 279174,
+      "surface": "Sir William",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 28,
+      "gold_id": "g021",
+      "note": "第28章紧接上句，而“Sir William”则站在门口全神贯注地瞻仰眼前的贵人，每当德·包尔小姐看过来就不停鞠躬，指威廉·卢卡斯爵士"
+    },
+    {
+      "sample_id": "s218",
+      "start": 279400,
+      "end": 279410,
+      "surface": "the ladies",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster"
+      ],
+      "chapter_index": 28,
+      "gold_id": "not_entity",
+      "note": "第28章谈话结束后，“the ladies drove on”（车上的德·包尔小姐与詹金森太太驱车离开），属复数泛指名词短语而非单一实体"
+    },
+    {
+      "sample_id": "s219",
+      "start": 280166,
+      "end": 280178,
+      "surface": "her Ladyship",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster",
+        "title_or_official"
+      ],
+      "chapter_index": 29,
+      "gold_id": "g013",
+      "note": "第29章收到罗新斯晚宴邀请后，柯林斯得意地说若是“her Ladyship”周日请他们去罗新斯喝茶他并不惊讶，没想到竟是正式晚宴，指凯瑟琳·德·包尔夫人"
+    },
+    {
+      "sample_id": "s220",
+      "start": 281842,
+      "end": 281853,
+      "surface": "Maria Lucas",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 29,
+      "gold_id": "g023",
+      "note": "第29章柯林斯反复催促大家快点穿戴，说凯瑟琳夫人极讨厌等饭，这些可怕的描述把很少见世面的“Maria Lucas”吓坏了，指玛丽亚·卢卡斯"
+    },
+    {
+      "sample_id": "s221",
+      "start": 282252,
+      "end": 282263,
+      "surface": "Mr. Collins",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 29,
+      "gold_id": "g009",
+      "note": "第29章穿过罗新斯园林时，伊丽莎白虽觉得景色宜人，却无法像“Mr. Collins”期望的那样狂喜，对门窗玻璃造价也兴趣索然，指柯林斯先生"
+    },
+    {
+      "sample_id": "s222",
+      "start": 282887,
+      "end": 282898,
+      "surface": "Mr. Collins",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 29,
+      "gold_id": "g009",
+      "note": "第29章进入门厅后，“Mr. Collins”满脸狂喜地指点精美的比例与装饰，随后众人跟随仆人进入客厅，指柯林斯先生"
+    },
+    {
+      "sample_id": "s223",
+      "start": 284203,
+      "end": 284214,
+      "surface": "Mr. Wickham",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 29,
+      "gold_id": "g008",
+      "note": "第29章凯瑟琳夫人傲慢专断的腔调彰显着自高自大，立刻让伊丽莎白脑海中浮现出“Mr. Wickham”，觉得夫人正如他所描绘的那样，指乔治·威克姆"
+    },
+    {
+      "sample_id": "s224",
+      "start": 285096,
+      "end": 285107,
+      "surface": "Mr. Collins",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 29,
+      "gold_id": "g009",
+      "note": "第29章坐了几分钟后众人被派去窗前欣赏风景，“Mr. Collins”陪在一旁指点美景，指柯林斯先生"
+    },
+    {
+      "sample_id": "s225",
+      "start": 285154,
+      "end": 285168,
+      "surface": "Lady Catherine",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 29,
+      "gold_id": "g013",
+      "note": "第29章紧接上句，柯林斯指点窗外美景，而“Lady Catherine”则恩赐般地告知他们夏天看会更美，指凯瑟琳·德·包尔夫人"
+    },
+    {
+      "sample_id": "s226",
+      "start": 286175,
+      "end": 286189,
+      "surface": "Lady Catherine",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 29,
+      "gold_id": "g013",
+      "note": "第29章晚宴上伊丽莎白坐在夏洛特和德·包尔小姐之间，夏洛特正忙于倾听“Lady Catherine”讲话，指凯瑟琳·德·包尔夫人"
+    },
+    {
+      "sample_id": "s227",
+      "start": 290122,
+      "end": 290134,
+      "surface": "Mrs. Collins",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 29,
+      "gold_id": "g010",
+      "note": "第29章凯瑟琳夫人吹嘘自己帮人介绍家庭教师，转头问“Mrs. Collins, did I tell you of Lady Metcalfe’s calling yesterday to thank me?”，指柯林斯太太（夏洛特·卢卡斯）"
+    },
+    {
+      "sample_id": "s228",
+      "start": 291672,
+      "end": 291683,
+      "surface": "Sir William",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 29,
+      "gold_id": "g021",
+      "note": "第29章茶后摆上牌桌，凯瑟琳夫人、“Sir William”与柯林斯夫妇坐下打四人牌（quadrille），指威廉·卢卡斯爵士"
+    },
+    {
+      "sample_id": "s229",
+      "start": 291975,
+      "end": 291989,
+      "surface": "Mrs. Jenkinson",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "title_or_official"
+      ],
+      "chapter_index": 29,
+      "gold_id": "x003",
+      "note": "第29章德·包尔小姐这一桌打牌极其沉闷，除了关系到牌局的话，只有“Mrs. Jenkinson”不时担心德·包尔小姐太热、太冷或光线不合适，指詹金森太太"
+    },
+    {
+      "sample_id": "s230",
+      "start": 292414,
+      "end": 292425,
+      "surface": "Sir William",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 29,
+      "gold_id": "g021",
+      "note": "第29章另一桌牌局上凯瑟琳夫人高谈阔论、柯林斯唯唯诺诺，而“Sir William did not say much”，只忙着在脑中记下趣闻和贵族名字，指威廉·卢卡斯爵士"
+    },
+    {
+      "sample_id": "s231",
+      "start": 293390,
+      "end": 293401,
+      "surface": "Sir William",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 30,
+      "gold_id": "g021",
+      "note": "第30章开头写“Sir William stayed only a week at Hunsford”，但足以确信女儿安顿得非常舒适，指威廉·卢卡斯爵士"
+    },
+    {
+      "sample_id": "s232",
+      "start": 293424,
+      "end": 293432,
+      "surface": "Hunsford",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 30,
+      "gold_id": "g041",
+      "note": "第30章紧接上句，威廉爵士在“Hunsford”只待了一周，指汉斯福"
+    },
+    {
+      "sample_id": "s233",
+      "start": 294657,
+      "end": 294668,
+      "surface": "Mr. Collins",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 30,
+      "gold_id": "g009",
+      "note": "第30章从客厅看不清小巷动静，全靠“Mr. Collins”向她们通报有什么马车经过以及德·包尔小姐每天驾车路过几次，指柯林斯先生"
+    },
+    {
+      "sample_id": "s234",
+      "start": 296279,
+      "end": 296286,
+      "surface": "Rosings",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 30,
+      "gold_id": "g040",
+      "note": "第30章到“Rosings”吃晚饭的消遣大约每周重复两次，除了少掉威廉爵士外每次都如出一辙，指罗新斯庄园"
+    },
+    {
+      "sample_id": "s235",
+      "start": 296350,
+      "end": 296361,
+      "surface": "Sir William",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 30,
+      "gold_id": "g021",
+      "note": "第30章紧接上句，每周两次去罗新斯晚宴，除了少了已回家的“Sir William”且晚上只摆一桌牌外，每次都跟第一次一样，指威廉·卢卡斯爵士"
+    },
+    {
+      "sample_id": "s236",
+      "start": 297803,
+      "end": 297817,
+      "surface": "Lady Catherine",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 30,
+      "gold_id": "g013",
+      "note": "第30章听说达西即将来罗新斯，伊丽莎白心想可以看看他如何对待被“Lady Catherine”明显内定给他的表妹，指凯瑟琳·德·包尔夫人"
+    },
+    {
+      "sample_id": "s237",
+      "start": 298001,
+      "end": 298011,
+      "surface": "Miss Lucas",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 30,
+      "gold_id": "g010",
+      "note": "第30章凯瑟琳夫人极为满意地谈起外甥达西的到来，但得知“Miss Lucas and herself”（夏洛特与伊丽莎白）在赫特福德郡早已常见到他时几乎有些生气，指夏洛特·卢卡斯"
+    },
+    {
+      "sample_id": "s238",
+      "start": 298365,
+      "end": 298372,
+      "surface": "Rosings",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 30,
+      "gold_id": "g040",
+      "note": "第30章达西抵达次日清晨，柯林斯便急忙赶往“Rosings”去向凯瑟琳夫人的两位外甥致敬，指罗新斯庄园"
+    },
+    {
+      "sample_id": "s239",
+      "start": 299529,
+      "end": 299548,
+      "surface": "Colonel Fitzwilliam",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 30,
+      "gold_id": "g017",
+      "note": "第30章柯林斯把达西和费茨威廉上校带回牧师住宅，达西依旧矜持寡言，而“Colonel Fitzwilliam”立刻健谈地交谈起来，指费茨威廉上校"
+    },
+    {
+      "sample_id": "s240",
+      "start": 301077,
+      "end": 301096,
+      "surface": "Colonel Fitzwilliam",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 31,
+      "gold_id": "g017",
+      "note": "第31章达西和上校到达后的第一周里，“Colonel Fitzwilliam”不止一次来牧师住宅拜访，而达西她们只在教堂见过，指费茨威廉上校"
+    },
+    {
+      "sample_id": "s241",
+      "start": 301288,
+      "end": 301302,
+      "surface": "Lady Catherine",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 31,
+      "gold_id": "g013",
+      "note": "第31章复活节傍晚她们应邀前往罗新斯，在“Lady Catherine’s drawing-room”加入聚会，指凯瑟琳·德·包尔夫人"
+    },
+    {
+      "sample_id": "s242",
+      "start": 304205,
+      "end": 304219,
+      "surface": "Lady Catherine",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 31,
+      "gold_id": "g013",
+      "note": "第31章咖啡后伊丽莎白应费茨威廉上校之邀弹钢琴，“Lady Catherine”听了半首曲子便又转头跟另一个外甥达西说话，指凯瑟琳·德·包尔夫人"
+    },
+    {
+      "sample_id": "s243",
+      "start": 305666,
+      "end": 305679,
+      "surface": "Hertfordshire",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 31,
+      "gold_id": "g045",
+      "note": "第31章伊丽莎白在钢琴旁跟达西开玩笑，怪他不厚道地把在“Hertfordshire”所知对她不利的事都说了出来，指赫特福德郡"
+    },
+    {
+      "sample_id": "s244",
+      "start": 305938,
+      "end": 305957,
+      "surface": "Colonel Fitzwilliam",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 31,
+      "gold_id": "g017",
+      "note": "第31章听见两人的交锋，“Colonel Fitzwilliam”好奇地喊道：请让我听听你要控告他什么，我想知道他在陌生人面前表现如何，指费茨威廉上校"
+    },
+    {
+      "sample_id": "s245",
+      "start": 306120,
+      "end": 306133,
+      "surface": "Hertfordshire",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 31,
+      "gold_id": "g045",
+      "note": "第31章伊丽莎白向费茨威廉上校控诉：我第一次在“Hertfordshire”见到达西是在一场舞会上，他整晚只跳了四支舞，指赫特福德郡"
+    },
+    {
+      "sample_id": "s246",
+      "start": 306624,
+      "end": 306643,
+      "surface": "Colonel Fitzwilliam",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 31,
+      "gold_id": "g017",
+      "note": "第31章调侃完达西在舞会上不肯被介绍给陌生人后，伊丽莎白转头问“Well, Colonel Fitzwilliam, what do I play next?”，指费茨威廉上校"
+    },
+    {
+      "sample_id": "s247",
+      "start": 306918,
+      "end": 306937,
+      "surface": "Colonel Fitzwilliam",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 31,
+      "gold_id": "g017",
+      "note": "第31章达西辩解自己不擅向陌生人自荐，伊丽莎白仍对着“Colonel Fitzwilliam”追问：我们要不要问问你表兄为什么不擅此道，指费茨威廉上校"
+    },
+    {
+      "sample_id": "s248",
+      "start": 308274,
+      "end": 308279,
+      "surface": "Darcy",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 31,
+      "gold_id": "g003",
+      "note": "第31章凯瑟琳夫人走近钢琴听了几分钟后，对“Darcy”点评说Miss Bennet如果多加练习弹得还不赖，指达西先生"
+    },
+    {
+      "sample_id": "s249",
+      "start": 310762,
+      "end": 310773,
+      "surface": "Netherfield",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 32,
+      "gold_id": "g036",
+      "note": "第32章达西独自造访牧师住宅，伊丽莎白问候Bingley兄妹后试探说：听说Bingley先生不怎么打算再回“Netherfield”了？指尼日斐花园"
+    },
+    {
+      "sample_id": "s250",
+      "start": 311200,
+      "end": 311211,
+      "surface": "Mr. Bingley",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 32,
+      "gold_id": "g004",
+      "note": "第32章伊丽莎白接着说，如果他很少回尼日斐不如退租，但也许“Mr. Bingley”租房本就是为了自己方便而非邻居方便，指查尔斯·宾利先生"
+    },
+    {
+      "sample_id": "s251",
+      "start": 311730,
+      "end": 311744,
+      "surface": "Lady Catherine",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 32,
+      "gold_id": "g013",
+      "note": "第32章为转换话题，达西环顾牧师住宅说这房子很舒适，并提到柯林斯刚来汉斯福时“Lady Catherine”应该为房子花了不少心思，指凯瑟琳·德·包尔夫人"
+    },
+    {
+      "sample_id": "s252",
+      "start": 313139,
+      "end": 313150,
+      "surface": "Netherfield",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 32,
+      "gold_id": "g036",
+      "note": "第32章达西微笑着说超出浪博恩附近对伊丽莎白都算远，伊丽莎白猜他一定以为自己在想“Jane and Netherfield”因而脸红，指尼日斐花园"
+    },
+    {
+      "sample_id": "s253",
+      "start": 313848,
+      "end": 313857,
+      "surface": "Longbourn",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 32,
+      "gold_id": "g035",
+      "note": "第32章达西把椅子往她身边拉了拉说：你不可能有这么强的恋乡情节，你不可能永远待在“Longbourn”，指浪博恩"
+    },
+    {
+      "sample_id": "s254",
+      "start": 315442,
+      "end": 315461,
+      "surface": "Colonel Fitzwilliam",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 32,
+      "gold_id": "g017",
+      "note": "第32章此后表兄弟俩几乎每天散步来牧师住宅，大家都清楚“Colonel Fitzwilliam”过来是因为喜欢她们的陪伴，指费茨威廉上校"
+    },
+    {
+      "sample_id": "s255",
+      "start": 318589,
+      "end": 318597,
+      "surface": "Hunsford",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 33,
+      "gold_id": "g041",
+      "note": "第33章伊丽莎白在林中散步三次偶遇达西，达西问她待在“Hunsford”是否愉快、是否喜欢独自散步以及对柯林斯夫妇幸福的看法，指汉斯福"
+    },
+    {
+      "sample_id": "s256",
+      "start": 318646,
+      "end": 318666,
+      "surface": "Mr. and Mrs. Collins",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "title_or_official"
+      ],
+      "chapter_index": 33,
+      "gold_id": "not_entity",
+      "note": "第33章紧接上句，达西询问她对“Mr. and Mrs. Collins’s happiness”（柯林斯夫妇的幸福）的看法，属两人并列合称而非单一实体"
+    },
+    {
+      "sample_id": "s257",
+      "start": 319137,
+      "end": 319146,
+      "surface": "Parsonage",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 33,
+      "gold_id": "g041",
+      "note": "第33章达西的话似乎暗示她以后再来肯特郡会住在罗新斯，伊丽莎白有些不安，走到“the Parsonage”对面的木栅门时大松一口气，指汉斯福牧师住宅"
+    },
+    {
+      "sample_id": "s258",
+      "start": 320268,
+      "end": 320287,
+      "surface": "Colonel Fitzwilliam",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 33,
+      "gold_id": "g017",
+      "note": "第33章散步时偶遇费茨威廉上校，谈起达西喜欢随心所欲，“Colonel Fitzwilliam”回答说我们都喜欢按自己的意思行事，只是他有钱更能如愿，指费茨威廉上校"
+    },
+    {
+      "sample_id": "s259",
+      "start": 322006,
+      "end": 322025,
+      "surface": "Colonel Fitzwilliam",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 33,
+      "gold_id": "g017",
+      "note": "第33章伊丽莎白以为达西独自监护妹妹，“Colonel Fitzwilliam”纠正说自己与达西共同担任达西小姐的监护人，指费茨威廉上校"
+    },
+    {
+      "sample_id": "s260",
+      "start": 322848,
+      "end": 322858,
+      "surface": "Mrs. Hurst",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 33,
+      "gold_id": "g019",
+      "note": "第33章伊丽莎白对上校说达西小姐很受自己认识的两位女士喜爱，即“Mrs. Hurst and Miss Bingley”，指赫斯特太太"
+    },
+    {
+      "sample_id": "s261",
+      "start": 322863,
+      "end": 322875,
+      "surface": "Miss Bingley",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 33,
+      "gold_id": "g018",
+      "note": "第33章紧接上句，与Mrs. Hurst并列喜爱达西小姐的“Miss Bingley”，指卡罗琳·宾利"
+    },
+    {
+      "sample_id": "s262",
+      "start": 323552,
+      "end": 323557,
+      "surface": "Darcy",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 33,
+      "gold_id": "g003",
+      "note": "第33章费茨威廉上校透露来罗新斯途中表兄告诉他曾挽救朋友免于一桩不智婚姻，并说这件事“Darcy”当然不希望外传以免传到女方家里，指达西先生"
+    },
+    {
+      "sample_id": "s263",
+      "start": 324608,
+      "end": 324619,
+      "surface": "Fitzwilliam",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 33,
+      "gold_id": "g017",
+      "note": "第33章伊丽莎白追问达西用了什么手段拆散他们，听完回答后满怀愤慨地沉默前行，“Fitzwilliam”观察了她一会儿问她为何如此出神，指费茨威廉上校"
+    },
+    {
+      "sample_id": "s264",
+      "start": 325290,
+      "end": 325301,
+      "surface": "Fitzwilliam",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 33,
+      "gold_id": "g017",
+      "note": "第33章伊丽莎白强自镇定说也许当事人之间感情本就不深，“Fitzwilliam”开玩笑说这可大大减损了我表兄胜利的荣耀，指费茨威廉上校"
+    },
+    {
+      "sample_id": "s265",
+      "start": 326093,
+      "end": 326105,
+      "surface": "Miss Bingley",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 33,
+      "gold_id": "g018",
+      "note": "第33章伊丽莎白确信上校所说的朋友就是Bingley，她从不怀疑达西参与了拆散Bingley和简，但此前一直将主谋归咎于“Miss Bingley”，指卡罗琳·宾利"
+    },
+    {
+      "sample_id": "s266",
+      "start": 328002,
+      "end": 328013,
+      "surface": "Mr. Collins",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 33,
+      "gold_id": "g009",
+      "note": "第33章伊丽莎白头痛且不愿见达西而未去罗新斯喝茶，夏洛特不勉强她，但“Mr. Collins”掩饰不住担心凯瑟琳夫人会因此不悦，指柯林斯先生"
+    },
+    {
+      "sample_id": "s267",
+      "start": 328892,
+      "end": 328903,
+      "surface": "Mr. Darcy’s",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 34,
+      "gold_id": "g003",
+      "note": "第34章伊丽莎白重读简的来信，“Mr. Darcy’s shameful boast”让他对姐姐所受的痛苦感受更加强烈，指达西先生"
+    },
+    {
+      "sample_id": "s268",
+      "start": 329683,
+      "end": 329702,
+      "surface": "Colonel Fitzwilliam",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 34,
+      "gold_id": "g017",
+      "note": "第34章门铃突然响起，伊丽莎白心头微颤，以为是曾有一次很晚来访的“Colonel Fitzwilliam”特来问候她，不料走进来的是达西，指费茨威廉上校"
+    },
+    {
+      "sample_id": "s269",
+      "start": 344311,
+      "end": 344324,
+      "surface": "Hertfordshire",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 35,
+      "gold_id": "g045",
+      "note": "第35章达西在信中辩解：我到“Hertfordshire”不久就和别人一样看出Bingley偏爱令姐胜过当地任何年轻女子，指赫特福德郡"
+    },
+    {
+      "sample_id": "s270",
+      "start": 344492,
+      "end": 344503,
+      "surface": "Netherfield",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 35,
+      "gold_id": "g036",
+      "note": "第35章达西在信中继续写道：但直到在“Netherfield”举办舞会那天晚上，我才担心他产生了认真的感情，指尼日斐花园"
+    },
+    {
+      "sample_id": "s271",
+      "start": 347972,
+      "end": 347978,
+      "surface": "London",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 35,
+      "gold_id": "g038",
+      "note": "第35章达西在信中叙述：Bingley的姐妹们与我一样不安，我们很快决定直接去“London”与他会合以劝他打消念头，指伦敦"
+    },
+    {
+      "sample_id": "s272",
+      "start": 350136,
+      "end": 350145,
+      "surface": "Pemberley",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 35,
+      "gold_id": "g039",
+      "note": "第35章达西在信中转入Wickham一事，说明Wickham的父亲是一位受人尊敬的人，多年来一直管理“the Pemberley estates”，指彭伯里庄园"
+    },
+    {
+      "sample_id": "s273",
+      "start": 350446,
+      "end": 350460,
+      "surface": "his own father",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster"
+      ],
+      "chapter_index": 35,
+      "gold_id": "x002",
+      "note": "第35章达西信中写道：我父亲资助Wickham上学和读剑桥，因为“his own father, always poor from the extravagance of his wife”无力供他受绅士教育，指威克姆的父亲（老达西管事）"
+    },
+    {
+      "sample_id": "s274",
+      "start": 350499,
+      "end": 350507,
+      "surface": "his wife",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster"
+      ],
+      "chapter_index": 35,
+      "gold_id": "x026",
+      "note": "达西信中提及威克姆之父因妻子（his wife，即威克姆之母）挥霍无度而始终贫困，无力供威克姆受绅士教育，系名录外特定人物老威克姆夫人。"
+    },
+    {
+      "sample_id": "s275",
+      "start": 351905,
+      "end": 351916,
+      "surface": "Mr. Wickham",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 35,
+      "gold_id": "g008",
+      "note": "达西信中叙述其父与老威克姆去世半年后，威克姆先生（Mr. Wickham）写信表示放弃担任圣职并要求折算经济补偿，指乔治·威克姆。"
+    },
+    {
+      "sample_id": "s276",
+      "start": 352780,
+      "end": 352789,
+      "surface": "Pemberley",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 35,
+      "gold_id": "g039",
+      "note": "达西信中说威克姆拿走三千镑后两人关系断绝，达西认为他品行太差而不愿邀请他来彭伯里（Pemberley），指彭伯里庄园。"
+    },
+    {
+      "sample_id": "s277",
+      "start": 352815,
+      "end": 352819,
+      "surface": "town",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 35,
+      "gold_id": "not_entity",
+      "note": "达西信中说不愿在城里（in town）接纳威克姆来往，后文紧接“In town, I believe, he chiefly lived”，此处 town 为泛指城里的普通名词。"
+    },
+    {
+      "sample_id": "s278",
+      "start": 354572,
+      "end": 354583,
+      "surface": "Mr. Wickham",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 35,
+      "gold_id": "g008",
+      "note": "达西信中叙述乔治安娜去年夏天随女伴去拉姆斯盖特，威克姆先生（Mr. Wickham）也蓄意前往并与杨格太太勾结讨好乔治安娜，指乔治·威克姆。"
+    },
+    {
+      "sample_id": "s279",
+      "start": 356575,
+      "end": 356594,
+      "surface": "Colonel Fitzwilliam",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 35,
+      "gold_id": "g017",
+      "note": "达西信中表示所述一切均可向费茨威廉上校（Colonel Fitzwilliam）求证，因其既是近亲又是先父遗嘱执行人之一，指费茨威廉上校。"
+    },
+    {
+      "sample_id": "s280",
+      "start": 359522,
+      "end": 359531,
+      "surface": "Pemberley",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 36,
+      "gold_id": "g039",
+      "note": "伊丽莎白重读达西来信，核对威克姆与彭伯里（Pemberley）家族关系的叙述与威克姆自述是否一致，指彭伯里。"
+    },
+    {
+      "sample_id": "s281",
+      "start": 361262,
+      "end": 361275,
+      "surface": "Hertfordshire",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 36,
+      "gold_id": "g045",
+      "note": "伊丽莎白回想威克姆加入民兵团前的生活经历在赫特福德郡（Hertfordshire）除了他自述外无人知晓，指赫特福德郡。"
+    },
+    {
+      "sample_id": "s282",
+      "start": 361781,
+      "end": 361790,
+      "surface": "Mr. Darcy",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 36,
+      "gold_id": "g003",
+      "note": "伊丽莎白试图回想威克姆有什么美德能挽救他免受达西先生攻击，或弥补达西先生（Mr. Darcy）所描述的多年游手好闲与恶习，指达西。"
+    },
+    {
+      "sample_id": "s283",
+      "start": 362278,
+      "end": 362288,
+      "surface": "Miss Darcy",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 36,
+      "gold_id": "g014",
+      "note": "伊丽莎白继续读信中关于威克姆企图算计达西小姐（Miss Darcy）的经过，并由前一天早上费茨威廉上校的话得到印证，指乔治安娜·达西。"
+    },
+    {
+      "sample_id": "s284",
+      "start": 362346,
+      "end": 362365,
+      "surface": "Colonel Fitzwilliam",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 36,
+      "gold_id": "g017",
+      "note": "前文述及威克姆算计达西小姐一事，从前一天早上费茨威廉上校（Colonel Fitzwilliam）与伊丽莎白的交谈中得到了印证，指费茨威廉上校。"
+    },
+    {
+      "sample_id": "s285",
+      "start": 365310,
+      "end": 365317,
+      "surface": "Wickham",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 36,
+      "gold_id": "g008",
+      "note": "伊丽莎白反思达西若真如威克姆（Wickham）所描绘的那样严重违背道义，世人不可能毫无察觉，指乔治·威克姆。"
+    },
+    {
+      "sample_id": "s286",
+      "start": 365504,
+      "end": 365515,
+      "surface": "Mr. Bingley",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 36,
+      "gold_id": "g004",
+      "note": "伊丽莎白想到若达西真如此恶劣，却能与宾利先生（Mr. Bingley）这样和蔼可亲的人结为挚友是不可思议的，指查尔斯·宾利。"
+    },
+    {
+      "sample_id": "s287",
+      "start": 365600,
+      "end": 365607,
+      "surface": "Wickham",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 36,
+      "gold_id": "g008",
+      "note": "伊丽莎白对自己感到羞愧，无论想到达西还是威克姆（Wickham），都觉得自己此前盲目、偏颇、充满偏见，指乔治·威克姆。"
+    },
+    {
+      "sample_id": "s288",
+      "start": 366408,
+      "end": 366415,
+      "surface": "Bingley",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 36,
+      "gold_id": "g004",
+      "note": "伊丽莎白的思绪从自己转到简，又从简转到宾利（Bingley），进而重读达西信中关于拆散简与宾利的解释，指查尔斯·宾利。"
+    },
+    {
+      "sample_id": "s289",
+      "start": 366981,
+      "end": 366985,
+      "surface": "Jane",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 36,
+      "gold_id": "g002",
+      "note": "伊丽莎白承认达西对简的描述很公允，感到简（Jane）的感情虽然热烈却很少外露，神态举止总是十分平和，指简·班纳特。"
+    },
+    {
+      "sample_id": "s290",
+      "start": 368538,
+      "end": 368545,
+      "surface": "Rosings",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 36,
+      "gold_id": "g040",
+      "note": "伊丽莎白散步回到汉斯福牧师宅，得知她外出期间来自罗新斯（Rosings）的两位先生——达西与费茨威廉上校曾来拜访，指罗新斯庄园。"
+    },
+    {
+      "sample_id": "s291",
+      "start": 368641,
+      "end": 368660,
+      "surface": "Colonel Fitzwilliam",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 36,
+      "gold_id": "g017",
+      "note": "伊丽莎白被告知达西只坐了几分钟便告辞，而费茨威廉上校（Colonel Fitzwilliam）坐了至少一小时等她回来，指费茨威廉上校。"
+    },
+    {
+      "sample_id": "s292",
+      "start": 370582,
+      "end": 370596,
+      "surface": "Lady Catherine",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 37,
+      "gold_id": "g013",
+      "note": "晚饭后凯瑟琳夫人（Lady Catherine）注意到班纳特小姐情绪不高，便自作主张以为她舍不得这么快回家并劝她多留，指凯瑟琳·德·包尔夫人。"
+    },
+    {
+      "sample_id": "s293",
+      "start": 371280,
+      "end": 371291,
+      "surface": "Mrs. Bennet",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 37,
+      "gold_id": "g006",
+      "note": "凯瑟琳夫人劝伊丽莎白在汉斯福多住两周，说班纳特太太（Mrs. Bennet）肯定能再离开她两周，伊丽莎白回答父亲写信催她回去，指班纳特太太。"
+    },
+    {
+      "sample_id": "s294",
+      "start": 372556,
+      "end": 372565,
+      "surface": "Pemberley",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 37,
+      "gold_id": "g039",
+      "note": "凯瑟琳夫人强调年轻女子出门须有仆人护送，举例说彭伯里（Pemberley）的达西先生与安妮夫人的女儿达西小姐去拉姆斯盖特时带了两名男仆，指彭伯里庄园。"
+    },
+    {
+      "sample_id": "s295",
+      "start": 375164,
+      "end": 375171,
+      "surface": "Meryton",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 37,
+      "gold_id": "g037",
+      "note": "伊丽莎白忧虑莉迪亚和基蒂的轻浮，只要麦里屯有军官她们就会调情，只要麦里屯（Meryton）离浪博恩只有步行距离她们就会一直往那儿跑，指麦里屯。"
+    },
+    {
+      "sample_id": "s296",
+      "start": 376421,
+      "end": 376426,
+      "surface": "Maria",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 37,
+      "gold_id": "g023",
+      "note": "凯瑟琳夫人在临别前一晚详细过问旅途安排并坚持教她们装箱的唯一正确摆法，弄得玛丽亚（Maria）回去后不得不拆开早上装好的箱子重装，指玛丽亚·卢卡斯。"
+    },
+    {
+      "sample_id": "s297",
+      "start": 378193,
+      "end": 378200,
+      "surface": "Rosings",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 38,
+      "gold_id": "g040",
+      "note": "柯林斯先生在伊丽莎白临行前致辞，自夸凭借与罗新斯（Rosings）的关系能带她见识上流社交、调剂简朴的家庭生活，指罗新斯庄园。"
+    },
+    {
+      "sample_id": "s298",
+      "start": 380785,
+      "end": 380790,
+      "surface": "Maria",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 38,
+      "gold_id": "g023",
+      "note": "柯林斯先生送伊丽莎白上马车，先把她扶上车后玛丽亚（Maria）接着跟上去，车门快关上时柯林斯提醒她们忘了给罗新斯的女眷留话，指玛丽亚·卢卡斯。"
+    },
+    {
+      "sample_id": "s299",
+      "start": 381276,
+      "end": 381281,
+      "surface": "Maria",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 38,
+      "gold_id": "g023",
+      "note": "马车驶离汉斯福几分钟后，玛丽亚（Maria）感叹仿佛才来一两天却发生了这么多事，在罗新斯吃了九次饭、喝了两次茶，指玛丽亚·卢卡斯。"
+    },
+    {
+      "sample_id": "s300",
+      "start": 381762,
+      "end": 381774,
+      "surface": "Mr. Gardiner",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 38,
+      "gold_id": "g015",
+      "note": "伊丽莎白与玛丽亚离开汉斯福四小时后抵达伦敦嘉丁纳先生（Mr. Gardiner）的家中并准备小住几日，指爱德华·嘉丁纳先生。"
+    },
+    {
+      "sample_id": "s301",
+      "start": 382029,
+      "end": 382038,
+      "surface": "Longbourn",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 38,
+      "gold_id": "g035",
+      "note": "在伦敦期间由于舅妈安排了各种社交活动，伊丽莎白没空细察简的情绪，但简将随她一起回浪博恩（Longbourn），到那里就有充足时间观察，指浪博恩。"
+    },
+    {
+      "sample_id": "s302",
+      "start": 383052,
+      "end": 383057,
+      "surface": "Kitty",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 39,
+      "gold_id": "g011",
+      "note": "五月第二周伊丽莎白、简与玛丽亚从格雷斯丘奇街出发，在赫特福德郡某镇约定客栈换乘班纳特先生的马车时，看见基蒂（Kitty）和莉迪亚在楼上餐厅窗前张望，指基蒂·班纳特。"
+    },
+    {
+      "sample_id": "s303",
+      "start": 384331,
+      "end": 384339,
+      "surface": "Brighton",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 39,
+      "gold_id": "g042",
+      "note": "莉迪亚向姐姐们宣布民兵团两周后离开麦里屯，将驻扎在布赖顿（Brighton）附近，并嚷着要爸爸夏天带全家去那里，指布赖顿。"
+    },
+    {
+      "sample_id": "s304",
+      "start": 384707,
+      "end": 384715,
+      "surface": "Brighton",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 39,
+      "gold_id": "g042",
+      "note": "伊丽莎白暗自震惊于全家去海滨的计划，心想一个民兵团和麦里屯的月度舞会已把她们搅得天翻地覆，更何况是布赖顿（Brighton）和满营士兵，指布赖顿。"
+    },
+    {
+      "sample_id": "s305",
+      "start": 386928,
+      "end": 386932,
+      "surface": "Jane",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 39,
+      "gold_id": "g002",
+      "note": "回家路上莉迪亚大谈特谈，问姐姐们外出期间有没有找到丈夫，并宣称简（Jane）快二十三岁了，很快就要变成老处女，指简·班纳特。"
+    },
+    {
+      "sample_id": "s306",
+      "start": 387425,
+      "end": 387440,
+      "surface": "Colonel Forster",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 39,
+      "gold_id": "g027",
+      "note": "莉迪亚津津乐道前几天她和基蒂在福斯特上校（Colonel Forster）家玩了一天，福斯特太太答应晚上办小舞会并开了变装玩笑，指福斯特上校。"
+    },
+    {
+      "sample_id": "s307",
+      "start": 388473,
+      "end": 388482,
+      "surface": "Longbourn",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 39,
+      "gold_id": "g035",
+      "note": "在回浪博恩（Longbourn）的一路上，莉迪亚在基蒂的帮腔下用各种聚会和玩笑故事逗同伴开心，伊丽莎白尽量少听，指浪博恩。"
+    },
+    {
+      "sample_id": "s308",
+      "start": 388633,
+      "end": 388644,
+      "surface": "Mrs. Bennet",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 39,
+      "gold_id": "g006",
+      "note": "姐妹们回到浪博恩受到热情迎接，班纳特太太（Mrs. Bennet）欣喜地看到简依然美丽如初，班纳特先生也主动向伊丽莎白表示欢迎回来，指班纳特太太。"
+    },
+    {
+      "sample_id": "s309",
+      "start": 388894,
+      "end": 388899,
+      "surface": "Maria",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 39,
+      "gold_id": "g023",
+      "note": "晚饭时餐厅里人很多，几乎所有卢卡斯家的人都来迎接玛丽亚（Maria）并打听见闻，指随伊丽莎白同行的玛丽亚·卢卡斯。"
+    },
+    {
+      "sample_id": "s310",
+      "start": 388998,
+      "end": 389003,
+      "surface": "Maria",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 39,
+      "gold_id": "g023",
+      "note": "餐桌上卢卡斯夫人隔着桌子向玛丽亚（Maria）询问她长女（夏洛特）的健康状况和家禽饲养情况，指玛丽亚·卢卡斯。"
+    },
+    {
+      "sample_id": "s311",
+      "start": 389423,
+      "end": 389427,
+      "surface": "Mary",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 39,
+      "gold_id": "g012",
+      "note": "莉迪亚在餐桌上大声向愿意听的人讲述早上的乐事，对玛丽（Mary）说真希望她也一起去，并讲起她和基蒂在马车上拉起窗帘装作没人的恶作剧，指玛丽·班纳特。"
+    },
+    {
+      "sample_id": "s312",
+      "start": 390122,
+      "end": 390126,
+      "surface": "Mary",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 39,
+      "gold_id": "g012",
+      "note": "面对莉迪亚吹嘘一路大声说笑的乐趣，玛丽（Mary）十分严肃地回答说这种娱乐不合自己的心意，自己宁愿看书，指玛丽·班纳特。"
+    },
+    {
+      "sample_id": "s313",
+      "start": 390498,
+      "end": 390502,
+      "surface": "Mary",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 39,
+      "gold_id": "g012",
+      "note": "莉迪亚对玛丽的那番大道理一句也没听进去，她听别人说话很少超过半分钟，而且从来不理会玛丽（Mary）的话，指玛丽·班纳特。"
+    },
+    {
+      "sample_id": "s314",
+      "start": 391194,
+      "end": 391202,
+      "surface": "Brighton",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 39,
+      "gold_id": "g042",
+      "note": "伊丽莎白到家没几个小时，就发现莉迪亚在客栈提到的去布赖顿（Brighton）的计划正在父母之间频繁讨论，指布赖顿。"
+    },
+    {
+      "sample_id": "s315",
+      "start": 391596,
+      "end": 391600,
+      "surface": "Jane",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 40,
+      "gold_id": "g002",
+      "note": "第四十章开头，伊丽莎白按捺不住把所发生之事告诉简（Jane）的急切心情，决定隐去涉及简的部分后，次日清晨向她讲述了达西求婚及写信的主要经过，指简·班纳特。"
+    },
+    {
+      "sample_id": "s316",
+      "start": 395488,
+      "end": 395492,
+      "surface": "Jane",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 40,
+      "gold_id": "g002",
+      "note": "伊丽莎白向简倾诉自己刚读达西那封信时非常难受，身边无人可诉说感受，也没有简（Jane）来安慰自己，指简·班纳特。"
+    },
+    {
+      "sample_id": "s317",
+      "start": 398994,
+      "end": 399000,
+      "surface": "London",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 40,
+      "gold_id": "g038",
+      "note": "班纳特太太向伊丽莎白抱怨简的伤心事，说自己已向菲利普斯妹妹提过，但打听不出简在伦敦（London）期间是否见过宾利，指伦敦。"
+    },
+    {
+      "sample_id": "s318",
+      "start": 401184,
+      "end": 401189,
+      "surface": "Kitty",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 41,
+      "gold_id": "g011",
+      "note": "民兵团即将离开麦里屯，唯有两位年长的班纳特小姐还能正常饮食作息，基蒂（Kitty）和莉迪亚自己痛苦万分，常常责怪两位姐姐无动于衷，指基蒂·班纳特。"
+    },
+    {
+      "sample_id": "s319",
+      "start": 401194,
+      "end": 401199,
+      "surface": "Lydia",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 41,
+      "gold_id": "g007",
+      "note": "基蒂和莉迪亚（Lydia）因民兵团离开而极度沮丧，频繁责备简和伊丽莎白冷漠无情，无法理解家里人怎能如此硬心肠，指莉迪亚·班纳特。"
+    },
+    {
+      "sample_id": "s320",
+      "start": 401805,
+      "end": 401813,
+      "surface": "Brighton",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 41,
+      "gold_id": "g042",
+      "note": "班纳特太太回忆二十五年前米勒上校的团离开时自己哭了两天，莉迪亚说自己也要心碎了，班纳特太太感叹“要是能去布赖顿（Brighton）就好了”，指布赖顿。"
+    },
+    {
+      "sample_id": "s321",
+      "start": 401968,
+      "end": 401983,
+      "surface": "my aunt Philips",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster"
+      ],
+      "chapter_index": 41,
+      "gold_id": "g024",
+      "note": "母女几人感叹去海边洗海水浴的好处时，基蒂补充说“我菲利普斯姨妈（my aunt Philips）肯定那对我大有好处”，指班纳特姐妹的姨妈菲利普斯太太。"
+    },
+    {
+      "sample_id": "s322",
+      "start": 402492,
+      "end": 402519,
+      "surface": "the colonel of the regiment",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster",
+        "title_or_official"
+      ],
+      "chapter_index": 41,
+      "gold_id": "g027",
+      "note": "莉迪亚收到该团上校（the colonel of the regiment）之妻福斯特太太的邀请，请她随同前往布赖顿，福斯特太太的丈夫即民兵团团长福斯特上校。"
+    },
+    {
+      "sample_id": "s323",
+      "start": 402693,
+      "end": 402698,
+      "surface": "Lydia",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 41,
+      "gold_id": "g007",
+      "note": "年轻新婚的福斯特太太因性情活泼与莉迪亚（Lydia）十分投缘，相识三个月便亲密了两个月，因此邀她同赴布赖顿，指莉迪亚·班纳特。"
+    },
+    {
+      "sample_id": "s324",
+      "start": 402876,
+      "end": 402887,
+      "surface": "Mrs. Bennet",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 41,
+      "gold_id": "g006",
+      "note": "莉迪亚获邀去布赖顿后欣喜若狂，她对福斯特太太的崇拜、班纳特太太（Mrs. Bennet）的高兴以及基蒂的懊丧难以言表，指班纳特太太。"
+    },
+    {
+      "sample_id": "s325",
+      "start": 403159,
+      "end": 403164,
+      "surface": "Kitty",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 41,
+      "gold_id": "g011",
+      "note": "莉迪亚在屋里狂喜奔走、大声说笑，而倒霉的基蒂（Kitty）则留在客厅里用尖酸委屈的腔调抱怨福斯特太太为什么不请自己，指基蒂·班纳特。"
+    },
+    {
+      "sample_id": "s326",
+      "start": 403953,
+      "end": 403958,
+      "surface": "Lydia",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 41,
+      "gold_id": "g007",
+      "note": "伊丽莎白私下劝父亲不要让莉迪亚去布赖顿，向父亲陈述莉迪亚（Lydia）平日行为的种种失当，以及在布赖顿更大诱惑下可能愈发轻率，指莉迪亚·班纳特。"
+    },
+    {
+      "sample_id": "s327",
+      "start": 406344,
+      "end": 406354,
+      "surface": "Mr. Bennet",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 41,
+      "gold_id": "g005",
+      "note": "伊丽莎白痛陈莉迪亚和基蒂缺乏管教将连累姐妹受辱，班纳特先生（Mr. Bennet）见她全心关切此事，便亲切地握着她的手安慰她和简必受尊重，指班纳特先生。"
+    },
+    {
+      "sample_id": "s328",
+      "start": 406729,
+      "end": 406737,
+      "surface": "Brighton",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 41,
+      "gold_id": "g042",
+      "note": "班纳特先生对伊丽莎白说，如果不让莉迪亚去布赖顿（Brighton），浪博恩就休想安宁，不如让她去，指布赖顿。"
+    },
+    {
+      "sample_id": "s329",
+      "start": 406757,
+      "end": 406772,
+      "surface": "Colonel Forster",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 41,
+      "gold_id": "g027",
+      "note": "班纳特先生宽慰伊丽莎白，认为福斯特上校（Colonel Forster）是个明白人，会看住莉迪亚不让她惹出真正的祸事，指福斯特上校。"
+    },
+    {
+      "sample_id": "s330",
+      "start": 407609,
+      "end": 407614,
+      "surface": "Lydia",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 41,
+      "gold_id": "g007",
+      "note": "伊丽莎白劝阻无果后失望离开；倘若莉迪亚（Lydia）和母亲知道她同父亲谈话的内容，母女俩定会怒不可遏，指莉迪亚·班纳特。"
+    },
+    {
+      "sample_id": "s331",
+      "start": 408574,
+      "end": 408582,
+      "surface": "Brighton",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 41,
+      "gold_id": "g042",
+      "note": "对班纳特太太而言，丈夫绝不打算亲自去海滨令人沮丧，唯有莉迪亚能去布赖顿（Brighton）这件事给了她全部安慰，指布赖顿。"
+    },
+    {
+      "sample_id": "s332",
+      "start": 409880,
+      "end": 409887,
+      "surface": "Meryton",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 41,
+      "gold_id": "g037",
+      "note": "民兵团留在麦里屯（Meryton）的最后一天，威克姆与其他军官在浪博恩吃晚饭，并向伊丽莎白问起她在汉斯福过得如何，指麦里屯。"
+    },
+    {
+      "sample_id": "s333",
+      "start": 410094,
+      "end": 410102,
+      "surface": "Hunsford",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 41,
+      "gold_id": "g041",
+      "note": "威克姆在浪博恩晚宴上问伊丽莎白在汉斯福（Hunsford）过得怎样，伊丽莎白故意提起费茨威廉上校和达西先生在罗新斯待了三周，指汉斯福。"
+    },
+    {
+      "sample_id": "s334",
+      "start": 410619,
+      "end": 410626,
+      "surface": "Rosings",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 41,
+      "gold_id": "g040",
+      "note": "威克姆故作漫不经心地追问伊丽莎白费茨威廉上校在罗新斯（Rosings）待了多久、是否经常见面，指罗新斯庄园。"
+    },
+    {
+      "sample_id": "s335",
+      "start": 412656,
+      "end": 412665,
+      "surface": "Elizabeth",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 41,
+      "gold_id": "g001",
+      "note": "威克姆辩解达西在姨妈面前有所收敛并急于促成与德·包尔小姐的婚事，伊丽莎白（Elizabeth）听了忍不住一笑，只微微点头而不愿再听他抱怨，指伊丽莎白·班纳特。"
+    },
+    {
+      "sample_id": "s336",
+      "start": 414346,
+      "end": 414356,
+      "surface": "Mr. Bennet",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 42,
+      "gold_id": "g005",
+      "note": "第四十二章剖析班纳特夫妇的婚姻：妻子浅薄愚昧使丈夫早早失去爱意与尊重，但班纳特先生（Mr. Bennet）并未借放纵享乐排遣失望，而是寄情于乡间与书籍，指班纳特先生。"
+    },
+    {
+      "sample_id": "s337",
+      "start": 414981,
+      "end": 414990,
+      "surface": "Elizabeth",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 42,
+      "gold_id": "g001",
+      "note": "班纳特先生拿妻子的无知愚蠢取乐，伊丽莎白（Elizabeth）却从未对父亲作为丈夫的不当行为视而不见，只是因敬重其才智并感激他对自己的疼爱而尽量不去想，指伊丽莎白·班纳特。"
+    },
+    {
+      "sample_id": "s338",
+      "start": 415835,
+      "end": 415842,
+      "surface": "Wickham",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 42,
+      "gold_id": "g008",
+      "note": "民兵团离开后，伊丽莎白除了为威克姆（Wickham）的离去感到庆幸外，发现失去民兵团后家里因母亲和妹妹整日抱怨无聊而一片阴郁，指乔治·威克姆。"
+    },
+    {
+      "sample_id": "s339",
+      "start": 417818,
+      "end": 417823,
+      "surface": "Kitty",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 42,
+      "gold_id": "g011",
+      "note": "莉迪亚出发去布赖顿时答应经常给母亲和基蒂（Kitty）写详尽的信，但来信总是让人久等且十分简短，指基蒂·班纳特。"
+    },
+    {
+      "sample_id": "s340",
+      "start": 420967,
+      "end": 420980,
+      "surface": "Mrs. Gardiner",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 42,
+      "gold_id": "g016",
+      "note": "又过了四周，嘉丁纳先生和嘉丁纳太太（Mrs. Gardiner）带着四个孩子终于来到浪博恩，准备把孩子留给简照看后带伊丽莎白去北方旅行，指嘉丁纳太太。"
+    },
+    {
+      "sample_id": "s341",
+      "start": 421175,
+      "end": 421179,
+      "surface": "Jane",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 42,
+      "gold_id": "g002",
+      "note": "嘉丁纳夫妇的两个女孩和两个男孩留在浪博恩，由深受喜爱、生性稳重温和的表姐简（Jane）专门照看、教导和陪伴，指简·班纳特。"
+    },
+    {
+      "sample_id": "s342",
+      "start": 421846,
+      "end": 421856,
+      "surface": "Derbyshire",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 42,
+      "gold_id": "g044",
+      "note": "叙述者说明本书无意描绘德比郡（Derbyshire）或沿途经过的牛津、布莱尼姆、沃里克等地，只关注德比郡的一小部分，指德比郡。"
+    },
+    {
+      "sample_id": "s343",
+      "start": 421941,
+      "end": 421949,
+      "surface": "Blenheim",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 42,
+      "gold_id": "x008",
+      "note": "叙述伊丽莎白随嘉丁纳夫妇前往德比郡途中经过的名胜路线包括牛津、布莱尼姆（Blenheim）、沃里克、凯尼尔沃思、伯明翰等，指布莱尼姆宫所在地。"
+    },
+    {
+      "sample_id": "s344",
+      "start": 422030,
+      "end": 422040,
+      "surface": "Derbyshire",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 42,
+      "gold_id": "g044",
+      "note": "叙述者指出沿途名胜众所周知，目前只关注德比郡（Derbyshire）的一小部分，即嘉丁纳太太昔日居住过的兰顿小镇一带，指德比郡。"
+    },
+    {
+      "sample_id": "s345",
+      "start": 422580,
+      "end": 422592,
+      "surface": "Mr. Gardiner",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 42,
+      "gold_id": "g015",
+      "note": "前一天晚上商议路线时嘉丁纳太太表示想重游距兰顿五英里的彭伯里，嘉丁纳先生（Mr. Gardiner）表示愿意前往，随后征求伊丽莎白的意见，指爱德华·嘉丁纳先生。"
+    },
+    {
+      "sample_id": "s346",
+      "start": 426444,
+      "end": 426453,
+      "surface": "Elizabeth",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 43,
+      "gold_id": "g001",
+      "note": "第四十三章参观彭伯里时，体面和气的女管家带他们走进宽敞华丽的餐厅，伊丽莎白（Elizabeth）略微打量后便走到窗前欣赏窗外山林与河谷景色，指伊丽莎白·班纳特。"
+    },
+    {
+      "sample_id": "s347",
+      "start": 426735,
+      "end": 426744,
+      "surface": "the river",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster"
+      ],
+      "chapter_index": 43,
+      "gold_id": "not_entity",
+      "note": "伊丽莎白在彭伯里餐厅窗前欣赏整个景致——河流（the river）、两岸散落的树木与蜿蜒的山谷，此处 the river 为普通景物名词。"
+    },
+    {
+      "sample_id": "s348",
+      "start": 427093,
+      "end": 427102,
+      "surface": "Elizabeth",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 43,
+      "gold_id": "g001",
+      "note": "参观彭伯里各房间时，伊丽莎白（Elizabeth）赞赏主人的品味既不俗艳也不浮华，比罗新斯的家具少了几分炫耀而多了真正的雅致，指伊丽莎白·班纳特。"
+    },
+    {
+      "sample_id": "s349",
+      "start": 428464,
+      "end": 428489,
+      "surface": "her late master’s steward",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster"
+      ],
+      "chapter_index": 43,
+      "gold_id": "x002",
+      "note": "彭伯里女管家指着壁炉架上方威克姆的袖珍画像，告诉他们这位青年绅士是她已故老主人的管事（her late master’s steward）之子，由老主人自费抚养长大，指老威克姆。"
+    },
+    {
+      "sample_id": "s350",
+      "start": 428792,
+      "end": 428801,
+      "surface": "my master",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster"
+      ],
+      "chapter_index": 43,
+      "gold_id": "g003",
+      "note": "雷诺兹太太指着另一幅八年前绘制的袖珍画像说“这是我家主人（my master）——画得非常像他”，嘉丁纳太太随后请伊丽莎白评判像不像，指彭伯里主人达西。"
+    },
+    {
+      "sample_id": "s351",
+      "start": 430064,
+      "end": 430076,
+      "surface": "Mr. Gardiner",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 43,
+      "gold_id": "g015",
+      "note": "雷诺兹太太夸赞达西小姐琴棋书画俱佳且主人刚送她一架新乐器，举止随和亲切的嘉丁纳先生（Mr. Gardiner）便通过提问鼓励女管家继续健谈，指爱德华·嘉丁纳先生。"
+    },
+    {
+      "sample_id": "s352",
+      "start": 430718,
+      "end": 430731,
+      "surface": "Mrs. Gardiner",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 43,
+      "gold_id": "g016",
+      "note": "雷诺兹太太说不知谁才配得上自家主人，嘉丁纳先生和嘉丁纳太太（Mrs. Gardiner）相视而笑，伊丽莎白也忍不住搭话，指嘉丁纳太太。"
+    },
+    {
+      "sample_id": "s353",
+      "start": 430939,
+      "end": 430948,
+      "surface": "Elizabeth",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 43,
+      "gold_id": "g001",
+      "note": "听到女管家坚称自己所言全是实情，伊丽莎白（Elizabeth）觉得这话未免捧得太高，随后更是惊讶地听女管家说自达西四岁起从未听他说过一句重话，指伊丽莎白·班纳特。"
+    },
+    {
+      "sample_id": "s354",
+      "start": 431390,
+      "end": 431399,
+      "surface": "her uncle",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster"
+      ],
+      "chapter_index": 43,
+      "gold_id": "g015",
+      "note": "伊丽莎白渴望多听一些关于达西性情的介绍，因此很感激她舅舅（her uncle）接话称赞“很少有人能当得起这样的夸奖，你有这样的主人很幸运”，指爱德华·嘉丁纳先生。"
+    },
+    {
+      "sample_id": "s355",
+      "start": 432252,
+      "end": 432264,
+      "surface": "Mr. Gardiner",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 43,
+      "gold_id": "g015",
+      "note": "嘉丁纳先生（Mr. Gardiner）觉得雷诺兹太太对主人的过度赞美出于家仆偏爱而颇感兴趣，便在登上大楼梯时再次把话题引回达西身上，指爱德华·嘉丁纳先生。"
+    },
+    {
+      "sample_id": "s356",
+      "start": 433722,
+      "end": 433732,
+      "surface": "his sister",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster"
+      ],
+      "chapter_index": 43,
+      "gold_id": "g014",
+      "note": "雷诺兹太太预想达西小姐走进这间房间时会有多高兴，并补充说达西一向如此，凡是能让他妹妹（his sister）高兴的事都会立刻办到，指乔治安娜·达西。"
+    },
+    {
+      "sample_id": "s357",
+      "start": 434469,
+      "end": 434478,
+      "surface": "Mr. Darcy",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 43,
+      "gold_id": "g003",
+      "note": "在彭伯里画廊的众多家族肖像中，伊丽莎白终于停下脚步，看到一幅酷似达西先生（Mr. Darcy）的肖像，脸上带着她曾见过的微笑，指达西。"
+    },
+    {
+      "sample_id": "s358",
+      "start": 434763,
+      "end": 434773,
+      "surface": "his father",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster"
+      ],
+      "chapter_index": 43,
+      "gold_id": "x001",
+      "note": "伊丽莎白在画廊凝视达西的肖像，雷诺兹太太告诉他们这幅画是在他父亲（his father）在世时画的，指已故的老达西先生。"
+    },
+    {
+      "sample_id": "s359",
+      "start": 435353,
+      "end": 435368,
+      "surface": "the housekeeper",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster"
+      ],
+      "chapter_index": 43,
+      "gold_id": "g029",
+      "note": "伊丽莎白站在达西画像前沉思，女管家（the housekeeper）所提出的每一个看法都对达西的品格有利，令她对达西的敬意与感激比以往更深，指彭伯里女管家雷诺兹太太。"
+    },
+    {
+      "sample_id": "s360",
+      "start": 436897,
+      "end": 436909,
+      "surface": "the gardener",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster"
+      ],
+      "chapter_index": 43,
+      "gold_id": "not_entity",
+      "note": "达西突然出现在彭伯里园林中，即便嘉丁纳夫妇仅凭画像认不出他，园丁（the gardener）见到主人时惊讶的表情也足以说明一切，系普通职业名词。"
+    },
+    {
+      "sample_id": "s361",
+      "start": 443023,
+      "end": 443032,
+      "surface": "Pemberley",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 43,
+      "gold_id": "g039",
+      "note": "达西折返与她们同行，伊丽莎白效仿他的礼貌开始夸赞此地景色，但刚说到“宜人”“迷人”便担心自己对彭伯里（Pemberley）的赞美会被曲解而住口，指彭伯里庄园。"
+    },
+    {
+      "sample_id": "s362",
+      "start": 444054,
+      "end": 444066,
+      "surface": "Mr. Gardiner",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 43,
+      "gold_id": "g015",
+      "note": "达西得知嘉丁纳夫妇是伊丽莎白的亲戚后非但没有走开，反而转过身与他们同行并同嘉丁纳先生（Mr. Gardiner）交谈起来，令伊丽莎白既欣慰又自豪，指爱德华·嘉丁纳先生。"
+    },
+    {
+      "sample_id": "s363",
+      "start": 454070,
+      "end": 454080,
+      "surface": "Miss Darcy",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 44,
+      "gold_id": "g014",
+      "note": "第四十四章达西兄妹来到兰顿拜访，伊丽莎白到兰顿后曾听说达西小姐（Miss Darcy）极其高傲，但观察几分钟后便确信她只是极其害羞，指乔治安娜·达西。"
+    },
+    {
+      "sample_id": "s364",
+      "start": 455612,
+      "end": 455623,
+      "surface": "their niece",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster"
+      ],
+      "chapter_index": 44,
+      "gold_id": "g001",
+      "note": "嘉丁纳夫妇对达西及同行来访的宾利十分关注，刚产生的关于达西先生与他们外甥女（their niece）之间关系的猜想使他们留心观察两人，指伊丽莎白·班纳特。"
+    },
+    {
+      "sample_id": "s365",
+      "start": 456315,
+      "end": 456324,
+      "surface": "Georgiana",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 44,
+      "gold_id": "g014",
+      "note": "伊丽莎白努力平复心情去款待每位来客，而客人们都预先对她抱有好感：宾利随时准备喜欢她，乔治安娜（Georgiana）热切盼望，达西则下定决心要感到欣悦，指乔治安娜·达西。"
+    },
+    {
+      "sample_id": "s366",
+      "start": 456802,
+      "end": 456812,
+      "surface": "Miss Darcy",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 44,
+      "gold_id": "g014",
+      "note": "伊丽莎白留心观察宾利，虽然不敢确定他看着自己时是否在寻找简的影子，却看得出他对曾被树立为简的情敌的达西小姐（Miss Darcy）并无特殊爱意，指乔治安娜·达西。"
+    },
+    {
+      "sample_id": "s367",
+      "start": 458660,
+      "end": 458668,
+      "surface": "Hunsford",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 44,
+      "gold_id": "g041",
+      "note": "伊丽莎白见达西不仅对自己殷勤有礼，还主动结交他曾公开鄙视的亲戚，不由回想起两人在汉斯福（Hunsford）牧师宅最后一次激烈交锋的场景，指汉斯福。"
+    },
+    {
+      "sample_id": "s368",
+      "start": 458918,
+      "end": 458925,
+      "surface": "Rosings",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 44,
+      "gold_id": "g040",
+      "note": "伊丽莎白感叹达西判若两人，哪怕在他尼日斐花园的好友面前，或是在罗新斯（Rosings）的显贵亲戚面前，也从未见他如此渴望讨人欢心、毫无架子，指罗新斯庄园。"
+    },
+    {
+      "sample_id": "s369",
+      "start": 459253,
+      "end": 459260,
+      "surface": "Rosings",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 44,
+      "gold_id": "g040",
+      "note": "伊丽莎白想到达西如今殷勤款待嘉丁纳夫妇，哪怕与这些人结交会招致尼日斐花园和罗新斯（Rosings）那些女眷的嘲笑与非议，指罗新斯庄园。"
+    },
+    {
+      "sample_id": "s370",
+      "start": 459424,
+      "end": 459445,
+      "surface": "Mr. and Mrs. Gardiner",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "title_or_official"
+      ],
+      "chapter_index": 44,
+      "gold_id": "not_entity",
+      "note": "达西兄妹起身告辞时，达西请妹妹一起邀请嘉丁纳先生和太太（Mr. and Mrs. Gardiner）及班纳特小姐在离开德比郡前去彭伯里吃晚饭，系夫妇合称词组。"
+    },
+    {
+      "sample_id": "s371",
+      "start": 459518,
+      "end": 459528,
+      "surface": "Miss Darcy",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 44,
+      "gold_id": "g014",
+      "note": "达西请妹妹一同发出彭伯里晚宴邀请，达西小姐（Miss Darcy）虽然带着不常发出邀请的羞怯，还是爽快地照办了，指乔治安娜·达西。"
+    },
+    {
+      "sample_id": "s372",
+      "start": 460163,
+      "end": 460172,
+      "surface": "Elizabeth",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 44,
+      "gold_id": "g001",
+      "note": "定下后天去彭伯里赴宴后，宾利表示非常高兴能再次见到伊丽莎白（Elizabeth），说自己还有很多话要跟她说并打听赫特福德郡的朋友，指伊丽莎白·班纳特。"
+    },
+    {
+      "sample_id": "s373",
+      "start": 464804,
+      "end": 464813,
+      "surface": "Pemberley",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 44,
+      "gold_id": "g039",
+      "note": "当晚舅妈与外甥女商定，既然达西小姐在刚抵达彭伯里（Pemberley）的当天就展现了如此隆重的礼貌前来拜访，她们次日一早也应去彭伯里回访，指彭伯里庄园。"
+    },
+    {
+      "sample_id": "s374",
+      "start": 465561,
+      "end": 465570,
+      "surface": "Pemberley",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 45,
+      "gold_id": "g039",
+      "note": "第四十五章开头，伊丽莎白深知宾利小姐对自己的厌恶源于嫉妒，禁不住想自己出现在彭伯里（Pemberley）对宾利小姐而言该是多么不受欢迎，指彭伯里庄园。"
+    },
+    {
+      "sample_id": "s375",
+      "start": 466106,
+      "end": 466116,
+      "surface": "Mrs. Hurst",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 45,
+      "gold_id": "g019",
+      "note": "嘉丁纳太太和伊丽莎白到达彭伯里客厅时，由达西小姐接待她们，当时赫斯特太太（Mrs. Hurst）、宾利小姐以及同达西小姐在伦敦共住的安斯利太太正陪坐，指路易莎·赫斯特太太。"
+    },
+    {
+      "sample_id": "s376",
+      "start": 466433,
+      "end": 466446,
+      "surface": "Mrs. Gardiner",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 45,
+      "gold_id": "g016",
+      "note": "乔治安娜接待她们时虽十分有礼却因害羞而局促不安，容易被自卑者误以为高傲冷淡，但嘉丁纳太太（Mrs. Gardiner）和她的外甥女对她做出了公正评价并体谅她，指嘉丁纳太太。"
+    },
+    {
+      "sample_id": "s377",
+      "start": 466508,
+      "end": 466518,
+      "surface": "Mrs. Hurst",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 45,
+      "gold_id": "g019",
+      "note": "在彭伯里客厅里，赫斯特太太（Mrs. Hurst）和宾利小姐只对嘉丁纳太太与伊丽莎白行了个屈膝礼，落座后便陷入尴尬的沉默，指路易莎·赫斯特太太。"
+    },
+    {
+      "sample_id": "s378",
+      "start": 466889,
+      "end": 466902,
+      "surface": "Mrs. Gardiner",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 45,
+      "gold_id": "g016",
+      "note": "安斯利太太主动开启话题打破沉默，显现出比另外两人更有教养，随后便由她和嘉丁纳太太（Mrs. Gardiner）在伊丽莎白偶尔帮腔下继续交谈，指嘉丁纳太太。"
+    },
+    {
+      "sample_id": "s379",
+      "start": 469044,
+      "end": 469053,
+      "surface": "Georgiana",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 45,
+      "gold_id": "g014",
+      "note": "达西此前一直陪嘉丁纳先生等人在河边，得知家里的女眷打算当天早上拜访乔治安娜（Georgiana）后，便离开他们赶回客厅，指乔治安娜·达西。"
+    },
+    {
+      "sample_id": "s380",
+      "start": 469500,
+      "end": 469512,
+      "surface": "Miss Bingley",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 45,
+      "gold_id": "g018",
+      "note": "达西走进客厅时几乎所有人都在注视他的举止，其中好奇心最强烈、神情最专注的莫过于宾利小姐（Miss Bingley），指卡罗琳·宾利。"
+    },
+    {
+      "sample_id": "s381",
+      "start": 471362,
+      "end": 471369,
+      "surface": "Bingley",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 45,
+      "gold_id": "g004",
+      "note": "关于达西小姐差点私奔一事，达西对宾利（Bingley）的所有亲友都极力隐瞒，因为达西希望日后促成妹妹与宾利结亲，指查尔斯·宾利。"
+    },
+    {
+      "sample_id": "s382",
+      "start": 471916,
+      "end": 471925,
+      "surface": "Georgiana",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 45,
+      "gold_id": "g014",
+      "note": "宾利小姐提起民兵团与威克姆后自讨没趣，伊丽莎白镇定的举止平息了达西的激动，乔治安娜（Georgiana）也渐渐恢复常态，只是还说不出话，指乔治安娜·达西。"
+    },
+    {
+      "sample_id": "s383",
+      "start": 473046,
+      "end": 473052,
+      "surface": "Louisa",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 45,
+      "gold_id": "g019",
+      "note": "客人们走后，宾利小姐在达西面前贬损伊丽莎白比冬天晒黑变粗了许多，并说路易莎（Louisa）和她都觉得差点认不出她来了，指路易莎·赫斯特太太。"
+    },
+    {
+      "sample_id": "s384",
+      "start": 473941,
+      "end": 473953,
+      "surface": "Miss Bingley",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 45,
+      "gold_id": "g018",
+      "note": "宾利小姐（Miss Bingley）明知达西仰慕伊丽莎白，却还是忍不住贬低伊丽莎白的眼睛尖刻泼辣、神态自负，看到达西有些恼火才达到目的，指卡罗琳·宾利。"
+    },
+    {
+      "sample_id": "s385",
+      "start": 474869,
+      "end": 474881,
+      "surface": "Miss Bingley",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 45,
+      "gold_id": "g018",
+      "note": "达西反驳说自己好几个月来一直认为伊丽莎白是他所认识的最美貌的女子之一，说完便走开了，留下宾利小姐（Miss Bingley）自讨苦吃，指卡罗琳·宾利。"
+    },
+    {
+      "sample_id": "s386",
+      "start": 474983,
+      "end": 474996,
+      "surface": "Mrs. Gardiner",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 45,
+      "gold_id": "g016",
+      "note": "回程路上，嘉丁纳太太（Mrs. Gardiner）和伊丽莎白谈起了拜访彭伯里期间发生的一切，唯独避而不谈最令两人关心的达西本人，指嘉丁纳太太。"
+    },
+    {
+      "sample_id": "s387",
+      "start": 476772,
+      "end": 476787,
+      "surface": "Colonel Forster",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 46,
+      "gold_id": "g027",
+      "note": "第四十六章简在第二封信中焦急告知伊丽莎白：昨晚十二点刚睡下，福斯特上校（Colonel Forster）派快马送信来，通知莉迪亚已与威克姆私奔去苏格兰，指福斯特上校。"
+    },
+    {
+      "sample_id": "s388",
+      "start": 477706,
+      "end": 477721,
+      "surface": "Colonel Forster",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 46,
+      "gold_id": "g027",
+      "note": "简在信中写道，私奔的两人想必在距离浪博恩十英里之内经过，福斯特上校（Colonel Forster）让大家觉得他本人很快也会赶来浪博恩，指福斯特上校。"
+    },
+    {
+      "sample_id": "s389",
+      "start": 478815,
+      "end": 478823,
+      "surface": "Brighton",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 46,
+      "gold_id": "g042",
+      "note": "简在后一封信中告知坏消息：担心莉迪亚与威克姆根本没去苏格兰；福斯特上校昨天已赶到，他是在快信发出没几小时后于前一天离开布赖顿（Brighton）的，指布赖顿。"
+    },
+    {
+      "sample_id": "s390",
+      "start": 478961,
+      "end": 478973,
+      "surface": "Gretna Green",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster"
+      ],
+      "chapter_index": 46,
+      "gold_id": "x010",
+      "note": "简信中说，尽管莉迪亚留给福斯特太太的短笺让人以为他们要去格雷特纳格林（Gretna Green）结婚，丹尼却透露威克姆根本没打算去那里或娶莉迪亚，指苏格兰边境私奔结婚小城格雷特纳格林。"
+    },
+    {
+      "sample_id": "s391",
+      "start": 479569,
+      "end": 479582,
+      "surface": "Hertfordshire",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 46,
+      "gold_id": "g045",
+      "note": "简信中叙述福斯特上校追踪两人至克拉彭后得知他们换乘出租马车往伦敦方向去了，在伦敦那侧打听无果后又赶来赫特福德郡（Hertfordshire）沿途关卡和客栈询问，指赫特福德郡。"
+    },
+    {
+      "sample_id": "s392",
+      "start": 481426,
+      "end": 481432,
+      "surface": "London",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 46,
+      "gold_id": "g038",
+      "note": "简在信中恳求伊丽莎白和舅舅舅妈尽快赶回，说父亲正要立刻随福斯特上校前往伦敦（London）设法寻找莉迪亚，指伦敦。"
+    },
+    {
+      "sample_id": "s393",
+      "start": 483575,
+      "end": 483584,
+      "surface": "Longbourn",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 46,
+      "gold_id": "g035",
+      "note": "达西来旅馆探望时见伊丽莎白脸色苍白，伊丽莎白强自镇定地回答自己没生病，只是刚收到来自浪博恩（Longbourn）的可怕消息而万分痛苦，指浪博恩。"
+    },
+    {
+      "sample_id": "s394",
+      "start": 484077,
+      "end": 484085,
+      "surface": "Brighton",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 46,
+      "gold_id": "g042",
+      "note": "伊丽莎白含泪向达西吐露刚收到简的来信：小妹莉迪亚抛下所有亲友投奔威克姆，两人已一起从布赖顿（Brighton）私奔出走，指布赖顿。"
+    },
+    {
+      "sample_id": "s395",
+      "start": 484674,
+      "end": 484682,
+      "surface": "Brighton",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 46,
+      "gold_id": "g042",
+      "note": "达西震惊追问此事是否千真万确，伊丽莎白肯定地说他们周日晚上一起离开布赖顿（Brighton），被追踪到接近伦敦处便断了线索，绝没有去苏格兰，指布赖顿。"
+    },
+    {
+      "sample_id": "s396",
+      "start": 484790,
+      "end": 484798,
+      "surface": "Scotland",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 46,
+      "gold_id": "x011",
+      "note": "伊丽莎白向达西说明莉迪亚和威克姆周日晚离开布赖顿后被追踪到伦敦附近，肯定没有去苏格兰（Scotland）结婚，指苏格兰。"
+    },
+    {
+      "sample_id": "s397",
+      "start": 487073,
+      "end": 487083,
+      "surface": "Miss Darcy",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 46,
+      "gold_id": "g014",
+      "note": "达西体贴地表示这桩不幸事件恐怕使他妹妹今天无法在彭伯里接待她们，伊丽莎白请他代向达西小姐（Miss Darcy）致歉，托词有急事必须立刻回家，指乔治安娜·达西。"
+    },
+    {
+      "sample_id": "s398",
+      "start": 487643,
+      "end": 487653,
+      "surface": "Derbyshire",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 46,
+      "gold_id": "g044",
+      "note": "达西告辞离开房间时，伊丽莎白感到他们今后恐怕再也不可能像在德比郡（Derbyshire）几次重逢时那样融洽相见了，指德比郡。"
+    },
+    {
+      "sample_id": "s399",
+      "start": 488724,
+      "end": 488744,
+      "surface": "Jane’s second letter",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster"
+      ],
+      "chapter_index": 46,
+      "gold_id": "not_entity",
+      "note": "伊丽莎白反思莉迪亚的丑事：自从读了简的第二封信（Jane’s second letter）后，她就不再指望威克姆会娶莉迪亚，此处指书信本身而非人物或地点实体。"
+    },
+    {
+      "sample_id": "s400",
+      "start": 489055,
+      "end": 489062,
+      "surface": "Wickham",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 46,
+      "gold_id": "g008",
+      "note": "伊丽莎白回想自己读第一封信时还万分惊讶，不明白威克姆（Wickham）怎会娶一个不可能带来钱财的姑娘，读了第二封信才明白他根本没打算结婚，指乔治·威克姆。"
+    },
+    {
+      "sample_id": "s401",
+      "start": 489681,
+      "end": 489686,
+      "surface": "Lydia",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 46,
+      "gold_id": "g007",
+      "note": "伊丽莎白回想民兵团在赫特福德郡时并未察觉莉迪亚钟情于威克姆，但她深信莉迪亚（Lydia）只要受到一点怂恿就会迷恋上任何人，指莉迪亚·班纳特。"
+    },
+    {
+      "sample_id": "s402",
+      "start": 490490,
+      "end": 490503,
+      "surface": "Mrs. Gardiner",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 46,
+      "gold_id": "g016",
+      "note": "嘉丁纳先生和嘉丁纳太太（Mrs. Gardiner）听仆人说外甥女突然身体不适便惊慌赶回旅馆，伊丽莎白立即说明召唤他们的真正原因并大声读了两封信，指嘉丁纳太太。"
+    },
+    {
+      "sample_id": "s403",
+      "start": 491322,
+      "end": 491331,
+      "surface": "Pemberley",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 46,
+      "gold_id": "g039",
+      "note": "三人迅速商定尽快启程回浪博恩，嘉丁纳太太忽然问起彭伯里（Pemberley）的晚宴怎么办，并说约翰告知达西刚才来过，伊丽莎白回答已向他辞谢约会，指彭伯里庄园。"
+    },
+    {
+      "sample_id": "s404",
+      "start": 493761,
+      "end": 493773,
+      "surface": "Mr. Gardiner",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 47,
+      "gold_id": "g015",
+      "note": "第四十七章旅途中，伊丽莎白怀疑威克姆若有心结婚为何不去苏格兰，嘉丁纳先生（Mr. Gardiner）回答说首先并没有绝对证据表明他们没去苏格兰，指爱德华·嘉丁纳先生。"
+    },
+    {
+      "sample_id": "s405",
+      "start": 494034,
+      "end": 494040,
+      "surface": "London",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 47,
+      "gold_id": "g038",
+      "note": "伊丽莎白指出他们从双轮马车换乘出租马车且巴尼特路上毫无踪迹，嘉丁纳先生便退一步说，即便假设他们在伦敦（London），也未必出于更恶劣的目的，指伦敦。"
+    },
+    {
+      "sample_id": "s406",
+      "start": 494304,
+      "end": 494310,
+      "surface": "London",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 47,
+      "gold_id": "g038",
+      "note": "嘉丁纳先生宽慰伊丽莎白说，两人手头都不宽裕，也许觉得在伦敦（London）结婚虽然不如在苏格兰快捷，却更为省钱，指伦敦。"
+    },
+    {
+      "sample_id": "s407",
+      "start": 495421,
+      "end": 495426,
+      "surface": "Lydia",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 47,
+      "gold_id": "g007",
+      "note": "嘉丁纳先生在马车上反问伊丽莎白，难道认为莉迪亚（Lydia）除了迷恋威克姆外已丧失一切廉耻，竟甘愿不结婚就与他同居吗，指莉迪亚·班纳特。"
+    },
+    {
+      "sample_id": "s408",
+      "start": 498023,
+      "end": 498042,
+      "surface": "Colonel Fitzwilliam",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 47,
+      "gold_id": "g017",
+      "note": "嘉丁纳先生问莉迪亚是否对威克姆的为人一无所知，伊丽莎白悔恨地说自己直到去了肯特郡、频繁接触达西及其亲戚费茨威廉上校（Colonel Fitzwilliam）前也蒙在鼓里，指费茨威廉上校。"
+    },
+    {
+      "sample_id": "s409",
+      "start": 498132,
+      "end": 498139,
+      "surface": "Meryton",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 47,
+      "gold_id": "g037",
+      "note": "伊丽莎白向舅舅解释，当她从肯特郡回到家时，民兵团再过一两周就要离开麦里屯（Meryton），因此她和简都没把威克姆的真相公之于众，指麦里屯。"
+    },
+    {
+      "sample_id": "s410",
+      "start": 498784,
+      "end": 498792,
+      "surface": "Brighton",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 47,
+      "gold_id": "g042",
+      "note": "嘉丁纳先生据此推断说，当民兵团和莉迪亚迁往布赖顿（Brighton）时，伊丽莎白想必毫无理由认为莉迪亚与威克姆彼此倾心，指布赖顿。"
+    },
+    {
+      "sample_id": "s411",
+      "start": 501831,
+      "end": 501844,
+      "surface": "Mrs. Gardiner",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 47,
+      "gold_id": "g016",
+      "note": "抵达浪博恩后伊丽莎白与简在门厅匆匆交谈，当时嘉丁纳先生和嘉丁纳太太（Mrs. Gardiner）正照看他们的孩子，随后一行人走过来，简跑上前向舅舅和舅妈道谢，指嘉丁纳太太。"
+    },
+    {
+      "sample_id": "s412",
+      "start": 502440,
+      "end": 502445,
+      "surface": "Lydia",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 47,
+      "gold_id": "g007",
+      "note": "大家在客厅询问详情，得知简也没有新消息，但简依然心存乐观，盼望每天早上能收到莉迪亚（Lydia）或父亲的来信解释行踪甚至宣布婚讯，指莉迪亚·班纳特。"
+    },
+    {
+      "sample_id": "s413",
+      "start": 503941,
+      "end": 503951,
+      "surface": "Mr. Bennet",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 47,
+      "gold_id": "g005",
+      "note": "嘉丁纳先生安慰卧床哭泣的班纳特太太，告诉她自己次日一早就去伦敦，会全力协助班纳特先生（Mr. Bennet）找回莉迪亚，指班纳特先生。"
+    },
+    {
+      "sample_id": "s414",
+      "start": 505416,
+      "end": 505428,
+      "surface": "Mr. Gardiner",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 47,
+      "gold_id": "g015",
+      "note": "班纳特太太一会儿哭诉一会儿又嘱咐置办嫁衣，嘉丁纳先生（Mr. Gardiner）在保证尽力协助的同时不得不劝她无论对希望还是恐惧都要有所节制，指爱德华·嘉丁纳先生。"
+    },
+    {
+      "sample_id": "s415",
+      "start": 506232,
+      "end": 506237,
+      "surface": "Kitty",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 47,
+      "gold_id": "g011",
+      "note": "晚饭时分，一直在各自房间忙碌的玛丽和基蒂（Kitty）终于来到餐厅与大家会合，一个刚离开书本，另一个刚结束梳妆，指基蒂·班纳特。"
+    },
+    {
+      "sample_id": "s416",
+      "start": 506653,
+      "end": 506658,
+      "surface": "Kitty",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 47,
+      "gold_id": "g011",
+      "note": "玛丽与基蒂神色还算平静，只是失去最要好的妹妹或因在这件事上招致责骂，使基蒂（Kitty）说话的腔调比平时多了几分烦躁抱怨，指基蒂·班纳特。"
+    },
+    {
+      "sample_id": "s417",
+      "start": 506667,
+      "end": 506671,
+      "surface": "Mary",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 47,
+      "gold_id": "g012",
+      "note": "与烦躁的基蒂不同，玛丽（Mary）很有自制力，落座后不久便带着严肃沉思的神情低声对伊丽莎白发表了一番道德训诫，指玛丽·班纳特。"
+    },
+    {
+      "sample_id": "s418",
+      "start": 507508,
+      "end": 507512,
+      "surface": "Mary",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 47,
+      "gold_id": "g012",
+      "note": "伊丽莎白听完玛丽关于女性名节脆弱的说教后惊愕地抬起眼睛，心情沉重得无言以对，玛丽（Mary）却继续从眼前的灾祸中提炼此类道德格言来自我安慰，指玛丽·班纳特。"
+    },
+    {
+      "sample_id": "s419",
+      "start": 507962,
+      "end": 507973,
+      "surface": "Miss Bennet",
+      "stratum": "hard",
+      "hard_features": [
+        "ambiguous_surface",
+        "out_of_roster",
+        "title_or_official"
+      ],
+      "chapter_index": 47,
+      "gold_id": "g002",
+      "note": "下午两位年长的班纳特小姐独处半小时，共同叹息这桩丑事的可怕后果——伊丽莎白认为几乎已成定局，而班纳特小姐（Miss Bennet）也无法断言完全不可能，指简·班纳特。"
+    },
+    {
+      "sample_id": "s420",
+      "start": 508171,
+      "end": 508186,
+      "surface": "Colonel Forster",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 47,
+      "gold_id": "g027",
+      "note": "伊丽莎白向简追问尚未听说的细节，问福斯特上校（Colonel Forster）怎么说、私奔发生前他们难道毫无察觉，指福斯特上校。"
+    },
+    {
+      "sample_id": "s421",
+      "start": 509795,
+      "end": 509803,
+      "surface": "Brighton",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 47,
+      "gold_id": "g042",
+      "note": "简告诉伊丽莎白，基蒂承认莉迪亚在最后一封信里已流露端倪且两人相恋已有好几周，伊丽莎白追问“但不是在他们去布赖顿（Brighton）之前吧”，指布赖顿。"
+    },
+    {
+      "sample_id": "s422",
+      "start": 509838,
+      "end": 509853,
+      "surface": "Colonel Forster",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 47,
+      "gold_id": "g027",
+      "note": "确认私情并非始于去布赖顿之前后，伊丽莎白又问简：福斯特上校（Colonel Forster）本人对威克姆印象如何、是否知道他的真面目，指福斯特上校。"
+    },
+    {
+      "sample_id": "s423",
+      "start": 510122,
+      "end": 510129,
+      "surface": "Meryton",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 47,
+      "gold_id": "g037",
+      "note": "简回答说福斯特上校如今也不像从前那样夸威克姆了，认为他轻率挥霍，而且私奔发生后听说他在麦里屯（Meryton）留下了大笔债务，指麦里屯。"
+    },
+    {
+      "sample_id": "s424",
+      "start": 510505,
+      "end": 510520,
+      "surface": "Colonel Forster",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 47,
+      "gold_id": "g027",
+      "note": "伊丽莎白接着询问福斯特上校（Colonel Forster）能否复述莉迪亚留给他妻子的那封短笺内容，简回答说上校把原信带来了并从口袋小本里取出递给伊丽莎白，指福斯特上校。"
+    },
+    {
+      "sample_id": "s425",
+      "start": 511648,
+      "end": 511653,
+      "surface": "Sally",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 47,
+      "gold_id": "x006",
+      "note": "莉迪亚在留给福斯特太太的信中说回浪博恩后会派人来取衣服，但请她先叫萨莉（Sally）在打包前把那件绣花细棉布长裙上的大口子补好，指修补衣物的女仆或熟人萨莉。"
+    },
+    {
+      "sample_id": "s426",
+      "start": 512981,
+      "end": 512986,
+      "surface": "Kitty",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 47,
+      "gold_id": "g011",
+      "note": "伊丽莎白心疼简独自照料母亲太辛苦，简说玛丽和基蒂（Kitty）都很热心想分担劳累，只是简认为基蒂体弱娇气、玛丽忙于读书而不忍累着她们，指基蒂·班纳特。"
+    },
+    {
+      "sample_id": "s427",
+      "start": 514008,
+      "end": 514012,
+      "surface": "Jane",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 47,
+      "gold_id": "g002",
+      "note": "伊丽莎白询问父亲在伦敦打算采取什么办法找回女儿，简（Jane）回答说父亲打算去他们最后换马的埃普索姆向马夫打听，并查清从克拉彭接走他们的出租马车车号，指简·班纳特。"
+    },
+    {
+      "sample_id": "s428",
+      "start": 514908,
+      "end": 514918,
+      "surface": "Mr. Bennet",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 48,
+      "gold_id": "g005",
+      "note": "第四十八章次日清晨，全家人原本盼望收到班纳特先生（Mr. Bennet）的来信，然而邮差来了却没有带来他的片言只语，指正在伦敦寻女的班纳特先生。"
+    },
+    {
+      "sample_id": "s429",
+      "start": 515728,
+      "end": 515741,
+      "surface": "Hertfordshire",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 48,
+      "gold_id": "g045",
+      "note": "嘉丁纳先生动身赴伦敦后，嘉丁纳太太和孩子们将在赫特福德郡（Hertfordshire）多留几天，以陪伴安慰外甥女们并分担照料班纳特太太，指赫特福德郡。"
+    },
+    {
+      "sample_id": "s430",
+      "start": 517110,
+      "end": 517122,
+      "surface": "Mr. Gardiner",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 48,
+      "gold_id": "g015",
+      "note": "嘉丁纳先生（Mr. Gardiner）周日离开浪博恩，周二他妻子收到他的来信，得知他一到伦敦便找到班纳特先生并劝他住进格雷斯丘奇街，指爱德华·嘉丁纳先生。"
+    },
+    {
+      "sample_id": "s431",
+      "start": 518400,
+      "end": 518415,
+      "surface": "Colonel Forster",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 48,
+      "gold_id": "g027",
+      "note": "嘉丁纳先生在信中询问威克姆是否有亲友知道他在伦敦何处藏身，认为福斯特上校（Colonel Forster）定会尽力提供这方面线索，又想到莉迪亚的二姐或许更清楚，指福斯特上校。"
+    },
+    {
+      "sample_id": "s432",
+      "start": 519610,
+      "end": 519621,
+      "surface": "Mr. Collins",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 48,
+      "gold_id": "g009",
+      "note": "在再次收到嘉丁纳先生来信前，家里先收到一封从另一处寄给父亲的信，写信人是柯林斯先生（Mr. Collins），简按父亲临行吩咐拆阅，伊丽莎白也凑过去同看，指威廉·柯林斯。"
+    },
+    {
+      "sample_id": "s433",
+      "start": 520127,
+      "end": 520139,
+      "surface": "Mrs. Collins",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 48,
+      "gold_id": "g010",
+      "note": "柯林斯先生在慰问信中写道，昨天收到赫特福德郡来信得知您遭受沉重苦难，请相信柯林斯太太（Mrs. Collins）和我本人由衷为您和全家感到同情，指夏洛特·卢卡斯。"
+    },
+    {
+      "sample_id": "s434",
+      "start": 520691,
+      "end": 520700,
+      "surface": "Charlotte",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 48,
+      "gold_id": "g010",
+      "note": "柯林斯先生在信中狠心称班纳特家小女儿还不如死了好，并说正如我亲爱的夏洛特（Charlotte）告诉我的那样，令嫒行为放荡源于过度娇惯，指夏洛特·卢卡斯。"
+    },
+    {
+      "sample_id": "s435",
+      "start": 521365,
+      "end": 521379,
+      "surface": "Lady Catherine",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 48,
+      "gold_id": "g013",
+      "note": "柯林斯在信中说已把此事告知凯瑟琳夫人母女，她们也认为一个女儿失足会连累其余姐妹的婚事，因为正如凯瑟琳夫人（Lady Catherine）屈尊所言，谁还肯与这种人家结亲，指凯瑟琳·德·包尔夫人。"
+    },
+    {
+      "sample_id": "s436",
+      "start": 521965,
+      "end": 521980,
+      "surface": "Colonel Forster",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 48,
+      "gold_id": "g027",
+      "note": "嘉丁纳先生直到收到福斯特上校（Colonel Forster）的回信后才再次写信回浪博恩，告知威克姆并无保持联系的亲戚，且在布赖顿欠下巨额赌债，指福斯特上校。"
+    },
+    {
+      "sample_id": "s437",
+      "start": 522876,
+      "end": 522888,
+      "surface": "Mr. Gardiner",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 48,
+      "gold_id": "g015",
+      "note": "关于威克姆在布赖顿欠下上千镑开销与赌债的详情，嘉丁纳先生（Mr. Gardiner）并未向浪博恩一家隐瞒，简听说威克姆是个赌徒后惊骇不已，指爱德华·嘉丁纳先生。"
+    },
+    {
+      "sample_id": "s438",
+      "start": 522943,
+      "end": 522952,
+      "surface": "Longbourn",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 48,
+      "gold_id": "g035",
+      "note": "嘉丁纳先生没有向浪博恩（Longbourn）一家人隐瞒威克姆欠下巨额赌债与店铺账目的详情，简听后惊呼万万没想到他竟是赌徒，指浪博恩班纳特家。"
+    },
+    {
+      "sample_id": "s439",
+      "start": 523070,
+      "end": 523082,
+      "surface": "Mr. Gardiner",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 48,
+      "gold_id": "g015",
+      "note": "嘉丁纳先生（Mr. Gardiner）在信中补充说，班纳特先生因四处寻访无果而心灰意冷，听从内兄劝告将于次日周六回家，把后续事宜交给嘉丁纳先生处理，指爱德华·嘉丁纳先生。"
+    },
+    {
+      "sample_id": "s440",
+      "start": 524062,
+      "end": 524075,
+      "surface": "Mrs. Gardiner",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 48,
+      "gold_id": "g016",
+      "note": "班纳特先生从伦敦回浪博恩的同时，嘉丁纳太太（Mrs. Gardiner）带着孩子们乘同一辆马车走第一程返回伦敦，离开时仍对伊丽莎白与那位德比郡朋友的关系满腹狐疑，指嘉丁纳太太。"
+    },
+    {
+      "sample_id": "s441",
+      "start": 524665,
+      "end": 524674,
+      "surface": "Elizabeth",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 48,
+      "gold_id": "g001",
+      "note": "全家人目前的惨境使伊丽莎白情绪低落无需其他借口，但伊丽莎白（Elizabeth）自己心里明白，倘若从未认识达西，她本可以稍微好受些地承受莉迪亚丑闻的煎熬，指伊丽莎白·班纳特。"
+    },
+    {
+      "sample_id": "s442",
+      "start": 524838,
+      "end": 524843,
+      "surface": "Lydia",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 48,
+      "gold_id": "g007",
+      "note": "伊丽莎白深知自己对达西的心意，明白若是根本不认识达西，她在面对莉迪亚（Lydia）身败名裂的恐惧时至少能少失眠几个夜晚，指莉迪亚·班纳特。"
+    },
+    {
+      "sample_id": "s443",
+      "start": 526763,
+      "end": 526771,
+      "surface": "Brighton",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 48,
+      "gold_id": "g042",
+      "note": "基蒂委屈地对父亲说自己绝不会私奔，要是去布赖顿一定比莉迪亚规矩，班纳特先生厉声斥道：“你去布赖顿（Brighton）！给我五十镑我也不敢放你去离那儿近如伊斯特本的地方！”指布赖顿。"
+    },
+    {
+      "sample_id": "s444",
+      "start": 526809,
+      "end": 526819,
+      "surface": "Eastbourne",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 48,
+      "gold_id": "x009",
+      "note": "班纳特先生训斥基蒂说，就算给五十镑也绝不放心让她去靠近布赖顿的伊斯特本（Eastbourne），今后绝不许军官进门，指苏塞克斯郡海滨小镇伊斯特本。"
+    },
+    {
+      "sample_id": "s445",
+      "start": 531742,
+      "end": 531749,
+      "surface": "Wickham",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 49,
+      "gold_id": "g008",
+      "note": "第四十九章嘉丁纳先生派快信告知已找到两人且威克姆同意结婚，伊丽莎白惊问他怎可能娶她，简则欣慰地说“那么威克姆（Wickham）并不像我们原先想的那样不堪”并向父亲道喜，指乔治·威克姆。"
+    },
+    {
+      "sample_id": "s446",
+      "start": 532792,
+      "end": 532800,
+      "surface": "my uncle",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster"
+      ],
+      "chapter_index": 49,
+      "gold_id": "g015",
+      "note": "班纳特先生说想知道两件事：一是你们舅舅花了多少钱促成这桩婚事，二是自己怎能还得起；简惊呼“钱！我舅舅（my uncle）！先生您这是什么意思？”，指爱德华·嘉丁纳先生。"
+    },
+    {
+      "sample_id": "s447",
+      "start": 533528,
+      "end": 533538,
+      "surface": "Mr. Bennet",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 49,
+      "gold_id": "g005",
+      "note": "班纳特先生断定威克姆若拿不到一万镑绝不会娶莉迪亚，简惊呼哪怕一半的数目也怎么还得起，班纳特先生（Mr. Bennet）没有回答，父女三人一路沉默思索回到屋里，指班纳特先生。"
+    },
+    {
+      "sample_id": "s448",
+      "start": 534542,
+      "end": 534554,
+      "surface": "Mr. Gardiner",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 49,
+      "gold_id": "g015",
+      "note": "伊丽莎白对简说，只要日后打听出威克姆的债务数额以及给妹妹名下划拨了多少财产，就能确切知道嘉丁纳先生（Mr. Gardiner）为他们出了多少钱，因为威克姆自己分文全无，指爱德华·嘉丁纳先生。"
+    },
+    {
+      "sample_id": "s449",
+      "start": 535889,
+      "end": 535897,
+      "surface": "my uncle",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster"
+      ],
+      "chapter_index": 49,
+      "gold_id": "g015",
+      "note": "简和伊丽莎白想起母亲还不知道这一喜讯，便去书房问正在写信的父亲“我们可以拿我舅舅（my uncle）的信去念给她听吗？”，并从写字台上拿走了嘉丁纳先生的信，指爱德华·嘉丁纳先生。"
+    },
+    {
+      "sample_id": "s450",
+      "start": 537061,
+      "end": 537067,
+      "surface": "father",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 49,
+      "gold_id": "g005",
+      "note": "班纳特太太得知莉迪亚要结婚后立刻操心起嫁衣，吩咐伊丽莎白：“莉齐，亲爱的，快跑下楼去找你父亲（father），问问他肯给她多少钱”，随即又改主意要亲自去问，指班纳特先生。"
+    },
+    {
+      "sample_id": "s451",
+      "start": 537279,
+      "end": 537294,
+      "surface": "eldest daughter",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster"
+      ],
+      "chapter_index": 49,
+      "gold_id": "g002",
+      "note": "见母亲兴奋得忘乎所以，她的长女（eldest daughter）便设法引导她想想嘉丁纳先生的恩情以平息这股狂喜，并提醒母亲这一圆满结局在很大程度上归功于舅舅的仁慈，指长女简·班纳特。"
+    },
+    {
+      "sample_id": "s452",
+      "start": 539158,
+      "end": 539167,
+      "surface": "Mrs. Hill",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 49,
+      "gold_id": "g034",
+      "note": "班纳特太太向刚进门的管家希尔报喜，说莉迪亚小姐要结婚了、婚礼上给大家端一大碗潘趣酒热闹一番，希尔太太（Mrs. Hill）当即表示欣喜祝贺，指浪博恩管家希尔太太。"
+    },
+    {
+      "sample_id": "s453",
+      "start": 543342,
+      "end": 543349,
+      "surface": "Meryton",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 50,
+      "gold_id": "g037",
+      "note": "第五十章提到，尽管莉迪亚总算结婚了，麦里屯（Meryton）那些刻薄老太太此前祝她交好运的风凉话并未因此收敛多少，因为嫁给这样的丈夫注定受苦，指麦里屯。"
+    },
+    {
+      "sample_id": "s454",
+      "start": 548477,
+      "end": 548489,
+      "surface": "Mr. Gardiner",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 50,
+      "gold_id": "g015",
+      "note": "嘉丁纳先生（Mr. Gardiner）很快又给妹夫写信，简短回应了班纳特先生的致谢并恳请今后切勿再提此事，信的主要内容是告知威克姆已决定转入正规军，指爱德华·嘉丁纳先生。"
+    },
+    {
+      "sample_id": "s455",
+      "start": 550174,
+      "end": 550187,
+      "surface": "Mrs. Gardiner",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 50,
+      "gold_id": "g016",
+      "note": "嘉丁纳先生在信中写道，一切手续将在一周内办妥，随后他们就去正规军报到，除非先受邀回浪博恩；而且他从嘉丁纳太太（Mrs. Gardiner）那里得知外甥女很想在去北方前见见家里人，指嘉丁纳太太。"
+    },
+    {
+      "sample_id": "s456",
+      "start": 550368,
+      "end": 550378,
+      "surface": "Mr. Bennet",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 50,
+      "gold_id": "g005",
+      "note": "读完嘉丁纳先生的信后，班纳特先生（Mr. Bennet）和女儿们都跟嘉丁纳先生一样清楚看到威克姆调离原民兵团的种种好处，唯独班纳特太太对此不满意，指班纳特先生。"
+    },
+    {
+      "sample_id": "s457",
+      "start": 550713,
+      "end": 550726,
+      "surface": "Hertfordshire",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 50,
+      "gold_id": "g045",
+      "note": "班纳特太太对莉迪亚要去北方定居深感失望，因为她原本丝毫没有放弃让小两口住在赫特福德郡（Hertfordshire）的打算，指赫特福德郡。"
+    },
+    {
+      "sample_id": "s458",
+      "start": 554834,
+      "end": 554839,
+      "surface": "Lydia",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 51,
+      "gold_id": "g007",
+      "note": "第五十一章威克姆夫妇回浪博恩探亲，两人对往事毫无愧色，莉迪亚（Lydia）更是主动提起那些她姐姐们绝不愿触及的话题，炫耀自己离家三个月就结了婚，指莉迪亚·班纳特。"
+    },
+    {
+      "sample_id": "s459",
+      "start": 555553,
+      "end": 555569,
+      "surface": "William Goulding",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster"
+      ],
+      "chapter_index": 51,
+      "gold_id": "x007",
+      "note": "莉迪亚得意洋洋地对母亲说，生怕附近的人不知道自己今天结了婚，路上追上乘双轮马车的威廉·古尔丁（William Goulding）时特意摇下车窗摘掉手套向他炫耀婚戒，指邻居威廉·古尔丁。"
+    },
+    {
+      "sample_id": "s460",
+      "start": 556391,
+      "end": 556403,
+      "surface": "Mrs. Philips",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 51,
+      "gold_id": "g024",
+      "note": "莉迪亚毫无羞愧且兴致高涨，巴不得快点见到菲利普斯太太（Mrs. Philips）、卢卡斯一家和所有邻居，听他们每个人称呼自己“威克姆太太”，指菲利普斯太太。"
+    },
+    {
+      "sample_id": "s461",
+      "start": 556612,
+      "end": 556630,
+      "surface": "the two housemaids",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster"
+      ],
+      "chapter_index": 51,
+      "gold_id": "not_entity",
+      "note": "晚饭后莉迪亚迫不及待地跑去向希尔太太和两个女仆（the two housemaids）炫耀自己的结婚戒指、吹嘘自己结了婚，此处为复数泛指家仆。"
+    },
+    {
+      "sample_id": "s462",
+      "start": 558191,
+      "end": 558198,
+      "surface": "Wickham",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 51,
+      "gold_id": "g008",
+      "note": "伊丽莎白观察到威克姆（Wickham）对莉迪亚的感情正如自己所料远不及莉迪亚对他的迷恋，确信私奔主要是由于莉迪亚一厢情愿的狂热，指乔治·威克姆。"
+    },
+    {
+      "sample_id": "s463",
+      "start": 559518,
+      "end": 559531,
+      "surface": "St. Clement’s",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster"
+      ],
+      "chapter_index": 51,
+      "gold_id": "x012",
+      "note": "莉迪亚非要向伊丽莎白讲述婚礼经过，说他们是在圣克莱门特教堂（St. Clement’s）结婚的，因为威克姆的住处就在那个教区，指伦敦圣克莱门特教堂。"
+    },
+    {
+      "sample_id": "s464",
+      "start": 560534,
+      "end": 560540,
+      "surface": "London",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 51,
+      "gold_id": "g038",
+      "note": "莉迪亚向伊丽莎白抱怨在舅舅家住了两周连门也没迈出一步，没有任何聚会或游乐，虽然眼下伦敦（London）人不多，但小剧院明明还开着，指伦敦。"
+    },
+    {
+      "sample_id": "s465",
+      "start": 564622,
+      "end": 564631,
+      "surface": "Longbourn",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 52,
+      "gold_id": "g035",
+      "note": "第五十二章嘉丁纳太太回信向伊丽莎白揭秘：就在她从浪博恩（Longbourn）回到伦敦的当天，嘉丁纳先生迎来了一位意想不到的访客达西先生，指浪博恩。"
+    },
+    {
+      "sample_id": "s466",
+      "start": 565991,
+      "end": 566002,
+      "surface": "Mrs. Younge",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 52,
+      "gold_id": "g031",
+      "note": "嘉丁纳太太在信中说明达西为何能找到私奔的两人：有一位名叫杨格太太（Mrs. Younge）的女人曾任达西小姐的家庭教师，被辞退后在爱德华街租大房子招租并与威克姆熟识，指杨格太太。"
+    },
+    {
+      "sample_id": "s467",
+      "start": 566039,
+      "end": 566049,
+      "surface": "Miss Darcy",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 52,
+      "gold_id": "g014",
+      "note": "嘉丁纳太太信中介绍杨格太太此前曾担任达西小姐（Miss Darcy）的家庭教师，因某件令人不满的事被免职，指乔治安娜·达西。"
+    },
+    {
+      "sample_id": "s468",
+      "start": 568023,
+      "end": 568032,
+      "surface": "Mr. Darcy",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 52,
+      "gold_id": "g003",
+      "note": "嘉丁纳太太信中叙述威克姆打算立刻辞去军职却不知去向何方、靠什么谋生，达西先生（Mr. Darcy）便质问他为什么不立刻娶莉迪亚，指达西。"
+    },
+    {
+      "sample_id": "s469",
+      "start": 568088,
+      "end": 568098,
+      "surface": "Mr. Bennet",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 52,
+      "gold_id": "g005",
+      "note": "达西对威克姆指出，尽管班纳特先生（Mr. Bennet）并不算非常富有，仍能多少帮衬他一些，结婚肯定对他的处境有利，威克姆却仍妄想在别处靠结婚发财，指班纳特先生。"
+    },
+    {
+      "sample_id": "s470",
+      "start": 569541,
+      "end": 569550,
+      "surface": "Longbourn",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 52,
+      "gold_id": "g035",
+      "note": "嘉丁纳太太信中说达西周六、周日又来商议，直到周一才全部敲定，一旦谈妥便立即派快马把信送往浪博恩（Longbourn），指浪博恩班纳特家。"
+    },
+    {
+      "sample_id": "s471",
+      "start": 572522,
+      "end": 572526,
+      "surface": "Jane",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 52,
+      "gold_id": "g002",
+      "note": "嘉丁纳太太信中说自己多次严肃规劝莉迪亚却犹如对牛弹琴，有时气极了，但转念想到亲爱的伊丽莎白和简（Jane），为了她俩的缘故还是耐着性子忍受了莉迪亚，指简·班纳特。"
+    },
+    {
+      "sample_id": "s472",
+      "start": 576822,
+      "end": 576833,
+      "surface": "Mrs. Bennet",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 52,
+      "gold_id": "g006",
+      "note": "威克姆在花园遇到正在看信的伊丽莎白，伊丽莎白问其他人出不出来，威克姆回答说不知道，班纳特太太（Mrs. Bennet）和莉迪亚正要坐马车去麦里屯，指班纳特太太。"
+    },
+    {
+      "sample_id": "s473",
+      "start": 577763,
+      "end": 577777,
+      "surface": "Miss de Bourgh",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 52,
+      "gold_id": "g026",
+      "note": "威克姆提到上个月在伦敦几次撞见达西，好奇他去伦敦做什么，伊丽莎白故意说是“也许在筹备他同德·包尔小姐（Miss de Bourgh）的婚事吧”，指安妮·德·包尔小姐。"
+    },
+    {
+      "sample_id": "s474",
+      "start": 580084,
+      "end": 580095,
+      "surface": "Mr. Wickham",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 53,
+      "gold_id": "g008",
+      "note": "第五十三章开头，威克姆先生（Mr. Wickham）对刚才同伊丽莎白的那番谈话十分满意，此后便再也没有提这桩往事来困扰自己或招惹伊丽莎白，指乔治·威克姆。"
+    },
+    {
+      "sample_id": "s475",
+      "start": 581201,
+      "end": 581218,
+      "surface": "Sir William Lucas",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 53,
+      "gold_id": "g021",
+      "note": "威克姆夫妇离开北方后，班纳特先生反讽地夸女婿又傻笑又向全家献殷勤，自己为他自豪极了，哪怕威廉·卢卡斯爵士（Sir William Lucas）亲自出马也拿不出更宝贝的女婿，指威廉·卢卡斯爵士（与柯林斯作对比）。"
+    },
+    {
+      "sample_id": "s476",
+      "start": 582336,
+      "end": 582348,
+      "surface": "Mrs. Philips",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 53,
+      "gold_id": "g024",
+      "note": "尼日斐花园管家接到通知准备迎接主人过一两天来打猎数周，菲利普斯太太（Mrs. Philips）最先把宾利先生要回来的消息带给班纳特太太，指菲利普斯太太。"
+    },
+    {
+      "sample_id": "s477",
+      "start": 583428,
+      "end": 583433,
+      "surface": "Lizzy",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 53,
+      "gold_id": "g001",
+      "note": "简听闻宾利要来不由脸色微变，私下对伊丽莎白说：“莉齐（Lizzy），今天姨妈告诉我们这个消息时我看见你看我了，我知道我显得很局促”，指伊丽莎白·班纳特。"
+    },
+    {
+      "sample_id": "s478",
+      "start": 583942,
+      "end": 583952,
+      "surface": "Derbyshire",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 53,
+      "gold_id": "g044",
+      "note": "伊丽莎白不知该如何看待宾利重返尼日斐花园：倘若她不曾在德比郡（Derbyshire）见过他，或许会以为他纯粹是为打猎而来，但见过之后仍觉得他钟情于简，指德比郡。"
+    },
+    {
+      "sample_id": "s479",
+      "start": 586344,
+      "end": 586355,
+      "surface": "Netherfield",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 53,
+      "gold_id": "g036",
+      "note": "简向伊丽莎白吐露说自己能以完全淡然的态度见宾利，却受不了母亲整天唠叨此事，感叹等他在尼日斐花园（Netherfield）小住结束自己才算快活，指尼日斐花园。"
+    },
+    {
+      "sample_id": "s480",
+      "start": 586618,
+      "end": 586629,
+      "surface": "Mrs. Bennet",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 53,
+      "gold_id": "g006",
+      "note": "宾利先生抵达后，班纳特太太（Mrs. Bennet）通过仆人打听到最早的消息，掐着指头算还要隔几天才能发请帖，没想到到达赫特福德郡后的第三天早上他就骑马来了，指班纳特太太。"
+    },
+    {
+      "sample_id": "s481",
+      "start": 587234,
+      "end": 587243,
+      "surface": "Mr. Darcy",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 53,
+      "gold_id": "g003",
+      "note": "宾利骑马进入草场朝屋子走来，伊丽莎白顺从母亲走到窗前张望，一眼看见达西先生（Mr. Darcy）同他一起前来，便回到妹妹身旁坐下，指达西。"
+    },
+    {
+      "sample_id": "s482",
+      "start": 587838,
+      "end": 587848,
+      "surface": "Derbyshire",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 53,
+      "gold_id": "g044",
+      "note": "简惊讶而关切地看着伊丽莎白，因为她对伊丽莎白与达西在德比郡（Derbyshire）的会面知之甚少，担心妹妹收到那封解释信后首次见他会十分尴尬，指德比郡。"
+    },
+    {
+      "sample_id": "s483",
+      "start": 588139,
+      "end": 588148,
+      "surface": "Mr. Darcy",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 53,
+      "gold_id": "g003",
+      "note": "简和伊丽莎白姐妹俩都坐立不安，而母亲却在一旁喋喋不休地说着自己多么讨厌达西先生（Mr. Darcy）、只因他是宾利先生的朋友才对他客气，指达西。"
+    },
+    {
+      "sample_id": "s484",
+      "start": 590154,
+      "end": 590167,
+      "surface": "Hertfordshire",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 53,
+      "gold_id": "g045",
+      "note": "伊丽莎白只偷偷看了达西一眼，见他神色如常般严肃，觉得他看上去更像从前在赫特福德郡（Hertfordshire）时的模样，而不像在彭伯里时那样温和，指赫特福德郡。"
+    },
+    {
+      "sample_id": "s485",
+      "start": 591138,
+      "end": 591148,
+      "surface": "Derbyshire",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 53,
+      "gold_id": "g044",
+      "note": "达西问候嘉丁纳夫妇后便几乎一言不发，或许是因为没坐在伊丽莎白身边，但他在德比郡（Derbyshire）时并非如此，在那里他不能同她说话时还会同她的亲友交谈，指德比郡。"
+    },
+    {
+      "sample_id": "s486",
+      "start": 591896,
+      "end": 591907,
+      "surface": "Mr. Bingley",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 53,
+      "gold_id": "g004",
+      "note": "班纳特太太对来访的宾利寒暄说：“宾利先生（Mr. Bingley），自打你离开后可有些日子了”，宾利连忙称是，指查尔斯·宾利。"
+    },
+    {
+      "sample_id": "s487",
+      "start": 592382,
+      "end": 592396,
+      "surface": "the ‘Courier,’",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster"
+      ],
+      "chapter_index": 53,
+      "gold_id": "not_entity",
+      "note": "班纳特太太对宾利谈起莉迪亚结婚的消息登在了《泰晤士报》和《信使报》（the ‘Courier,’）上，此处为报纸名称而非人物或地点实体。"
+    },
+    {
+      "sample_id": "s488",
+      "start": 592744,
+      "end": 592751,
+      "surface": "Bingley",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 53,
+      "gold_id": "g004",
+      "note": "班纳特太太抱怨嘉丁纳弟弟拟的新婚启事太简略并问宾利看到没有，宾利（Bingley）回答说看到了并向她道贺，伊丽莎白则羞得不敢抬头看达西的神色，指查尔斯·宾利。"
+    },
+    {
+      "sample_id": "s489",
+      "start": 593775,
+      "end": 593786,
+      "surface": "Mr. Bingley",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 53,
+      "gold_id": "g004",
+      "note": "班纳特太太热情邀请宾利：“宾利先生（Mr. Bingley），等你打光了自己领地上的鸟，请一定来这儿在班纳特先生的庄园里尽情打猎”，指查尔斯·宾利。"
+    },
+    {
+      "sample_id": "s490",
+      "start": 595466,
+      "end": 595477,
+      "surface": "Mr. Bingley",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 53,
+      "gold_id": "g004",
+      "note": "两位先生起身告辞时，班纳特太太请他们过几天来浪博恩吃晚饭，并补充说：“宾利先生（Mr. Bingley），你可欠我们一次拜访呢，去年冬天你进城前答应回来就跟我们吃顿便饭的”，指查尔斯·宾利。"
+    },
+    {
+      "sample_id": "s491",
+      "start": 597363,
+      "end": 597367,
+      "surface": "Jane",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 54,
+      "gold_id": "g002",
+      "note": "第五十四章简自信能把宾利当作普通熟人坦然相见，伊丽莎白笑着打趣说：“是啊，确实非常冷淡。哦，简（Jane）！当心点儿”，指简·班纳特。"
+    },
+    {
+      "sample_id": "s492",
+      "start": 598824,
+      "end": 598828,
+      "surface": "Jane",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 54,
+      "gold_id": "g002",
+      "note": "周二晚宴上宾利对简的举止流露出倾慕，虽比从前谨慎，却使伊丽莎白确信只要由他自己做主，简（Jane）和他自己的幸福很快就会定下来，指简·班纳特。"
+    },
+    {
+      "sample_id": "s493",
+      "start": 602497,
+      "end": 602508,
+      "surface": "Mrs. Bennet",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 54,
+      "gold_id": "g006",
+      "note": "牌局结束后，班纳特太太（Mrs. Bennet）原本盘算留尼日斐花园的两位先生吃夜宵，不巧他们的马车比别人先叫好，没能留住他们，指班纳特太太。"
+    },
+    {
+      "sample_id": "s494",
+      "start": 603037,
+      "end": 603044,
+      "surface": "Lucases",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 54,
+      "gold_id": "not_entity",
+      "note": "客人们走后班纳特太太自夸当晚菜肴丰盛，说汤比上周在卢卡斯家（Lucases’）喝的好上五十倍，连达西先生都承认鹧鸪烤得好，系卢卡斯家族复数合称。"
+    },
+    {
+      "sample_id": "s495",
+      "start": 603441,
+      "end": 603450,
+      "surface": "Mrs. Long",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 54,
+      "gold_id": "g032",
+      "note": "班纳特太太转述朗格太太夸简今晚美极了并预言简终将嫁到尼日斐花园，随即大赞朗格太太（Mrs. Long）是世上最好的人，连她那两个不好看的外甥女也显得十分讨喜，指朗格太太。"
+    },
+    {
+      "sample_id": "s496",
+      "start": 606058,
+      "end": 606063,
+      "surface": "Sarah",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 55,
+      "gold_id": "x005",
+      "note": "第五十五章宾利独自一人早早骑马来访，班纳特太太穿着晨衣、头发才梳了一半就跑进女儿房间嚷道：“快点，快点。来呀，萨拉（Sarah），马上来帮班纳特小姐穿上长裙，别管莉齐小姐的头发了”，指浪博恩女仆萨拉。"
+    },
+    {
+      "sample_id": "s497",
+      "start": 606140,
+      "end": 606150,
+      "surface": "Miss Lizzy",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "title_or_official"
+      ],
+      "chapter_index": 55,
+      "gold_id": "g001",
+      "note": "班纳特太太催促简快下楼见宾利，吩咐女仆萨拉先帮大小姐穿裙子，“别管莉齐小姐（Miss Lizzy）的头发了”，指伊丽莎白·班纳特。"
+    },
+    {
+      "sample_id": "s498",
+      "start": 607951,
+      "end": 607958,
+      "surface": "Bingley",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 55,
+      "gold_id": "g004",
+      "note": "班纳特太太特意带基蒂上楼把客厅留给简和宾利，但当天的计策并未奏效，宾利（Bingley）虽然风度迷人、耐心忍受母亲的唠叨，却尚未公开向女儿求婚，指查尔斯·宾利。"
+    },
+    {
+      "sample_id": "s499",
+      "start": 608928,
+      "end": 608938,
+      "surface": "Mr. Bennet",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 55,
+      "gold_id": "g005",
+      "note": "次日早上宾利准时赴约，与班纳特先生（Mr. Bennet）按约定一起度过上午去打猎，班纳特先生发现宾利比预想中更随和健谈、毫不自负愚蠢，指班纳特先生。"
+    },
+    {
+      "sample_id": "s500",
+      "start": 612859,
+      "end": 612864,
+      "surface": "Kitty",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 55,
+      "gold_id": "g011",
+      "note": "宾利向简求婚成功后全家欣喜若狂，简满面甜蜜光彩，基蒂（Kitty）则傻笑着盼望很快轮到自己，指基蒂·班纳特。"
+    },
+    {
+      "sample_id": "s501",
+      "start": 615004,
+      "end": 615013,
+      "surface": "Longbourn",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 55,
+      "gold_id": "g035",
+      "note": "从订婚这天起，宾利自然成了浪博恩（Longbourn）每天必到的常客，常常早饭前就赶来，一直待到晚饭后才走，指浪博恩。"
+    },
+    {
+      "sample_id": "s502",
+      "start": 617756,
+      "end": 617768,
+      "surface": "Mrs. Philips",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 55,
+      "gold_id": "g024",
+      "note": "浪博恩家里的喜事瞒不了多久，班纳特太太获准悄悄告诉菲利普斯太太（Mrs. Philips），而菲利普斯太太则未经许可便向麦里屯所有邻居传开了，指菲利普斯太太。"
+    },
+    {
+      "sample_id": "s503",
+      "start": 617852,
+      "end": 617859,
+      "surface": "Meryton",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 55,
+      "gold_id": "g037",
+      "note": "菲利普斯太太把简与宾利订婚的消息传遍了麦里屯（Meryton）的所有邻居，班纳特一家顿时被誉为世上最走运的家庭，指麦里屯。"
+    },
+    {
+      "sample_id": "s504",
+      "start": 619139,
+      "end": 619144,
+      "surface": "Kitty",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 56,
+      "gold_id": "g011",
+      "note": "第五十六章凯瑟琳·德·包尔夫人突然登门造访，尽管班纳特太太和基蒂（Kitty）完全不认识她，母女俩的惊讶程度甚至还比不上伊丽莎白，指基蒂·班纳特。"
+    },
+    {
+      "sample_id": "s505",
+      "start": 619974,
+      "end": 619988,
+      "surface": "Lady Catherine",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 56,
+      "gold_id": "g013",
+      "note": "凯瑟琳夫人指着基蒂问是不是伊丽莎白的妹妹，班纳特太太欣喜于能同凯瑟琳夫人（Lady Catherine）这样一位贵妇说话，连忙回答这是倒数第二个女儿，指凯瑟琳·德·包尔夫人。"
+    },
+    {
+      "sample_id": "s506",
+      "start": 620306,
+      "end": 620313,
+      "surface": "Rosings",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 56,
+      "gold_id": "g040",
+      "note": "凯瑟琳夫人挑剔浪博恩的园子太小，班纳特太太赔笑说“夫人，我敢说这跟罗新斯（Rosings）比起来当然算不了什么，但向您保证比威廉·卢卡斯爵士家的大多了”，指罗新斯庄园。"
+    },
+    {
+      "sample_id": "s507",
+      "start": 620378,
+      "end": 620395,
+      "surface": "Sir William Lucas",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 56,
+      "gold_id": "g021",
+      "note": "班纳特太太回应凯瑟琳夫人对园子大小的挑剔，说虽比不上罗新斯，但比威廉·卢卡斯爵士（Sir William Lucas）家的园子大多了，指威廉·卢卡斯爵士。"
+    },
+    {
+      "sample_id": "s508",
+      "start": 620802,
+      "end": 620811,
+      "surface": "Charlotte",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 56,
+      "gold_id": "g010",
+      "note": "听凯瑟琳夫人说前天晚上刚见过柯林斯夫妇，伊丽莎白以为她会拿出一封夏洛特（Charlotte）托她捎来的信，因为这似乎是她来访唯一可能的理由，指夏洛特·卢卡斯。"
+    },
+    {
+      "sample_id": "s509",
+      "start": 621009,
+      "end": 621023,
+      "surface": "Lady Catherine",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 56,
+      "gold_id": "g013",
+      "note": "班纳特太太殷勤地请贵客用些茶点，但凯瑟琳夫人（Lady Catherine）十分坚决且不太礼貌地拒绝吃任何东西，随后起身邀伊丽莎白去草坪旁的小树林散步，指凯瑟琳·德·包尔夫人。"
+    },
+    {
+      "sample_id": "s510",
+      "start": 621583,
+      "end": 621597,
+      "surface": "Lady Catherine",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 56,
+      "gold_id": "g013",
+      "note": "伊丽莎白回房拿了阳伞陪贵客下楼，穿过门厅时，凯瑟琳夫人（Lady Catherine）推开餐厅和客厅的门略微打量了一番，评定这两间屋子还算体面，指凯瑟琳·德·包尔夫人。"
+    },
+    {
+      "sample_id": "s511",
+      "start": 623401,
+      "end": 623410,
+      "surface": "Elizabeth",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 56,
+      "gold_id": "g001",
+      "note": "凯瑟琳夫人在小树林里兴师问罪，说听说她企图同自己的外甥达西先生结亲，伊丽莎白（Elizabeth）既惊讶又鄙夷地涨红了脸，反问她既然认为不可能当真何必远道而来，指伊丽莎白·班纳特。"
+    },
+    {
+      "sample_id": "s512",
+      "start": 626280,
+      "end": 626289,
+      "surface": "Mr. Darcy",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 56,
+      "gold_id": "g003",
+      "note": "伊丽莎白反驳凯瑟琳夫人说，既然达西先生（Mr. Darcy）无论在道义上还是意愿上都不受表妹束缚，为什么不能另作选择，而如果他选中的是我，我为什么不能接受，指达西。"
+    },
+    {
+      "sample_id": "s513",
+      "start": 627625,
+      "end": 627634,
+      "surface": "my nephew",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster"
+      ],
+      "chapter_index": 56,
+      "gold_id": "g003",
+      "note": "凯瑟琳夫人喝令伊丽莎白住口听她说：“我女儿和我外甥（my nephew）是天生的一对，母系同出一脉贵族，父系也都是受人尊敬的古老家族”，指凯瑟琳夫人的外甥达西。"
+    },
+    {
+      "sample_id": "s514",
+      "start": 628764,
+      "end": 628778,
+      "surface": "Lady Catherine",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 56,
+      "gold_id": "g013",
+      "note": "凯瑟琳夫人逼问“你到底跟他订婚没有？”，尽管伊丽莎白绝不会纯粹为了顺从凯瑟琳夫人（Lady Catherine）而回答这个问题，但略一思索后还是据实回答“没有”，指凯瑟琳·德·包尔夫人。"
+    },
+    {
+      "sample_id": "s515",
+      "start": 632758,
+      "end": 632766,
+      "surface": "carriage",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 56,
+      "gold_id": "not_entity",
+      "note": "凯瑟琳夫人怒气冲冲地不辞而别，伊丽莎白平静地走回屋里，在上楼时听见马车（carriage）驶离的声音，此处 carriage 为普通交通工具名词。"
+    },
+    {
+      "sample_id": "s516",
+      "start": 633732,
+      "end": 633739,
+      "surface": "Rosings",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 57,
+      "gold_id": "g040",
+      "note": "第五十七章伊丽莎白久久难以平复心情，想到凯瑟琳夫人竟真不辞辛劳从罗新斯（Rosings）跑来，只为拆散她与达西先生那莫须有的婚约，指罗新斯庄园。"
+    },
+    {
+      "sample_id": "s517",
+      "start": 636485,
+      "end": 636496,
+      "surface": "Mrs. Bennet",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 57,
+      "gold_id": "g006",
+      "note": "家里其他人听说来访者是谁后大感惊讶，伊丽莎白便用先前哄住班纳特太太（Mrs. Bennet）好奇心的同一种托词敷衍过去，免受追问折磨，指班纳特太太。"
+    },
+    {
+      "sample_id": "s518",
+      "start": 637933,
+      "end": 637944,
+      "surface": "Mr. Collins",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 57,
+      "gold_id": "g009",
+      "note": "次日清晨班纳特先生拿着一封信叫伊丽莎白进书房，打趣说就算她再聪明也猜不出仰慕者是谁，揭晓“这封信是柯林斯先生（Mr. Collins）写来的”，指威廉·柯林斯。"
+    },
+    {
+      "sample_id": "s519",
+      "start": 638390,
+      "end": 638402,
+      "surface": "Mrs. Collins",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 57,
+      "gold_id": "g010",
+      "note": "班纳特先生念柯林斯的来信：在对长女简的婚事转达了柯林斯太太（Mrs. Collins）和他本人的诚挚祝贺后，又根据卢卡斯家的同一消息来源提到了伊丽莎白与达西的传闻，指夏洛特·卢卡斯。"
+    },
+    {
+      "sample_id": "s520",
+      "start": 641487,
+      "end": 641492,
+      "surface": "Lizzy",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 57,
+      "gold_id": "g001",
+      "note": "班纳特先生念完信中关于基督徒式宽恕莉迪亚夫妇以及夏洛特怀上小生命的段落后，笑着对女儿说：“可是，莉齐（Lizzy），你看起来好像并不觉得好笑”，指伊丽莎白·班纳特。"
+    },
+    {
+      "sample_id": "s521",
+      "start": 641725,
+      "end": 641734,
+      "surface": "Elizabeth",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 57,
+      "gold_id": "g001",
+      "note": "面对父亲的打趣，伊丽莎白（Elizabeth）连忙强作欢颜地叫道：“哦，我乐坏了，但这实在太离奇了！”，指伊丽莎白·班纳特。"
+    },
+    {
+      "sample_id": "s522",
+      "start": 643406,
+      "end": 643410,
+      "surface": "Mary",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 58,
+      "gold_id": "g012",
+      "note": "第五十八章几天后宾利和达西早早到来，宾利提议大家一起出去散步，班纳特太太向来不习惯散步，玛丽（Mary）永远抽不出时间，其余五人便一同出发，指玛丽·班纳特。"
+    },
+    {
+      "sample_id": "s523",
+      "start": 643488,
+      "end": 643492,
+      "surface": "Jane",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 58,
+      "gold_id": "g002",
+      "note": "五人出门散步后，宾利和简（Jane）很快便故意落在后面，让伊丽莎白、基蒂和达西走在前头彼此陪伴，指简·班纳特。"
+    },
+    {
+      "sample_id": "s524",
+      "start": 643869,
+      "end": 643874,
+      "surface": "Maria",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 58,
+      "gold_id": "g023",
+      "note": "前头三人朝卢卡斯家走去，因为基蒂想去拜访玛丽亚（Maria）；等基蒂进了卢卡斯家离开他们后，伊丽莎白便鼓起勇气与达西单独继续往前走并向他致谢，指玛丽亚·卢卡斯。"
+    },
+    {
+      "sample_id": "s525",
+      "start": 653627,
+      "end": 653637,
+      "surface": "Derbyshire",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 58,
+      "gold_id": "g044",
+      "note": "达西与伊丽莎白互诉衷肠后，谈起乔治安娜对结识她的喜悦及因她突然离开而感到的失望，伊丽莎白随之得知达西在离开兰顿客栈前就已下定决心从德比郡（Derbyshire）赶往伦敦帮她寻找妹妹，指德比郡。"
+    },
+    {
+      "sample_id": "s526",
+      "start": 660244,
+      "end": 660251,
+      "surface": "Bingley",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 59,
+      "gold_id": "g004",
+      "note": "第五十九章伊丽莎白向简吐露与达西订婚的实情并说服简相信自己真心爱他后，简欣喜地说今后作为宾利的朋友和你的丈夫，世上只有宾利（Bingley）和你比他更令我珍爱，指查尔斯·宾利。"
+    },
+    {
+      "sample_id": "s527",
+      "start": 662117,
+      "end": 662128,
+      "surface": "Mrs. Bennet",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 59,
+      "gold_id": "g006",
+      "note": "次日达西提出想去看芒特山景致，伊丽莎白默许并上楼准备出门，班纳特太太（Mrs. Bennet）跟上楼来对她说真抱歉让你不得不独自陪那个讨厌的人，一切都是为了简的缘故，指班纳特太太。"
+    },
+    {
+      "sample_id": "s528",
+      "start": 664339,
+      "end": 664348,
+      "surface": "Mr. Darcy",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 59,
+      "gold_id": "g003",
+      "note": "晚上达西向班纳特先生求娶伊丽莎白，班纳特先生叫来女儿单刀直入询问，伊丽莎白怀着几分羞窘向父亲确切保证自己对达西先生（Mr. Darcy）的真挚感情，指达西。"
+    },
+    {
+      "sample_id": "s529",
+      "start": 666515,
+      "end": 666520,
+      "surface": "Darcy",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 59,
+      "gold_id": "g003",
+      "note": "为了让父亲彻底消除疑虑，伊丽莎白把达西先生自愿为莉迪亚所做的一切告诉了父亲，班纳特先生惊叹道：“这么说，达西（Darcy）包揽了一切：促成婚事、出钱、替那家伙还债、给他买军职！”，指达西。"
+    },
+    {
+      "sample_id": "s530",
+      "start": 667222,
+      "end": 667231,
+      "surface": "Elizabeth",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 59,
+      "gold_id": "g001",
+      "note": "班纳特先生消除了疑虑并拿几天前柯林斯的来信打趣一番后放女儿离开，伊丽莎白（Elizabeth）心头卸下千钧重担，回房静思半小时后从容地与家人会合，指伊丽莎白·班纳特。"
+    },
+    {
+      "sample_id": "s531",
+      "start": 670017,
+      "end": 670037,
+      "surface": "my three sons-in-law",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster"
+      ],
+      "chapter_index": 59,
+      "gold_id": "not_entity",
+      "note": "班纳特先生努力增进对达西的了解，不久便对伊丽莎白打趣说：“我非常赞赏我的三个女婿（my three sons-in-law），威克姆或许是我最偏爱的，但我想我会像喜欢简的丈夫一样喜欢你的丈夫”，系三个女婿的复数合称。"
+    },
+    {
+      "sample_id": "s532",
+      "start": 671829,
+      "end": 671840,
+      "surface": "Netherfield",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 60,
+      "gold_id": "g036",
+      "note": "第六十章伊丽莎白顽皮地问达西最初怎么会爱上自己，达西反问她：“简在尼日斐花园（Netherfield）生病期间，你对她那般深情体贴的照料难道算不上美德吗？”，指尼日斐花园。"
+    },
+    {
+      "sample_id": "s533",
+      "start": 673666,
+      "end": 673677,
+      "surface": "Netherfield",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 60,
+      "gold_id": "g036",
+      "note": "两人谈起凯瑟琳夫人登门兴师问罪反倒促成好事后，伊丽莎白问达西：“告诉我，你当初来尼日斐花园（Netherfield）是为了什么？难道只是为了骑马来浪博恩局促不安吗？”，指尼日斐花园。"
+    },
+    {
+      "sample_id": "s534",
+      "start": 675998,
+      "end": 676009,
+      "surface": "Mr. Collins",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 60,
+      "gold_id": "g009",
+      "note": "达西写信给凯瑟琳夫人告知婚事，而班纳特先生写给柯林斯先生（Mr. Collins）的回信则是另一种风格，请他再次道贺并建议他站到更有钱可给的外甥达西一边，指威廉·柯林斯。"
+    },
+    {
+      "sample_id": "s535",
+      "start": 676959,
+      "end": 676970,
+      "surface": "Mr. Collins",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 60,
+      "gold_id": "g009",
+      "note": "还没等收到柯林斯先生（Mr. Collins）的回信或他妻子对伊丽莎白的贺信，浪博恩一家就听说柯林斯夫妇亲自来卢卡斯山庄暂避大发雷霆的凯瑟琳夫人了，指威廉·柯林斯。"
+    },
+    {
+      "sample_id": "s536",
+      "start": 677688,
+      "end": 677705,
+      "surface": "Sir William Lucas",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 60,
+      "gold_id": "g021",
+      "note": "达西不仅平静忍受了柯林斯浮夸谄媚的客套，甚至在威廉·卢卡斯爵士（Sir William Lucas）恭维他夺走了本郡最璀璨的明珠并盼望常在圣詹姆斯宫相聚时也能保持体面的镇定，指威廉·卢卡斯爵士。"
+    },
+    {
+      "sample_id": "s537",
+      "start": 677932,
+      "end": 677943,
+      "surface": "Sir William",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 60,
+      "gold_id": "g021",
+      "note": "面对卢卡斯爵士的恭维，达西哪怕真的耸了耸肩，也是在威廉爵士（Sir William）走出视线之后才做的，指威廉·卢卡斯爵士。"
+    },
+    {
+      "sample_id": "s538",
+      "start": 677963,
+      "end": 677975,
+      "surface": "Mrs. Philips",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 60,
+      "gold_id": "g024",
+      "note": "除了卢卡斯爵士外，菲利普斯太太（Mrs. Philips）的粗俗对达西的忍耐力或许是更大的考验，只要她一开口就免不了俗气，指菲利普斯太太。"
+    },
+    {
+      "sample_id": "s539",
+      "start": 678060,
+      "end": 678072,
+      "surface": "Mrs. Philips",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 60,
+      "gold_id": "g024",
+      "note": "尽管菲利普斯太太（Mrs. Philips）和她姐姐一样对达西敬畏有加，不敢像宾利好脾气所纵容的那样随便攀谈，但她一开口仍难免粗俗，指菲利普斯太太。"
+    },
+    {
+      "sample_id": "s540",
+      "start": 679789,
+      "end": 679800,
+      "surface": "Netherfield",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 61,
+      "gold_id": "g036",
+      "note": "第六十一章结局交代，宾利先生和简在尼日斐花园（Netherfield）只住了一年，便因离简的母亲和麦里屯亲戚太近而在德比郡邻郡购置庄园搬走了，指尼日斐花园。"
+    },
+    {
+      "sample_id": "s541",
+      "start": 680961,
+      "end": 680965,
+      "surface": "Mary",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 61,
+      "gold_id": "g012",
+      "note": "三个姐姐出嫁、基蒂常去两位姐姐家小住后，玛丽是唯一留在家的女儿；由于班纳特太太片刻离不开人陪坐，玛丽（Mary）不得不更多地与外界交际，但每次早间拜访后仍能发表一番道德感慨，指玛丽·班纳特。"
+    },
+    {
+      "sample_id": "s542",
+      "start": 681249,
+      "end": 681256,
+      "surface": "Wickham",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 61,
+      "gold_id": "g008",
+      "note": "至于威克姆（Wickham）和莉迪亚，两位姐姐的婚礼丝毫没有改变他们的本性，威克姆泰然接受了伊丽莎白必已悉知他忘恩负义与虚伪的事实，指乔治·威克姆。"
+    },
+    {
+      "sample_id": "s543",
+      "start": 681832,
+      "end": 681837,
+      "surface": "Lizzy",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 61,
+      "gold_id": "g001",
+      "note": "莉迪亚在伊丽莎白结婚时写来贺信，开头称呼“我亲爱的莉齐（Lizzy）”，祝她幸福并厚颜请求在朝廷里给威克姆谋个年入三四百镑的差事，指伊丽莎白·班纳特。"
+    },
+    {
+      "sample_id": "s544",
+      "start": 683671,
+      "end": 683679,
+      "surface": "Bingleys",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 61,
+      "gold_id": "not_entity",
+      "note": "达西虽绝不在彭伯里接待威克姆，但看在伊丽莎白份上资助他升迁；而威克姆夫妇常在宾利夫妇（Bingleys）家一住许久，连好脾气的宾利都忍不住想下逐客令，系宾利夫妇复数合称。"
+    },
+    {
+      "sample_id": "s545",
+      "start": 683843,
+      "end": 683855,
+      "surface": "Miss Bingley",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 61,
+      "gold_id": "g018",
+      "note": "宾利小姐（Miss Bingley）对达西的婚事深感懊恼屈辱，但为了保住造访彭伯里的权利，她收起一切怨恨，对乔治安娜比以往更亲热，并向伊丽莎白补足了全部礼数，指卡罗琳·宾利。"
+    },
+    {
+      "sample_id": "s546",
+      "start": 685553,
+      "end": 685562,
+      "surface": "Pemberley",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 61,
+      "gold_id": "g039",
+      "note": "结局写凯瑟琳夫人在外甥劝说及对他的疼爱或好奇心驱使下，最终消了气，屈尊来到彭伯里（Pemberley）探望达西夫妇，指彭伯里庄园。"
+    }
+  ]
+}

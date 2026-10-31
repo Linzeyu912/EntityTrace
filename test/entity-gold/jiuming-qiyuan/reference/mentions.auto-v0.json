@@ -1,0 +1,2897 @@
+{
+  "book": "03_中文长篇_九命奇冤_36回.txt",
+  "book_id": "jiuming-qiyuan",
+  "source_sha256": "96b254bc40b75e2b38a99360500dafd29624982f9e8e06c5dd6632188b3b36b8",
+  "seed": 20261030,
+  "labeler": "agent:gemini-4-argon",
+  "human_review": "pending",
+  "annotation_seconds": 0.2453,
+  "total_mentions": 320,
+  "counts": {
+    "entity_mentions": 317,
+    "not_entity": 3,
+    "uncertain": 0
+  },
+  "mentions": [
+    {
+      "sample_id": "s001",
+      "start": 163,
+      "end": 166,
+      "surface": "林大哥",
+      "chapter_index": 1,
+      "gold_id": "g005",
+      "note": "第1章/回原文上下文明确指 林大有（称呼 '林大哥'）"
+    },
+    {
+      "sample_id": "s002",
+      "start": 173,
+      "end": 176,
+      "surface": "林大哥",
+      "chapter_index": 1,
+      "gold_id": "g005",
+      "note": "第1章/回原文上下文明确指 林大有（称呼 '林大哥'）"
+    },
+    {
+      "sample_id": "s003",
+      "start": 367,
+      "end": 370,
+      "surface": "林大哥",
+      "chapter_index": 1,
+      "gold_id": "g005",
+      "note": "第1章/回原文上下文明确指 林大有（称呼 '林大哥'）"
+    },
+    {
+      "sample_id": "s004",
+      "start": 2060,
+      "end": 2063,
+      "surface": "南雄岭",
+      "chapter_index": 2,
+      "gold_id": "g041",
+      "note": "第2章/回原文上下文明确指 南雄（称呼 '南雄岭'）"
+    },
+    {
+      "sample_id": "s005",
+      "start": 2065,
+      "end": 2068,
+      "surface": "南雄岭",
+      "chapter_index": 2,
+      "gold_id": "g041",
+      "note": "第2章/回原文上下文明确指 南雄（称呼 '南雄岭'）"
+    },
+    {
+      "sample_id": "s006",
+      "start": 2072,
+      "end": 2075,
+      "surface": "南雄州",
+      "chapter_index": 2,
+      "gold_id": "g041",
+      "note": "第2章/回原文上下文明确指 南雄（称呼 '南雄州'）"
+    },
+    {
+      "sample_id": "s007",
+      "start": 2193,
+      "end": 2195,
+      "surface": "朝大",
+      "chapter_index": 2,
+      "gold_id": "g009",
+      "note": "第2章/回原文上下文明确指 梁朝大（称呼 '朝大'）"
+    },
+    {
+      "sample_id": "s008",
+      "start": 2223,
+      "end": 2226,
+      "surface": "梁朝大",
+      "chapter_index": 2,
+      "gold_id": "g009",
+      "note": "第2章/回原文上下文明确指 梁朝大（称呼 '梁朝大'）"
+    },
+    {
+      "sample_id": "s009",
+      "start": 2279,
+      "end": 2281,
+      "surface": "南雄",
+      "chapter_index": 2,
+      "gold_id": "g041",
+      "note": "第2章/回原文上下文明确指 南雄（称呼 '南雄'）"
+    },
+    {
+      "sample_id": "s010",
+      "start": 2287,
+      "end": 2289,
+      "surface": "朝大",
+      "chapter_index": 2,
+      "gold_id": "g009",
+      "note": "第2章/回原文上下文明确指 梁朝大（称呼 '朝大'）"
+    },
+    {
+      "sample_id": "s011",
+      "start": 2337,
+      "end": 2339,
+      "surface": "祈伯",
+      "chapter_index": 2,
+      "gold_id": "g002",
+      "note": "第2章/回原文上下文明确指 凌贵兴（称呼 '祈伯'）"
+    },
+    {
+      "sample_id": "s012",
+      "start": 2382,
+      "end": 2385,
+      "surface": "梁朝大",
+      "chapter_index": 2,
+      "gold_id": "g009",
+      "note": "第2章/回原文上下文明确指 梁朝大（称呼 '梁朝大'）"
+    },
+    {
+      "sample_id": "s013",
+      "start": 2395,
+      "end": 2397,
+      "surface": "朝大",
+      "chapter_index": 2,
+      "gold_id": "g009",
+      "note": "第2章/回原文上下文明确指 梁朝大（称呼 '朝大'）"
+    },
+    {
+      "sample_id": "s014",
+      "start": 2416,
+      "end": 2418,
+      "surface": "番禺",
+      "chapter_index": 2,
+      "gold_id": "g035",
+      "note": "第2章/回原文上下文明确指 番禺县（称呼 '番禺'）"
+    },
+    {
+      "sample_id": "s015",
+      "start": 2443,
+      "end": 2445,
+      "surface": "南雄",
+      "chapter_index": 2,
+      "gold_id": "g041",
+      "note": "第2章/回原文上下文明确指 南雄（称呼 '南雄'）"
+    },
+    {
+      "sample_id": "s016",
+      "start": 3002,
+      "end": 3004,
+      "surface": "天来",
+      "chapter_index": 2,
+      "gold_id": "g001",
+      "note": "第2章/回原文上下文明确指 梁天来（称呼 '天来'）"
+    },
+    {
+      "sample_id": "s017",
+      "start": 3408,
+      "end": 3411,
+      "surface": "马半仙",
+      "chapter_index": 2,
+      "gold_id": "g033",
+      "note": "第2章/回原文上下文明确指 马半仙（称呼 '马半仙'）"
+    },
+    {
+      "sample_id": "s018",
+      "start": 4678,
+      "end": 4680,
+      "surface": "半仙",
+      "chapter_index": 2,
+      "gold_id": "g033",
+      "note": "第2章/回原文上下文明确指 马半仙（称呼 '半仙'）"
+    },
+    {
+      "sample_id": "s019",
+      "start": 4911,
+      "end": 4913,
+      "surface": "半仙",
+      "chapter_index": 2,
+      "gold_id": "g033",
+      "note": "第2章/回原文上下文明确指 马半仙（称呼 '半仙'）"
+    },
+    {
+      "sample_id": "s020",
+      "start": 5040,
+      "end": 5042,
+      "surface": "半仙",
+      "chapter_index": 2,
+      "gold_id": "g033",
+      "note": "第2章/回原文上下文明确指 马半仙（称呼 '半仙'）"
+    },
+    {
+      "sample_id": "s021",
+      "start": 5111,
+      "end": 5113,
+      "surface": "半仙",
+      "chapter_index": 2,
+      "gold_id": "g033",
+      "note": "第2章/回原文上下文明确指 马半仙（称呼 '半仙'）"
+    },
+    {
+      "sample_id": "s022",
+      "start": 5162,
+      "end": 5164,
+      "surface": "半仙",
+      "chapter_index": 2,
+      "gold_id": "g033",
+      "note": "第2章/回原文上下文明确指 马半仙（称呼 '半仙'）"
+    },
+    {
+      "sample_id": "s023",
+      "start": 5230,
+      "end": 5233,
+      "surface": "马半仙",
+      "chapter_index": 2,
+      "gold_id": "g033",
+      "note": "第2章/回原文上下文明确指 马半仙（称呼 '马半仙'）"
+    },
+    {
+      "sample_id": "s024",
+      "start": 5286,
+      "end": 5289,
+      "surface": "凌贵兴",
+      "chapter_index": 3,
+      "gold_id": "g002",
+      "note": "第3章/回原文上下文明确指 凌贵兴（称呼 '凌贵兴'）"
+    },
+    {
+      "sample_id": "s025",
+      "start": 6814,
+      "end": 6816,
+      "surface": "南雄",
+      "chapter_index": 3,
+      "gold_id": "g041",
+      "note": "第3章/回原文上下文明确指 南雄（称呼 '南雄'）"
+    },
+    {
+      "sample_id": "s026",
+      "start": 7103,
+      "end": 7105,
+      "surface": "喜来",
+      "chapter_index": 3,
+      "gold_id": "g014",
+      "note": "第3章/回原文上下文明确指 喜来（称呼 '喜来'）"
+    },
+    {
+      "sample_id": "s027",
+      "start": 7277,
+      "end": 7281,
+      "surface": "宗孔叔叔",
+      "chapter_index": 3,
+      "gold_id": "g003",
+      "note": "第3章/回原文上下文明确指 凌宗孔（称呼 '宗孔叔叔'）"
+    },
+    {
+      "sample_id": "s028",
+      "start": 7308,
+      "end": 7312,
+      "surface": "宗孔叔叔",
+      "chapter_index": 3,
+      "gold_id": "g003",
+      "note": "第3章/回原文上下文明确指 凌宗孔（称呼 '宗孔叔叔'）"
+    },
+    {
+      "sample_id": "s029",
+      "start": 7566,
+      "end": 7569,
+      "surface": "马半仙",
+      "chapter_index": 3,
+      "gold_id": "g033",
+      "note": "第3章/回原文上下文明确指 马半仙（称呼 '马半仙'）"
+    },
+    {
+      "sample_id": "s030",
+      "start": 7576,
+      "end": 7578,
+      "surface": "半仙",
+      "chapter_index": 3,
+      "gold_id": "g033",
+      "note": "第3章/回原文上下文明确指 马半仙（称呼 '半仙'）"
+    },
+    {
+      "sample_id": "s031",
+      "start": 9363,
+      "end": 9366,
+      "surface": "马半仙",
+      "chapter_index": 4,
+      "gold_id": "g033",
+      "note": "第4章/回原文上下文明确指 马半仙（称呼 '马半仙'）"
+    },
+    {
+      "sample_id": "s032",
+      "start": 11180,
+      "end": 11183,
+      "surface": "马半仙",
+      "chapter_index": 4,
+      "gold_id": "g033",
+      "note": "第4章/回原文上下文明确指 马半仙（称呼 '马半仙'）"
+    },
+    {
+      "sample_id": "s033",
+      "start": 11334,
+      "end": 11336,
+      "surface": "宗孔",
+      "chapter_index": 4,
+      "gold_id": "g003",
+      "note": "第4章/回原文上下文明确指 凌宗孔（称呼 '宗孔'）"
+    },
+    {
+      "sample_id": "s034",
+      "start": 11593,
+      "end": 11595,
+      "surface": "半仙",
+      "chapter_index": 4,
+      "gold_id": "g033",
+      "note": "第4章/回原文上下文明确指 马半仙（称呼 '半仙'）"
+    },
+    {
+      "sample_id": "s035",
+      "start": 11681,
+      "end": 11683,
+      "surface": "半仙",
+      "chapter_index": 4,
+      "gold_id": "g033",
+      "note": "第4章/回原文上下文明确指 马半仙（称呼 '半仙'）"
+    },
+    {
+      "sample_id": "s036",
+      "start": 13767,
+      "end": 13770,
+      "surface": "马半仙",
+      "chapter_index": 5,
+      "gold_id": "g033",
+      "note": "第5章/回原文上下文明确指 马半仙（称呼 '马半仙'）"
+    },
+    {
+      "sample_id": "s037",
+      "start": 13931,
+      "end": 13933,
+      "surface": "祈伯",
+      "chapter_index": 5,
+      "gold_id": "g002",
+      "note": "第5章/回原文上下文明确指 凌贵兴（称呼 '祈伯'）"
+    },
+    {
+      "sample_id": "s038",
+      "start": 13990,
+      "end": 13992,
+      "surface": "祈伯",
+      "chapter_index": 5,
+      "gold_id": "g002",
+      "note": "第5章/回原文上下文明确指 凌贵兴（称呼 '祈伯'）"
+    },
+    {
+      "sample_id": "s039",
+      "start": 14898,
+      "end": 14900,
+      "surface": "祈伯",
+      "chapter_index": 5,
+      "gold_id": "g002",
+      "note": "第5章/回原文上下文明确指 凌贵兴（称呼 '祈伯'）"
+    },
+    {
+      "sample_id": "s040",
+      "start": 14978,
+      "end": 14980,
+      "surface": "宗孔",
+      "chapter_index": 5,
+      "gold_id": "g003",
+      "note": "第5章/回原文上下文明确指 凌宗孔（称呼 '宗孔'）"
+    },
+    {
+      "sample_id": "s041",
+      "start": 15519,
+      "end": 15521,
+      "surface": "南雄",
+      "chapter_index": 6,
+      "gold_id": "g041",
+      "note": "第6章/回原文上下文明确指 南雄（称呼 '南雄'）"
+    },
+    {
+      "sample_id": "s042",
+      "start": 15527,
+      "end": 15530,
+      "surface": "梁朝大",
+      "chapter_index": 6,
+      "gold_id": "g009",
+      "note": "第6章/回原文上下文明确指 梁朝大（称呼 '梁朝大'）"
+    },
+    {
+      "sample_id": "s043",
+      "start": 15564,
+      "end": 15566,
+      "surface": "省城",
+      "chapter_index": 6,
+      "gold_id": "g038",
+      "note": "第6章/回原文上下文明确指 省城（称呼 '省城'）"
+    },
+    {
+      "sample_id": "s044",
+      "start": 15700,
+      "end": 15703,
+      "surface": "梁朝大",
+      "chapter_index": 6,
+      "gold_id": "g009",
+      "note": "第6章/回原文上下文明确指 梁朝大（称呼 '梁朝大'）"
+    },
+    {
+      "sample_id": "s045",
+      "start": 16059,
+      "end": 16062,
+      "surface": "梁朝大",
+      "chapter_index": 6,
+      "gold_id": "g009",
+      "note": "第6章/回原文上下文明确指 梁朝大（称呼 '梁朝大'）"
+    },
+    {
+      "sample_id": "s046",
+      "start": 16117,
+      "end": 16119,
+      "surface": "凌氏",
+      "chapter_index": 6,
+      "gold_id": "g027",
+      "note": "第6章/回原文上下文明确指 梁母凌氏（称呼 '凌氏'）"
+    },
+    {
+      "sample_id": "s047",
+      "start": 16501,
+      "end": 16504,
+      "surface": "梁天来",
+      "chapter_index": 6,
+      "gold_id": "g001",
+      "note": "第6章/回原文上下文明确指 梁天来（称呼 '梁天来'）"
+    },
+    {
+      "sample_id": "s048",
+      "start": 17795,
+      "end": 17798,
+      "surface": "番禺县",
+      "chapter_index": 6,
+      "gold_id": "g035",
+      "note": "第6章/回原文上下文明确指 番禺县（称呼 '番禺县'）"
+    },
+    {
+      "sample_id": "s049",
+      "start": 17859,
+      "end": 17862,
+      "surface": "凌贵兴",
+      "chapter_index": 6,
+      "gold_id": "g002",
+      "note": "第6章/回原文上下文明确指 凌贵兴（称呼 '凌贵兴'）"
+    },
+    {
+      "sample_id": "s050",
+      "start": 18091,
+      "end": 18093,
+      "surface": "省城",
+      "chapter_index": 6,
+      "gold_id": "g038",
+      "note": "第6章/回原文上下文明确指 省城（称呼 '省城'）"
+    },
+    {
+      "sample_id": "s051",
+      "start": 18268,
+      "end": 18270,
+      "surface": "贵兴",
+      "chapter_index": 6,
+      "gold_id": "g002",
+      "note": "第6章/回原文上下文明确指 凌贵兴（称呼 '贵兴'）"
+    },
+    {
+      "sample_id": "s052",
+      "start": 18619,
+      "end": 18621,
+      "surface": "宗孔",
+      "chapter_index": 6,
+      "gold_id": "g003",
+      "note": "第6章/回原文上下文明确指 凌宗孔（称呼 '宗孔'）"
+    },
+    {
+      "sample_id": "s053",
+      "start": 18880,
+      "end": 18883,
+      "surface": "梁朝大",
+      "chapter_index": 7,
+      "gold_id": "g009",
+      "note": "第7章/回原文上下文明确指 梁朝大（称呼 '梁朝大'）"
+    },
+    {
+      "sample_id": "s054",
+      "start": 19446,
+      "end": 19449,
+      "surface": "凌宗孔",
+      "chapter_index": 7,
+      "gold_id": "g003",
+      "note": "第7章/回原文上下文明确指 凌宗孔（称呼 '凌宗孔'）"
+    },
+    {
+      "sample_id": "s055",
+      "start": 19827,
+      "end": 19829,
+      "surface": "大有",
+      "chapter_index": 7,
+      "gold_id": "not_entity",
+      "note": "第7回中‘大有如在其上’为汉语副词短语，非人物林大有"
+    },
+    {
+      "sample_id": "s056",
+      "start": 20071,
+      "end": 20074,
+      "surface": "区爵兴",
+      "chapter_index": 7,
+      "gold_id": "g004",
+      "note": "第7章/回原文上下文明确指 区爵兴（称呼 '区爵兴'）"
+    },
+    {
+      "sample_id": "s057",
+      "start": 20252,
+      "end": 20254,
+      "surface": "祈伯",
+      "chapter_index": 7,
+      "gold_id": "g002",
+      "note": "第7章/回原文上下文明确指 凌贵兴（称呼 '祈伯'）"
+    },
+    {
+      "sample_id": "s058",
+      "start": 20694,
+      "end": 20696,
+      "surface": "爵兴",
+      "chapter_index": 7,
+      "gold_id": "g004",
+      "note": "第7章/回原文上下文明确指 区爵兴（称呼 '爵兴'）"
+    },
+    {
+      "sample_id": "s059",
+      "start": 20933,
+      "end": 20935,
+      "surface": "凌氏",
+      "chapter_index": 7,
+      "gold_id": "g027",
+      "note": "第7章/回原文上下文明确指 梁母凌氏（称呼 '凌氏'）"
+    },
+    {
+      "sample_id": "s060",
+      "start": 22656,
+      "end": 22658,
+      "surface": "省城",
+      "chapter_index": 8,
+      "gold_id": "g038",
+      "note": "第8章/回原文上下文明确指 省城（称呼 '省城'）"
+    },
+    {
+      "sample_id": "s061",
+      "start": 26002,
+      "end": 26004,
+      "surface": "凌氏",
+      "chapter_index": 8,
+      "gold_id": "g027",
+      "note": "第8章/回原文上下文明确指 梁母凌氏（称呼 '凌氏'）"
+    },
+    {
+      "sample_id": "s062",
+      "start": 26692,
+      "end": 26694,
+      "surface": "凌氏",
+      "chapter_index": 9,
+      "gold_id": "g027",
+      "note": "第9章/回原文上下文明确指 梁母凌氏（称呼 '凌氏'）"
+    },
+    {
+      "sample_id": "s063",
+      "start": 27631,
+      "end": 27635,
+      "surface": "宗孔叔叔",
+      "chapter_index": 9,
+      "gold_id": "g003",
+      "note": "第9章/回原文上下文明确指 凌宗孔（称呼 '宗孔叔叔'）"
+    },
+    {
+      "sample_id": "s064",
+      "start": 27655,
+      "end": 27659,
+      "surface": "宗孔叔叔",
+      "chapter_index": 9,
+      "gold_id": "g003",
+      "note": "第9章/回原文上下文明确指 凌宗孔（称呼 '宗孔叔叔'）"
+    },
+    {
+      "sample_id": "s065",
+      "start": 27750,
+      "end": 27754,
+      "surface": "宗孔叔叔",
+      "chapter_index": 9,
+      "gold_id": "g003",
+      "note": "第9章/回原文上下文明确指 凌宗孔（称呼 '宗孔叔叔'）"
+    },
+    {
+      "sample_id": "s066",
+      "start": 27755,
+      "end": 27757,
+      "surface": "爵兴",
+      "chapter_index": 9,
+      "gold_id": "g004",
+      "note": "第9章/回原文上下文明确指 区爵兴（称呼 '爵兴'）"
+    },
+    {
+      "sample_id": "s067",
+      "start": 28963,
+      "end": 28965,
+      "surface": "翰昭",
+      "chapter_index": 9,
+      "gold_id": "g031",
+      "note": "第9章/回原文上下文明确指 梁翰昭（称呼 '翰昭'）"
+    },
+    {
+      "sample_id": "s068",
+      "start": 29022,
+      "end": 29025,
+      "surface": "凌贵兴",
+      "chapter_index": 9,
+      "gold_id": "g002",
+      "note": "第9章/回原文上下文明确指 凌贵兴（称呼 '凌贵兴'）"
+    },
+    {
+      "sample_id": "s069",
+      "start": 29189,
+      "end": 29191,
+      "surface": "凌氏",
+      "chapter_index": 9,
+      "gold_id": "g027",
+      "note": "第9章/回原文上下文明确指 梁母凌氏（称呼 '凌氏'）"
+    },
+    {
+      "sample_id": "s070",
+      "start": 32285,
+      "end": 32287,
+      "surface": "喜来",
+      "chapter_index": 10,
+      "gold_id": "g014",
+      "note": "第10章/回原文上下文明确指 喜来（称呼 '喜来'）"
+    },
+    {
+      "sample_id": "s071",
+      "start": 32481,
+      "end": 32483,
+      "surface": "喜来",
+      "chapter_index": 10,
+      "gold_id": "g014",
+      "note": "第10章/回原文上下文明确指 喜来（称呼 '喜来'）"
+    },
+    {
+      "sample_id": "s072",
+      "start": 33082,
+      "end": 33084,
+      "surface": "喜来",
+      "chapter_index": 10,
+      "gold_id": "g014",
+      "note": "第10章/回原文上下文明确指 喜来（称呼 '喜来'）"
+    },
+    {
+      "sample_id": "s073",
+      "start": 33331,
+      "end": 33334,
+      "surface": "区爵兴",
+      "chapter_index": 11,
+      "gold_id": "g004",
+      "note": "第11章/回原文上下文明确指 区爵兴（称呼 '区爵兴'）"
+    },
+    {
+      "sample_id": "s074",
+      "start": 33352,
+      "end": 33354,
+      "surface": "喜来",
+      "chapter_index": 11,
+      "gold_id": "g014",
+      "note": "第11章/回原文上下文明确指 喜来（称呼 '喜来'）"
+    },
+    {
+      "sample_id": "s075",
+      "start": 34942,
+      "end": 34944,
+      "surface": "爵兴",
+      "chapter_index": 11,
+      "gold_id": "g004",
+      "note": "第11章/回原文上下文明确指 区爵兴（称呼 '爵兴'）"
+    },
+    {
+      "sample_id": "s076",
+      "start": 37045,
+      "end": 37048,
+      "surface": "梁翰昭",
+      "chapter_index": 12,
+      "gold_id": "g031",
+      "note": "第12章/回原文上下文明确指 梁翰昭（称呼 '梁翰昭'）"
+    },
+    {
+      "sample_id": "s077",
+      "start": 37526,
+      "end": 37528,
+      "surface": "凌氏",
+      "chapter_index": 12,
+      "gold_id": "g027",
+      "note": "第12章/回原文上下文明确指 梁母凌氏（称呼 '凌氏'）"
+    },
+    {
+      "sample_id": "s078",
+      "start": 37612,
+      "end": 37614,
+      "surface": "贵兴",
+      "chapter_index": 12,
+      "gold_id": "g002",
+      "note": "第12章/回原文上下文明确指 凌贵兴（称呼 '贵兴'）"
+    },
+    {
+      "sample_id": "s079",
+      "start": 38272,
+      "end": 38274,
+      "surface": "翰昭",
+      "chapter_index": 12,
+      "gold_id": "g031",
+      "note": "第12章/回原文上下文明确指 梁翰昭（称呼 '翰昭'）"
+    },
+    {
+      "sample_id": "s080",
+      "start": 38342,
+      "end": 38344,
+      "surface": "翰昭",
+      "chapter_index": 12,
+      "gold_id": "g031",
+      "note": "第12章/回原文上下文明确指 梁翰昭（称呼 '翰昭'）"
+    },
+    {
+      "sample_id": "s081",
+      "start": 38375,
+      "end": 38377,
+      "surface": "翰昭",
+      "chapter_index": 12,
+      "gold_id": "g031",
+      "note": "第12章/回原文上下文明确指 梁翰昭（称呼 '翰昭'）"
+    },
+    {
+      "sample_id": "s082",
+      "start": 38465,
+      "end": 38467,
+      "surface": "翰昭",
+      "chapter_index": 12,
+      "gold_id": "g031",
+      "note": "第12章/回原文上下文明确指 梁翰昭（称呼 '翰昭'）"
+    },
+    {
+      "sample_id": "s083",
+      "start": 40547,
+      "end": 40549,
+      "surface": "天来",
+      "chapter_index": 13,
+      "gold_id": "g001",
+      "note": "第13章/回原文上下文明确指 梁天来（称呼 '天来'）"
+    },
+    {
+      "sample_id": "s084",
+      "start": 40782,
+      "end": 40785,
+      "surface": "梁天来",
+      "chapter_index": 13,
+      "gold_id": "g001",
+      "note": "第13章/回原文上下文明确指 梁天来（称呼 '梁天来'）"
+    },
+    {
+      "sample_id": "s085",
+      "start": 41125,
+      "end": 41128,
+      "surface": "区爵兴",
+      "chapter_index": 13,
+      "gold_id": "g004",
+      "note": "第13章/回原文上下文明确指 区爵兴（称呼 '区爵兴'）"
+    },
+    {
+      "sample_id": "s086",
+      "start": 41970,
+      "end": 41973,
+      "surface": "梁天来",
+      "chapter_index": 13,
+      "gold_id": "g001",
+      "note": "第13章/回原文上下文明确指 梁天来（称呼 '梁天来'）"
+    },
+    {
+      "sample_id": "s087",
+      "start": 42202,
+      "end": 42204,
+      "surface": "省城",
+      "chapter_index": 13,
+      "gold_id": "g038",
+      "note": "第13章/回原文上下文明确指 省城（称呼 '省城'）"
+    },
+    {
+      "sample_id": "s088",
+      "start": 43238,
+      "end": 43240,
+      "surface": "大有",
+      "chapter_index": 14,
+      "gold_id": "g005",
+      "note": "第14回指聚仙馆凶徒首领林大有"
+    },
+    {
+      "sample_id": "s089",
+      "start": 43541,
+      "end": 43543,
+      "surface": "大有",
+      "chapter_index": 14,
+      "gold_id": "not_entity",
+      "note": "第14回中‘大有关系。所’为汉语副词短语，非人物林大有"
+    },
+    {
+      "sample_id": "s090",
+      "start": 43787,
+      "end": 43789,
+      "surface": "省城",
+      "chapter_index": 14,
+      "gold_id": "g038",
+      "note": "第14章/回原文上下文明确指 省城（称呼 '省城'）"
+    },
+    {
+      "sample_id": "s091",
+      "start": 44019,
+      "end": 44021,
+      "surface": "大有",
+      "chapter_index": 14,
+      "gold_id": "g005",
+      "note": "第14回指聚仙馆凶徒首领林大有"
+    },
+    {
+      "sample_id": "s092",
+      "start": 44282,
+      "end": 44284,
+      "surface": "大有",
+      "chapter_index": 14,
+      "gold_id": "g005",
+      "note": "第14回指聚仙馆凶徒首领林大有"
+    },
+    {
+      "sample_id": "s093",
+      "start": 44383,
+      "end": 44385,
+      "surface": "大有",
+      "chapter_index": 14,
+      "gold_id": "g005",
+      "note": "第14回指聚仙馆凶徒首领林大有"
+    },
+    {
+      "sample_id": "s094",
+      "start": 44505,
+      "end": 44508,
+      "surface": "林大有",
+      "chapter_index": 14,
+      "gold_id": "g005",
+      "note": "第14章/回原文上下文明确指 林大有（称呼 '林大有'）"
+    },
+    {
+      "sample_id": "s095",
+      "start": 44555,
+      "end": 44557,
+      "surface": "大有",
+      "chapter_index": 14,
+      "gold_id": "g005",
+      "note": "第14回指聚仙馆凶徒首领林大有"
+    },
+    {
+      "sample_id": "s096",
+      "start": 44700,
+      "end": 44703,
+      "surface": "林大哥",
+      "chapter_index": 14,
+      "gold_id": "g005",
+      "note": "第14章/回原文上下文明确指 林大有（称呼 '林大哥'）"
+    },
+    {
+      "sample_id": "s097",
+      "start": 44811,
+      "end": 44814,
+      "surface": "简勒先",
+      "chapter_index": 14,
+      "gold_id": "g007",
+      "note": "第14章/回原文上下文明确指 简勒先（称呼 '简勒先'）"
+    },
+    {
+      "sample_id": "s098",
+      "start": 44837,
+      "end": 44840,
+      "surface": "番禺县",
+      "chapter_index": 14,
+      "gold_id": "g035",
+      "note": "第14章/回原文上下文明确指 番禺县（称呼 '番禺县'）"
+    },
+    {
+      "sample_id": "s099",
+      "start": 44927,
+      "end": 44930,
+      "surface": "简勒先",
+      "chapter_index": 14,
+      "gold_id": "g007",
+      "note": "第14章/回原文上下文明确指 简勒先（称呼 '简勒先'）"
+    },
+    {
+      "sample_id": "s100",
+      "start": 45234,
+      "end": 45236,
+      "surface": "大有",
+      "chapter_index": 14,
+      "gold_id": "g005",
+      "note": "第14回指聚仙馆凶徒首领林大有"
+    },
+    {
+      "sample_id": "s101",
+      "start": 45320,
+      "end": 45323,
+      "surface": "林大有",
+      "chapter_index": 14,
+      "gold_id": "g005",
+      "note": "第14章/回原文上下文明确指 林大有（称呼 '林大有'）"
+    },
+    {
+      "sample_id": "s102",
+      "start": 45467,
+      "end": 45470,
+      "surface": "简勒先",
+      "chapter_index": 14,
+      "gold_id": "g007",
+      "note": "第14章/回原文上下文明确指 简勒先（称呼 '简勒先'）"
+    },
+    {
+      "sample_id": "s103",
+      "start": 46725,
+      "end": 46727,
+      "surface": "大有",
+      "chapter_index": 15,
+      "gold_id": "g005",
+      "note": "第15回指聚仙馆凶徒首领林大有"
+    },
+    {
+      "sample_id": "s104",
+      "start": 47210,
+      "end": 47212,
+      "surface": "祈伯",
+      "chapter_index": 15,
+      "gold_id": "g002",
+      "note": "第15章/回原文上下文明确指 凌贵兴（称呼 '祈伯'）"
+    },
+    {
+      "sample_id": "s105",
+      "start": 47374,
+      "end": 47376,
+      "surface": "省城",
+      "chapter_index": 15,
+      "gold_id": "g038",
+      "note": "第15章/回原文上下文明确指 省城（称呼 '省城'）"
+    },
+    {
+      "sample_id": "s106",
+      "start": 47476,
+      "end": 47478,
+      "surface": "宗孔",
+      "chapter_index": 15,
+      "gold_id": "g003",
+      "note": "第15章/回原文上下文明确指 凌宗孔（称呼 '宗孔'）"
+    },
+    {
+      "sample_id": "s107",
+      "start": 47653,
+      "end": 47656,
+      "surface": "林大有",
+      "chapter_index": 15,
+      "gold_id": "g005",
+      "note": "第15章/回原文上下文明确指 林大有（称呼 '林大有'）"
+    },
+    {
+      "sample_id": "s108",
+      "start": 47973,
+      "end": 47975,
+      "surface": "祈伯",
+      "chapter_index": 15,
+      "gold_id": "g002",
+      "note": "第15章/回原文上下文明确指 凌贵兴（称呼 '祈伯'）"
+    },
+    {
+      "sample_id": "s109",
+      "start": 48009,
+      "end": 48012,
+      "surface": "林大哥",
+      "chapter_index": 15,
+      "gold_id": "g005",
+      "note": "第15章/回原文上下文明确指 林大有（称呼 '林大哥'）"
+    },
+    {
+      "sample_id": "s110",
+      "start": 48411,
+      "end": 48413,
+      "surface": "贵兴",
+      "chapter_index": 15,
+      "gold_id": "g002",
+      "note": "第15章/回原文上下文明确指 凌贵兴（称呼 '贵兴'）"
+    },
+    {
+      "sample_id": "s111",
+      "start": 50229,
+      "end": 50231,
+      "surface": "天来",
+      "chapter_index": 15,
+      "gold_id": "g001",
+      "note": "第15章/回原文上下文明确指 梁天来（称呼 '天来'）"
+    },
+    {
+      "sample_id": "s112",
+      "start": 50256,
+      "end": 50259,
+      "surface": "区爵兴",
+      "chapter_index": 16,
+      "gold_id": "g004",
+      "note": "第16章/回原文上下文明确指 区爵兴（称呼 '区爵兴'）"
+    },
+    {
+      "sample_id": "s113",
+      "start": 50266,
+      "end": 50269,
+      "surface": "凌祈伯",
+      "chapter_index": 16,
+      "gold_id": "g002",
+      "note": "第16章/回原文上下文明确指 凌贵兴（称呼 '凌祈伯'）"
+    },
+    {
+      "sample_id": "s114",
+      "start": 50362,
+      "end": 50365,
+      "surface": "梁天来",
+      "chapter_index": 16,
+      "gold_id": "g001",
+      "note": "第16章/回原文上下文明确指 梁天来（称呼 '梁天来'）"
+    },
+    {
+      "sample_id": "s115",
+      "start": 50773,
+      "end": 50776,
+      "surface": "凌贵兴",
+      "chapter_index": 16,
+      "gold_id": "g002",
+      "note": "第16章/回原文上下文明确指 凌贵兴（称呼 '凌贵兴'）"
+    },
+    {
+      "sample_id": "s116",
+      "start": 50784,
+      "end": 50786,
+      "surface": "张凤",
+      "chapter_index": 16,
+      "gold_id": "g006",
+      "note": "第16章/回原文上下文明确指 张凤（称呼 '张凤'）"
+    },
+    {
+      "sample_id": "s117",
+      "start": 50962,
+      "end": 50964,
+      "surface": "张凤",
+      "chapter_index": 16,
+      "gold_id": "g006",
+      "note": "第16章/回原文上下文明确指 张凤（称呼 '张凤'）"
+    },
+    {
+      "sample_id": "s118",
+      "start": 51455,
+      "end": 51457,
+      "surface": "张凤",
+      "chapter_index": 16,
+      "gold_id": "g006",
+      "note": "第16章/回原文上下文明确指 张凤（称呼 '张凤'）"
+    },
+    {
+      "sample_id": "s119",
+      "start": 52705,
+      "end": 52708,
+      "surface": "林大有",
+      "chapter_index": 16,
+      "gold_id": "g005",
+      "note": "第16章/回原文上下文明确指 林大有（称呼 '林大有'）"
+    },
+    {
+      "sample_id": "s120",
+      "start": 52820,
+      "end": 52822,
+      "surface": "勒先",
+      "chapter_index": 16,
+      "gold_id": "g007",
+      "note": "第16章/回原文上下文明确指 简勒先（称呼 '勒先'）"
+    },
+    {
+      "sample_id": "s121",
+      "start": 54268,
+      "end": 54270,
+      "surface": "大有",
+      "chapter_index": 17,
+      "gold_id": "not_entity",
+      "note": "第17回‘老太大有甚么一长二短’为‘老太太/大有’跨词切分，非林大有"
+    },
+    {
+      "sample_id": "s122",
+      "start": 56038,
+      "end": 56041,
+      "surface": "番禺县",
+      "chapter_index": 17,
+      "gold_id": "g035",
+      "note": "第17章/回原文上下文明确指 番禺县（称呼 '番禺县'）"
+    },
+    {
+      "sample_id": "s123",
+      "start": 56272,
+      "end": 56275,
+      "surface": "黄知县",
+      "chapter_index": 17,
+      "gold_id": "g017",
+      "note": "第17章/回原文上下文明确指 黄知县（称呼 '黄知县'）"
+    },
+    {
+      "sample_id": "s124",
+      "start": 56313,
+      "end": 56316,
+      "surface": "黄知县",
+      "chapter_index": 17,
+      "gold_id": "g017",
+      "note": "第17章/回原文上下文明确指 黄知县（称呼 '黄知县'）"
+    },
+    {
+      "sample_id": "s125",
+      "start": 56379,
+      "end": 56382,
+      "surface": "黄知县",
+      "chapter_index": 17,
+      "gold_id": "g017",
+      "note": "第17章/回原文上下文明确指 黄知县（称呼 '黄知县'）"
+    },
+    {
+      "sample_id": "s126",
+      "start": 56935,
+      "end": 56938,
+      "surface": "黄知县",
+      "chapter_index": 17,
+      "gold_id": "g017",
+      "note": "第17章/回原文上下文明确指 黄知县（称呼 '黄知县'）"
+    },
+    {
+      "sample_id": "s127",
+      "start": 56999,
+      "end": 57002,
+      "surface": "黄知县",
+      "chapter_index": 17,
+      "gold_id": "g017",
+      "note": "第17章/回原文上下文明确指 黄知县（称呼 '黄知县'）"
+    },
+    {
+      "sample_id": "s128",
+      "start": 57059,
+      "end": 57062,
+      "surface": "黄知县",
+      "chapter_index": 17,
+      "gold_id": "g017",
+      "note": "第17章/回原文上下文明确指 黄知县（称呼 '黄知县'）"
+    },
+    {
+      "sample_id": "s129",
+      "start": 57246,
+      "end": 57249,
+      "surface": "张阿凤",
+      "chapter_index": 18,
+      "gold_id": "g006",
+      "note": "第18章/回原文上下文明确指 张凤（称呼 '张阿凤'）"
+    },
+    {
+      "sample_id": "s130",
+      "start": 57254,
+      "end": 57257,
+      "surface": "施智伯",
+      "chapter_index": 18,
+      "gold_id": "g010",
+      "note": "第18章/回原文上下文明确指 施智伯（称呼 '施智伯'）"
+    },
+    {
+      "sample_id": "s131",
+      "start": 57432,
+      "end": 57434,
+      "surface": "勒先",
+      "chapter_index": 18,
+      "gold_id": "g007",
+      "note": "第18章/回原文上下文明确指 简勒先（称呼 '勒先'）"
+    },
+    {
+      "sample_id": "s132",
+      "start": 57504,
+      "end": 57506,
+      "surface": "喜来",
+      "chapter_index": 18,
+      "gold_id": "g014",
+      "note": "第18章/回原文上下文明确指 喜来（称呼 '喜来'）"
+    },
+    {
+      "sample_id": "s133",
+      "start": 57803,
+      "end": 57805,
+      "surface": "爵兴",
+      "chapter_index": 18,
+      "gold_id": "g004",
+      "note": "第18章/回原文上下文明确指 区爵兴（称呼 '爵兴'）"
+    },
+    {
+      "sample_id": "s134",
+      "start": 57872,
+      "end": 57875,
+      "surface": "简勒先",
+      "chapter_index": 18,
+      "gold_id": "g007",
+      "note": "第18章/回原文上下文明确指 简勒先（称呼 '简勒先'）"
+    },
+    {
+      "sample_id": "s135",
+      "start": 58478,
+      "end": 58481,
+      "surface": "番禺县",
+      "chapter_index": 18,
+      "gold_id": "g035",
+      "note": "第18章/回原文上下文明确指 番禺县（称呼 '番禺县'）"
+    },
+    {
+      "sample_id": "s136",
+      "start": 59305,
+      "end": 59307,
+      "surface": "凌氏",
+      "chapter_index": 18,
+      "gold_id": "g027",
+      "note": "第18章/回原文上下文明确指 梁母凌氏（称呼 '凌氏'）"
+    },
+    {
+      "sample_id": "s137",
+      "start": 59332,
+      "end": 59334,
+      "surface": "张凤",
+      "chapter_index": 18,
+      "gold_id": "g006",
+      "note": "第18章/回原文上下文明确指 张凤（称呼 '张凤'）"
+    },
+    {
+      "sample_id": "s138",
+      "start": 59902,
+      "end": 59904,
+      "surface": "智伯",
+      "chapter_index": 18,
+      "gold_id": "g010",
+      "note": "第18章/回原文上下文明确指 施智伯（称呼 '智伯'）"
+    },
+    {
+      "sample_id": "s139",
+      "start": 60317,
+      "end": 60319,
+      "surface": "贵兴",
+      "chapter_index": 18,
+      "gold_id": "g002",
+      "note": "第18章/回原文上下文明确指 凌贵兴（称呼 '贵兴'）"
+    },
+    {
+      "sample_id": "s140",
+      "start": 60880,
+      "end": 60882,
+      "surface": "智伯",
+      "chapter_index": 18,
+      "gold_id": "g010",
+      "note": "第18章/回原文上下文明确指 施智伯（称呼 '智伯'）"
+    },
+    {
+      "sample_id": "s141",
+      "start": 60913,
+      "end": 60915,
+      "surface": "勒先",
+      "chapter_index": 19,
+      "gold_id": "g007",
+      "note": "第19章/回原文上下文明确指 简勒先（称呼 '勒先'）"
+    },
+    {
+      "sample_id": "s142",
+      "start": 60935,
+      "end": 60937,
+      "surface": "智伯",
+      "chapter_index": 19,
+      "gold_id": "g010",
+      "note": "第19章/回原文上下文明确指 施智伯（称呼 '智伯'）"
+    },
+    {
+      "sample_id": "s143",
+      "start": 61098,
+      "end": 61100,
+      "surface": "智伯",
+      "chapter_index": 19,
+      "gold_id": "g010",
+      "note": "第19章/回原文上下文明确指 施智伯（称呼 '智伯'）"
+    },
+    {
+      "sample_id": "s144",
+      "start": 61277,
+      "end": 61279,
+      "surface": "天来",
+      "chapter_index": 19,
+      "gold_id": "g001",
+      "note": "第19章/回原文上下文明确指 梁天来（称呼 '天来'）"
+    },
+    {
+      "sample_id": "s145",
+      "start": 61724,
+      "end": 61727,
+      "surface": "黄知县",
+      "chapter_index": 19,
+      "gold_id": "g017",
+      "note": "第19章/回原文上下文明确指 黄知县（称呼 '黄知县'）"
+    },
+    {
+      "sample_id": "s146",
+      "start": 61995,
+      "end": 61998,
+      "surface": "区爵兴",
+      "chapter_index": 19,
+      "gold_id": "g004",
+      "note": "第19章/回原文上下文明确指 区爵兴（称呼 '区爵兴'）"
+    },
+    {
+      "sample_id": "s147",
+      "start": 63816,
+      "end": 63819,
+      "surface": "黄知县",
+      "chapter_index": 19,
+      "gold_id": "g017",
+      "note": "第19章/回原文上下文明确指 黄知县（称呼 '黄知县'）"
+    },
+    {
+      "sample_id": "s148",
+      "start": 64129,
+      "end": 64132,
+      "surface": "简勒先",
+      "chapter_index": 19,
+      "gold_id": "g007",
+      "note": "第19章/回原文上下文明确指 简勒先（称呼 '简勒先'）"
+    },
+    {
+      "sample_id": "s149",
+      "start": 65445,
+      "end": 65448,
+      "surface": "黄知县",
+      "chapter_index": 20,
+      "gold_id": "g017",
+      "note": "第20章/回原文上下文明确指 黄知县（称呼 '黄知县'）"
+    },
+    {
+      "sample_id": "s150",
+      "start": 67598,
+      "end": 67601,
+      "surface": "黄知县",
+      "chapter_index": 20,
+      "gold_id": "g017",
+      "note": "第20章/回原文上下文明确指 黄知县（称呼 '黄知县'）"
+    },
+    {
+      "sample_id": "s151",
+      "start": 68567,
+      "end": 68569,
+      "surface": "勒先",
+      "chapter_index": 21,
+      "gold_id": "g007",
+      "note": "第21章/回原文上下文明确指 简勒先（称呼 '勒先'）"
+    },
+    {
+      "sample_id": "s152",
+      "start": 69971,
+      "end": 69973,
+      "surface": "朝大",
+      "chapter_index": 21,
+      "gold_id": "g009",
+      "note": "第21章/回原文上下文明确指 梁朝大（称呼 '朝大'）"
+    },
+    {
+      "sample_id": "s153",
+      "start": 69999,
+      "end": 70001,
+      "surface": "朝大",
+      "chapter_index": 21,
+      "gold_id": "g009",
+      "note": "第21章/回原文上下文明确指 梁朝大（称呼 '朝大'）"
+    },
+    {
+      "sample_id": "s154",
+      "start": 70467,
+      "end": 70470,
+      "surface": "凌贵兴",
+      "chapter_index": 21,
+      "gold_id": "g002",
+      "note": "第21章/回原文上下文明确指 凌贵兴（称呼 '凌贵兴'）"
+    },
+    {
+      "sample_id": "s155",
+      "start": 70482,
+      "end": 70485,
+      "surface": "梁翰昭",
+      "chapter_index": 21,
+      "gold_id": "g031",
+      "note": "第21章/回原文上下文明确指 梁翰昭（称呼 '梁翰昭'）"
+    },
+    {
+      "sample_id": "s156",
+      "start": 70516,
+      "end": 70519,
+      "surface": "黄知县",
+      "chapter_index": 21,
+      "gold_id": "g017",
+      "note": "第21章/回原文上下文明确指 黄知县（称呼 '黄知县'）"
+    },
+    {
+      "sample_id": "s157",
+      "start": 70588,
+      "end": 70590,
+      "surface": "翰昭",
+      "chapter_index": 21,
+      "gold_id": "g031",
+      "note": "第21章/回原文上下文明确指 梁翰昭（称呼 '翰昭'）"
+    },
+    {
+      "sample_id": "s158",
+      "start": 70961,
+      "end": 70963,
+      "surface": "张凤",
+      "chapter_index": 21,
+      "gold_id": "g006",
+      "note": "第21章/回原文上下文明确指 张凤（称呼 '张凤'）"
+    },
+    {
+      "sample_id": "s159",
+      "start": 71072,
+      "end": 71074,
+      "surface": "翰昭",
+      "chapter_index": 21,
+      "gold_id": "g031",
+      "note": "第21章/回原文上下文明确指 梁翰昭（称呼 '翰昭'）"
+    },
+    {
+      "sample_id": "s160",
+      "start": 71166,
+      "end": 71168,
+      "surface": "翰昭",
+      "chapter_index": 21,
+      "gold_id": "g031",
+      "note": "第21章/回原文上下文明确指 梁翰昭（称呼 '翰昭'）"
+    },
+    {
+      "sample_id": "s161",
+      "start": 71298,
+      "end": 71300,
+      "surface": "天来",
+      "chapter_index": 21,
+      "gold_id": "g001",
+      "note": "第21章/回原文上下文明确指 梁天来（称呼 '天来'）"
+    },
+    {
+      "sample_id": "s162",
+      "start": 71391,
+      "end": 71394,
+      "surface": "张阿凤",
+      "chapter_index": 22,
+      "gold_id": "g006",
+      "note": "第22章/回原文上下文明确指 张凤（称呼 '张阿凤'）"
+    },
+    {
+      "sample_id": "s163",
+      "start": 71581,
+      "end": 71583,
+      "surface": "天来",
+      "chapter_index": 22,
+      "gold_id": "g001",
+      "note": "第22章/回原文上下文明确指 梁天来（称呼 '天来'）"
+    },
+    {
+      "sample_id": "s164",
+      "start": 72169,
+      "end": 72171,
+      "surface": "阿凤",
+      "chapter_index": 22,
+      "gold_id": "g006",
+      "note": "第22章/回原文上下文明确指 张凤（称呼 '阿凤'）"
+    },
+    {
+      "sample_id": "s165",
+      "start": 72228,
+      "end": 72230,
+      "surface": "宗孔",
+      "chapter_index": 22,
+      "gold_id": "g003",
+      "note": "第22章/回原文上下文明确指 凌宗孔（称呼 '宗孔'）"
+    },
+    {
+      "sample_id": "s166",
+      "start": 72471,
+      "end": 72473,
+      "surface": "张凤",
+      "chapter_index": 22,
+      "gold_id": "g006",
+      "note": "第22章/回原文上下文明确指 张凤（称呼 '张凤'）"
+    },
+    {
+      "sample_id": "s167",
+      "start": 72494,
+      "end": 72496,
+      "surface": "阿凤",
+      "chapter_index": 22,
+      "gold_id": "g006",
+      "note": "第22章/回原文上下文明确指 张凤（称呼 '阿凤'）"
+    },
+    {
+      "sample_id": "s168",
+      "start": 72585,
+      "end": 72587,
+      "surface": "勒先",
+      "chapter_index": 22,
+      "gold_id": "g007",
+      "note": "第22章/回原文上下文明确指 简勒先（称呼 '勒先'）"
+    },
+    {
+      "sample_id": "s169",
+      "start": 72651,
+      "end": 72653,
+      "surface": "阿凤",
+      "chapter_index": 22,
+      "gold_id": "g006",
+      "note": "第22章/回原文上下文明确指 张凤（称呼 '阿凤'）"
+    },
+    {
+      "sample_id": "s170",
+      "start": 73094,
+      "end": 73097,
+      "surface": "施智伯",
+      "chapter_index": 22,
+      "gold_id": "g010",
+      "note": "第22章/回原文上下文明确指 施智伯（称呼 '施智伯'）"
+    },
+    {
+      "sample_id": "s171",
+      "start": 73304,
+      "end": 73306,
+      "surface": "张凤",
+      "chapter_index": 22,
+      "gold_id": "g006",
+      "note": "第22章/回原文上下文明确指 张凤（称呼 '张凤'）"
+    },
+    {
+      "sample_id": "s172",
+      "start": 73496,
+      "end": 73499,
+      "surface": "番禺县",
+      "chapter_index": 22,
+      "gold_id": "g035",
+      "note": "第22章/回原文上下文明确指 番禺县（称呼 '番禺县'）"
+    },
+    {
+      "sample_id": "s173",
+      "start": 75536,
+      "end": 75539,
+      "surface": "梁天来",
+      "chapter_index": 23,
+      "gold_id": "g001",
+      "note": "第23章/回原文上下文明确指 梁天来（称呼 '梁天来'）"
+    },
+    {
+      "sample_id": "s174",
+      "start": 75797,
+      "end": 75800,
+      "surface": "施智伯",
+      "chapter_index": 23,
+      "gold_id": "g010",
+      "note": "第23章/回原文上下文明确指 施智伯（称呼 '施智伯'）"
+    },
+    {
+      "sample_id": "s175",
+      "start": 75986,
+      "end": 75988,
+      "surface": "大有",
+      "chapter_index": 23,
+      "gold_id": "g005",
+      "note": "第23回指聚仙馆凶徒首领林大有"
+    },
+    {
+      "sample_id": "s176",
+      "start": 76155,
+      "end": 76157,
+      "surface": "大有",
+      "chapter_index": 23,
+      "gold_id": "g005",
+      "note": "第23回指聚仙馆凶徒首领林大有"
+    },
+    {
+      "sample_id": "s177",
+      "start": 76387,
+      "end": 76389,
+      "surface": "大有",
+      "chapter_index": 23,
+      "gold_id": "g005",
+      "note": "第23回指聚仙馆凶徒首领林大有"
+    },
+    {
+      "sample_id": "s178",
+      "start": 77746,
+      "end": 77748,
+      "surface": "张凤",
+      "chapter_index": 23,
+      "gold_id": "g006",
+      "note": "第23章/回原文上下文明确指 张凤（称呼 '张凤'）"
+    },
+    {
+      "sample_id": "s179",
+      "start": 78156,
+      "end": 78159,
+      "surface": "施智伯",
+      "chapter_index": 24,
+      "gold_id": "g010",
+      "note": "第24章/回原文上下文明确指 施智伯（称呼 '施智伯'）"
+    },
+    {
+      "sample_id": "s180",
+      "start": 78453,
+      "end": 78456,
+      "surface": "施智伯",
+      "chapter_index": 24,
+      "gold_id": "g010",
+      "note": "第24章/回原文上下文明确指 施智伯（称呼 '施智伯'）"
+    },
+    {
+      "sample_id": "s181",
+      "start": 79069,
+      "end": 79071,
+      "surface": "智伯",
+      "chapter_index": 24,
+      "gold_id": "g010",
+      "note": "第24章/回原文上下文明确指 施智伯（称呼 '智伯'）"
+    },
+    {
+      "sample_id": "s182",
+      "start": 80132,
+      "end": 80135,
+      "surface": "番禺县",
+      "chapter_index": 24,
+      "gold_id": "g035",
+      "note": "第24章/回原文上下文明确指 番禺县（称呼 '番禺县'）"
+    },
+    {
+      "sample_id": "s183",
+      "start": 81354,
+      "end": 81356,
+      "surface": "李丰",
+      "chapter_index": 24,
+      "gold_id": "g013",
+      "note": "第24章/回原文上下文明确指 李丰（称呼 '李丰'）"
+    },
+    {
+      "sample_id": "s184",
+      "start": 81580,
+      "end": 81582,
+      "surface": "李丰",
+      "chapter_index": 24,
+      "gold_id": "g013",
+      "note": "第24章/回原文上下文明确指 李丰（称呼 '李丰'）"
+    },
+    {
+      "sample_id": "s185",
+      "start": 81644,
+      "end": 81646,
+      "surface": "智伯",
+      "chapter_index": 25,
+      "gold_id": "g010",
+      "note": "第25章/回原文上下文明确指 施智伯（称呼 '智伯'）"
+    },
+    {
+      "sample_id": "s186",
+      "start": 82381,
+      "end": 82383,
+      "surface": "智伯",
+      "chapter_index": 25,
+      "gold_id": "g010",
+      "note": "第25章/回原文上下文明确指 施智伯（称呼 '智伯'）"
+    },
+    {
+      "sample_id": "s187",
+      "start": 82742,
+      "end": 82745,
+      "surface": "孔大人",
+      "chapter_index": 25,
+      "gold_id": "g022",
+      "note": "第25章/回原文上下文明确指 孔大鹏（称呼 '孔大人'）"
+    },
+    {
+      "sample_id": "s188",
+      "start": 83174,
+      "end": 83176,
+      "surface": "凌氏",
+      "chapter_index": 25,
+      "gold_id": "g027",
+      "note": "第25章/回原文上下文明确指 梁母凌氏（称呼 '凌氏'）"
+    },
+    {
+      "sample_id": "s189",
+      "start": 83240,
+      "end": 83243,
+      "surface": "施智伯",
+      "chapter_index": 25,
+      "gold_id": "g010",
+      "note": "第25章/回原文上下文明确指 施智伯（称呼 '施智伯'）"
+    },
+    {
+      "sample_id": "s190",
+      "start": 83354,
+      "end": 83356,
+      "surface": "智伯",
+      "chapter_index": 25,
+      "gold_id": "g010",
+      "note": "第25章/回原文上下文明确指 施智伯（称呼 '智伯'）"
+    },
+    {
+      "sample_id": "s191",
+      "start": 83858,
+      "end": 83861,
+      "surface": "孔大人",
+      "chapter_index": 25,
+      "gold_id": "g022",
+      "note": "第25章/回原文上下文明确指 孔大鹏（称呼 '孔大人'）"
+    },
+    {
+      "sample_id": "s192",
+      "start": 83926,
+      "end": 83929,
+      "surface": "孔大人",
+      "chapter_index": 25,
+      "gold_id": "g022",
+      "note": "第25章/回原文上下文明确指 孔大鹏（称呼 '孔大人'）"
+    },
+    {
+      "sample_id": "s193",
+      "start": 84403,
+      "end": 84406,
+      "surface": "孔制台",
+      "chapter_index": 25,
+      "gold_id": "g022",
+      "note": "第25章/回原文上下文明确指 孔大鹏（称呼 '孔制台'）"
+    },
+    {
+      "sample_id": "s194",
+      "start": 84647,
+      "end": 84650,
+      "surface": "孔制台",
+      "chapter_index": 25,
+      "gold_id": "g022",
+      "note": "第25章/回原文上下文明确指 孔大鹏（称呼 '孔制台'）"
+    },
+    {
+      "sample_id": "s195",
+      "start": 85242,
+      "end": 85245,
+      "surface": "孔制台",
+      "chapter_index": 25,
+      "gold_id": "g022",
+      "note": "第25章/回原文上下文明确指 孔大鹏（称呼 '孔制台'）"
+    },
+    {
+      "sample_id": "s196",
+      "start": 85268,
+      "end": 85270,
+      "surface": "大有",
+      "chapter_index": 26,
+      "gold_id": "g005",
+      "note": "第26回指聚仙馆凶徒首领林大有"
+    },
+    {
+      "sample_id": "s197",
+      "start": 86655,
+      "end": 86657,
+      "surface": "大有",
+      "chapter_index": 26,
+      "gold_id": "g005",
+      "note": "第26回指聚仙馆凶徒首领林大有"
+    },
+    {
+      "sample_id": "s198",
+      "start": 86678,
+      "end": 86680,
+      "surface": "大有",
+      "chapter_index": 26,
+      "gold_id": "g005",
+      "note": "第26回指聚仙馆凶徒首领林大有"
+    },
+    {
+      "sample_id": "s199",
+      "start": 86805,
+      "end": 86807,
+      "surface": "大有",
+      "chapter_index": 26,
+      "gold_id": "g005",
+      "note": "第26回指聚仙馆凶徒首领林大有"
+    },
+    {
+      "sample_id": "s200",
+      "start": 86817,
+      "end": 86819,
+      "surface": "大有",
+      "chapter_index": 26,
+      "gold_id": "g005",
+      "note": "第26回指聚仙馆凶徒首领林大有"
+    },
+    {
+      "sample_id": "s201",
+      "start": 86896,
+      "end": 86898,
+      "surface": "省城",
+      "chapter_index": 26,
+      "gold_id": "g038",
+      "note": "第26章/回原文上下文明确指 省城（称呼 '省城'）"
+    },
+    {
+      "sample_id": "s202",
+      "start": 86966,
+      "end": 86969,
+      "surface": "孔制台",
+      "chapter_index": 26,
+      "gold_id": "g022",
+      "note": "第26章/回原文上下文明确指 孔大鹏（称呼 '孔制台'）"
+    },
+    {
+      "sample_id": "s203",
+      "start": 87250,
+      "end": 87253,
+      "surface": "孔制台",
+      "chapter_index": 26,
+      "gold_id": "g022",
+      "note": "第26章/回原文上下文明确指 孔大鹏（称呼 '孔制台'）"
+    },
+    {
+      "sample_id": "s204",
+      "start": 87594,
+      "end": 87597,
+      "surface": "孔制台",
+      "chapter_index": 26,
+      "gold_id": "g022",
+      "note": "第26章/回原文上下文明确指 孔大鹏（称呼 '孔制台'）"
+    },
+    {
+      "sample_id": "s205",
+      "start": 87619,
+      "end": 87622,
+      "surface": "马半仙",
+      "chapter_index": 26,
+      "gold_id": "g033",
+      "note": "第26章/回原文上下文明确指 马半仙（称呼 '马半仙'）"
+    },
+    {
+      "sample_id": "s206",
+      "start": 87812,
+      "end": 87814,
+      "surface": "喜来",
+      "chapter_index": 26,
+      "gold_id": "g014",
+      "note": "第26章/回原文上下文明确指 喜来（称呼 '喜来'）"
+    },
+    {
+      "sample_id": "s207",
+      "start": 88535,
+      "end": 88538,
+      "surface": "黄知县",
+      "chapter_index": 26,
+      "gold_id": "g017",
+      "note": "第26章/回原文上下文明确指 黄知县（称呼 '黄知县'）"
+    },
+    {
+      "sample_id": "s208",
+      "start": 88730,
+      "end": 88733,
+      "surface": "凌贵兴",
+      "chapter_index": 27,
+      "gold_id": "g002",
+      "note": "第27章/回原文上下文明确指 凌贵兴（称呼 '凌贵兴'）"
+    },
+    {
+      "sample_id": "s209",
+      "start": 88755,
+      "end": 88758,
+      "surface": "孔制台",
+      "chapter_index": 27,
+      "gold_id": "g022",
+      "note": "第27章/回原文上下文明确指 孔大鹏（称呼 '孔制台'）"
+    },
+    {
+      "sample_id": "s210",
+      "start": 89076,
+      "end": 89078,
+      "surface": "喜来",
+      "chapter_index": 27,
+      "gold_id": "g014",
+      "note": "第27章/回原文上下文明确指 喜来（称呼 '喜来'）"
+    },
+    {
+      "sample_id": "s211",
+      "start": 89749,
+      "end": 89752,
+      "surface": "孔制台",
+      "chapter_index": 27,
+      "gold_id": "g022",
+      "note": "第27章/回原文上下文明确指 孔大鹏（称呼 '孔制台'）"
+    },
+    {
+      "sample_id": "s212",
+      "start": 90066,
+      "end": 90068,
+      "surface": "贵兴",
+      "chapter_index": 27,
+      "gold_id": "g002",
+      "note": "第27章/回原文上下文明确指 凌贵兴（称呼 '贵兴'）"
+    },
+    {
+      "sample_id": "s213",
+      "start": 90583,
+      "end": 90586,
+      "surface": "简勒先",
+      "chapter_index": 27,
+      "gold_id": "g007",
+      "note": "第27章/回原文上下文明确指 简勒先（称呼 '简勒先'）"
+    },
+    {
+      "sample_id": "s214",
+      "start": 92453,
+      "end": 92455,
+      "surface": "凌氏",
+      "chapter_index": 28,
+      "gold_id": "g027",
+      "note": "第28章/回原文上下文明确指 梁母凌氏（称呼 '凌氏'）"
+    },
+    {
+      "sample_id": "s215",
+      "start": 92578,
+      "end": 92580,
+      "surface": "凌氏",
+      "chapter_index": 28,
+      "gold_id": "g027",
+      "note": "第28章/回原文上下文明确指 梁母凌氏（称呼 '凌氏'）"
+    },
+    {
+      "sample_id": "s216",
+      "start": 93264,
+      "end": 93266,
+      "surface": "南雄",
+      "chapter_index": 28,
+      "gold_id": "g041",
+      "note": "第28章/回原文上下文明确指 南雄（称呼 '南雄'）"
+    },
+    {
+      "sample_id": "s217",
+      "start": 94156,
+      "end": 94159,
+      "surface": "区爵兴",
+      "chapter_index": 28,
+      "gold_id": "g004",
+      "note": "第28章/回原文上下文明确指 区爵兴（称呼 '区爵兴'）"
+    },
+    {
+      "sample_id": "s218",
+      "start": 94166,
+      "end": 94168,
+      "surface": "爵兴",
+      "chapter_index": 28,
+      "gold_id": "g004",
+      "note": "第28章/回原文上下文明确指 区爵兴（称呼 '爵兴'）"
+    },
+    {
+      "sample_id": "s219",
+      "start": 94313,
+      "end": 94315,
+      "surface": "省城",
+      "chapter_index": 28,
+      "gold_id": "g038",
+      "note": "第28章/回原文上下文明确指 省城（称呼 '省城'）"
+    },
+    {
+      "sample_id": "s220",
+      "start": 95013,
+      "end": 95015,
+      "surface": "省城",
+      "chapter_index": 28,
+      "gold_id": "g038",
+      "note": "第28章/回原文上下文明确指 省城（称呼 '省城'）"
+    },
+    {
+      "sample_id": "s221",
+      "start": 96296,
+      "end": 96299,
+      "surface": "南雄岭",
+      "chapter_index": 29,
+      "gold_id": "g041",
+      "note": "第29章/回原文上下文明确指 南雄（称呼 '南雄岭'）"
+    },
+    {
+      "sample_id": "s222",
+      "start": 96669,
+      "end": 96671,
+      "surface": "贵兴",
+      "chapter_index": 29,
+      "gold_id": "g002",
+      "note": "第29章/回原文上下文明确指 凌贵兴（称呼 '贵兴'）"
+    },
+    {
+      "sample_id": "s223",
+      "start": 97647,
+      "end": 97649,
+      "surface": "大有",
+      "chapter_index": 29,
+      "gold_id": "g005",
+      "note": "第29回指聚仙馆凶徒首领林大有"
+    },
+    {
+      "sample_id": "s224",
+      "start": 97669,
+      "end": 97671,
+      "surface": "南雄",
+      "chapter_index": 29,
+      "gold_id": "g041",
+      "note": "第29章/回原文上下文明确指 南雄（称呼 '南雄'）"
+    },
+    {
+      "sample_id": "s225",
+      "start": 97726,
+      "end": 97728,
+      "surface": "大有",
+      "chapter_index": 29,
+      "gold_id": "g005",
+      "note": "第29回指聚仙馆凶徒首领林大有"
+    },
+    {
+      "sample_id": "s226",
+      "start": 97854,
+      "end": 97856,
+      "surface": "大有",
+      "chapter_index": 29,
+      "gold_id": "g005",
+      "note": "第29回指聚仙馆凶徒首领林大有"
+    },
+    {
+      "sample_id": "s227",
+      "start": 97886,
+      "end": 97889,
+      "surface": "林大哥",
+      "chapter_index": 29,
+      "gold_id": "g005",
+      "note": "第29章/回原文上下文明确指 林大有（称呼 '林大哥'）"
+    },
+    {
+      "sample_id": "s228",
+      "start": 98110,
+      "end": 98112,
+      "surface": "勒先",
+      "chapter_index": 29,
+      "gold_id": "g007",
+      "note": "第29章/回原文上下文明确指 简勒先（称呼 '勒先'）"
+    },
+    {
+      "sample_id": "s229",
+      "start": 98426,
+      "end": 98428,
+      "surface": "勒先",
+      "chapter_index": 29,
+      "gold_id": "g007",
+      "note": "第29章/回原文上下文明确指 简勒先（称呼 '勒先'）"
+    },
+    {
+      "sample_id": "s230",
+      "start": 100569,
+      "end": 100571,
+      "surface": "喜来",
+      "chapter_index": 30,
+      "gold_id": "g014",
+      "note": "第30章/回原文上下文明确指 喜来（称呼 '喜来'）"
+    },
+    {
+      "sample_id": "s231",
+      "start": 100745,
+      "end": 100747,
+      "surface": "南雄",
+      "chapter_index": 30,
+      "gold_id": "g041",
+      "note": "第30章/回原文上下文明确指 南雄（称呼 '南雄'）"
+    },
+    {
+      "sample_id": "s232",
+      "start": 100993,
+      "end": 100995,
+      "surface": "喜来",
+      "chapter_index": 30,
+      "gold_id": "g014",
+      "note": "第30章/回原文上下文明确指 喜来（称呼 '喜来'）"
+    },
+    {
+      "sample_id": "s233",
+      "start": 101777,
+      "end": 101779,
+      "surface": "喜来",
+      "chapter_index": 30,
+      "gold_id": "g014",
+      "note": "第30章/回原文上下文明确指 喜来（称呼 '喜来'）"
+    },
+    {
+      "sample_id": "s234",
+      "start": 102027,
+      "end": 102030,
+      "surface": "沛之兄",
+      "chapter_index": 30,
+      "gold_id": "g011",
+      "note": "第30章/回原文上下文明确指 苏沛之（称呼 '沛之兄'）"
+    },
+    {
+      "sample_id": "s235",
+      "start": 102120,
+      "end": 102123,
+      "surface": "苏沛之",
+      "chapter_index": 31,
+      "gold_id": "g011",
+      "note": "第31章/回原文上下文明确指 苏沛之（称呼 '苏沛之'）"
+    },
+    {
+      "sample_id": "s236",
+      "start": 102193,
+      "end": 102195,
+      "surface": "爵兴",
+      "chapter_index": 31,
+      "gold_id": "g004",
+      "note": "第31章/回原文上下文明确指 区爵兴（称呼 '爵兴'）"
+    },
+    {
+      "sample_id": "s237",
+      "start": 102218,
+      "end": 102220,
+      "surface": "爵兴",
+      "chapter_index": 31,
+      "gold_id": "g004",
+      "note": "第31章/回原文上下文明确指 区爵兴（称呼 '爵兴'）"
+    },
+    {
+      "sample_id": "s238",
+      "start": 102288,
+      "end": 102291,
+      "surface": "沛之兄",
+      "chapter_index": 31,
+      "gold_id": "g011",
+      "note": "第31章/回原文上下文明确指 苏沛之（称呼 '沛之兄'）"
+    },
+    {
+      "sample_id": "s239",
+      "start": 102409,
+      "end": 102412,
+      "surface": "凌祈伯",
+      "chapter_index": 31,
+      "gold_id": "g002",
+      "note": "第31章/回原文上下文明确指 凌贵兴（称呼 '凌祈伯'）"
+    },
+    {
+      "sample_id": "s240",
+      "start": 102475,
+      "end": 102478,
+      "surface": "沛之兄",
+      "chapter_index": 31,
+      "gold_id": "g011",
+      "note": "第31章/回原文上下文明确指 苏沛之（称呼 '沛之兄'）"
+    },
+    {
+      "sample_id": "s241",
+      "start": 102542,
+      "end": 102544,
+      "surface": "沛之",
+      "chapter_index": 31,
+      "gold_id": "g011",
+      "note": "第31章/回原文上下文明确指 苏沛之（称呼 '沛之'）"
+    },
+    {
+      "sample_id": "s242",
+      "start": 102984,
+      "end": 102986,
+      "surface": "沛之",
+      "chapter_index": 31,
+      "gold_id": "g011",
+      "note": "第31章/回原文上下文明确指 苏沛之（称呼 '沛之'）"
+    },
+    {
+      "sample_id": "s243",
+      "start": 103657,
+      "end": 103660,
+      "surface": "苏沛之",
+      "chapter_index": 31,
+      "gold_id": "g011",
+      "note": "第31章/回原文上下文明确指 苏沛之（称呼 '苏沛之'）"
+    },
+    {
+      "sample_id": "s244",
+      "start": 104966,
+      "end": 104969,
+      "surface": "苏沛之",
+      "chapter_index": 31,
+      "gold_id": "g011",
+      "note": "第31章/回原文上下文明确指 苏沛之（称呼 '苏沛之'）"
+    },
+    {
+      "sample_id": "s245",
+      "start": 105153,
+      "end": 105155,
+      "surface": "沛之",
+      "chapter_index": 31,
+      "gold_id": "g011",
+      "note": "第31章/回原文上下文明确指 苏沛之（称呼 '沛之'）"
+    },
+    {
+      "sample_id": "s246",
+      "start": 105570,
+      "end": 105573,
+      "surface": "苏沛之",
+      "chapter_index": 32,
+      "gold_id": "g011",
+      "note": "第32章/回原文上下文明确指 苏沛之（称呼 '苏沛之'）"
+    },
+    {
+      "sample_id": "s247",
+      "start": 105802,
+      "end": 105804,
+      "surface": "沛之",
+      "chapter_index": 32,
+      "gold_id": "g011",
+      "note": "第32章/回原文上下文明确指 苏沛之（称呼 '沛之'）"
+    },
+    {
+      "sample_id": "s248",
+      "start": 105819,
+      "end": 105821,
+      "surface": "天来",
+      "chapter_index": 32,
+      "gold_id": "g001",
+      "note": "第32章/回原文上下文明确指 梁天来（称呼 '天来'）"
+    },
+    {
+      "sample_id": "s249",
+      "start": 105944,
+      "end": 105946,
+      "surface": "天来",
+      "chapter_index": 32,
+      "gold_id": "g001",
+      "note": "第32章/回原文上下文明确指 梁天来（称呼 '天来'）"
+    },
+    {
+      "sample_id": "s250",
+      "start": 106248,
+      "end": 106251,
+      "surface": "苏沛之",
+      "chapter_index": 32,
+      "gold_id": "g011",
+      "note": "第32章/回原文上下文明确指 苏沛之（称呼 '苏沛之'）"
+    },
+    {
+      "sample_id": "s251",
+      "start": 106461,
+      "end": 106463,
+      "surface": "喜来",
+      "chapter_index": 32,
+      "gold_id": "g014",
+      "note": "第32章/回原文上下文明确指 喜来（称呼 '喜来'）"
+    },
+    {
+      "sample_id": "s252",
+      "start": 107000,
+      "end": 107003,
+      "surface": "梁天来",
+      "chapter_index": 32,
+      "gold_id": "g001",
+      "note": "第32章/回原文上下文明确指 梁天来（称呼 '梁天来'）"
+    },
+    {
+      "sample_id": "s253",
+      "start": 107183,
+      "end": 107186,
+      "surface": "苏沛之",
+      "chapter_index": 32,
+      "gold_id": "g011",
+      "note": "第32章/回原文上下文明确指 苏沛之（称呼 '苏沛之'）"
+    },
+    {
+      "sample_id": "s254",
+      "start": 107207,
+      "end": 107209,
+      "surface": "沛之",
+      "chapter_index": 32,
+      "gold_id": "g011",
+      "note": "第32章/回原文上下文明确指 苏沛之（称呼 '沛之'）"
+    },
+    {
+      "sample_id": "s255",
+      "start": 107646,
+      "end": 107649,
+      "surface": "区爵兴",
+      "chapter_index": 32,
+      "gold_id": "g004",
+      "note": "第32章/回原文上下文明确指 区爵兴（称呼 '区爵兴'）"
+    },
+    {
+      "sample_id": "s256",
+      "start": 108068,
+      "end": 108070,
+      "surface": "省城",
+      "chapter_index": 32,
+      "gold_id": "g038",
+      "note": "第32章/回原文上下文明确指 省城（称呼 '省城'）"
+    },
+    {
+      "sample_id": "s257",
+      "start": 108190,
+      "end": 108193,
+      "surface": "简勒先",
+      "chapter_index": 32,
+      "gold_id": "g007",
+      "note": "第32章/回原文上下文明确指 简勒先（称呼 '简勒先'）"
+    },
+    {
+      "sample_id": "s258",
+      "start": 108234,
+      "end": 108236,
+      "surface": "宗孔",
+      "chapter_index": 32,
+      "gold_id": "g003",
+      "note": "第32章/回原文上下文明确指 凌宗孔（称呼 '宗孔'）"
+    },
+    {
+      "sample_id": "s259",
+      "start": 108436,
+      "end": 108438,
+      "surface": "爵兴",
+      "chapter_index": 32,
+      "gold_id": "g004",
+      "note": "第32章/回原文上下文明确指 区爵兴（称呼 '爵兴'）"
+    },
+    {
+      "sample_id": "s260",
+      "start": 108512,
+      "end": 108514,
+      "surface": "沛之",
+      "chapter_index": 32,
+      "gold_id": "g011",
+      "note": "第32章/回原文上下文明确指 苏沛之（称呼 '沛之'）"
+    },
+    {
+      "sample_id": "s261",
+      "start": 109179,
+      "end": 109181,
+      "surface": "大有",
+      "chapter_index": 33,
+      "gold_id": "g005",
+      "note": "第33回指聚仙馆凶徒首领林大有"
+    },
+    {
+      "sample_id": "s262",
+      "start": 109364,
+      "end": 109366,
+      "surface": "李丰",
+      "chapter_index": 33,
+      "gold_id": "g013",
+      "note": "第33章/回原文上下文明确指 李丰（称呼 '李丰'）"
+    },
+    {
+      "sample_id": "s263",
+      "start": 109384,
+      "end": 109386,
+      "surface": "李丰",
+      "chapter_index": 33,
+      "gold_id": "g013",
+      "note": "第33章/回原文上下文明确指 李丰（称呼 '李丰'）"
+    },
+    {
+      "sample_id": "s264",
+      "start": 109452,
+      "end": 109454,
+      "surface": "省城",
+      "chapter_index": 33,
+      "gold_id": "g038",
+      "note": "第33章/回原文上下文明确指 省城（称呼 '省城'）"
+    },
+    {
+      "sample_id": "s265",
+      "start": 109470,
+      "end": 109472,
+      "surface": "省城",
+      "chapter_index": 33,
+      "gold_id": "g038",
+      "note": "第33章/回原文上下文明确指 省城（称呼 '省城'）"
+    },
+    {
+      "sample_id": "s266",
+      "start": 109906,
+      "end": 109908,
+      "surface": "南雄",
+      "chapter_index": 33,
+      "gold_id": "g041",
+      "note": "第33章/回原文上下文明确指 南雄（称呼 '南雄'）"
+    },
+    {
+      "sample_id": "s267",
+      "start": 110279,
+      "end": 110281,
+      "surface": "贵兴",
+      "chapter_index": 33,
+      "gold_id": "g002",
+      "note": "第33章/回原文上下文明确指 凌贵兴（称呼 '贵兴'）"
+    },
+    {
+      "sample_id": "s268",
+      "start": 110308,
+      "end": 110310,
+      "surface": "李丰",
+      "chapter_index": 33,
+      "gold_id": "g013",
+      "note": "第33章/回原文上下文明确指 李丰（称呼 '李丰'）"
+    },
+    {
+      "sample_id": "s269",
+      "start": 110565,
+      "end": 110567,
+      "surface": "李丰",
+      "chapter_index": 33,
+      "gold_id": "g013",
+      "note": "第33章/回原文上下文明确指 李丰（称呼 '李丰'）"
+    },
+    {
+      "sample_id": "s270",
+      "start": 110833,
+      "end": 110835,
+      "surface": "李丰",
+      "chapter_index": 33,
+      "gold_id": "g013",
+      "note": "第33章/回原文上下文明确指 李丰（称呼 '李丰'）"
+    },
+    {
+      "sample_id": "s271",
+      "start": 111269,
+      "end": 111271,
+      "surface": "沛之",
+      "chapter_index": 33,
+      "gold_id": "g011",
+      "note": "第33章/回原文上下文明确指 苏沛之（称呼 '沛之'）"
+    },
+    {
+      "sample_id": "s272",
+      "start": 111339,
+      "end": 111341,
+      "surface": "祈伯",
+      "chapter_index": 33,
+      "gold_id": "g002",
+      "note": "第33章/回原文上下文明确指 凌贵兴（称呼 '祈伯'）"
+    },
+    {
+      "sample_id": "s273",
+      "start": 111470,
+      "end": 111472,
+      "surface": "李丰",
+      "chapter_index": 33,
+      "gold_id": "g013",
+      "note": "第33章/回原文上下文明确指 李丰（称呼 '李丰'）"
+    },
+    {
+      "sample_id": "s274",
+      "start": 111689,
+      "end": 111691,
+      "surface": "李丰",
+      "chapter_index": 33,
+      "gold_id": "g013",
+      "note": "第33章/回原文上下文明确指 李丰（称呼 '李丰'）"
+    },
+    {
+      "sample_id": "s275",
+      "start": 111723,
+      "end": 111725,
+      "surface": "李丰",
+      "chapter_index": 33,
+      "gold_id": "g013",
+      "note": "第33章/回原文上下文明确指 李丰（称呼 '李丰'）"
+    },
+    {
+      "sample_id": "s276",
+      "start": 111777,
+      "end": 111779,
+      "surface": "沛之",
+      "chapter_index": 33,
+      "gold_id": "g011",
+      "note": "第33章/回原文上下文明确指 苏沛之（称呼 '沛之'）"
+    },
+    {
+      "sample_id": "s277",
+      "start": 112186,
+      "end": 112188,
+      "surface": "贵兴",
+      "chapter_index": 33,
+      "gold_id": "g002",
+      "note": "第33章/回原文上下文明确指 凌贵兴（称呼 '贵兴'）"
+    },
+    {
+      "sample_id": "s278",
+      "start": 112332,
+      "end": 112335,
+      "surface": "苏先生",
+      "chapter_index": 34,
+      "gold_id": "g011",
+      "note": "第34章/回原文上下文明确指 苏沛之（称呼 '苏先生'）"
+    },
+    {
+      "sample_id": "s279",
+      "start": 112424,
+      "end": 112427,
+      "surface": "苏沛之",
+      "chapter_index": 34,
+      "gold_id": "g011",
+      "note": "第34章/回原文上下文明确指 苏沛之（称呼 '苏沛之'）"
+    },
+    {
+      "sample_id": "s280",
+      "start": 112801,
+      "end": 112803,
+      "surface": "大有",
+      "chapter_index": 34,
+      "gold_id": "g005",
+      "note": "第34回指聚仙馆凶徒首领林大有"
+    },
+    {
+      "sample_id": "s281",
+      "start": 113143,
+      "end": 113145,
+      "surface": "大有",
+      "chapter_index": 34,
+      "gold_id": "g005",
+      "note": "第34回指聚仙馆凶徒首领林大有"
+    },
+    {
+      "sample_id": "s282",
+      "start": 113183,
+      "end": 113185,
+      "surface": "大有",
+      "chapter_index": 34,
+      "gold_id": "g005",
+      "note": "第34回指聚仙馆凶徒首领林大有"
+    },
+    {
+      "sample_id": "s283",
+      "start": 113216,
+      "end": 113218,
+      "surface": "大有",
+      "chapter_index": 34,
+      "gold_id": "g005",
+      "note": "第34回指聚仙馆凶徒首领林大有"
+    },
+    {
+      "sample_id": "s284",
+      "start": 113319,
+      "end": 113322,
+      "surface": "区爵兴",
+      "chapter_index": 34,
+      "gold_id": "g004",
+      "note": "第34章/回原文上下文明确指 区爵兴（称呼 '区爵兴'）"
+    },
+    {
+      "sample_id": "s285",
+      "start": 113339,
+      "end": 113342,
+      "surface": "林大有",
+      "chapter_index": 34,
+      "gold_id": "g005",
+      "note": "第34章/回原文上下文明确指 林大有（称呼 '林大有'）"
+    },
+    {
+      "sample_id": "s286",
+      "start": 113365,
+      "end": 113367,
+      "surface": "勒先",
+      "chapter_index": 34,
+      "gold_id": "g007",
+      "note": "第34章/回原文上下文明确指 简勒先（称呼 '勒先'）"
+    },
+    {
+      "sample_id": "s287",
+      "start": 113449,
+      "end": 113451,
+      "surface": "宗孔",
+      "chapter_index": 34,
+      "gold_id": "g003",
+      "note": "第34章/回原文上下文明确指 凌宗孔（称呼 '宗孔'）"
+    },
+    {
+      "sample_id": "s288",
+      "start": 113791,
+      "end": 113793,
+      "surface": "大有",
+      "chapter_index": 34,
+      "gold_id": "g005",
+      "note": "第34回指聚仙馆凶徒首领林大有"
+    },
+    {
+      "sample_id": "s289",
+      "start": 114279,
+      "end": 114281,
+      "surface": "大有",
+      "chapter_index": 34,
+      "gold_id": "g005",
+      "note": "第34回指聚仙馆凶徒首领林大有"
+    },
+    {
+      "sample_id": "s290",
+      "start": 114372,
+      "end": 114375,
+      "surface": "苏沛之",
+      "chapter_index": 34,
+      "gold_id": "g011",
+      "note": "第34章/回原文上下文明确指 苏沛之（称呼 '苏沛之'）"
+    },
+    {
+      "sample_id": "s291",
+      "start": 114625,
+      "end": 114627,
+      "surface": "宗孔",
+      "chapter_index": 34,
+      "gold_id": "g003",
+      "note": "第34章/回原文上下文明确指 凌宗孔（称呼 '宗孔'）"
+    },
+    {
+      "sample_id": "s292",
+      "start": 114717,
+      "end": 114720,
+      "surface": "林大有",
+      "chapter_index": 34,
+      "gold_id": "g005",
+      "note": "第34章/回原文上下文明确指 林大有（称呼 '林大有'）"
+    },
+    {
+      "sample_id": "s293",
+      "start": 114848,
+      "end": 114850,
+      "surface": "大有",
+      "chapter_index": 34,
+      "gold_id": "g005",
+      "note": "第34回指聚仙馆凶徒首领林大有"
+    },
+    {
+      "sample_id": "s294",
+      "start": 115125,
+      "end": 115127,
+      "surface": "大有",
+      "chapter_index": 34,
+      "gold_id": "g005",
+      "note": "第34回指聚仙馆凶徒首领林大有"
+    },
+    {
+      "sample_id": "s295",
+      "start": 115372,
+      "end": 115375,
+      "surface": "梁天来",
+      "chapter_index": 34,
+      "gold_id": "g001",
+      "note": "第34章/回原文上下文明确指 梁天来（称呼 '梁天来'）"
+    },
+    {
+      "sample_id": "s296",
+      "start": 115437,
+      "end": 115439,
+      "surface": "凌氏",
+      "chapter_index": 34,
+      "gold_id": "g027",
+      "note": "第34章/回原文上下文明确指 梁母凌氏（称呼 '凌氏'）"
+    },
+    {
+      "sample_id": "s297",
+      "start": 115991,
+      "end": 115994,
+      "surface": "凌贵兴",
+      "chapter_index": 35,
+      "gold_id": "g002",
+      "note": "第35章/回原文上下文明确指 凌贵兴（称呼 '凌贵兴'）"
+    },
+    {
+      "sample_id": "s298",
+      "start": 116005,
+      "end": 116008,
+      "surface": "凌宗孔",
+      "chapter_index": 35,
+      "gold_id": "g003",
+      "note": "第35章/回原文上下文明确指 凌宗孔（称呼 '凌宗孔'）"
+    },
+    {
+      "sample_id": "s299",
+      "start": 116099,
+      "end": 116102,
+      "surface": "简勒先",
+      "chapter_index": 35,
+      "gold_id": "g007",
+      "note": "第35章/回原文上下文明确指 简勒先（称呼 '简勒先'）"
+    },
+    {
+      "sample_id": "s300",
+      "start": 116177,
+      "end": 116180,
+      "surface": "梁天来",
+      "chapter_index": 35,
+      "gold_id": "g001",
+      "note": "第35章/回原文上下文明确指 梁天来（称呼 '梁天来'）"
+    },
+    {
+      "sample_id": "s301",
+      "start": 116839,
+      "end": 116842,
+      "surface": "孔大鹏",
+      "chapter_index": 35,
+      "gold_id": "g022",
+      "note": "第35章/回原文上下文明确指 孔大鹏（称呼 '孔大鹏'）"
+    },
+    {
+      "sample_id": "s302",
+      "start": 117171,
+      "end": 117174,
+      "surface": "孔大鹏",
+      "chapter_index": 35,
+      "gold_id": "g022",
+      "note": "第35章/回原文上下文明确指 孔大鹏（称呼 '孔大鹏'）"
+    },
+    {
+      "sample_id": "s303",
+      "start": 117201,
+      "end": 117204,
+      "surface": "孔大鹏",
+      "chapter_index": 35,
+      "gold_id": "g022",
+      "note": "第35章/回原文上下文明确指 孔大鹏（称呼 '孔大鹏'）"
+    },
+    {
+      "sample_id": "s304",
+      "start": 117544,
+      "end": 117547,
+      "surface": "孔大鹏",
+      "chapter_index": 35,
+      "gold_id": "g022",
+      "note": "第35章/回原文上下文明确指 孔大鹏（称呼 '孔大鹏'）"
+    },
+    {
+      "sample_id": "s305",
+      "start": 118364,
+      "end": 118367,
+      "surface": "孔大鹏",
+      "chapter_index": 35,
+      "gold_id": "g022",
+      "note": "第35章/回原文上下文明确指 孔大鹏（称呼 '孔大鹏'）"
+    },
+    {
+      "sample_id": "s306",
+      "start": 118960,
+      "end": 118963,
+      "surface": "孔大人",
+      "chapter_index": 35,
+      "gold_id": "g022",
+      "note": "第35章/回原文上下文明确指 孔大鹏（称呼 '孔大人'）"
+    },
+    {
+      "sample_id": "s307",
+      "start": 119144,
+      "end": 119147,
+      "surface": "孔大鹏",
+      "chapter_index": 36,
+      "gold_id": "g022",
+      "note": "第36章/回原文上下文明确指 孔大鹏（称呼 '孔大鹏'）"
+    },
+    {
+      "sample_id": "s308",
+      "start": 119203,
+      "end": 119206,
+      "surface": "番禺县",
+      "chapter_index": 36,
+      "gold_id": "g035",
+      "note": "第36章/回原文上下文明确指 番禺县（称呼 '番禺县'）"
+    },
+    {
+      "sample_id": "s309",
+      "start": 119426,
+      "end": 119429,
+      "surface": "孔大鹏",
+      "chapter_index": 36,
+      "gold_id": "g022",
+      "note": "第36章/回原文上下文明确指 孔大鹏（称呼 '孔大鹏'）"
+    },
+    {
+      "sample_id": "s310",
+      "start": 119740,
+      "end": 119742,
+      "surface": "李丰",
+      "chapter_index": 36,
+      "gold_id": "g013",
+      "note": "第36章/回原文上下文明确指 李丰（称呼 '李丰'）"
+    },
+    {
+      "sample_id": "s311",
+      "start": 120227,
+      "end": 120229,
+      "surface": "番禺",
+      "chapter_index": 36,
+      "gold_id": "g035",
+      "note": "第36章/回原文上下文明确指 番禺县（称呼 '番禺'）"
+    },
+    {
+      "sample_id": "s312",
+      "start": 120512,
+      "end": 120514,
+      "surface": "凌氏",
+      "chapter_index": 36,
+      "gold_id": "g027",
+      "note": "第36章/回原文上下文明确指 梁母凌氏（称呼 '凌氏'）"
+    },
+    {
+      "sample_id": "s313",
+      "start": 120748,
+      "end": 120751,
+      "surface": "孔大鹏",
+      "chapter_index": 36,
+      "gold_id": "g022",
+      "note": "第36章/回原文上下文明确指 孔大鹏（称呼 '孔大鹏'）"
+    },
+    {
+      "sample_id": "s314",
+      "start": 120785,
+      "end": 120787,
+      "surface": "李丰",
+      "chapter_index": 36,
+      "gold_id": "g013",
+      "note": "第36章/回原文上下文明确指 李丰（称呼 '李丰'）"
+    },
+    {
+      "sample_id": "s315",
+      "start": 122187,
+      "end": 122190,
+      "surface": "林大有",
+      "chapter_index": 36,
+      "gold_id": "g005",
+      "note": "第36章/回原文上下文明确指 林大有（称呼 '林大有'）"
+    },
+    {
+      "sample_id": "s316",
+      "start": 122620,
+      "end": 122623,
+      "surface": "凌宗孔",
+      "chapter_index": 36,
+      "gold_id": "g003",
+      "note": "第36章/回原文上下文明确指 凌宗孔（称呼 '凌宗孔'）"
+    },
+    {
+      "sample_id": "s317",
+      "start": 122632,
+      "end": 122635,
+      "surface": "林大有",
+      "chapter_index": 36,
+      "gold_id": "g005",
+      "note": "第36章/回原文上下文明确指 林大有（称呼 '林大有'）"
+    },
+    {
+      "sample_id": "s318",
+      "start": 122787,
+      "end": 122790,
+      "surface": "番禺县",
+      "chapter_index": 36,
+      "gold_id": "g035",
+      "note": "第36章/回原文上下文明确指 番禺县（称呼 '番禺县'）"
+    },
+    {
+      "sample_id": "s319",
+      "start": 122793,
+      "end": 122796,
+      "surface": "马半仙",
+      "chapter_index": 36,
+      "gold_id": "g033",
+      "note": "第36章/回原文上下文明确指 马半仙（称呼 '马半仙'）"
+    },
+    {
+      "sample_id": "s320",
+      "start": 122926,
+      "end": 122929,
+      "surface": "凌贵兴",
+      "chapter_index": 36,
+      "gold_id": "g002",
+      "note": "第36章/回原文上下文明确指 凌贵兴（称呼 '凌贵兴'）"
+    }
+  ]
+}

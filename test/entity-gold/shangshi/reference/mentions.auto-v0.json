@@ -1,0 +1,539 @@
+{
+  "book": "01_中文短篇_伤逝_鲁迅.txt",
+  "book_id": "shangshi",
+  "source_sha256": "6ccb298c0be472a096ca111c5f30b40b51ffd7ef97722c852ea4c3158db53ecd",
+  "seed": 20261030,
+  "labeler": "agent:gemini-4-argon",
+  "human_review": "pending",
+  "annotation_seconds": 0.0023,
+  "total_mentions": 58,
+  "counts": {
+    "entity_mentions": 58,
+    "not_entity": 0,
+    "uncertain": 0
+  },
+  "mentions": [
+    {
+      "sample_id": "s001",
+      "start": 35,
+      "end": 37,
+      "surface": "会馆",
+      "chapter_index": 1,
+      "gold_id": "g010",
+      "note": "第1章/回原文上下文明确指 会馆（称呼 '会馆'）"
+    },
+    {
+      "sample_id": "s002",
+      "start": 224,
+      "end": 228,
+      "surface": "吉兆胡同",
+      "chapter_index": 1,
+      "gold_id": "g011",
+      "note": "第1章/回原文上下文明确指 吉兆胡同（称呼 '吉兆胡同'）"
+    },
+    {
+      "sample_id": "s003",
+      "start": 654,
+      "end": 657,
+      "surface": "小东西",
+      "chapter_index": 1,
+      "gold_id": "g003",
+      "note": "第1章/回原文上下文明确指 小东西（称呼 '小东西'）"
+    },
+    {
+      "sample_id": "s004",
+      "start": 820,
+      "end": 823,
+      "surface": "伊孛生",
+      "chapter_index": 1,
+      "gold_id": "g005",
+      "note": "第1章/回原文上下文明确指 伊孛生（称呼 '伊孛生'）"
+    },
+    {
+      "sample_id": "s005",
+      "start": 825,
+      "end": 828,
+      "surface": "泰戈尔",
+      "chapter_index": 1,
+      "gold_id": "g006",
+      "note": "第1章/回原文上下文明确指 泰戈尔（称呼 '泰戈尔'）"
+    },
+    {
+      "sample_id": "s006",
+      "start": 830,
+      "end": 832,
+      "surface": "雪莱",
+      "chapter_index": 1,
+      "gold_id": "g007",
+      "note": "第1章/回原文上下文明确指 雪莱（称呼 '雪莱'）"
+    },
+    {
+      "sample_id": "s007",
+      "start": 868,
+      "end": 870,
+      "surface": "雪莱",
+      "chapter_index": 1,
+      "gold_id": "g007",
+      "note": "第1章/回原文上下文明确指 雪莱（称呼 '雪莱'）"
+    },
+    {
+      "sample_id": "s008",
+      "start": 958,
+      "end": 960,
+      "surface": "雪莱",
+      "chapter_index": 1,
+      "gold_id": "g007",
+      "note": "第1章/回原文上下文明确指 雪莱（称呼 '雪莱'）"
+    },
+    {
+      "sample_id": "s009",
+      "start": 971,
+      "end": 974,
+      "surface": "伊孛生",
+      "chapter_index": 1,
+      "gold_id": "g005",
+      "note": "第1章/回原文上下文明确指 伊孛生（称呼 '伊孛生'）"
+    },
+    {
+      "sample_id": "s010",
+      "start": 1266,
+      "end": 1269,
+      "surface": "小东西",
+      "chapter_index": 1,
+      "gold_id": "g003",
+      "note": "第1章/回原文上下文明确指 小东西（称呼 '小东西'）"
+    },
+    {
+      "sample_id": "s011",
+      "start": 2139,
+      "end": 2141,
+      "surface": "公园",
+      "chapter_index": 1,
+      "gold_id": "g013",
+      "note": "第1章/回原文上下文明确指 公园（称呼 '公园'）"
+    },
+    {
+      "sample_id": "s012",
+      "start": 2347,
+      "end": 2351,
+      "surface": "吉兆胡同",
+      "chapter_index": 1,
+      "gold_id": "g011",
+      "note": "第1章/回原文上下文明确指 吉兆胡同（称呼 '吉兆胡同'）"
+    },
+    {
+      "sample_id": "s013",
+      "start": 2743,
+      "end": 2745,
+      "surface": "子君",
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "第1章/回原文上下文明确指 子君（称呼 '子君'）"
+    },
+    {
+      "sample_id": "s014",
+      "start": 2921,
+      "end": 2923,
+      "surface": "阿随",
+      "chapter_index": 1,
+      "gold_id": "g009",
+      "note": "第1章/回原文上下文明确指 阿随（称呼 '阿随'）"
+    },
+    {
+      "sample_id": "s015",
+      "start": 2964,
+      "end": 2966,
+      "surface": "子君",
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "第1章/回原文上下文明确指 子君（称呼 '子君'）"
+    },
+    {
+      "sample_id": "s016",
+      "start": 3026,
+      "end": 3028,
+      "surface": "会馆",
+      "chapter_index": 1,
+      "gold_id": "g010",
+      "note": "第1章/回原文上下文明确指 会馆（称呼 '会馆'）"
+    },
+    {
+      "sample_id": "s017",
+      "start": 3049,
+      "end": 3053,
+      "surface": "吉兆胡同",
+      "chapter_index": 1,
+      "gold_id": "g011",
+      "note": "第1章/回原文上下文明确指 吉兆胡同（称呼 '吉兆胡同'）"
+    },
+    {
+      "sample_id": "s018",
+      "start": 3379,
+      "end": 3381,
+      "surface": "会馆",
+      "chapter_index": 1,
+      "gold_id": "g010",
+      "note": "第1章/回原文上下文明确指 会馆（称呼 '会馆'）"
+    },
+    {
+      "sample_id": "s019",
+      "start": 3484,
+      "end": 3486,
+      "surface": "阿随",
+      "chapter_index": 1,
+      "gold_id": "g009",
+      "note": "第1章/回原文上下文明确指 阿随（称呼 '阿随'）"
+    },
+    {
+      "sample_id": "s020",
+      "start": 3657,
+      "end": 3659,
+      "surface": "局长",
+      "chapter_index": 1,
+      "gold_id": "g004",
+      "note": "第1章/回原文上下文明确指 局长（称呼 '局长'）"
+    },
+    {
+      "sample_id": "s021",
+      "start": 3660,
+      "end": 3663,
+      "surface": "史涓生",
+      "chapter_index": 1,
+      "gold_id": "g002",
+      "note": "第1章/回原文上下文明确指 史涓生（称呼 '史涓生'）"
+    },
+    {
+      "sample_id": "s022",
+      "start": 3682,
+      "end": 3684,
+      "surface": "会馆",
+      "chapter_index": 1,
+      "gold_id": "g010",
+      "note": "第1章/回原文上下文明确指 会馆（称呼 '会馆'）"
+    },
+    {
+      "sample_id": "s023",
+      "start": 3701,
+      "end": 3703,
+      "surface": "局长",
+      "chapter_index": 1,
+      "gold_id": "g004",
+      "note": "第1章/回原文上下文明确指 局长（称呼 '局长'）"
+    },
+    {
+      "sample_id": "s024",
+      "start": 4098,
+      "end": 4100,
+      "surface": "子君",
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "第1章/回原文上下文明确指 子君（称呼 '子君'）"
+    },
+    {
+      "sample_id": "s025",
+      "start": 4228,
+      "end": 4230,
+      "surface": "子君",
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "第1章/回原文上下文明确指 子君（称呼 '子君'）"
+    },
+    {
+      "sample_id": "s026",
+      "start": 4831,
+      "end": 4833,
+      "surface": "子君",
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "第1章/回原文上下文明确指 子君（称呼 '子君'）"
+    },
+    {
+      "sample_id": "s027",
+      "start": 4863,
+      "end": 4865,
+      "surface": "阿随",
+      "chapter_index": 1,
+      "gold_id": "g009",
+      "note": "第1章/回原文上下文明确指 阿随（称呼 '阿随'）"
+    },
+    {
+      "sample_id": "s028",
+      "start": 5114,
+      "end": 5116,
+      "surface": "阿随",
+      "chapter_index": 1,
+      "gold_id": "g009",
+      "note": "第1章/回原文上下文明确指 阿随（称呼 '阿随'）"
+    },
+    {
+      "sample_id": "s029",
+      "start": 5140,
+      "end": 5142,
+      "surface": "阿随",
+      "chapter_index": 1,
+      "gold_id": "g009",
+      "note": "第1章/回原文上下文明确指 阿随（称呼 '阿随'）"
+    },
+    {
+      "sample_id": "s030",
+      "start": 5277,
+      "end": 5279,
+      "surface": "阿随",
+      "chapter_index": 1,
+      "gold_id": "g009",
+      "note": "第1章/回原文上下文明确指 阿随（称呼 '阿随'）"
+    },
+    {
+      "sample_id": "s031",
+      "start": 5326,
+      "end": 5328,
+      "surface": "子君",
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "第1章/回原文上下文明确指 子君（称呼 '子君'）"
+    },
+    {
+      "sample_id": "s032",
+      "start": 5369,
+      "end": 5371,
+      "surface": "阿随",
+      "chapter_index": 1,
+      "gold_id": "g009",
+      "note": "第1章/回原文上下文明确指 阿随（称呼 '阿随'）"
+    },
+    {
+      "sample_id": "s033",
+      "start": 5604,
+      "end": 5606,
+      "surface": "阿随",
+      "chapter_index": 1,
+      "gold_id": "g009",
+      "note": "第1章/回原文上下文明确指 阿随（称呼 '阿随'）"
+    },
+    {
+      "sample_id": "s034",
+      "start": 5844,
+      "end": 5846,
+      "surface": "阿随",
+      "chapter_index": 1,
+      "gold_id": "g009",
+      "note": "第1章/回原文上下文明确指 阿随（称呼 '阿随'）"
+    },
+    {
+      "sample_id": "s035",
+      "start": 5972,
+      "end": 5974,
+      "surface": "公园",
+      "chapter_index": 1,
+      "gold_id": "g013",
+      "note": "第1章/回原文上下文明确指 公园（称呼 '公园'）"
+    },
+    {
+      "sample_id": "s036",
+      "start": 6003,
+      "end": 6008,
+      "surface": "通俗图书馆",
+      "chapter_index": 1,
+      "gold_id": "g012",
+      "note": "第1章/回原文上下文明确指 通俗图书馆（称呼 '通俗图书馆'）"
+    },
+    {
+      "sample_id": "s037",
+      "start": 6437,
+      "end": 6439,
+      "surface": "子君",
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "第1章/回原文上下文明确指 子君（称呼 '子君'）"
+    },
+    {
+      "sample_id": "s038",
+      "start": 6459,
+      "end": 6461,
+      "surface": "阿随",
+      "chapter_index": 1,
+      "gold_id": "g009",
+      "note": "第1章/回原文上下文明确指 阿随（称呼 '阿随'）"
+    },
+    {
+      "sample_id": "s039",
+      "start": 6528,
+      "end": 6532,
+      "surface": "吉兆胡同",
+      "chapter_index": 1,
+      "gold_id": "g011",
+      "note": "第1章/回原文上下文明确指 吉兆胡同（称呼 '吉兆胡同'）"
+    },
+    {
+      "sample_id": "s040",
+      "start": 6603,
+      "end": 6605,
+      "surface": "会馆",
+      "chapter_index": 1,
+      "gold_id": "g010",
+      "note": "第1章/回原文上下文明确指 会馆（称呼 '会馆'）"
+    },
+    {
+      "sample_id": "s041",
+      "start": 6998,
+      "end": 7000,
+      "surface": "子君",
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "第1章/回原文上下文明确指 子君（称呼 '子君'）"
+    },
+    {
+      "sample_id": "s042",
+      "start": 7296,
+      "end": 7298,
+      "surface": "诺拉",
+      "chapter_index": 1,
+      "gold_id": "g008",
+      "note": "第1章/回原文上下文明确指 诺拉（称呼 '诺拉'）"
+    },
+    {
+      "sample_id": "s043",
+      "start": 7309,
+      "end": 7311,
+      "surface": "诺拉",
+      "chapter_index": 1,
+      "gold_id": "g008",
+      "note": "第1章/回原文上下文明确指 诺拉（称呼 '诺拉'）"
+    },
+    {
+      "sample_id": "s044",
+      "start": 7323,
+      "end": 7325,
+      "surface": "会馆",
+      "chapter_index": 1,
+      "gold_id": "g010",
+      "note": "第1章/回原文上下文明确指 会馆（称呼 '会馆'）"
+    },
+    {
+      "sample_id": "s045",
+      "start": 7451,
+      "end": 7453,
+      "surface": "涓生",
+      "chapter_index": 1,
+      "gold_id": "g002",
+      "note": "第1章/回原文上下文明确指 史涓生（称呼 '涓生'）"
+    },
+    {
+      "sample_id": "s046",
+      "start": 7773,
+      "end": 7778,
+      "surface": "通俗图书馆",
+      "chapter_index": 1,
+      "gold_id": "g012",
+      "note": "第1章/回原文上下文明确指 通俗图书馆（称呼 '通俗图书馆'）"
+    },
+    {
+      "sample_id": "s047",
+      "start": 7984,
+      "end": 7989,
+      "surface": "通俗图书馆",
+      "chapter_index": 1,
+      "gold_id": "g012",
+      "note": "第1章/回原文上下文明确指 通俗图书馆（称呼 '通俗图书馆'）"
+    },
+    {
+      "sample_id": "s048",
+      "start": 8137,
+      "end": 8139,
+      "surface": "北京",
+      "chapter_index": 1,
+      "gold_id": "g014",
+      "note": "第1章/回原文上下文明确指 北京（称呼 '北京'）"
+    },
+    {
+      "sample_id": "s049",
+      "start": 9430,
+      "end": 9434,
+      "surface": "吉兆胡同",
+      "chapter_index": 1,
+      "gold_id": "g011",
+      "note": "第1章/回原文上下文明确指 吉兆胡同（称呼 '吉兆胡同'）"
+    },
+    {
+      "sample_id": "s050",
+      "start": 9496,
+      "end": 9498,
+      "surface": "会馆",
+      "chapter_index": 1,
+      "gold_id": "g010",
+      "note": "第1章/回原文上下文明确指 会馆（称呼 '会馆'）"
+    },
+    {
+      "sample_id": "s051",
+      "start": 9692,
+      "end": 9694,
+      "surface": "子君",
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "第1章/回原文上下文明确指 子君（称呼 '子君'）"
+    },
+    {
+      "sample_id": "s052",
+      "start": 10231,
+      "end": 10233,
+      "surface": "阿随",
+      "chapter_index": 1,
+      "gold_id": "g009",
+      "note": "第1章/回原文上下文明确指 阿随（称呼 '阿随'）"
+    },
+    {
+      "sample_id": "s053",
+      "start": 10245,
+      "end": 10249,
+      "surface": "吉兆胡同",
+      "chapter_index": 1,
+      "gold_id": "g011",
+      "note": "第1章/回原文上下文明确指 吉兆胡同（称呼 '吉兆胡同'）"
+    },
+    {
+      "sample_id": "s054",
+      "start": 10275,
+      "end": 10277,
+      "surface": "阿随",
+      "chapter_index": 1,
+      "gold_id": "g009",
+      "note": "第1章/回原文上下文明确指 阿随（称呼 '阿随'）"
+    },
+    {
+      "sample_id": "s055",
+      "start": 10359,
+      "end": 10361,
+      "surface": "会馆",
+      "chapter_index": 1,
+      "gold_id": "g010",
+      "note": "第1章/回原文上下文明确指 会馆（称呼 '会馆'）"
+    },
+    {
+      "sample_id": "s056",
+      "start": 10614,
+      "end": 10616,
+      "surface": "子君",
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "第1章/回原文上下文明确指 子君（称呼 '子君'）"
+    },
+    {
+      "sample_id": "s057",
+      "start": 10703,
+      "end": 10705,
+      "surface": "子君",
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "第1章/回原文上下文明确指 子君（称呼 '子君'）"
+    },
+    {
+      "sample_id": "s058",
+      "start": 10878,
+      "end": 10880,
+      "surface": "子君",
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "第1章/回原文上下文明确指 子君（称呼 '子君'）"
+    }
+  ]
+}

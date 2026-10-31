@@ -1,0 +1,1537 @@
+{
+  "book": "01_中文短篇_伤逝_鲁迅.txt",
+  "book_id": "shangshi",
+  "source_sha256": "6ccb298c0be472a096ca111c5f30b40b51ffd7ef97722c852ea4c3158db53ecd",
+  "labeler": "agent:gemini-manual-context-r3",
+  "human_review": "pending",
+  "sampling_version": "r3-stratified-v1",
+  "seed": 20261030,
+  "major_entity_min_occurrences": 5,
+  "major_entity_ids": [
+    "g001",
+    "g009",
+    "g010",
+    "g011"
+  ],
+  "entity_occurrence_counts": {
+    "g001": 46,
+    "g002": 2,
+    "g003": 2,
+    "g004": 2,
+    "g005": 2,
+    "g006": 1,
+    "g007": 3,
+    "g008": 2,
+    "g009": 14,
+    "g010": 9,
+    "g011": 6,
+    "g012": 3,
+    "g013": 2,
+    "g014": 1
+  },
+  "out_of_roster_entities": [
+    {
+      "gold_id": "x001",
+      "kind": "person",
+      "canonical": "子君的父亲",
+      "note": "子君在老家的父亲，后到吉兆胡同将子君接回"
+    },
+    {
+      "gold_id": "x002",
+      "kind": "person",
+      "canonical": "鲶鱼须的老东西",
+      "note": "会馆里长著鲶鱼须、常贴在脏窗玻璃上窥视子君与涓生的住客"
+    },
+    {
+      "gold_id": "x003",
+      "kind": "person",
+      "canonical": "官太太（房东太太）",
+      "note": "吉兆胡同住所的房东小官太太（含房主人指称），因小油鸡等与子君暗斗并在子君被接走后告知涓生"
+    },
+    {
+      "gold_id": "x004",
+      "kind": "object",
+      "canonical": "油鸡",
+      "note": "涓生与子君在吉兆胡同饲养的四只小油鸡（及两家争执所涉小油鸡）"
+    },
+    {
+      "gold_id": "x005",
+      "kind": "org",
+      "canonical": "局里",
+      "note": "史涓生原先供职抄写公文、后被局长免职的机关“局里”"
+    }
+  ],
+  "annotation_started_at": "2026-10-30T06:53:45Z",
+  "annotation_finished_at": "2026-10-30T06:58:10Z",
+  "annotation_seconds": 265,
+  "total_mentions": 116,
+  "mentions": [
+    {
+      "sample_id": "s001",
+      "start": 26,
+      "end": 28,
+      "surface": "子君",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“我要写下我的悔恨和悲哀，为”与后文“，为自己”表明叙述者涓生在篇首为亡妻子君（g001）与自己写下悔恨。"
+    },
+    {
+      "sample_id": "s002",
+      "start": 35,
+      "end": 37,
+      "surface": "会馆",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g010",
+      "note": "后文“里的被遗忘在偏僻里的破屋是这样地寂静和空虚”及“我重来时，偏偏空著的又只有这一间屋”表明指涓生独居并重回的会馆（g010）。"
+    },
+    {
+      "sample_id": "s003",
+      "start": 68,
+      "end": 70,
+      "surface": "子君",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“时光过得真快，我爱”与后文“，仗著她逃出这寂静和空虚，已经满一年了”表明指叙述者深爱的女主人公子君（g001）。"
+    },
+    {
+      "sample_id": "s004",
+      "start": 182,
+      "end": 184,
+      "surface": "子君",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“深夜中独自躺在床上，就如我未曾和”与后文“同居以前一般……在吉兆胡同创立了满怀希望的小小的家庭”表明指与涓生同居的子君（g001）。"
+    },
+    {
+      "sample_id": "s005",
+      "start": 224,
+      "end": 228,
+      "surface": "吉兆胡同",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g011",
+      "note": "前文“我并没有曾经从这破屋子搬出，在”与后文“创立了满怀希望的小小的家庭”表明指涓生与子君搬出破屋后同居立家的吉兆胡同（g011）。"
+    },
+    {
+      "sample_id": "s006",
+      "start": 277,
+      "end": 279,
+      "surface": "子君",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“在一年之前，这寂静和空虚是并不这样的，常常含著期待；期待”与后文“的到来……一听到皮鞋的高底尖触著砖路的清响”表明指涓生在会馆期待来访的子君（g001）。"
+    },
+    {
+      "sample_id": "s007",
+      "start": 422,
+      "end": 424,
+      "surface": "子君",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“然而现在呢，只有寂静和空虚依旧，”与后文“却决不再来了，而且永远，永远地！”表明指已逝世、永不再来的子君（g001）。"
+    },
+    {
+      "sample_id": "s008",
+      "start": 444,
+      "end": 446,
+      "surface": "子君",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "后文“不在我这破屋里时，我什么也看不见。在百无聊赖中，顺手抓过一本书来”表明指昔日未来会馆破屋探望时的子君（g001）。"
+    },
+    {
+      "sample_id": "s009",
+      "start": 563,
+      "end": 565,
+      "surface": "子君",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“仿佛听到大门外一切往来的履声，从中便有”与后文“的，而且橐橐地逐渐临近”表明指涓生在会馆倾听辨认出的子君（g001）的脚步声。"
+    },
+    {
+      "sample_id": "s010",
+      "start": 611,
+      "end": 613,
+      "surface": "子君",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“终于消失在别的步声的杂沓中了。我憎恶那不像”与后文“鞋声的穿布底鞋的长班的儿子”表明指涓生期盼听到的子君（g001）的皮鞋声。"
+    },
+    {
+      "sample_id": "s011",
+      "start": 633,
+      "end": 635,
+      "surface": "子君",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“我憎恶那太像”与后文“鞋声的常常穿著新皮鞋的邻院的搽雪花膏的小东西！”表明将邻院小东西的新皮鞋声与子君（g001）的鞋声作对比。"
+    },
+    {
+      "sample_id": "s012",
+      "start": 830,
+      "end": 832,
+      "surface": "雪莱",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g007",
+      "note": "前文“谈家庭专制，谈打破旧习惯，谈男女平等，谈伊孛生，谈泰戈尔，谈”与后文“壁上就钉著一张铜板的雪莱半身像”表明指涓生向子君谈及的英国诗人雪莱（g007）。"
+    },
+    {
+      "sample_id": "s013",
+      "start": 868,
+      "end": 870,
+      "surface": "雪莱",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g007",
+      "note": "前文“壁上就钉著一张铜板的”与后文“半身像，是从杂志上裁下来的，是他的最美的一张像”表明指墙壁半身像所绘的诗人雪莱（g007）。"
+    },
+    {
+      "sample_id": "s014",
+      "start": 928,
+      "end": 930,
+      "surface": "子君",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“当我指给她看时，她却只草草一看，便低了头，似乎不好意思了。这些地方，”与后文“就大概还未脱尽旧思想的束缚”表明指看雪莱像害羞低头的子君（g001）。"
+    },
+    {
+      "sample_id": "s015",
+      "start": 958,
+      "end": 960,
+      "surface": "雪莱",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g007",
+      "note": "前文“我后来也想，倒不如换一张”与后文“淹死在海里的记念像或是伊孛生的罢”表明指淹死在海里的诗人雪莱（g007）。"
+    },
+    {
+      "sample_id": "s016",
+      "start": 1050,
+      "end": 1052,
+      "surface": "父亲",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "x001",
+      "note": "前文“这是我们交际了半年，又谈起她在这里的胞叔和在家的”与后文“时，她默想了一会之后……说了出来的话”表明指子君在老家的父亲（x001）。"
+    },
+    {
+      "sample_id": "s017",
+      "start": 1219,
+      "end": 1222,
+      "surface": "老东西",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster"
+      ],
+      "chapter_index": 1,
+      "gold_id": "x002",
+      "note": "前文“送她出门，照例是相离十多步远；照例是那鲶鱼须的”与后文“的脸又紧帖在脏的窗玻璃上了，连鼻尖都挤成一个小平面”表明指会馆内常贴窗窥探的鲶鱼须老东西（x002）。"
+    },
+    {
+      "sample_id": "s018",
+      "start": 1615,
+      "end": 1617,
+      "surface": "子君",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“照见我含泪握著她的手，一条腿跪了下去……。\n\n不但我自己的，便是”与后文“的言语举动，我那时就没有看得分明；仅知道她已经允许我了”表明指接受涓生求爱的子君（g001）。"
+    },
+    {
+      "sample_id": "s019",
+      "start": 2139,
+      "end": 2141,
+      "surface": "公园",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g013",
+      "note": "前文“去年的暮春是最为幸福，也是最为忙碌的时光……我们这时才在路上同行，也到过几回”与后文“，最多的是寻住所”表明指涓生与子君暮春同游的公园（g013）。"
+    },
+    {
+      "sample_id": "s020",
+      "start": 2347,
+      "end": 2351,
+      "surface": "吉兆胡同",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g011",
+      "note": "前文“看了二十多处，这才得到可以暂且敷衍的处所，是”与后文“一所小屋里的两间南屋；主人是一个小官”表明指寻得两间南屋作为住所的吉兆胡同（g011）。"
+    },
+    {
+      "sample_id": "s021",
+      "start": 2410,
+      "end": 2412,
+      "surface": "女工",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "not_entity",
+      "note": "前文“他只有夫人和一个不到周岁的女孩子，雇一个乡下的”与后文“，只要孩子不啼哭，是极其安闲幽静的”表明此处“一个乡下的女工”为不定指的佣人职业泛称，非特定叙事个体。"
+    },
+    {
+      "sample_id": "s022",
+      "start": 2458,
+      "end": 2460,
+      "surface": "子君",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“我们的家具很简单，但已经用去了我的筹来的款子的大半；”与后文“还卖掉了她唯一的金戒指和耳环”表明指变卖首饰补贴安家费用的子君（g001）。"
+    },
+    {
+      "sample_id": "s023",
+      "start": 2576,
+      "end": 2578,
+      "surface": "朋友",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "not_entity",
+      "note": "前文“我也陆续和几个自以为忠告，其实是替我胆怯，或者竟是嫉妒的”与后文“绝了交。然而这倒很清静”表明此处指“几个……朋友”的复数泛称，无单一特定个体。"
+    },
+    {
+      "sample_id": "s024",
+      "start": 2604,
+      "end": 2606,
+      "surface": "车夫",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "not_entity",
+      "note": "前文“每日办公散后，虽然已近黄昏，”与后文“又一定走得这样慢，但究竟还有二人相对的时候”表明泛指每日下班乘车时拉车的车夫，非特定个体。"
+    },
+    {
+      "sample_id": "s025",
+      "start": 2743,
+      "end": 2745,
+      "surface": "子君",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“不过三星期，我似乎于她已经更加了解……\n\n”与后文“也逐日活泼起来。但她并不爱花……然而她爱动物”表明指同居后逐日活泼起来的子君（g001）。"
+    },
+    {
+      "sample_id": "s026",
+      "start": 2809,
+      "end": 2812,
+      "surface": "官太太",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "title_or_official"
+      ],
+      "chapter_index": 1,
+      "gold_id": "x003",
+      "note": "前文“然而她爱动物，也许是从”与后文“那里传染的罢，不一月，我们的眷属便骤然加得很多，四只小油鸡，在小院子里和房主人的十多只在一同走”表明指同院居住的房东官太太（x003）。"
+    },
+    {
+      "sample_id": "s027",
+      "start": 2839,
+      "end": 2841,
+      "surface": "油鸡",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "x004",
+      "note": "前文“不一月，我们的眷属便骤然加得很多，四只小”与后文“，在小院子里和房主人的十多只在一同走”表明指涓生与子君饲养的四只小油鸡（x004）。"
+    },
+    {
+      "sample_id": "s028",
+      "start": 2848,
+      "end": 2850,
+      "surface": "房主",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "x003",
+      "note": "前文“四只小油鸡，在小院子里和”与后文“人的十多只在一同走。但她们却认识鸡的相貌，各知道那一只是自家的”中“她们”将子君与房主人并举，表明此处房主人指养鸡的房东太太（x003）。"
+    },
+    {
+      "sample_id": "s029",
+      "start": 2889,
+      "end": 2892,
+      "surface": "叭儿狗",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g009",
+      "note": "前文“还有一只花白的”与后文“，从庙会买来，记得似乎原有名字，子君却给它另起了一个，叫作阿随”表明这只从庙会买来的花白叭儿狗即阿随（g009）。"
+    },
+    {
+      "sample_id": "s030",
+      "start": 2908,
+      "end": 2910,
+      "surface": "子君",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“还有一只花白的叭儿狗，从庙会买来，记得似乎原有名字，”与后文“却给它另起了一个，叫作阿随”表明指给狗改名为阿随的子君（g001）。"
+    },
+    {
+      "sample_id": "s031",
+      "start": 2921,
+      "end": 2923,
+      "surface": "阿随",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g009",
+      "note": "前文“子君却给它另起了一个，叫作”与后文“。我就叫它阿随，但我不喜欢这名字”表明指子君所起之名的宠物狗阿随（g009）。"
+    },
+    {
+      "sample_id": "s032",
+      "start": 2928,
+      "end": 2930,
+      "surface": "阿随",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g009",
+      "note": "前文“子君却给它另起了一个，叫作阿随。我就叫它”与后文“，但我不喜欢这名字”表明指涓生随子君称呼的宠物狗阿随（g009）。"
+    },
+    {
+      "sample_id": "s033",
+      "start": 2964,
+      "end": 2966,
+      "surface": "子君",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“这是真的，爱情必须时时更新，生长，创造。我和”与后文“说起这，她也领会地点点头”表明指倾听涓生谈论爱情并点头领会的子君（g001）。"
+    },
+    {
+      "sample_id": "s034",
+      "start": 3026,
+      "end": 3028,
+      "surface": "会馆",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g010",
+      "note": "前文“我们在”与后文“里时，还偶有议论的冲突和意思的误会，自从到吉兆胡同以来，连这一点也没有了”表明指同居前涓生所住的会馆（g010）。"
+    },
+    {
+      "sample_id": "s035",
+      "start": 3049,
+      "end": 3053,
+      "surface": "吉兆胡同",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g011",
+      "note": "前文“我们在会馆里时，还偶有议论的冲突和意思的误会，自从到”与后文“以来，连这一点也没有了”表明指两人搬入同居的吉兆胡同（g011）。"
+    },
+    {
+      "sample_id": "s036",
+      "start": 3101,
+      "end": 3103,
+      "surface": "子君",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "后文“竟胖了起来，脸色也红活了；可惜的是忙。管了家务便连谈天的工夫也没有”表明指操持家务而发胖红润的子君（g001）。"
+    },
+    {
+      "sample_id": "s037",
+      "start": 3158,
+      "end": 3160,
+      "surface": "女工",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "not_entity",
+      "note": "前文“管了家务便连谈天的工夫也没有，何况读书和散步。我们常说，我们总还得雇一个”与后文“。\n\n这就使我也一样地不快活”表明“雇一个女工”为未实现的设想与职业泛称，非特定实体。"
+    },
+    {
+      "sample_id": "s038",
+      "start": 3225,
+      "end": 3228,
+      "surface": "官太太",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "title_or_official"
+      ],
+      "chapter_index": 1,
+      "gold_id": "x003",
+      "note": "前文“常见她包藏著不快活的颜色……幸而探听出来了，也还是和那小”与后文“的暗斗，导火线便是两家的小油鸡”表明指因油鸡与子君暗斗的房东小官太太（x003）。"
+    },
+    {
+      "sample_id": "s039",
+      "start": 3241,
+      "end": 3243,
+      "surface": "油鸡",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "x004",
+      "note": "前文“幸而探听出来了，也还是和那小官太太的暗斗，导火线便是两家的小”与后文“。但又何必硬不告诉我呢？”表明指引发争端的油鸡（x004）。"
+    },
+    {
+      "sample_id": "s040",
+      "start": 3311,
+      "end": 3313,
+      "surface": "局里",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "x005",
+      "note": "前文“我的路也铸定了，每星期中的六天，是由家到局，又由局到家。在”与后文“便坐在办公桌前钞，钞，钞些公文和信件”表明指涓生每日上班抄写公文的局里（x005）。"
+    },
+    {
+      "sample_id": "s041",
+      "start": 3379,
+      "end": 3381,
+      "surface": "会馆",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g010",
+      "note": "前文“但我的食品却比在”与后文“里时好得多了。做菜虽不是子君的特长”表明指涓生独居时的会馆（g010）。"
+    },
+    {
+      "sample_id": "s042",
+      "start": 3393,
+      "end": 3395,
+      "surface": "子君",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“但我的食品却比在会馆里时好得多了。做菜虽不是”与后文“的特长，然而她于此却倾注著全力”表明指倾注全力为涓生做菜的子君（g001）。"
+    },
+    {
+      "sample_id": "s043",
+      "start": 3484,
+      "end": 3486,
+      "surface": "阿随",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g009",
+      "note": "前文“况且她又这样地终日汗流满面……况且还要饲”与后文“，饲油鸡，……都是非她不可的工作”表明指子君每日喂养的狗阿随（g009）。"
+    },
+    {
+      "sample_id": "s044",
+      "start": 3488,
+      "end": 3490,
+      "surface": "油鸡",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "x004",
+      "note": "前文“况且还要饲阿随，饲”与后文“，……都是非她不可的工作。我曾经忠告她”表明指子君每日亲自喂养的油鸡（x004）。"
+    },
+    {
+      "sample_id": "s045",
+      "start": 3615,
+      "end": 3617,
+      "surface": "局里",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "x005",
+      "note": "前文“双十节的前一晚，我呆坐著，她在洗碗。听到打门声，我去开门时，是”与后文“的信差，交给我一张油印的纸条……奉局长谕史涓生著毋庸到局办事”表明指派信差送免职谕条的局里（x005）。"
+    },
+    {
+      "sample_id": "s046",
+      "start": 3657,
+      "end": 3659,
+      "surface": "局长",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short",
+        "title_or_official"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g004",
+      "note": "前文“到灯下去一看，果然，印著的就是：奉”与后文“谕史涓生著毋庸到局办事秘书处启十月九号”表明指下谕免去史涓生职务的局长（g004）。"
+    },
+    {
+      "sample_id": "s047",
+      "start": 3682,
+      "end": 3684,
+      "surface": "会馆",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g010",
+      "note": "前文“奉局长谕史涓生著毋庸到局办事秘书处启十月九号\n\n这在”与后文“里时，我就早已料到了；那雪花膏便是局长的儿子的赌友”表明指此前居住、遇到擦雪花膏者的会馆（g010）。"
+    },
+    {
+      "sample_id": "s048",
+      "start": 3701,
+      "end": 3703,
+      "surface": "局长",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short",
+        "title_or_official"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g004",
+      "note": "前文“这在会馆里时，我就早已料到了；那雪花膏便是”与后文“的儿子的赌友，一定要去添些谣言，设法报告的”表明指听信儿子赌友谣言而免职涓生的局长（g004）。"
+    },
+    {
+      "sample_id": "s049",
+      "start": 3841,
+      "end": 3843,
+      "surface": "子君",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“但我的心却跳跃著。那么一个无畏的”与后文“也变了色，尤其使我痛心；她近来似乎也较为怯弱了”表明指因涓生失业而变色的子君（g001）。"
+    },
+    {
+      "sample_id": "s050",
+      "start": 4098,
+      "end": 4100,
+      "surface": "子君",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“我立刻转身向了书案，推开盛香油的瓶子和醋碟，”与后文“便送过那黯淡的灯来。我先拟广告”表明指把灯送到书案旁协助涓生的子君（g001）。"
+    },
+    {
+      "sample_id": "s051",
+      "start": 4228,
+      "end": 4230,
+      "surface": "子君",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“当停笔凝思的时候，转眼去一瞥她的脸，在昏暗的灯光下，又很见得凄然。我真不料这样微细的小事情，竟会给坚决的，无畏的”与后文“以这么显著的变化”表明指神色凄然、变得怯弱的子君（g001）。"
+    },
+    {
+      "sample_id": "s052",
+      "start": 4285,
+      "end": 4287,
+      "surface": "会馆",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g010",
+      "note": "前文“我的心因此更缭乱，忽然有安宁的生活的影像——”与后文“里的破屋的寂静，在眼前一闪”表明指涓生脑海中闪现的会馆（g010）破屋。"
+    },
+    {
+      "sample_id": "s053",
+      "start": 4454,
+      "end": 4456,
+      "surface": "局里",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "x005",
+      "note": "前文“外来的打击其实倒是振作了我们的新精神。”与后文“的生活，原如鸟贩子手里的禽鸟一般，仅有一点小米维系残生……现在总算脱出这牢笼了”表明指涓生刚脱离的局里（x005）。"
+    },
+    {
+      "sample_id": "s054",
+      "start": 4712,
+      "end": 4714,
+      "surface": "子君",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“可惜的是我没有一间静室，”与后文“又没有先前那么幽静，善于体帖了，屋子里总是散乱著碗碟，弥漫著煤烟”表明指忙于杂务、不再幽静体贴的子君（g001）。"
+    },
+    {
+      "sample_id": "s055",
+      "start": 4781,
+      "end": 4783,
+      "surface": "阿随",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g009",
+      "note": "前文“但是这自然还只能怨我自己无力置一间书斋。然而又加以”与后文“，加以油鸡们。加以油鸡们又大起来了”表明指家中添乱的狗阿随（g009）。"
+    },
+    {
+      "sample_id": "s056",
+      "start": 4786,
+      "end": 4788,
+      "surface": "油鸡",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "x004",
+      "note": "前文“然而又加以阿随，加以”与后文“们。加以油鸡们又大起来了，更容易成为两家争吵的引线”表明指家中饲养的油鸡（x004）。"
+    },
+    {
+      "sample_id": "s057",
+      "start": 4792,
+      "end": 4794,
+      "surface": "油鸡",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "x004",
+      "note": "前文“然而又加以阿随，加以油鸡们。加以”与后文“们又大起来了，更容易成为两家争吵的引线”表明指日渐长大、引发两家争吵的油鸡（x004）。"
+    },
+    {
+      "sample_id": "s058",
+      "start": 4831,
+      "end": 4833,
+      "surface": "子君",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“加以每日的“川流不息”的吃饭；”与后文“的功业，仿佛就完全建立在这吃饭中。吃了筹钱，筹来吃饭”表明指终日围绕做饭喂食奔忙的子君（g001）。"
+    },
+    {
+      "sample_id": "s059",
+      "start": 4863,
+      "end": 4865,
+      "surface": "阿随",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g009",
+      "note": "前文“吃了筹钱，筹来吃饭，还要喂”与后文“，饲油鸡；她似乎将先前所知道的全都忘掉了”表明指子君每日喂食的阿随（g009）。"
+    },
+    {
+      "sample_id": "s060",
+      "start": 4867,
+      "end": 4869,
+      "surface": "油鸡",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "x004",
+      "note": "前文“吃了筹钱，筹来吃饭，还要喂阿随，饲”与后文“；她似乎将先前所知道的全都忘掉了”表明指子君每日喂食的油鸡（x004）。"
+    },
+    {
+      "sample_id": "s061",
+      "start": 5114,
+      "end": 5116,
+      "surface": "阿随",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g009",
+      "note": "前文“有时连饭也不够，虽然我因为终日坐在家里用脑，饭量已经比先前要减少得多。这是先去喂了”与后文“了，有时还并那近来连自己也轻易不吃的羊肉”表明指被子君先拿饭和羊肉喂养的阿随（g009）。"
+    },
+    {
+      "sample_id": "s062",
+      "start": 5140,
+      "end": 5142,
+      "surface": "阿随",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g009",
+      "note": "前文“这是先去喂了阿随了，有时还并那近来连自己也轻易不吃的羊肉。她说，”与后文“实在瘦得太可怜，房东太太还因此嗤笑我们了”表明指子君心疼太瘦的阿随（g009）。"
+    },
+    {
+      "sample_id": "s063",
+      "start": 5185,
+      "end": 5187,
+      "surface": "油鸡",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "x004",
+      "note": "前文“她说，阿随实在瘦得太可怜……\n\n于是吃我残饭的便只有”与后文“们。这是我积久才看出来的”表明指吃涓生残饭的油鸡（x004）。"
+    },
+    {
+      "sample_id": "s064",
+      "start": 5239,
+      "end": 5242,
+      "surface": "叭儿狗",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g009",
+      "note": "前文“于是吃我残饭的便只有油鸡们……自觉了我在这里的位置：不过是”与后文“和油鸡之间”表明此处“叭儿狗”指先吃好饭与羊肉的阿随（g009）。"
+    },
+    {
+      "sample_id": "s065",
+      "start": 5243,
+      "end": 5245,
+      "surface": "油鸡",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "x004",
+      "note": "前文“自觉了我在这里的位置：不过是叭儿狗和”与后文“之间。\n\n后来，经多次的抗争和催逼，油鸡们也逐渐成为肴馔”表明指吃涓生残饭的油鸡（x004）。"
+    },
+    {
+      "sample_id": "s066",
+      "start": 5263,
+      "end": 5265,
+      "surface": "油鸡",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "x004",
+      "note": "前文“后来，经多次的抗争和催逼，”与后文“们也逐渐成为肴馔，我们和阿随都享用了十多日的鲜肥”表明指被宰杀充作食物的油鸡（x004）。"
+    },
+    {
+      "sample_id": "s067",
+      "start": 5277,
+      "end": 5279,
+      "surface": "阿随",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g009",
+      "note": "前文“后来，经多次的抗争和催逼，油鸡们也逐渐成为肴馔，我们和”与后文“都享用了十多日的鲜肥”表明指与涓生、子君分食油鸡的阿随（g009）。"
+    },
+    {
+      "sample_id": "s068",
+      "start": 5326,
+      "end": 5328,
+      "surface": "子君",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“因为它们早已每日只能得到几粒高粱了。从此便清静得多。只有”与后文“很颓唐，似乎常觉得凄苦和无聊，至于不大愿意开口”表明指因油鸡被杀而凄苦颓唐的子君（g001）。"
+    },
+    {
+      "sample_id": "s069",
+      "start": 5369,
+      "end": 5371,
+      "surface": "阿随",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g009",
+      "note": "前文“我想，人是多么容易改变呵！\n\n但是”与后文“也将留不住了……子君也早没有一点食物可以引它打拱或直立起来”表明指因食量负担重而留不住的阿随（g009）。"
+    },
+    {
+      "sample_id": "s070",
+      "start": 5397,
+      "end": 5399,
+      "surface": "子君",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“但是阿随也将留不住了。我们已经不能再希望从什么地方会有来信，”与后文“也早没有一点食物可以引它打拱或直立起来”表明指再无食物逗引阿随的子君（g001）。"
+    },
+    {
+      "sample_id": "s071",
+      "start": 5574,
+      "end": 5576,
+      "surface": "子君",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“终于是用包袱蒙著头，由我带到西郊去放掉了，还要追上来，便推在一个并不很深的土坑里。\n\n我一回寓，觉得又清静得多多了；但”与后文“的凄惨的神色，却使我很吃惊”表明指因阿随被放逐而面露凄惨神色的子君（g001）。"
+    },
+    {
+      "sample_id": "s072",
+      "start": 5604,
+      "end": 5606,
+      "surface": "阿随",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g009",
+      "note": "前文“但子君的凄惨的神色，却使我很吃惊。那是没有见过的神色，自然是为”与后文“。但又何至于此呢？我还没有说起推在土坑里的事”表明指被涓生推入西郊土坑放掉的阿随（g009）。"
+    },
+    {
+      "sample_id": "s073",
+      "start": 5662,
+      "end": 5664,
+      "surface": "子君",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“到夜间，在她的凄惨的神色中，加上冰冷的分子了。\n\n“奇怪。——”与后文“，你怎么今天这样儿了？”我忍不住问”表明指涓生直接呼唤询问的子君（g001）。"
+    },
+    {
+      "sample_id": "s074",
+      "start": 5844,
+      "end": 5846,
+      "surface": "阿随",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g009",
+      "note": "前文“现在忍受著这生活压迫的苦痛，大半倒是为她，便是放掉”与后文“，也何尝不如此。但子君的识见却似乎只是浅薄起来”表明指被涓生带去西郊放掉的阿随（g009）。"
+    },
+    {
+      "sample_id": "s075",
+      "start": 5855,
+      "end": 5857,
+      "surface": "子君",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“现在忍受著这生活压迫的苦痛，大半倒是为她，便是放掉阿随，也何尝不如此。但”与后文“的识见却似乎只是浅薄起来，竟至于连这一点也想不到了”表明指在涓生眼中识见变浅薄的子君（g001）。"
+    },
+    {
+      "sample_id": "s076",
+      "start": 5972,
+      "end": 5974,
+      "surface": "公园",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g013",
+      "note": "前文“天气的冷和神情的冷，逼迫我不能在家庭中安身。但是，往那里去呢？大道上，”与后文“里，虽然没有冰冷的神情，冷风究竟也刺得人皮肤欲裂”表明指涓生冬日外出徘徊时经过的公园（g013）。"
+    },
+    {
+      "sample_id": "s077",
+      "start": 6437,
+      "end": 6439,
+      "surface": "子君",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“我看见怒涛中的渔夫，战壕中的兵士……深夜的偷儿……。”与后文“，——不在近旁。她的勇气都失掉了，只为著阿随悲愤，为著做饭出神”表明指留在寓所为阿随悲愤的子君（g001）。"
+    },
+    {
+      "sample_id": "s078",
+      "start": 6459,
+      "end": 6461,
+      "surface": "阿随",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g009",
+      "note": "前文“子君，——不在近旁。她的勇气都失掉了，只为著”与后文“悲愤，为著做饭出神”表明指令子君念念不忘而悲愤的阿随（g009）。"
+    },
+    {
+      "sample_id": "s079",
+      "start": 6528,
+      "end": 6532,
+      "surface": "吉兆胡同",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g011",
+      "note": "前文“火炉里的不死不活的几片硬煤，也终于烧尽了，已是闭馆的时候。又须回到”与后文“，领略冰冷的颜色去了”表明指图书馆闭馆后涓生返回同居寓所所在的吉兆胡同（g011）。"
+    },
+    {
+      "sample_id": "s080",
+      "start": 6574,
+      "end": 6576,
+      "surface": "子君",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“近来也间或遇到温暖的神情，但这却反而增加我的苦痛。记得有一夜，”与后文“的眼里忽而又发出久已不见的稚气的光来，笑著和我谈到还在会馆时候的情形”表明指夜间同涓生追忆往昔的子君（g001）。"
+    },
+    {
+      "sample_id": "s081",
+      "start": 6603,
+      "end": 6605,
+      "surface": "会馆",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g010",
+      "note": "前文“记得有一夜，子君的眼里忽而又发出久已不见的稚气的光来，笑著和我谈到还在”与后文“时候的情形，时时又很带些恐怖的神色”表明指两人同居前相聚的会馆（g010）。"
+    },
+    {
+      "sample_id": "s082",
+      "start": 6720,
+      "end": 6722,
+      "surface": "子君",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“然而我的笑貌一上脸，我的话一出口，却即刻变为空虚……给我一个难堪的恶毒的冷嘲。”与后文“似乎也觉得的，从此便失掉了她往常的麻木似的镇静”表明指察觉到涓生勉强笑貌的子君（g001）。"
+    },
+    {
+      "sample_id": "s083",
+      "start": 6998,
+      "end": 7000,
+      "surface": "子君",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "后文“有怨色，在早晨，极冷的早晨，这是从未见过的，但也许是从我看来的怨色”表明指在极冷早晨面露怨色的子君（g001）。"
+    },
+    {
+      "sample_id": "s084",
+      "start": 7296,
+      "end": 7298,
+      "surface": "诺拉",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g008",
+      "note": "前文“我和她闲谈，故意地引起我们的往事，提到文艺，于是涉及外国的文人，文人的作品：《”与后文“》，《海的女人》。称扬诺拉的果决……”表明指易卜生剧作《诺拉》及其同名女主人公诺拉（g008）。"
+    },
+    {
+      "sample_id": "s085",
+      "start": 7309,
+      "end": 7311,
+      "surface": "诺拉",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g008",
+      "note": "前文“于是涉及外国的文人，文人的作品：《诺拉》，《海的女人》。称扬”与后文“的果决……。也还是去年在会馆的破屋里讲过的那些话”表明指涓生借以暗示分手的剧作人物诺拉（g008）。"
+    },
+    {
+      "sample_id": "s086",
+      "start": 7323,
+      "end": 7325,
+      "surface": "会馆",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g010",
+      "note": "前文“称扬诺拉的果决……。也还是去年在”与后文“的破屋里讲过的那些话，但现在已经变成空虚”表明指去年涓生向子君高谈阔论的会馆（g010）。"
+    },
+    {
+      "sample_id": "s087",
+      "start": 7451,
+      "end": 7453,
+      "surface": "涓生",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g002",
+      "note": "前文““是的。”她又沉默了一会，说，“但是，……”与后文“，我觉得你近来很两样了。可是的？你，——你老实告诉我。””表明子君直接呼唤男主人公史涓生（g002）。"
+    },
+    {
+      "sample_id": "s088",
+      "start": 7729,
+      "end": 7731,
+      "surface": "母亲",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "not_entity",
+      "note": "前文“眼里也发了稚气的闪闪的光泽。这眼光射向四处，正如孩子在饥渴中寻求著慈爱的”与后文“，但只在空中寻求，恐怖地回避著我的眼”表明此处“慈爱的母亲”是形容子君无助眼光的比喻修辞，并非故事中的人物实体。"
+    },
+    {
+      "sample_id": "s089",
+      "start": 8137,
+      "end": 8139,
+      "surface": "北京",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g014",
+      "note": "前文“我们总算度过了极难忍受的冬天，这”与后文“的冬天；就如蜻蜓落在恶作剧的坏孩子的手里一般”表明指故事发生地北京（g014）。"
+    },
+    {
+      "sample_id": "s090",
+      "start": 8441,
+      "end": 8444,
+      "surface": "官太太",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "title_or_official"
+      ],
+      "chapter_index": 1,
+      "gold_id": "x003",
+      "note": "前文“但终于走进自己的屋子里了，没有灯火；摸火柴点起来时，是异样的寂寞和空虚！\n\n正在错愕中，”与后文“便到窗外来叫我出去。\n\n“今天子君的父亲来到这里，将她接回去了。””表明指前来传话的房东官太太（x003）。"
+    },
+    {
+      "sample_id": "s091",
+      "start": 8459,
+      "end": 8461,
+      "surface": "子君",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“正在错愕中，官太太便到窗外来叫我出去。\n\n“今天”与后文“的父亲来到这里，将她接回去了。””表明指被父亲接走的女主人公子君（g001）。"
+    },
+    {
+      "sample_id": "s092",
+      "start": 8462,
+      "end": 8464,
+      "surface": "父亲",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "x001",
+      "note": "前文“正在错愕中，官太太便到窗外来叫我出去。\n\n“今天子君的”与后文“来到这里，将她接回去了。””表明指来到吉兆胡同把子君接回家的子君的父亲（x001）。"
+    },
+    {
+      "sample_id": "s093",
+      "start": 8616,
+      "end": 8618,
+      "surface": "子君",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“我不信；但是屋子里是异样的寂寞和空虚。我遍看各处，寻觅”与后文“；只见几件破旧而黯淡的家具……现在她就郑重地将这留给我一个人”表明指离去前将食物铜元留给涓生的子君（g001）。"
+    },
+    {
+      "sample_id": "s094",
+      "start": 8960,
+      "end": 8962,
+      "surface": "子君",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“暗中忽然仿佛看见一堆食物，这之后，便浮出一个”与后文“的灰黄的脸来，睁了孩子气的眼睛，恳托似的看著我”表明指涓生在暗中幻觉里浮现出的子君（g001）。"
+    },
+    {
+      "sample_id": "s095",
+      "start": 9051,
+      "end": 9053,
+      "surface": "父亲",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "x001",
+      "note": "前文“现在她知道，她以后所有的只是她”与后文“——儿女的债主——的烈日一般的严威和旁人的赛过冰霜的冷眼”表明指以“儿女的债主”般严威对待她的子君的父亲（x001）。"
+    },
+    {
+      "sample_id": "s096",
+      "start": 9158,
+      "end": 9160,
+      "surface": "子君",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“我不应该将真实说给”与后文“，我们相爱过，我应该永久奉献她我的说谎”表明指涓生懊悔向其说出真话的子君（g001）。"
+    },
+    {
+      "sample_id": "s097",
+      "start": 9191,
+      "end": 9193,
+      "surface": "子君",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“我不应该将真实说给子君，我们相爱过，我应该永久奉献她我的说谎。如果真实可以宝贵，这在”与后文“就不该是一个沉重的空虚”表明指因涓生的真话而背负沉重空虚的子君（g001）。"
+    },
+    {
+      "sample_id": "s098",
+      "start": 9242,
+      "end": 9244,
+      "surface": "子君",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“我以为将真实说给”与后文“，她便可以毫无顾虑，坚决地毅然前行，一如我们将要同居时那样”表明指涓生误以为会毅然前行的子君（g001）。"
+    },
+    {
+      "sample_id": "s099",
+      "start": 9430,
+      "end": 9434,
+      "surface": "吉兆胡同",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g011",
+      "note": "前文“我要离开”与后文“，在这里是异样的空虚和寂寞。我想，只要离开这里，子君便如还在我的身边”表明指子君离去后充满空虚寂寞的吉兆胡同（g011）。"
+    },
+    {
+      "sample_id": "s100",
+      "start": 9458,
+      "end": 9460,
+      "surface": "子君",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“我要离开吉兆胡同，在这里是异样的空虚和寂寞。我想，只要离开这里，”与后文“便如还在我的身边；至少，也如还在城中，有一天，将要出乎意表地访我”表明指涓生幻想仍在身边或城中的子君（g001）。"
+    },
+    {
+      "sample_id": "s101",
+      "start": 9496,
+      "end": 9498,
+      "surface": "会馆",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g010",
+      "note": "前文“有一天，将要出乎意表地访我，像住在”与后文“时候似的”表明指昔日子君常来造访的会馆（g010）。"
+    },
+    {
+      "sample_id": "s102",
+      "start": 9688,
+      "end": 9690,
+      "surface": "朋友",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“他听了我托他在别处觅事之后，冷冷地说，“但那里去呢？很难。——你那，什么呢，你的”与后文“罢，子君，你可知道，她死了。””表明世交口中的“你的朋友”与后文“子君”同位，指代子君（g001）。"
+    },
+    {
+      "sample_id": "s103",
+      "start": 9692,
+      "end": 9694,
+      "surface": "子君",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“——你那，什么呢，你的朋友罢，”与后文“，你可知道，她死了。””表明指世交告知死讯的子君（g001）。"
+    },
+    {
+      "sample_id": "s104",
+      "start": 9826,
+      "end": 9828,
+      "surface": "子君",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“我已经忘却了怎样辞别他，回到自己的寓所。我知道他是不说谎话的；”与后文“总不会再来的了，像去年那样”表明指已死去、再不会前来的子君（g001）。"
+    },
+    {
+      "sample_id": "s105",
+      "start": 10231,
+      "end": 10233,
+      "surface": "阿随",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g009",
+      "note": "前文“但偶然看到地面，却盘旋著一匹小小的动物，瘦弱的，半死的，满身灰土的……。\n\n我一细看，我的心就一停，接著便直跳起来。\n\n那是”与后文“。它回来了”表明指自己找回吉兆胡同寓所的狗阿随（g009）。"
+    },
+    {
+      "sample_id": "s106",
+      "start": 10245,
+      "end": 10249,
+      "surface": "吉兆胡同",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g011",
+      "note": "前文“那是阿随。它回来了。\n\n我的离开”与后文“，也不单是为了房主人们和他家女工的冷眼，大半就为著这阿随”表明指涓生最终搬离的吉兆胡同（g011）。"
+    },
+    {
+      "sample_id": "s107",
+      "start": 10256,
+      "end": 10258,
+      "surface": "房主",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "x003",
+      "note": "前文“我的离开吉兆胡同，也不单是为了”与后文“人们和他家女工的冷眼，大半就为著这阿随”表明指吉兆胡同给涓生冷眼的房东（房东太太及房主一家，x003）。"
+    },
+    {
+      "sample_id": "s108",
+      "start": 10263,
+      "end": 10265,
+      "surface": "女工",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "not_entity",
+      "note": "前文“我的离开吉兆胡同，也不单是为了房主人们和他家”与后文“的冷眼，大半就为著这阿随”表明此处仅泛称房东家的佣工，无独立个体刻画。"
+    },
+    {
+      "sample_id": "s109",
+      "start": 10275,
+      "end": 10277,
+      "surface": "阿随",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g009",
+      "note": "前文“我的离开吉兆胡同，也不单是为了房主人们和他家女工的冷眼，大半就为著这”与后文“。但是，“那里去呢？””表明指回来后促使涓生搬离的阿随（g009）。"
+    },
+    {
+      "sample_id": "s110",
+      "start": 10359,
+      "end": 10361,
+      "surface": "会馆",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g010",
+      "note": "前文“经过许多回的思量和比较，也还只有”与后文“是还能相容的地方。依然是这样的破屋，这样的板床，这样的半枯的槐树和紫藤”表明指涓生重回独居的会馆（g010）。"
+    },
+    {
+      "sample_id": "s111",
+      "start": 10614,
+      "end": 10616,
+      "surface": "子君",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“长久的枯坐中记起上午在街头所见的葬式……\n\n然而”与后文“的葬式却又在我的眼前，是独自负著虚空的重担，在灰白的长路上前行”表明指涓生眼前浮现其孤寂葬式的子君（g001）。"
+    },
+    {
+      "sample_id": "s112",
+      "start": 10703,
+      "end": 10705,
+      "surface": "子君",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“我愿意真有所谓鬼魂，真有所谓地狱，那么，即使在孽风怒吼之中，我也将寻觅”与后文“，当面说出我的悔恨和悲哀，祈求她的饶恕”表明指涓生愿在地狱孽风中寻觅谢罪的子君（g001）。"
+    },
+    {
+      "sample_id": "s113",
+      "start": 10764,
+      "end": 10766,
+      "surface": "子君",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“我将在孽风和毒焰中拥抱”与后文“，乞她宽容，或者使她快意……”表明指涓生渴望在毒焰中拥抱乞恕的子君（g001）。"
+    },
+    {
+      "sample_id": "s114",
+      "start": 10855,
+      "end": 10857,
+      "surface": "子君",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“我总得向著新的生路跨出去，那第一步，——却不过是写下我的悔恨和悲哀，为”与后文“，为自己”呼应篇首，表明指涓生为其写下悔恨与悲哀的子君（g001）。"
+    },
+    {
+      "sample_id": "s115",
+      "start": 10878,
+      "end": 10880,
+      "surface": "子君",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“我仍然只有唱歌一般的哭声，给”与后文“送葬，葬在遗忘中”表明指涓生以哭声送葬在遗忘中的子君（g001）。"
+    },
+    {
+      "sample_id": "s116",
+      "start": 10914,
+      "end": 10916,
+      "surface": "子君",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "g001",
+      "note": "前文“我要遗忘；我为自己，并且要不再想到这用了遗忘给”与后文“送葬”表明指文末再次提及的被葬于遗忘中的子君（g001）。"
+    }
+  ]
+}

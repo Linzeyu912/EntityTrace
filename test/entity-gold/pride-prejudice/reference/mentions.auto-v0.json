@@ -1,0 +1,2897 @@
+{
+  "book": "04_英文长篇_Pride_and_Prejudice_61章.txt",
+  "book_id": "pride-prejudice",
+  "source_sha256": "bef40b0773f5f1857216fa56233e8a4851ab3a98c86b94d4356b005501e912ff",
+  "seed": 20261030,
+  "labeler": "agent:gemini-4-argon",
+  "human_review": "pending",
+  "annotation_seconds": 0.3799,
+  "total_mentions": 320,
+  "counts": {
+    "entity_mentions": 320,
+    "not_entity": 0,
+    "uncertain": 0
+  },
+  "mentions": [
+    {
+      "sample_id": "s001",
+      "start": 2816,
+      "end": 2827,
+      "surface": "Mr. Bingley",
+      "chapter_index": 1,
+      "gold_id": "g004",
+      "note": "第1章/回原文上下文明确指 Charles Bingley（称呼 'Mr. Bingley'）"
+    },
+    {
+      "sample_id": "s002",
+      "start": 3197,
+      "end": 3202,
+      "surface": "Lydia",
+      "chapter_index": 1,
+      "gold_id": "g007",
+      "note": "第1章/回原文上下文明确指 Lydia Bennet（称呼 'Lydia'）"
+    },
+    {
+      "sample_id": "s003",
+      "start": 3429,
+      "end": 3439,
+      "surface": "Mr. Bennet",
+      "chapter_index": 1,
+      "gold_id": "g005",
+      "note": "第1章/回原文上下文明确指 Mr. Bennet（称呼 'Mr. Bennet'）"
+    },
+    {
+      "sample_id": "s004",
+      "start": 4969,
+      "end": 4974,
+      "surface": "Lizzy",
+      "chapter_index": 2,
+      "gold_id": "g001",
+      "note": "第2章/回原文上下文明确指 Elizabeth Bennet（称呼 'Lizzy'）"
+    },
+    {
+      "sample_id": "s005",
+      "start": 5014,
+      "end": 5025,
+      "surface": "Mr. Bingley",
+      "chapter_index": 2,
+      "gold_id": "g004",
+      "note": "第2章/回原文上下文明确指 Charles Bingley（称呼 'Mr. Bingley'）"
+    },
+    {
+      "sample_id": "s006",
+      "start": 5406,
+      "end": 5416,
+      "surface": "Mr. Bennet",
+      "chapter_index": 2,
+      "gold_id": "g005",
+      "note": "第2章/回原文上下文明确指 Mr. Bennet（称呼 'Mr. Bennet'）"
+    },
+    {
+      "sample_id": "s007",
+      "start": 5624,
+      "end": 5629,
+      "surface": "Kitty",
+      "chapter_index": 2,
+      "gold_id": "g011",
+      "note": "第2章/回原文上下文明确指 Catherine (Kitty) Bennet（称呼 'Kitty'）"
+    },
+    {
+      "sample_id": "s008",
+      "start": 8044,
+      "end": 8049,
+      "surface": "Kitty",
+      "chapter_index": 2,
+      "gold_id": "g011",
+      "note": "第2章/回原文上下文明确指 Catherine (Kitty) Bennet（称呼 'Kitty'）"
+    },
+    {
+      "sample_id": "s009",
+      "start": 11278,
+      "end": 11284,
+      "surface": "London",
+      "chapter_index": 3,
+      "gold_id": "g038",
+      "note": "第3章/回原文上下文明确指 London（称呼 'London'）"
+    },
+    {
+      "sample_id": "s010",
+      "start": 13646,
+      "end": 13651,
+      "surface": "Darcy",
+      "chapter_index": 3,
+      "gold_id": "g003",
+      "note": "第3章/回原文上下文明确指 Fitzwilliam Darcy（称呼 'Darcy'）"
+    },
+    {
+      "sample_id": "s011",
+      "start": 15609,
+      "end": 15618,
+      "surface": "Elizabeth",
+      "chapter_index": 3,
+      "gold_id": "g001",
+      "note": "第3章/回原文上下文明确指 Elizabeth Bennet（称呼 'Elizabeth'）"
+    },
+    {
+      "sample_id": "s012",
+      "start": 15746,
+      "end": 15755,
+      "surface": "Catherine",
+      "chapter_index": 3,
+      "gold_id": "g011",
+      "note": "第3章/回原文上下文明确指 Catherine (Kitty) Bennet（称呼 'Catherine'）"
+    },
+    {
+      "sample_id": "s013",
+      "start": 17781,
+      "end": 17791,
+      "surface": "Mr. Bennet",
+      "chapter_index": 3,
+      "gold_id": "g005",
+      "note": "第3章/回原文上下文明确指 Mr. Bennet（称呼 'Mr. Bennet'）"
+    },
+    {
+      "sample_id": "s014",
+      "start": 23727,
+      "end": 23738,
+      "surface": "Miss Bennet",
+      "chapter_index": 4,
+      "gold_id": "g002",
+      "note": "第4章按班纳特家排行称长女简为 Miss Bennet"
+    },
+    {
+      "sample_id": "s015",
+      "start": 23996,
+      "end": 24007,
+      "surface": "Miss Bennet",
+      "chapter_index": 4,
+      "gold_id": "g002",
+      "note": "第4章按班纳特家排行称长女简为 Miss Bennet"
+    },
+    {
+      "sample_id": "s016",
+      "start": 24245,
+      "end": 24256,
+      "surface": "Miss Bennet",
+      "chapter_index": 4,
+      "gold_id": "g002",
+      "note": "第4章按班纳特家排行称长女简为 Miss Bennet"
+    },
+    {
+      "sample_id": "s017",
+      "start": 26318,
+      "end": 26325,
+      "surface": "Meryton",
+      "chapter_index": 5,
+      "gold_id": "g037",
+      "note": "第5章/回原文上下文明确指 Meryton（称呼 'Meryton'）"
+    },
+    {
+      "sample_id": "s018",
+      "start": 28008,
+      "end": 28013,
+      "surface": "Eliza",
+      "chapter_index": 5,
+      "gold_id": "g001",
+      "note": "第5章/回原文上下文明确指 Elizabeth Bennet（称呼 'Eliza'）"
+    },
+    {
+      "sample_id": "s019",
+      "start": 29781,
+      "end": 29792,
+      "surface": "Miss Bennet",
+      "chapter_index": 6,
+      "gold_id": "g002",
+      "note": "第6章按班纳特家排行称长女简为 Miss Bennet"
+    },
+    {
+      "sample_id": "s020",
+      "start": 30939,
+      "end": 30949,
+      "surface": "Miss Lucas",
+      "chapter_index": 6,
+      "gold_id": "g010",
+      "note": "第6章/回原文上下文明确指 Charlotte Lucas（称呼 'Miss Lucas'）"
+    },
+    {
+      "sample_id": "s021",
+      "start": 33003,
+      "end": 33010,
+      "surface": "Meryton",
+      "chapter_index": 6,
+      "gold_id": "g037",
+      "note": "第6章/回原文上下文明确指 Meryton（称呼 'Meryton'）"
+    },
+    {
+      "sample_id": "s022",
+      "start": 36158,
+      "end": 36168,
+      "surface": "Miss Lucas",
+      "chapter_index": 6,
+      "gold_id": "g010",
+      "note": "第6章/回原文上下文明确指 Charlotte Lucas（称呼 'Miss Lucas'）"
+    },
+    {
+      "sample_id": "s023",
+      "start": 39537,
+      "end": 39543,
+      "surface": "London",
+      "chapter_index": 6,
+      "gold_id": "g038",
+      "note": "第6章/回原文上下文明确指 London（称呼 'London'）"
+    },
+    {
+      "sample_id": "s024",
+      "start": 39808,
+      "end": 39813,
+      "surface": "Eliza",
+      "chapter_index": 6,
+      "gold_id": "g001",
+      "note": "第6章/回原文上下文明确指 Elizabeth Bennet（称呼 'Eliza'）"
+    },
+    {
+      "sample_id": "s025",
+      "start": 41964,
+      "end": 41985,
+      "surface": "Miss Elizabeth Bennet",
+      "chapter_index": 6,
+      "gold_id": "g001",
+      "note": "第6章/回原文上下文明确指 Elizabeth Bennet（称呼 'Miss Elizabeth Bennet'）"
+    },
+    {
+      "sample_id": "s026",
+      "start": 41990,
+      "end": 42011,
+      "surface": "Miss Elizabeth Bennet",
+      "chapter_index": 6,
+      "gold_id": "g001",
+      "note": "第6章/回原文上下文明确指 Elizabeth Bennet（称呼 'Miss Elizabeth Bennet'）"
+    },
+    {
+      "sample_id": "s027",
+      "start": 42728,
+      "end": 42738,
+      "surface": "Mr. Bennet",
+      "chapter_index": 7,
+      "gold_id": "g005",
+      "note": "第7章/回原文上下文明确指 Mr. Bennet（称呼 'Mr. Bennet'）"
+    },
+    {
+      "sample_id": "s028",
+      "start": 43340,
+      "end": 43347,
+      "surface": "Meryton",
+      "chapter_index": 7,
+      "gold_id": "g037",
+      "note": "第7章/回原文上下文明确指 Meryton（称呼 'Meryton'）"
+    },
+    {
+      "sample_id": "s029",
+      "start": 43568,
+      "end": 43577,
+      "surface": "Catherine",
+      "chapter_index": 7,
+      "gold_id": "g011",
+      "note": "第7章/回原文上下文明确指 Catherine (Kitty) Bennet（称呼 'Catherine'）"
+    },
+    {
+      "sample_id": "s030",
+      "start": 46585,
+      "end": 46596,
+      "surface": "Miss Bennet",
+      "chapter_index": 7,
+      "gold_id": "g002",
+      "note": "第7章按班纳特家排行称长女简为 Miss Bennet"
+    },
+    {
+      "sample_id": "s031",
+      "start": 48681,
+      "end": 48692,
+      "surface": "Mrs. Bennet",
+      "chapter_index": 7,
+      "gold_id": "g006",
+      "note": "第7章/回原文上下文明确指 Mrs. Bennet（称呼 'Mrs. Bennet'）"
+    },
+    {
+      "sample_id": "s032",
+      "start": 50715,
+      "end": 50724,
+      "surface": "Catherine",
+      "chapter_index": 7,
+      "gold_id": "g011",
+      "note": "第7章/回原文上下文明确指 Catherine (Kitty) Bennet（称呼 'Catherine'）"
+    },
+    {
+      "sample_id": "s033",
+      "start": 53648,
+      "end": 53660,
+      "surface": "Miss Bingley",
+      "chapter_index": 7,
+      "gold_id": "g018",
+      "note": "第7章/回原文上下文明确指 Caroline Bingley（称呼 'Miss Bingley'）"
+    },
+    {
+      "sample_id": "s034",
+      "start": 53838,
+      "end": 53847,
+      "surface": "Longbourn",
+      "chapter_index": 7,
+      "gold_id": "g035",
+      "note": "第7章/回原文上下文明确指 Longbourn（称呼 'Longbourn'）"
+    },
+    {
+      "sample_id": "s035",
+      "start": 56178,
+      "end": 56199,
+      "surface": "Miss Elizabeth Bennet",
+      "chapter_index": 8,
+      "gold_id": "g001",
+      "note": "第8章/回原文上下文明确指 Elizabeth Bennet（称呼 'Miss Elizabeth Bennet'）"
+    },
+    {
+      "sample_id": "s036",
+      "start": 57784,
+      "end": 57789,
+      "surface": "Darcy",
+      "chapter_index": 8,
+      "gold_id": "g003",
+      "note": "第8章/回原文上下文明确指 Fitzwilliam Darcy（称呼 'Darcy'）"
+    },
+    {
+      "sample_id": "s037",
+      "start": 60049,
+      "end": 60056,
+      "surface": "Charles",
+      "chapter_index": 8,
+      "gold_id": "g004",
+      "note": "第8章指查尔斯·宾利（Charles Bingley）"
+    },
+    {
+      "sample_id": "s038",
+      "start": 60126,
+      "end": 60135,
+      "surface": "Pemberley",
+      "chapter_index": 8,
+      "gold_id": "g039",
+      "note": "第8章/回原文上下文明确指 Pemberley（称呼 'Pemberley'）"
+    },
+    {
+      "sample_id": "s039",
+      "start": 60242,
+      "end": 60251,
+      "surface": "Pemberley",
+      "chapter_index": 8,
+      "gold_id": "g039",
+      "note": "第8章/回原文上下文明确指 Pemberley（称呼 'Pemberley'）"
+    },
+    {
+      "sample_id": "s040",
+      "start": 60437,
+      "end": 60444,
+      "surface": "Charles",
+      "chapter_index": 8,
+      "gold_id": "g004",
+      "note": "第8章指查尔斯·宾利（Charles Bingley）"
+    },
+    {
+      "sample_id": "s041",
+      "start": 60463,
+      "end": 60471,
+      "surface": "Caroline",
+      "chapter_index": 8,
+      "gold_id": "g018",
+      "note": "第8章/回原文上下文明确指 Caroline Bingley（称呼 'Caroline'）"
+    },
+    {
+      "sample_id": "s042",
+      "start": 60807,
+      "end": 60817,
+      "surface": "Miss Darcy",
+      "chapter_index": 8,
+      "gold_id": "g014",
+      "note": "第8章/回原文上下文明确指 Georgiana Darcy（称呼 'Miss Darcy'）"
+    },
+    {
+      "sample_id": "s043",
+      "start": 60935,
+      "end": 60956,
+      "surface": "Miss Elizabeth Bennet",
+      "chapter_index": 8,
+      "gold_id": "g001",
+      "note": "第8章/回原文上下文明确指 Elizabeth Bennet（称呼 'Miss Elizabeth Bennet'）"
+    },
+    {
+      "sample_id": "s044",
+      "start": 61354,
+      "end": 61361,
+      "surface": "Charles",
+      "chapter_index": 8,
+      "gold_id": "g004",
+      "note": "第8章指查尔斯·宾利（Charles Bingley）"
+    },
+    {
+      "sample_id": "s045",
+      "start": 63175,
+      "end": 63187,
+      "surface": "Miss Bingley",
+      "chapter_index": 8,
+      "gold_id": "g018",
+      "note": "第8章/回原文上下文明确指 Caroline Bingley（称呼 'Miss Bingley'）"
+    },
+    {
+      "sample_id": "s046",
+      "start": 63523,
+      "end": 63528,
+      "surface": "Eliza",
+      "chapter_index": 8,
+      "gold_id": "g001",
+      "note": "第8章/回原文上下文明确指 Elizabeth Bennet（称呼 'Eliza'）"
+    },
+    {
+      "sample_id": "s047",
+      "start": 70280,
+      "end": 70295,
+      "surface": "Charlotte Lucas",
+      "chapter_index": 9,
+      "gold_id": "g010",
+      "note": "第9章/回原文上下文明确指 Charlotte Lucas（称呼 'Charlotte Lucas'）"
+    },
+    {
+      "sample_id": "s048",
+      "start": 71188,
+      "end": 71195,
+      "surface": "Bingley",
+      "chapter_index": 9,
+      "gold_id": "g004",
+      "note": "第9章/回原文上下文明确指 Charles Bingley（称呼 'Bingley'）"
+    },
+    {
+      "sample_id": "s049",
+      "start": 71548,
+      "end": 71556,
+      "surface": "Gardiner",
+      "chapter_index": 9,
+      "gold_id": "g015",
+      "note": "第9章前文 'brother Gardiner' 指嘉丁纳先生"
+    },
+    {
+      "sample_id": "s050",
+      "start": 77036,
+      "end": 77044,
+      "surface": "Caroline",
+      "chapter_index": 10,
+      "gold_id": "g018",
+      "note": "第10章/回原文上下文明确指 Caroline Bingley（称呼 'Caroline'）"
+    },
+    {
+      "sample_id": "s051",
+      "start": 77256,
+      "end": 77263,
+      "surface": "Charles",
+      "chapter_index": 10,
+      "gold_id": "g004",
+      "note": "第10章指查尔斯·宾利（Charles Bingley）"
+    },
+    {
+      "sample_id": "s052",
+      "start": 81659,
+      "end": 81670,
+      "surface": "Miss Bennet",
+      "chapter_index": 10,
+      "gold_id": "g002",
+      "note": "第10章按班纳特家排行称长女简为 Miss Bennet"
+    },
+    {
+      "sample_id": "s053",
+      "start": 85789,
+      "end": 85796,
+      "surface": "Philips",
+      "chapter_index": 10,
+      "gold_id": "g025",
+      "note": "第10章前文 uncle Philips 指菲利普斯先生"
+    },
+    {
+      "sample_id": "s054",
+      "start": 89186,
+      "end": 89197,
+      "surface": "Miss Bennet",
+      "chapter_index": 11,
+      "gold_id": "g002",
+      "note": "第11章按班纳特家排行称长女简为 Miss Bennet"
+    },
+    {
+      "sample_id": "s055",
+      "start": 90105,
+      "end": 90116,
+      "surface": "Miss Bennet",
+      "chapter_index": 11,
+      "gold_id": "g002",
+      "note": "第11章按班纳特家排行称长女简为 Miss Bennet"
+    },
+    {
+      "sample_id": "s056",
+      "start": 90175,
+      "end": 90182,
+      "surface": "Charles",
+      "chapter_index": 11,
+      "gold_id": "g004",
+      "note": "第11章指查尔斯·宾利（Charles Bingley）"
+    },
+    {
+      "sample_id": "s057",
+      "start": 94629,
+      "end": 94638,
+      "surface": "Elizabeth",
+      "chapter_index": 11,
+      "gold_id": "g001",
+      "note": "第11章/回原文上下文明确指 Elizabeth Bennet（称呼 'Elizabeth'）"
+    },
+    {
+      "sample_id": "s058",
+      "start": 94726,
+      "end": 94738,
+      "surface": "Miss Bingley",
+      "chapter_index": 11,
+      "gold_id": "g018",
+      "note": "第11章/回原文上下文明确指 Caroline Bingley（称呼 'Miss Bingley'）"
+    },
+    {
+      "sample_id": "s059",
+      "start": 97797,
+      "end": 97808,
+      "surface": "Miss Bennet",
+      "chapter_index": 12,
+      "gold_id": "g002",
+      "note": "第12章按班纳特家排行称长女简为 Miss Bennet"
+    },
+    {
+      "sample_id": "s060",
+      "start": 99838,
+      "end": 99847,
+      "surface": "Catherine",
+      "chapter_index": 12,
+      "gold_id": "g011",
+      "note": "第12章/回原文上下文明确指 Catherine (Kitty) Bennet（称呼 'Catherine'）"
+    },
+    {
+      "sample_id": "s061",
+      "start": 100457,
+      "end": 100472,
+      "surface": "Charlotte Lucas",
+      "chapter_index": 13,
+      "gold_id": "g010",
+      "note": "第13章/回原文上下文明确指 Charlotte Lucas（称呼 'Charlotte Lucas'）"
+    },
+    {
+      "sample_id": "s062",
+      "start": 100941,
+      "end": 100946,
+      "surface": "Lydia",
+      "chapter_index": 13,
+      "gold_id": "g007",
+      "note": "第13章/回原文上下文明确指 Lydia Bennet（称呼 'Lydia'）"
+    },
+    {
+      "sample_id": "s063",
+      "start": 103528,
+      "end": 103552,
+      "surface": "Lady Catherine de Bourgh",
+      "chapter_index": 13,
+      "gold_id": "g013",
+      "note": "第13章/回原文上下文明确指 Lady Catherine de Bourgh（称呼 'Lady Catherine de Bourgh'）"
+    },
+    {
+      "sample_id": "s064",
+      "start": 106548,
+      "end": 106557,
+      "surface": "Catherine",
+      "chapter_index": 13,
+      "gold_id": "g011",
+      "note": "第13章/回原文上下文明确指 Catherine (Kitty) Bennet（称呼 'Catherine'）"
+    },
+    {
+      "sample_id": "s065",
+      "start": 114729,
+      "end": 114736,
+      "surface": "Philips",
+      "chapter_index": 14,
+      "gold_id": "g025",
+      "note": "第14章前文 uncle Philips 指菲利普斯先生"
+    },
+    {
+      "sample_id": "s066",
+      "start": 114871,
+      "end": 114878,
+      "surface": "Meryton",
+      "chapter_index": 14,
+      "gold_id": "g037",
+      "note": "第14章/回原文上下文明确指 Meryton（称呼 'Meryton'）"
+    },
+    {
+      "sample_id": "s067",
+      "start": 116629,
+      "end": 116653,
+      "surface": "Lady Catherine de Bourgh",
+      "chapter_index": 15,
+      "gold_id": "g013",
+      "note": "第15章/回原文上下文明确指 Lady Catherine de Bourgh（称呼 'Lady Catherine de Bourgh'）"
+    },
+    {
+      "sample_id": "s068",
+      "start": 117101,
+      "end": 117110,
+      "surface": "Longbourn",
+      "chapter_index": 15,
+      "gold_id": "g035",
+      "note": "第15章/回原文上下文明确指 Longbourn（称呼 'Longbourn'）"
+    },
+    {
+      "sample_id": "s069",
+      "start": 117966,
+      "end": 117975,
+      "surface": "Longbourn",
+      "chapter_index": 15,
+      "gold_id": "g035",
+      "note": "第15章/回原文上下文明确指 Longbourn（称呼 'Longbourn'）"
+    },
+    {
+      "sample_id": "s070",
+      "start": 119187,
+      "end": 119197,
+      "surface": "Mr. Bennet",
+      "chapter_index": 15,
+      "gold_id": "g005",
+      "note": "第15章/回原文上下文明确指 Mr. Bennet（称呼 'Mr. Bennet'）"
+    },
+    {
+      "sample_id": "s071",
+      "start": 122548,
+      "end": 122559,
+      "surface": "Mr. Wickham",
+      "chapter_index": 15,
+      "gold_id": "g008",
+      "note": "第15章/回原文上下文明确指 George Wickham（称呼 'Mr. Wickham'）"
+    },
+    {
+      "sample_id": "s072",
+      "start": 122663,
+      "end": 122673,
+      "surface": "Miss Lydia",
+      "chapter_index": 15,
+      "gold_id": "g007",
+      "note": "第15章/回原文上下文明确指 Lydia Bennet（称呼 'Miss Lydia'）"
+    },
+    {
+      "sample_id": "s073",
+      "start": 126715,
+      "end": 126729,
+      "surface": "Lady Catherine",
+      "chapter_index": 16,
+      "gold_id": "g013",
+      "note": "第16章/回原文上下文明确指 Lady Catherine de Bourgh（称呼 'Lady Catherine'）"
+    },
+    {
+      "sample_id": "s074",
+      "start": 128105,
+      "end": 128112,
+      "surface": "Philips",
+      "chapter_index": 16,
+      "gold_id": "g025",
+      "note": "第16章前文 uncle Philips 指菲利普斯先生"
+    },
+    {
+      "sample_id": "s075",
+      "start": 129236,
+      "end": 129247,
+      "surface": "Mr. Wickham",
+      "chapter_index": 16,
+      "gold_id": "g008",
+      "note": "第16章/回原文上下文明确指 George Wickham（称呼 'Mr. Wickham'）"
+    },
+    {
+      "sample_id": "s076",
+      "start": 130716,
+      "end": 130727,
+      "surface": "Miss Bennet",
+      "chapter_index": 16,
+      "gold_id": "g002",
+      "note": "第16章按班纳特家排行称长女简为 Miss Bennet"
+    },
+    {
+      "sample_id": "s077",
+      "start": 131068,
+      "end": 131075,
+      "surface": "Wickham",
+      "chapter_index": 16,
+      "gold_id": "g008",
+      "note": "第16章/回原文上下文明确指 George Wickham（称呼 'Wickham'）"
+    },
+    {
+      "sample_id": "s078",
+      "start": 142320,
+      "end": 142344,
+      "surface": "Lady Catherine de Bourgh",
+      "chapter_index": 16,
+      "gold_id": "g013",
+      "note": "第16章/回原文上下文明确指 Lady Catherine de Bourgh（称呼 'Lady Catherine de Bourgh'）"
+    },
+    {
+      "sample_id": "s079",
+      "start": 142486,
+      "end": 142500,
+      "surface": "Lady Catherine",
+      "chapter_index": 16,
+      "gold_id": "g013",
+      "note": "第16章/回原文上下文明确指 Lady Catherine de Bourgh（称呼 'Lady Catherine'）"
+    },
+    {
+      "sample_id": "s080",
+      "start": 146575,
+      "end": 146586,
+      "surface": "Mr. Wickham",
+      "chapter_index": 17,
+      "gold_id": "g008",
+      "note": "第17章/回原文上下文明确指 George Wickham（称呼 'Mr. Wickham'）"
+    },
+    {
+      "sample_id": "s081",
+      "start": 148015,
+      "end": 148026,
+      "surface": "Mrs. Bennet",
+      "chapter_index": 17,
+      "gold_id": "g006",
+      "note": "第17章/回原文上下文明确指 Mrs. Bennet（称呼 'Mrs. Bennet'）"
+    },
+    {
+      "sample_id": "s082",
+      "start": 149585,
+      "end": 149609,
+      "surface": "Lady Catherine de Bourgh",
+      "chapter_index": 17,
+      "gold_id": "g013",
+      "note": "第17章/回原文上下文明确指 Lady Catherine de Bourgh（称呼 'Lady Catherine de Bourgh'）"
+    },
+    {
+      "sample_id": "s083",
+      "start": 152970,
+      "end": 152975,
+      "surface": "Lydia",
+      "chapter_index": 18,
+      "gold_id": "g007",
+      "note": "第18章/回原文上下文明确指 Lydia Bennet（称呼 'Lydia'）"
+    },
+    {
+      "sample_id": "s084",
+      "start": 153415,
+      "end": 153422,
+      "surface": "Wickham",
+      "chapter_index": 18,
+      "gold_id": "g008",
+      "note": "第18章/回原文上下文明确指 George Wickham（称呼 'Wickham'）"
+    },
+    {
+      "sample_id": "s085",
+      "start": 154160,
+      "end": 154175,
+      "surface": "Charlotte Lucas",
+      "chapter_index": 18,
+      "gold_id": "g010",
+      "note": "第18章/回原文上下文明确指 Charlotte Lucas（称呼 'Charlotte Lucas'）"
+    },
+    {
+      "sample_id": "s086",
+      "start": 154867,
+      "end": 154882,
+      "surface": "Charlotte Lucas",
+      "chapter_index": 18,
+      "gold_id": "g010",
+      "note": "第18章/回原文上下文明确指 Charlotte Lucas（称呼 'Charlotte Lucas'）"
+    },
+    {
+      "sample_id": "s087",
+      "start": 155467,
+      "end": 155472,
+      "surface": "Darcy",
+      "chapter_index": 18,
+      "gold_id": "g003",
+      "note": "第18章/回原文上下文明确指 Fitzwilliam Darcy（称呼 'Darcy'）"
+    },
+    {
+      "sample_id": "s088",
+      "start": 157887,
+      "end": 157894,
+      "surface": "Meryton",
+      "chapter_index": 18,
+      "gold_id": "g037",
+      "note": "第18章/回原文上下文明确指 Meryton（称呼 'Meryton'）"
+    },
+    {
+      "sample_id": "s089",
+      "start": 162408,
+      "end": 162413,
+      "surface": "Eliza",
+      "chapter_index": 18,
+      "gold_id": "g001",
+      "note": "第18章/回原文上下文明确指 Elizabeth Bennet（称呼 'Eliza'）"
+    },
+    {
+      "sample_id": "s090",
+      "start": 162451,
+      "end": 162465,
+      "surface": "George Wickham",
+      "chapter_index": 18,
+      "gold_id": "g008",
+      "note": "第18章/回原文上下文明确指 George Wickham（称呼 'George Wickham'）"
+    },
+    {
+      "sample_id": "s091",
+      "start": 162929,
+      "end": 162943,
+      "surface": "George Wickham",
+      "chapter_index": 18,
+      "gold_id": "g008",
+      "note": "第18章/回原文上下文明确指 George Wickham（称呼 'George Wickham'）"
+    },
+    {
+      "sample_id": "s092",
+      "start": 163118,
+      "end": 163132,
+      "surface": "George Wickham",
+      "chapter_index": 18,
+      "gold_id": "g008",
+      "note": "第18章/回原文上下文明确指 George Wickham（称呼 'George Wickham'）"
+    },
+    {
+      "sample_id": "s093",
+      "start": 163456,
+      "end": 163461,
+      "surface": "Eliza",
+      "chapter_index": 18,
+      "gold_id": "g001",
+      "note": "第18章/回原文上下文明确指 Elizabeth Bennet（称呼 'Eliza'）"
+    },
+    {
+      "sample_id": "s094",
+      "start": 165625,
+      "end": 165632,
+      "surface": "Meryton",
+      "chapter_index": 18,
+      "gold_id": "g037",
+      "note": "第18章/回原文上下文明确指 Meryton（称呼 'Meryton'）"
+    },
+    {
+      "sample_id": "s095",
+      "start": 165684,
+      "end": 165693,
+      "surface": "Mr. Darcy",
+      "chapter_index": 18,
+      "gold_id": "g003",
+      "note": "第18章/回原文上下文明确指 Fitzwilliam Darcy（称呼 'Mr. Darcy'）"
+    },
+    {
+      "sample_id": "s096",
+      "start": 166670,
+      "end": 166680,
+      "surface": "Miss Lucas",
+      "chapter_index": 18,
+      "gold_id": "g010",
+      "note": "第18章/回原文上下文明确指 Charlotte Lucas（称呼 'Miss Lucas'）"
+    },
+    {
+      "sample_id": "s097",
+      "start": 170721,
+      "end": 170732,
+      "surface": "Mr. Bingley",
+      "chapter_index": 18,
+      "gold_id": "g004",
+      "note": "第18章/回原文上下文明确指 Charles Bingley（称呼 'Mr. Bingley'）"
+    },
+    {
+      "sample_id": "s098",
+      "start": 178641,
+      "end": 178651,
+      "surface": "Miss Lucas",
+      "chapter_index": 18,
+      "gold_id": "g010",
+      "note": "第18章/回原文上下文明确指 Charlotte Lucas（称呼 'Miss Lucas'）"
+    },
+    {
+      "sample_id": "s099",
+      "start": 179108,
+      "end": 179119,
+      "surface": "Mrs. Bennet",
+      "chapter_index": 18,
+      "gold_id": "g006",
+      "note": "第18章/回原文上下文明确指 Mrs. Bennet（称呼 'Mrs. Bennet'）"
+    },
+    {
+      "sample_id": "s100",
+      "start": 179796,
+      "end": 179801,
+      "surface": "Darcy",
+      "chapter_index": 18,
+      "gold_id": "g003",
+      "note": "第18章/回原文上下文明确指 Fitzwilliam Darcy（称呼 'Darcy'）"
+    },
+    {
+      "sample_id": "s101",
+      "start": 180531,
+      "end": 180538,
+      "surface": "Bingley",
+      "chapter_index": 18,
+      "gold_id": "g004",
+      "note": "第18章/回原文上下文明确指 Charles Bingley（称呼 'Bingley'）"
+    },
+    {
+      "sample_id": "s102",
+      "start": 181318,
+      "end": 181329,
+      "surface": "Mr. Bingley",
+      "chapter_index": 18,
+      "gold_id": "g004",
+      "note": "第18章/回原文上下文明确指 Charles Bingley（称呼 'Mr. Bingley'）"
+    },
+    {
+      "sample_id": "s103",
+      "start": 182280,
+      "end": 182285,
+      "surface": "Kitty",
+      "chapter_index": 19,
+      "gold_id": "g011",
+      "note": "第19章/回原文上下文明确指 Catherine (Kitty) Bennet（称呼 'Kitty'）"
+    },
+    {
+      "sample_id": "s104",
+      "start": 183109,
+      "end": 183114,
+      "surface": "Kitty",
+      "chapter_index": 19,
+      "gold_id": "g011",
+      "note": "第19章/回原文上下文明确指 Catherine (Kitty) Bennet（称呼 'Kitty'）"
+    },
+    {
+      "sample_id": "s105",
+      "start": 185347,
+      "end": 185371,
+      "surface": "Lady Catherine de Bourgh",
+      "chapter_index": 19,
+      "gold_id": "g013",
+      "note": "第19章/回原文上下文明确指 Lady Catherine de Bourgh（称呼 'Lady Catherine de Bourgh'）"
+    },
+    {
+      "sample_id": "s106",
+      "start": 192134,
+      "end": 192145,
+      "surface": "Mrs. Bennet",
+      "chapter_index": 20,
+      "gold_id": "g006",
+      "note": "第20章/回原文上下文明确指 Mrs. Bennet（称呼 'Mrs. Bennet'）"
+    },
+    {
+      "sample_id": "s107",
+      "start": 192239,
+      "end": 192248,
+      "surface": "Elizabeth",
+      "chapter_index": 20,
+      "gold_id": "g001",
+      "note": "第20章/回原文上下文明确指 Elizabeth Bennet（称呼 'Elizabeth'）"
+    },
+    {
+      "sample_id": "s108",
+      "start": 194384,
+      "end": 194394,
+      "surface": "Mr. Bennet",
+      "chapter_index": 20,
+      "gold_id": "g005",
+      "note": "第20章/回原文上下文明确指 Mr. Bennet（称呼 'Mr. Bennet'）"
+    },
+    {
+      "sample_id": "s109",
+      "start": 194793,
+      "end": 194798,
+      "surface": "Lizzy",
+      "chapter_index": 20,
+      "gold_id": "g001",
+      "note": "第20章/回原文上下文明确指 Elizabeth Bennet（称呼 'Lizzy'）"
+    },
+    {
+      "sample_id": "s110",
+      "start": 194882,
+      "end": 194887,
+      "surface": "Lizzy",
+      "chapter_index": 20,
+      "gold_id": "g001",
+      "note": "第20章/回原文上下文明确指 Elizabeth Bennet（称呼 'Lizzy'）"
+    },
+    {
+      "sample_id": "s111",
+      "start": 197165,
+      "end": 197180,
+      "surface": "Charlotte Lucas",
+      "chapter_index": 20,
+      "gold_id": "g010",
+      "note": "第20章/回原文上下文明确指 Charlotte Lucas（称呼 'Charlotte Lucas'）"
+    },
+    {
+      "sample_id": "s112",
+      "start": 201792,
+      "end": 201802,
+      "surface": "Miss Lucas",
+      "chapter_index": 21,
+      "gold_id": "g010",
+      "note": "第21章/回原文上下文明确指 Charlotte Lucas（称呼 'Miss Lucas'）"
+    },
+    {
+      "sample_id": "s113",
+      "start": 203958,
+      "end": 203965,
+      "surface": "Wickham",
+      "chapter_index": 21,
+      "gold_id": "g008",
+      "note": "第21章/回原文上下文明确指 George Wickham（称呼 'Wickham'）"
+    },
+    {
+      "sample_id": "s114",
+      "start": 204165,
+      "end": 204181,
+      "surface": "Caroline Bingley",
+      "chapter_index": 21,
+      "gold_id": "g018",
+      "note": "第21章/回原文上下文明确指 Caroline Bingley（称呼 'Caroline Bingley'）"
+    },
+    {
+      "sample_id": "s115",
+      "start": 205857,
+      "end": 205865,
+      "surface": "Caroline",
+      "chapter_index": 21,
+      "gold_id": "g018",
+      "note": "第21章/回原文上下文明确指 Caroline Bingley（称呼 'Caroline'）"
+    },
+    {
+      "sample_id": "s116",
+      "start": 206057,
+      "end": 206063,
+      "surface": "London",
+      "chapter_index": 21,
+      "gold_id": "g038",
+      "note": "第21章/回原文上下文明确指 London（称呼 'London'）"
+    },
+    {
+      "sample_id": "s117",
+      "start": 206186,
+      "end": 206193,
+      "surface": "Charles",
+      "chapter_index": 21,
+      "gold_id": "g004",
+      "note": "第21章指查尔斯·宾利（Charles Bingley）"
+    },
+    {
+      "sample_id": "s118",
+      "start": 207260,
+      "end": 207275,
+      "surface": "Georgiana Darcy",
+      "chapter_index": 21,
+      "gold_id": "g014",
+      "note": "第21章/回原文上下文明确指 Georgiana Darcy（称呼 'Georgiana Darcy'）"
+    },
+    {
+      "sample_id": "s119",
+      "start": 207946,
+      "end": 207953,
+      "surface": "Charles",
+      "chapter_index": 21,
+      "gold_id": "g004",
+      "note": "第21章指查尔斯·宾利（Charles Bingley）"
+    },
+    {
+      "sample_id": "s120",
+      "start": 210104,
+      "end": 210112,
+      "surface": "Caroline",
+      "chapter_index": 21,
+      "gold_id": "g018",
+      "note": "第21章/回原文上下文明确指 Caroline Bingley（称呼 'Caroline'）"
+    },
+    {
+      "sample_id": "s121",
+      "start": 220455,
+      "end": 220465,
+      "surface": "Miss Lucas",
+      "chapter_index": 22,
+      "gold_id": "g010",
+      "note": "第22章/回原文上下文明确指 Charlotte Lucas（称呼 'Miss Lucas'）"
+    },
+    {
+      "sample_id": "s122",
+      "start": 225365,
+      "end": 225380,
+      "surface": "Charlotte Lucas",
+      "chapter_index": 23,
+      "gold_id": "g010",
+      "note": "第23章/回原文上下文明确指 Charlotte Lucas（称呼 'Charlotte Lucas'）"
+    },
+    {
+      "sample_id": "s123",
+      "start": 225713,
+      "end": 225718,
+      "surface": "Lydia",
+      "chapter_index": 23,
+      "gold_id": "g007",
+      "note": "第23章/回原文上下文明确指 Lydia Bennet（称呼 'Lydia'）"
+    },
+    {
+      "sample_id": "s124",
+      "start": 225741,
+      "end": 225751,
+      "surface": "Miss Lucas",
+      "chapter_index": 23,
+      "gold_id": "g010",
+      "note": "第23章/回原文上下文明确指 Charlotte Lucas（称呼 'Miss Lucas'）"
+    },
+    {
+      "sample_id": "s125",
+      "start": 226602,
+      "end": 226609,
+      "surface": "Bingley",
+      "chapter_index": 23,
+      "gold_id": "g004",
+      "note": "第23章/回原文上下文明确指 Charles Bingley（称呼 'Bingley'）"
+    },
+    {
+      "sample_id": "s126",
+      "start": 226688,
+      "end": 226696,
+      "surface": "Caroline",
+      "chapter_index": 23,
+      "gold_id": "g018",
+      "note": "第23章/回原文上下文明确指 Caroline Bingley（称呼 'Caroline'）"
+    },
+    {
+      "sample_id": "s127",
+      "start": 227895,
+      "end": 227904,
+      "surface": "Longbourn",
+      "chapter_index": 23,
+      "gold_id": "g035",
+      "note": "第23章/回原文上下文明确指 Longbourn（称呼 'Longbourn'）"
+    },
+    {
+      "sample_id": "s128",
+      "start": 230090,
+      "end": 230099,
+      "surface": "Longbourn",
+      "chapter_index": 23,
+      "gold_id": "g035",
+      "note": "第23章/回原文上下文明确指 Longbourn（称呼 'Longbourn'）"
+    },
+    {
+      "sample_id": "s129",
+      "start": 230922,
+      "end": 230937,
+      "surface": "Charlotte Lucas",
+      "chapter_index": 23,
+      "gold_id": "g010",
+      "note": "第23章/回原文上下文明确指 Charlotte Lucas（称呼 'Charlotte Lucas'）"
+    },
+    {
+      "sample_id": "s130",
+      "start": 231239,
+      "end": 231250,
+      "surface": "Mrs. Bennet",
+      "chapter_index": 23,
+      "gold_id": "g006",
+      "note": "第23章/回原文上下文明确指 Mrs. Bennet（称呼 'Mrs. Bennet'）"
+    },
+    {
+      "sample_id": "s131",
+      "start": 232061,
+      "end": 232067,
+      "surface": "London",
+      "chapter_index": 24,
+      "gold_id": "g038",
+      "note": "第24章/回原文上下文明确指 London（称呼 'London'）"
+    },
+    {
+      "sample_id": "s132",
+      "start": 232409,
+      "end": 232419,
+      "surface": "Miss Darcy",
+      "chapter_index": 24,
+      "gold_id": "g014",
+      "note": "第24章/回原文上下文明确指 Georgiana Darcy（称呼 'Miss Darcy'）"
+    },
+    {
+      "sample_id": "s133",
+      "start": 232501,
+      "end": 232509,
+      "surface": "Caroline",
+      "chapter_index": 24,
+      "gold_id": "g018",
+      "note": "第24章/回原文上下文明确指 Caroline Bingley（称呼 'Caroline'）"
+    },
+    {
+      "sample_id": "s134",
+      "start": 233082,
+      "end": 233092,
+      "surface": "Miss Darcy",
+      "chapter_index": 24,
+      "gold_id": "g014",
+      "note": "第24章/回原文上下文明确指 Georgiana Darcy（称呼 'Miss Darcy'）"
+    },
+    {
+      "sample_id": "s135",
+      "start": 235517,
+      "end": 235528,
+      "surface": "Miss Bennet",
+      "chapter_index": 24,
+      "gold_id": "g002",
+      "note": "第24章按班纳特家排行称长女简为 Miss Bennet"
+    },
+    {
+      "sample_id": "s136",
+      "start": 236432,
+      "end": 236437,
+      "surface": "Lizzy",
+      "chapter_index": 24,
+      "gold_id": "g001",
+      "note": "第24章/回原文上下文明确指 Elizabeth Bennet（称呼 'Lizzy'）"
+    },
+    {
+      "sample_id": "s137",
+      "start": 237382,
+      "end": 237397,
+      "surface": "Charlotte Lucas",
+      "chapter_index": 24,
+      "gold_id": "g010",
+      "note": "第24章/回原文上下文明确指 Charlotte Lucas（称呼 'Charlotte Lucas'）"
+    },
+    {
+      "sample_id": "s138",
+      "start": 242447,
+      "end": 242458,
+      "surface": "Miss Bennet",
+      "chapter_index": 24,
+      "gold_id": "g002",
+      "note": "第24章按班纳特家排行称长女简为 Miss Bennet"
+    },
+    {
+      "sample_id": "s139",
+      "start": 242884,
+      "end": 242893,
+      "surface": "Charlotte",
+      "chapter_index": 25,
+      "gold_id": "g010",
+      "note": "第25章/回原文上下文明确指 Charlotte Lucas（称呼 'Charlotte'）"
+    },
+    {
+      "sample_id": "s140",
+      "start": 243389,
+      "end": 243400,
+      "surface": "Mrs. Bennet",
+      "chapter_index": 25,
+      "gold_id": "g006",
+      "note": "第25章/回原文上下文明确指 Mrs. Bennet（称呼 'Mrs. Bennet'）"
+    },
+    {
+      "sample_id": "s141",
+      "start": 243503,
+      "end": 243512,
+      "surface": "Longbourn",
+      "chapter_index": 25,
+      "gold_id": "g035",
+      "note": "第25章/回原文上下文明确指 Longbourn（称呼 'Longbourn'）"
+    },
+    {
+      "sample_id": "s142",
+      "start": 243802,
+      "end": 243815,
+      "surface": "Mrs. Gardiner",
+      "chapter_index": 25,
+      "gold_id": "g016",
+      "note": "第25章/回原文上下文明确指 Mrs. Gardiner（称呼 'Mrs. Gardiner'）"
+    },
+    {
+      "sample_id": "s143",
+      "start": 244134,
+      "end": 244147,
+      "surface": "Mrs. Gardiner",
+      "chapter_index": 25,
+      "gold_id": "g016",
+      "note": "第25章/回原文上下文明确指 Mrs. Gardiner（称呼 'Mrs. Gardiner'）"
+    },
+    {
+      "sample_id": "s144",
+      "start": 247601,
+      "end": 247614,
+      "surface": "Mrs. Gardiner",
+      "chapter_index": 25,
+      "gold_id": "g016",
+      "note": "第25章/回原文上下文明确指 Mrs. Gardiner（称呼 'Mrs. Gardiner'）"
+    },
+    {
+      "sample_id": "s145",
+      "start": 248099,
+      "end": 248108,
+      "surface": "Mr. Darcy",
+      "chapter_index": 25,
+      "gold_id": "g003",
+      "note": "第25章/回原文上下文明确指 Fitzwilliam Darcy（称呼 'Mr. Darcy'）"
+    },
+    {
+      "sample_id": "s146",
+      "start": 249032,
+      "end": 249043,
+      "surface": "Miss Bennet",
+      "chapter_index": 25,
+      "gold_id": "g002",
+      "note": "第25章按班纳特家排行称长女简为 Miss Bennet"
+    },
+    {
+      "sample_id": "s147",
+      "start": 249180,
+      "end": 249188,
+      "surface": "Caroline",
+      "chapter_index": 25,
+      "gold_id": "g018",
+      "note": "第25章/回原文上下文明确指 Caroline Bingley（称呼 'Caroline'）"
+    },
+    {
+      "sample_id": "s148",
+      "start": 250189,
+      "end": 250196,
+      "surface": "Wickham",
+      "chapter_index": 25,
+      "gold_id": "g008",
+      "note": "第25章/回原文上下文明确指 George Wickham（称呼 'Wickham'）"
+    },
+    {
+      "sample_id": "s149",
+      "start": 251309,
+      "end": 251326,
+      "surface": "Fitzwilliam Darcy",
+      "chapter_index": 25,
+      "gold_id": "g003",
+      "note": "第25章/回原文上下文明确指 Fitzwilliam Darcy（称呼 'Fitzwilliam Darcy'）"
+    },
+    {
+      "sample_id": "s150",
+      "start": 251396,
+      "end": 251409,
+      "surface": "Mrs. Gardiner",
+      "chapter_index": 26,
+      "gold_id": "g016",
+      "note": "第26章/回原文上下文明确指 Mrs. Gardiner（称呼 'Mrs. Gardiner'）"
+    },
+    {
+      "sample_id": "s151",
+      "start": 255152,
+      "end": 255161,
+      "surface": "Charlotte",
+      "chapter_index": 26,
+      "gold_id": "g010",
+      "note": "第26章/回原文上下文明确指 Charlotte Lucas（称呼 'Charlotte'）"
+    },
+    {
+      "sample_id": "s152",
+      "start": 258169,
+      "end": 258177,
+      "surface": "Caroline",
+      "chapter_index": 26,
+      "gold_id": "g018",
+      "note": "第26章/回原文上下文明确指 Caroline Bingley（称呼 'Caroline'）"
+    },
+    {
+      "sample_id": "s153",
+      "start": 259073,
+      "end": 259085,
+      "surface": "Miss Bingley",
+      "chapter_index": 26,
+      "gold_id": "g018",
+      "note": "第26章/回原文上下文明确指 Caroline Bingley（称呼 'Miss Bingley'）"
+    },
+    {
+      "sample_id": "s154",
+      "start": 263151,
+      "end": 263164,
+      "surface": "Mrs. Gardiner",
+      "chapter_index": 26,
+      "gold_id": "g016",
+      "note": "第26章/回原文上下文明确指 Mrs. Gardiner（称呼 'Mrs. Gardiner'）"
+    },
+    {
+      "sample_id": "s155",
+      "start": 264692,
+      "end": 264701,
+      "surface": "Charlotte",
+      "chapter_index": 27,
+      "gold_id": "g010",
+      "note": "第27章/回原文上下文明确指 Charlotte Lucas（称呼 'Charlotte'）"
+    },
+    {
+      "sample_id": "s156",
+      "start": 265931,
+      "end": 265955,
+      "surface": "Lady Catherine de Bourgh",
+      "chapter_index": 27,
+      "gold_id": "g013",
+      "note": "第27章/回原文上下文明确指 Lady Catherine de Bourgh（称呼 'Lady Catherine de Bourgh'）"
+    },
+    {
+      "sample_id": "s157",
+      "start": 267549,
+      "end": 267558,
+      "surface": "Elizabeth",
+      "chapter_index": 27,
+      "gold_id": "g001",
+      "note": "第27章/回原文上下文明确指 Elizabeth Bennet（称呼 'Elizabeth'）"
+    },
+    {
+      "sample_id": "s158",
+      "start": 270543,
+      "end": 270556,
+      "surface": "Mrs. Gardiner",
+      "chapter_index": 27,
+      "gold_id": "g016",
+      "note": "第27章/回原文上下文明确指 Mrs. Gardiner（称呼 'Mrs. Gardiner'）"
+    },
+    {
+      "sample_id": "s159",
+      "start": 276649,
+      "end": 276663,
+      "surface": "Lady Catherine",
+      "chapter_index": 28,
+      "gold_id": "g013",
+      "note": "第28章/回原文上下文明确指 Lady Catherine de Bourgh（称呼 'Lady Catherine'）"
+    },
+    {
+      "sample_id": "s160",
+      "start": 277875,
+      "end": 277880,
+      "surface": "Eliza",
+      "chapter_index": 28,
+      "gold_id": "g001",
+      "note": "第28章/回原文上下文明确指 Elizabeth Bennet（称呼 'Eliza'）"
+    },
+    {
+      "sample_id": "s161",
+      "start": 283179,
+      "end": 283191,
+      "surface": "Mrs. Collins",
+      "chapter_index": 29,
+      "gold_id": "g010",
+      "note": "第29章/回原文上下文明确指 Charlotte Lucas（称呼 'Mrs. Collins'）"
+    },
+    {
+      "sample_id": "s162",
+      "start": 286577,
+      "end": 286591,
+      "surface": "Lady Catherine",
+      "chapter_index": 29,
+      "gold_id": "g013",
+      "note": "第29章/回原文上下文明确指 Lady Catherine de Bourgh（称呼 'Lady Catherine'）"
+    },
+    {
+      "sample_id": "s163",
+      "start": 287416,
+      "end": 287428,
+      "surface": "Mrs. Collins",
+      "chapter_index": 29,
+      "gold_id": "g010",
+      "note": "第29章/回原文上下文明确指 Charlotte Lucas（称呼 'Mrs. Collins'）"
+    },
+    {
+      "sample_id": "s164",
+      "start": 288156,
+      "end": 288167,
+      "surface": "Miss Bennet",
+      "chapter_index": 29,
+      "gold_id": "g001",
+      "note": "第29章在汉斯福/罗新斯简不在场，在场人士称呼伊丽莎白为 Miss Bennet"
+    },
+    {
+      "sample_id": "s165",
+      "start": 300360,
+      "end": 300371,
+      "surface": "Miss Bennet",
+      "chapter_index": 30,
+      "gold_id": "g002",
+      "note": "第30章上下文谈及伊丽莎白之姐简·班纳特（Miss Bennet）"
+    },
+    {
+      "sample_id": "s166",
+      "start": 301161,
+      "end": 301170,
+      "surface": "Mr. Darcy",
+      "chapter_index": 31,
+      "gold_id": "g003",
+      "note": "第31章/回原文上下文明确指 Fitzwilliam Darcy（称呼 'Mr. Darcy'）"
+    },
+    {
+      "sample_id": "s167",
+      "start": 301704,
+      "end": 301716,
+      "surface": "Mrs. Collins",
+      "chapter_index": 31,
+      "gold_id": "g010",
+      "note": "第31章/回原文上下文明确指 Charlotte Lucas（称呼 'Mrs. Collins'）"
+    },
+    {
+      "sample_id": "s168",
+      "start": 302998,
+      "end": 303007,
+      "surface": "Georgiana",
+      "chapter_index": 31,
+      "gold_id": "g014",
+      "note": "第31章/回原文上下文明确指 Georgiana Darcy（称呼 'Georgiana'）"
+    },
+    {
+      "sample_id": "s169",
+      "start": 310552,
+      "end": 310558,
+      "surface": "London",
+      "chapter_index": 32,
+      "gold_id": "g038",
+      "note": "第32章/回原文上下文明确指 London（称呼 'London'）"
+    },
+    {
+      "sample_id": "s170",
+      "start": 315699,
+      "end": 315713,
+      "surface": "George Wickham",
+      "chapter_index": 32,
+      "gold_id": "g008",
+      "note": "第32章/回原文上下文明确指 George Wickham（称呼 'George Wickham'）"
+    },
+    {
+      "sample_id": "s171",
+      "start": 318654,
+      "end": 318666,
+      "surface": "Mrs. Collins",
+      "chapter_index": 33,
+      "gold_id": "g010",
+      "note": "第33章/回原文上下文明确指 Charlotte Lucas（称呼 'Mrs. Collins'）"
+    },
+    {
+      "sample_id": "s172",
+      "start": 322506,
+      "end": 322516,
+      "surface": "Miss Darcy",
+      "chapter_index": 33,
+      "gold_id": "g014",
+      "note": "第33章/回原文上下文明确指 Georgiana Darcy（称呼 'Miss Darcy'）"
+    },
+    {
+      "sample_id": "s173",
+      "start": 323067,
+      "end": 323076,
+      "surface": "Mr. Darcy",
+      "chapter_index": 33,
+      "gold_id": "g003",
+      "note": "第33章/回原文上下文明确指 Fitzwilliam Darcy（称呼 'Mr. Darcy'）"
+    },
+    {
+      "sample_id": "s174",
+      "start": 323445,
+      "end": 323452,
+      "surface": "Bingley",
+      "chapter_index": 33,
+      "gold_id": "g004",
+      "note": "第33章/回原文上下文明确指 Charles Bingley（称呼 'Bingley'）"
+    },
+    {
+      "sample_id": "s175",
+      "start": 326714,
+      "end": 326720,
+      "surface": "London",
+      "chapter_index": 33,
+      "gold_id": "g038",
+      "note": "第33章/回原文上下文明确指 London（称呼 'London'）"
+    },
+    {
+      "sample_id": "s176",
+      "start": 339793,
+      "end": 339804,
+      "surface": "Mr. Wickham",
+      "chapter_index": 34,
+      "gold_id": "g008",
+      "note": "第34章/回原文上下文明确指 George Wickham（称呼 'Mr. Wickham'）"
+    },
+    {
+      "sample_id": "s177",
+      "start": 340088,
+      "end": 340097,
+      "surface": "Charlotte",
+      "chapter_index": 34,
+      "gold_id": "g010",
+      "note": "第34章/回原文上下文明确指 Charlotte Lucas（称呼 'Charlotte'）"
+    },
+    {
+      "sample_id": "s178",
+      "start": 343436,
+      "end": 343447,
+      "surface": "Mr. Wickham",
+      "chapter_index": 35,
+      "gold_id": "g008",
+      "note": "第35章/回原文上下文明确指 George Wickham（称呼 'Mr. Wickham'）"
+    },
+    {
+      "sample_id": "s179",
+      "start": 349784,
+      "end": 349795,
+      "surface": "Mr. Wickham",
+      "chapter_index": 35,
+      "gold_id": "g008",
+      "note": "第35章/回原文上下文明确指 George Wickham（称呼 'Mr. Wickham'）"
+    },
+    {
+      "sample_id": "s180",
+      "start": 350269,
+      "end": 350283,
+      "surface": "George Wickham",
+      "chapter_index": 35,
+      "gold_id": "g008",
+      "note": "第35章/回原文上下文明确指 George Wickham（称呼 'George Wickham'）"
+    },
+    {
+      "sample_id": "s181",
+      "start": 355214,
+      "end": 355223,
+      "surface": "Georgiana",
+      "chapter_index": 35,
+      "gold_id": "g014",
+      "note": "第35章/回原文上下文明确指 Georgiana Darcy（称呼 'Georgiana'）"
+    },
+    {
+      "sample_id": "s182",
+      "start": 355594,
+      "end": 355605,
+      "surface": "Mr. Wickham",
+      "chapter_index": 35,
+      "gold_id": "g008",
+      "note": "第35章/回原文上下文明确指 George Wickham（称呼 'Mr. Wickham'）"
+    },
+    {
+      "sample_id": "s183",
+      "start": 365504,
+      "end": 365515,
+      "surface": "Mr. Bingley",
+      "chapter_index": 36,
+      "gold_id": "g004",
+      "note": "第36章/回原文上下文明确指 Charles Bingley（称呼 'Mr. Bingley'）"
+    },
+    {
+      "sample_id": "s184",
+      "start": 366489,
+      "end": 366498,
+      "surface": "Mr. Darcy",
+      "chapter_index": 36,
+      "gold_id": "g003",
+      "note": "第36章/回原文上下文明确指 Fitzwilliam Darcy（称呼 'Mr. Darcy'）"
+    },
+    {
+      "sample_id": "s185",
+      "start": 366867,
+      "end": 366876,
+      "surface": "Charlotte",
+      "chapter_index": 36,
+      "gold_id": "g010",
+      "note": "第36章/回原文上下文明确指 Charlotte Lucas（称呼 'Charlotte'）"
+    },
+    {
+      "sample_id": "s186",
+      "start": 370582,
+      "end": 370596,
+      "surface": "Lady Catherine",
+      "chapter_index": 37,
+      "gold_id": "g013",
+      "note": "第37章/回原文上下文明确指 Lady Catherine de Bourgh（称呼 'Lady Catherine'）"
+    },
+    {
+      "sample_id": "s187",
+      "start": 371198,
+      "end": 371210,
+      "surface": "Mrs. Collins",
+      "chapter_index": 37,
+      "gold_id": "g010",
+      "note": "第37章/回原文上下文明确指 Charlotte Lucas（称呼 'Mrs. Collins'）"
+    },
+    {
+      "sample_id": "s188",
+      "start": 372416,
+      "end": 372425,
+      "surface": "Georgiana",
+      "chapter_index": 37,
+      "gold_id": "g014",
+      "note": "第37章/回原文上下文明确指 Georgiana Darcy（称呼 'Georgiana'）"
+    },
+    {
+      "sample_id": "s189",
+      "start": 372734,
+      "end": 372746,
+      "surface": "Mrs. Collins",
+      "chapter_index": 37,
+      "gold_id": "g010",
+      "note": "第37章/回原文上下文明确指 Charlotte Lucas（称呼 'Mrs. Collins'）"
+    },
+    {
+      "sample_id": "s190",
+      "start": 373625,
+      "end": 373634,
+      "surface": "Mr. Darcy",
+      "chapter_index": 37,
+      "gold_id": "g003",
+      "note": "第37章/回原文上下文明确指 Fitzwilliam Darcy（称呼 'Mr. Darcy'）"
+    },
+    {
+      "sample_id": "s191",
+      "start": 374736,
+      "end": 374745,
+      "surface": "Catherine",
+      "chapter_index": 37,
+      "gold_id": "g011",
+      "note": "第37章/回原文上下文明确指 Catherine (Kitty) Bennet（称呼 'Catherine'）"
+    },
+    {
+      "sample_id": "s192",
+      "start": 374860,
+      "end": 374869,
+      "surface": "Catherine",
+      "chapter_index": 37,
+      "gold_id": "g011",
+      "note": "第37章/回原文上下文明确指 Catherine (Kitty) Bennet（称呼 'Catherine'）"
+    },
+    {
+      "sample_id": "s193",
+      "start": 377793,
+      "end": 377802,
+      "surface": "Charlotte",
+      "chapter_index": 38,
+      "gold_id": "g010",
+      "note": "第38章/回原文上下文明确指 Charlotte Lucas（称呼 'Charlotte'）"
+    },
+    {
+      "sample_id": "s194",
+      "start": 379138,
+      "end": 379150,
+      "surface": "Mrs. Collins",
+      "chapter_index": 38,
+      "gold_id": "g010",
+      "note": "第38章/回原文上下文明确指 Charlotte Lucas（称呼 'Mrs. Collins'）"
+    },
+    {
+      "sample_id": "s195",
+      "start": 382943,
+      "end": 382953,
+      "surface": "Mr. Bennet",
+      "chapter_index": 39,
+      "gold_id": "g005",
+      "note": "第39章/回原文上下文明确指 Mr. Bennet（称呼 'Mr. Bennet'）"
+    },
+    {
+      "sample_id": "s196",
+      "start": 384179,
+      "end": 384186,
+      "surface": "Meryton",
+      "chapter_index": 39,
+      "gold_id": "g037",
+      "note": "第39章/回原文上下文明确指 Meryton（称呼 'Meryton'）"
+    },
+    {
+      "sample_id": "s197",
+      "start": 387092,
+      "end": 387099,
+      "surface": "Philips",
+      "chapter_index": 39,
+      "gold_id": "g025",
+      "note": "第39章前文 uncle Philips 指菲利普斯先生"
+    },
+    {
+      "sample_id": "s198",
+      "start": 390584,
+      "end": 390591,
+      "surface": "Meryton",
+      "chapter_index": 39,
+      "gold_id": "g037",
+      "note": "第39章/回原文上下文明确指 Meryton（称呼 'Meryton'）"
+    },
+    {
+      "sample_id": "s199",
+      "start": 391867,
+      "end": 391878,
+      "surface": "Miss Bennet",
+      "chapter_index": 40,
+      "gold_id": "g002",
+      "note": "第40章按班纳特家排行称长女简为 Miss Bennet"
+    },
+    {
+      "sample_id": "s200",
+      "start": 392946,
+      "end": 392960,
+      "surface": "George Wickham",
+      "chapter_index": 40,
+      "gold_id": "g008",
+      "note": "第40章/回原文上下文明确指 George Wickham（称呼 'George Wickham'）"
+    },
+    {
+      "sample_id": "s201",
+      "start": 396622,
+      "end": 396629,
+      "surface": "Meryton",
+      "chapter_index": 40,
+      "gold_id": "g037",
+      "note": "第40章/回原文上下文明确指 Meryton（称呼 'Meryton'）"
+    },
+    {
+      "sample_id": "s202",
+      "start": 398746,
+      "end": 398757,
+      "surface": "Mrs. Bennet",
+      "chapter_index": 40,
+      "gold_id": "g006",
+      "note": "第40章/回原文上下文明确指 Mrs. Bennet（称呼 'Mrs. Bennet'）"
+    },
+    {
+      "sample_id": "s203",
+      "start": 398913,
+      "end": 398920,
+      "surface": "Philips",
+      "chapter_index": 40,
+      "gold_id": "g025",
+      "note": "第40章前文 uncle Philips 指菲利普斯先生"
+    },
+    {
+      "sample_id": "s204",
+      "start": 398994,
+      "end": 399000,
+      "surface": "London",
+      "chapter_index": 40,
+      "gold_id": "g038",
+      "note": "第40章/回原文上下文明确指 London（称呼 'London'）"
+    },
+    {
+      "sample_id": "s205",
+      "start": 399900,
+      "end": 399909,
+      "surface": "Charlotte",
+      "chapter_index": 40,
+      "gold_id": "g010",
+      "note": "第40章/回原文上下文明确指 Charlotte Lucas（称呼 'Charlotte'）"
+    },
+    {
+      "sample_id": "s206",
+      "start": 401976,
+      "end": 401983,
+      "surface": "Philips",
+      "chapter_index": 41,
+      "gold_id": "g025",
+      "note": "第41章前文 uncle Philips 指菲利普斯先生"
+    },
+    {
+      "sample_id": "s207",
+      "start": 404255,
+      "end": 404260,
+      "surface": "Lydia",
+      "chapter_index": 41,
+      "gold_id": "g007",
+      "note": "第41章/回原文上下文明确指 Lydia Bennet（称呼 'Lydia'）"
+    },
+    {
+      "sample_id": "s208",
+      "start": 411714,
+      "end": 411721,
+      "surface": "Wickham",
+      "chapter_index": 41,
+      "gold_id": "g008",
+      "note": "第41章/回原文上下文明确指 George Wickham（称呼 'Wickham'）"
+    },
+    {
+      "sample_id": "s209",
+      "start": 413401,
+      "end": 413412,
+      "surface": "Mrs. Bennet",
+      "chapter_index": 41,
+      "gold_id": "g006",
+      "note": "第41章/回原文上下文明确指 Mrs. Bennet（称呼 'Mrs. Bennet'）"
+    },
+    {
+      "sample_id": "s210",
+      "start": 414346,
+      "end": 414356,
+      "surface": "Mr. Bennet",
+      "chapter_index": 42,
+      "gold_id": "g005",
+      "note": "第42章/回原文上下文明确指 Mr. Bennet（称呼 'Mr. Bennet'）"
+    },
+    {
+      "sample_id": "s211",
+      "start": 419366,
+      "end": 419379,
+      "surface": "Mrs. Gardiner",
+      "chapter_index": 42,
+      "gold_id": "g016",
+      "note": "第42章/回原文上下文明确指 Mrs. Gardiner（称呼 'Mrs. Gardiner'）"
+    },
+    {
+      "sample_id": "s212",
+      "start": 419554,
+      "end": 419560,
+      "surface": "London",
+      "chapter_index": 42,
+      "gold_id": "g038",
+      "note": "第42章/回原文上下文明确指 London（称呼 'London'）"
+    },
+    {
+      "sample_id": "s213",
+      "start": 420006,
+      "end": 420019,
+      "surface": "Mrs. Gardiner",
+      "chapter_index": 42,
+      "gold_id": "g016",
+      "note": "第42章/回原文上下文明确指 Mrs. Gardiner（称呼 'Mrs. Gardiner'）"
+    },
+    {
+      "sample_id": "s214",
+      "start": 421032,
+      "end": 421041,
+      "surface": "Longbourn",
+      "chapter_index": 42,
+      "gold_id": "g035",
+      "note": "第42章/回原文上下文明确指 Longbourn（称呼 'Longbourn'）"
+    },
+    {
+      "sample_id": "s215",
+      "start": 421406,
+      "end": 421415,
+      "surface": "Longbourn",
+      "chapter_index": 42,
+      "gold_id": "g035",
+      "note": "第42章/回原文上下文明确指 Longbourn（称呼 'Longbourn'）"
+    },
+    {
+      "sample_id": "s216",
+      "start": 422623,
+      "end": 422632,
+      "surface": "Elizabeth",
+      "chapter_index": 42,
+      "gold_id": "g001",
+      "note": "第42章/回原文上下文明确指 Elizabeth Bennet（称呼 'Elizabeth'）"
+    },
+    {
+      "sample_id": "s217",
+      "start": 422834,
+      "end": 422841,
+      "surface": "Wickham",
+      "chapter_index": 42,
+      "gold_id": "g008",
+      "note": "第42章/回原文上下文明确指 George Wickham（称呼 'Wickham'）"
+    },
+    {
+      "sample_id": "s218",
+      "start": 423152,
+      "end": 423165,
+      "surface": "Mrs. Gardiner",
+      "chapter_index": 42,
+      "gold_id": "g016",
+      "note": "第42章/回原文上下文明确指 Mrs. Gardiner（称呼 'Mrs. Gardiner'）"
+    },
+    {
+      "sample_id": "s219",
+      "start": 425526,
+      "end": 425535,
+      "surface": "Elizabeth",
+      "chapter_index": 43,
+      "gold_id": "g001",
+      "note": "第43章/回原文上下文明确指 Elizabeth Bennet（称呼 'Elizabeth'）"
+    },
+    {
+      "sample_id": "s220",
+      "start": 429014,
+      "end": 429019,
+      "surface": "Lizzy",
+      "chapter_index": 43,
+      "gold_id": "g001",
+      "note": "第43章/回原文上下文明确指 Elizabeth Bennet（称呼 'Lizzy'）"
+    },
+    {
+      "sample_id": "s221",
+      "start": 429620,
+      "end": 429631,
+      "surface": "Mr. Wickham",
+      "chapter_index": 43,
+      "gold_id": "g008",
+      "note": "第43章/回原文上下文明确指 George Wickham（称呼 'Mr. Wickham'）"
+    },
+    {
+      "sample_id": "s222",
+      "start": 429769,
+      "end": 429779,
+      "surface": "Miss Darcy",
+      "chapter_index": 43,
+      "gold_id": "g014",
+      "note": "第43章/回原文上下文明确指 Georgiana Darcy（称呼 'Miss Darcy'）"
+    },
+    {
+      "sample_id": "s223",
+      "start": 434106,
+      "end": 434116,
+      "surface": "Miss Darcy",
+      "chapter_index": 43,
+      "gold_id": "g014",
+      "note": "第43章/回原文上下文明确指 Georgiana Darcy（称呼 'Miss Darcy'）"
+    },
+    {
+      "sample_id": "s224",
+      "start": 445526,
+      "end": 445539,
+      "surface": "Mrs. Gardiner",
+      "chapter_index": 43,
+      "gold_id": "g016",
+      "note": "第43章/回原文上下文明确指 Mrs. Gardiner（称呼 'Mrs. Gardiner'）"
+    },
+    {
+      "sample_id": "s225",
+      "start": 448426,
+      "end": 448435,
+      "surface": "Mr. Darcy",
+      "chapter_index": 43,
+      "gold_id": "g003",
+      "note": "第43章/回原文上下文明确指 Fitzwilliam Darcy（称呼 'Mr. Darcy'）"
+    },
+    {
+      "sample_id": "s226",
+      "start": 449225,
+      "end": 449230,
+      "surface": "Lizzy",
+      "chapter_index": 43,
+      "gold_id": "g001",
+      "note": "第43章/回原文上下文明确指 Elizabeth Bennet（称呼 'Lizzy'）"
+    },
+    {
+      "sample_id": "s227",
+      "start": 449969,
+      "end": 449982,
+      "surface": "Mrs. Gardiner",
+      "chapter_index": 43,
+      "gold_id": "g016",
+      "note": "第43章/回原文上下文明确指 Mrs. Gardiner（称呼 'Mrs. Gardiner'）"
+    },
+    {
+      "sample_id": "s228",
+      "start": 451906,
+      "end": 451915,
+      "surface": "Mr. Darcy",
+      "chapter_index": 43,
+      "gold_id": "g003",
+      "note": "第43章/回原文上下文明确指 Fitzwilliam Darcy（称呼 'Mr. Darcy'）"
+    },
+    {
+      "sample_id": "s229",
+      "start": 456315,
+      "end": 456324,
+      "surface": "Georgiana",
+      "chapter_index": 44,
+      "gold_id": "g014",
+      "note": "第44章/回原文上下文明确指 Georgiana Darcy（称呼 'Georgiana'）"
+    },
+    {
+      "sample_id": "s230",
+      "start": 456802,
+      "end": 456812,
+      "surface": "Miss Darcy",
+      "chapter_index": 44,
+      "gold_id": "g014",
+      "note": "第44章/回原文上下文明确指 Georgiana Darcy（称呼 'Miss Darcy'）"
+    },
+    {
+      "sample_id": "s231",
+      "start": 466523,
+      "end": 466535,
+      "surface": "Miss Bingley",
+      "chapter_index": 45,
+      "gold_id": "g018",
+      "note": "第45章/回原文上下文明确指 Caroline Bingley（称呼 'Miss Bingley'）"
+    },
+    {
+      "sample_id": "s232",
+      "start": 466974,
+      "end": 466984,
+      "surface": "Miss Darcy",
+      "chapter_index": 45,
+      "gold_id": "g014",
+      "note": "第45章/回原文上下文明确指 Georgiana Darcy（称呼 'Miss Darcy'）"
+    },
+    {
+      "sample_id": "s233",
+      "start": 469044,
+      "end": 469053,
+      "surface": "Georgiana",
+      "chapter_index": 45,
+      "gold_id": "g014",
+      "note": "第45章/回原文上下文明确指 Georgiana Darcy（称呼 'Georgiana'）"
+    },
+    {
+      "sample_id": "s234",
+      "start": 469500,
+      "end": 469512,
+      "surface": "Miss Bingley",
+      "chapter_index": 45,
+      "gold_id": "g018",
+      "note": "第45章/回原文上下文明确指 Caroline Bingley（称呼 'Miss Bingley'）"
+    },
+    {
+      "sample_id": "s235",
+      "start": 470093,
+      "end": 470098,
+      "surface": "Eliza",
+      "chapter_index": 45,
+      "gold_id": "g001",
+      "note": "第45章/回原文上下文明确指 Elizabeth Bennet（称呼 'Eliza'）"
+    },
+    {
+      "sample_id": "s236",
+      "start": 471916,
+      "end": 471925,
+      "surface": "Georgiana",
+      "chapter_index": 45,
+      "gold_id": "g014",
+      "note": "第45章/回原文上下文明确指 Georgiana Darcy（称呼 'Georgiana'）"
+    },
+    {
+      "sample_id": "s237",
+      "start": 472376,
+      "end": 472388,
+      "surface": "Miss Bingley",
+      "chapter_index": 45,
+      "gold_id": "g018",
+      "note": "第45章/回原文上下文明确指 Caroline Bingley（称呼 'Miss Bingley'）"
+    },
+    {
+      "sample_id": "s238",
+      "start": 472768,
+      "end": 472780,
+      "surface": "Miss Bingley",
+      "chapter_index": 45,
+      "gold_id": "g018",
+      "note": "第45章/回原文上下文明确指 Caroline Bingley（称呼 'Miss Bingley'）"
+    },
+    {
+      "sample_id": "s239",
+      "start": 472881,
+      "end": 472886,
+      "surface": "Eliza",
+      "chapter_index": 45,
+      "gold_id": "g001",
+      "note": "第45章/回原文上下文明确指 Elizabeth Bennet（称呼 'Eliza'）"
+    },
+    {
+      "sample_id": "s240",
+      "start": 478477,
+      "end": 478482,
+      "surface": "Lizzy",
+      "chapter_index": 46,
+      "gold_id": "g001",
+      "note": "第46章/回原文上下文明确指 Elizabeth Bennet（称呼 'Lizzy'）"
+    },
+    {
+      "sample_id": "s241",
+      "start": 478630,
+      "end": 478635,
+      "surface": "Lydia",
+      "chapter_index": 46,
+      "gold_id": "g007",
+      "note": "第46章/回原文上下文明确指 Lydia Bennet（称呼 'Lydia'）"
+    },
+    {
+      "sample_id": "s242",
+      "start": 484219,
+      "end": 484224,
+      "surface": "Darcy",
+      "chapter_index": 46,
+      "gold_id": "g003",
+      "note": "第46章/回原文上下文明确指 Fitzwilliam Darcy（称呼 'Darcy'）"
+    },
+    {
+      "sample_id": "s243",
+      "start": 490914,
+      "end": 490919,
+      "surface": "Lydia",
+      "chapter_index": 46,
+      "gold_id": "g007",
+      "note": "第46章/回原文上下文明确指 Lydia Bennet（称呼 'Lydia'）"
+    },
+    {
+      "sample_id": "s244",
+      "start": 496580,
+      "end": 496587,
+      "surface": "Wickham",
+      "chapter_index": 47,
+      "gold_id": "g008",
+      "note": "第47章/回原文上下文明确指 George Wickham（称呼 'Wickham'）"
+    },
+    {
+      "sample_id": "s245",
+      "start": 501831,
+      "end": 501844,
+      "surface": "Mrs. Gardiner",
+      "chapter_index": 47,
+      "gold_id": "g016",
+      "note": "第47章/回原文上下文明确指 Mrs. Gardiner（称呼 'Mrs. Gardiner'）"
+    },
+    {
+      "sample_id": "s246",
+      "start": 503898,
+      "end": 503904,
+      "surface": "London",
+      "chapter_index": 47,
+      "gold_id": "g038",
+      "note": "第47章/回原文上下文明确指 London（称呼 'London'）"
+    },
+    {
+      "sample_id": "s247",
+      "start": 504923,
+      "end": 504933,
+      "surface": "Mr. Bennet",
+      "chapter_index": 47,
+      "gold_id": "g005",
+      "note": "第47章/回原文上下文明确指 Mr. Bennet（称呼 'Mr. Bennet'）"
+    },
+    {
+      "sample_id": "s248",
+      "start": 507962,
+      "end": 507973,
+      "surface": "Miss Bennet",
+      "chapter_index": 47,
+      "gold_id": "g002",
+      "note": "第47章按班纳特家排行称长女简为 Miss Bennet"
+    },
+    {
+      "sample_id": "s249",
+      "start": 511139,
+      "end": 511148,
+      "surface": "Longbourn",
+      "chapter_index": 47,
+      "gold_id": "g035",
+      "note": "第47章/回原文上下文明确指 Longbourn（称呼 'Longbourn'）"
+    },
+    {
+      "sample_id": "s250",
+      "start": 513108,
+      "end": 513113,
+      "surface": "Kitty",
+      "chapter_index": 47,
+      "gold_id": "g011",
+      "note": "第47章/回原文上下文明确指 Catherine (Kitty) Bennet（称呼 'Kitty'）"
+    },
+    {
+      "sample_id": "s251",
+      "start": 513224,
+      "end": 513231,
+      "surface": "Philips",
+      "chapter_index": 47,
+      "gold_id": "g025",
+      "note": "第47章前文 uncle Philips 指菲利普斯先生"
+    },
+    {
+      "sample_id": "s252",
+      "start": 515866,
+      "end": 515877,
+      "surface": "Mrs. Bennet",
+      "chapter_index": 48,
+      "gold_id": "g006",
+      "note": "第48章/回原文上下文明确指 Mrs. Bennet（称呼 'Mrs. Bennet'）"
+    },
+    {
+      "sample_id": "s253",
+      "start": 517615,
+      "end": 517621,
+      "surface": "London",
+      "chapter_index": 48,
+      "gold_id": "g038",
+      "note": "第48章/回原文上下文明确指 London（称呼 'London'）"
+    },
+    {
+      "sample_id": "s254",
+      "start": 525861,
+      "end": 525867,
+      "surface": "London",
+      "chapter_index": 48,
+      "gold_id": "g038",
+      "note": "第48章/回原文上下文明确指 London（称呼 'London'）"
+    },
+    {
+      "sample_id": "s255",
+      "start": 526297,
+      "end": 526308,
+      "surface": "Miss Bennet",
+      "chapter_index": 48,
+      "gold_id": "g002",
+      "note": "第48章按班纳特家排行称长女简为 Miss Bennet"
+    },
+    {
+      "sample_id": "s256",
+      "start": 527469,
+      "end": 527479,
+      "surface": "Mr. Bennet",
+      "chapter_index": 49,
+      "gold_id": "g005",
+      "note": "第49章/回原文上下文明确指 Mr. Bennet（称呼 'Mr. Bennet'）"
+    },
+    {
+      "sample_id": "s257",
+      "start": 531287,
+      "end": 531296,
+      "surface": "Longbourn",
+      "chapter_index": 49,
+      "gold_id": "g035",
+      "note": "第49章/回原文上下文明确指 Longbourn（称呼 'Longbourn'）"
+    },
+    {
+      "sample_id": "s258",
+      "start": 533528,
+      "end": 533538,
+      "surface": "Mr. Bennet",
+      "chapter_index": 49,
+      "gold_id": "g005",
+      "note": "第49章/回原文上下文明确指 Mr. Bennet（称呼 'Mr. Bennet'）"
+    },
+    {
+      "sample_id": "s259",
+      "start": 535465,
+      "end": 535474,
+      "surface": "Elizabeth",
+      "chapter_index": 49,
+      "gold_id": "g001",
+      "note": "第49章/回原文上下文明确指 Elizabeth Bennet（称呼 'Elizabeth'）"
+    },
+    {
+      "sample_id": "s260",
+      "start": 536921,
+      "end": 536928,
+      "surface": "Wickham",
+      "chapter_index": 49,
+      "gold_id": "g008",
+      "note": "第49章/回原文上下文明确指 George Wickham（称呼 'Wickham'）"
+    },
+    {
+      "sample_id": "s261",
+      "start": 536998,
+      "end": 537006,
+      "surface": "Gardiner",
+      "chapter_index": 49,
+      "gold_id": "g015",
+      "note": "第49章前文 'brother Gardiner' 指嘉丁纳先生"
+    },
+    {
+      "sample_id": "s262",
+      "start": 537971,
+      "end": 537983,
+      "surface": "Mrs. Wickham",
+      "chapter_index": 49,
+      "gold_id": "g007",
+      "note": "第49章/回原文上下文明确指 Lydia Bennet（称呼 'Mrs. Wickham'）"
+    },
+    {
+      "sample_id": "s263",
+      "start": 538778,
+      "end": 538785,
+      "surface": "Philips",
+      "chapter_index": 49,
+      "gold_id": "g025",
+      "note": "第49章前文 uncle Philips 指菲利普斯先生"
+    },
+    {
+      "sample_id": "s264",
+      "start": 538978,
+      "end": 538985,
+      "surface": "Meryton",
+      "chapter_index": 49,
+      "gold_id": "g037",
+      "note": "第49章/回原文上下文明确指 Meryton（称呼 'Meryton'）"
+    },
+    {
+      "sample_id": "s265",
+      "start": 539052,
+      "end": 539062,
+      "surface": "Miss Lydia",
+      "chapter_index": 49,
+      "gold_id": "g007",
+      "note": "第49章/回原文上下文明确指 Lydia Bennet（称呼 'Miss Lydia'）"
+    },
+    {
+      "sample_id": "s266",
+      "start": 543050,
+      "end": 543060,
+      "surface": "Miss Lydia",
+      "chapter_index": 50,
+      "gold_id": "g007",
+      "note": "第50章/回原文上下文明确指 Lydia Bennet（称呼 'Miss Lydia'）"
+    },
+    {
+      "sample_id": "s267",
+      "start": 549864,
+      "end": 549871,
+      "surface": "Meryton",
+      "chapter_index": 50,
+      "gold_id": "g037",
+      "note": "第50章/回原文上下文明确指 Meryton（称呼 'Meryton'）"
+    },
+    {
+      "sample_id": "s268",
+      "start": 553507,
+      "end": 553518,
+      "surface": "Miss Bennet",
+      "chapter_index": 51,
+      "gold_id": "g002",
+      "note": "第51章按班纳特家排行称长女简为 Miss Bennet"
+    },
+    {
+      "sample_id": "s269",
+      "start": 556478,
+      "end": 556490,
+      "surface": "Mrs. Wickham",
+      "chapter_index": 51,
+      "gold_id": "g007",
+      "note": "第51章/回原文上下文明确指 Lydia Bennet（称呼 'Mrs. Wickham'）"
+    },
+    {
+      "sample_id": "s270",
+      "start": 567767,
+      "end": 567772,
+      "surface": "Lydia",
+      "chapter_index": 52,
+      "gold_id": "g007",
+      "note": "第52章/回原文上下文明确指 Lydia Bennet（称呼 'Lydia'）"
+    },
+    {
+      "sample_id": "s271",
+      "start": 577621,
+      "end": 577626,
+      "surface": "Darcy",
+      "chapter_index": 52,
+      "gold_id": "g003",
+      "note": "第52章/回原文上下文明确指 Fitzwilliam Darcy（称呼 'Darcy'）"
+    },
+    {
+      "sample_id": "s272",
+      "start": 590065,
+      "end": 590070,
+      "surface": "Darcy",
+      "chapter_index": 53,
+      "gold_id": "g003",
+      "note": "第53章/回原文上下文明确指 Fitzwilliam Darcy（称呼 'Darcy'）"
+    },
+    {
+      "sample_id": "s273",
+      "start": 592215,
+      "end": 592225,
+      "surface": "Miss Lucas",
+      "chapter_index": 53,
+      "gold_id": "g010",
+      "note": "第53章/回原文上下文明确指 Charlotte Lucas（称呼 'Miss Lucas'）"
+    },
+    {
+      "sample_id": "s274",
+      "start": 592476,
+      "end": 592490,
+      "surface": "George Wickham",
+      "chapter_index": 53,
+      "gold_id": "g008",
+      "note": "第53章/回原文上下文明确指 George Wickham（称呼 'George Wickham'）"
+    },
+    {
+      "sample_id": "s275",
+      "start": 592501,
+      "end": 592511,
+      "surface": "Miss Lydia",
+      "chapter_index": 53,
+      "gold_id": "g007",
+      "note": "第53章/回原文上下文明确指 Lydia Bennet（称呼 'Miss Lydia'）"
+    },
+    {
+      "sample_id": "s276",
+      "start": 592633,
+      "end": 592641,
+      "surface": "Gardiner",
+      "chapter_index": 53,
+      "gold_id": "g015",
+      "note": "第53章前文 'brother Gardiner' 指嘉丁纳先生"
+    },
+    {
+      "sample_id": "s277",
+      "start": 593637,
+      "end": 593644,
+      "surface": "Bingley",
+      "chapter_index": 53,
+      "gold_id": "g004",
+      "note": "第53章/回原文上下文明确指 Charles Bingley（称呼 'Bingley'）"
+    },
+    {
+      "sample_id": "s278",
+      "start": 595399,
+      "end": 595408,
+      "surface": "Longbourn",
+      "chapter_index": 53,
+      "gold_id": "g035",
+      "note": "第53章/回原文上下文明确指 Longbourn（称呼 'Longbourn'）"
+    },
+    {
+      "sample_id": "s279",
+      "start": 597809,
+      "end": 597818,
+      "surface": "Longbourn",
+      "chapter_index": 54,
+      "gold_id": "g035",
+      "note": "第54章/回原文上下文明确指 Longbourn（称呼 'Longbourn'）"
+    },
+    {
+      "sample_id": "s280",
+      "start": 603977,
+      "end": 603988,
+      "surface": "Miss Bennet",
+      "chapter_index": 54,
+      "gold_id": "g002",
+      "note": "第54章按班纳特家排行称长女简为 Miss Bennet"
+    },
+    {
+      "sample_id": "s281",
+      "start": 605094,
+      "end": 605105,
+      "surface": "Mr. Bingley",
+      "chapter_index": 55,
+      "gold_id": "g004",
+      "note": "第55章/回原文上下文明确指 Charles Bingley（称呼 'Mr. Bingley'）"
+    },
+    {
+      "sample_id": "s282",
+      "start": 605172,
+      "end": 605178,
+      "surface": "London",
+      "chapter_index": 55,
+      "gold_id": "g038",
+      "note": "第55章/回原文上下文明确指 London（称呼 'London'）"
+    },
+    {
+      "sample_id": "s283",
+      "start": 606791,
+      "end": 606800,
+      "surface": "Catherine",
+      "chapter_index": 55,
+      "gold_id": "g011",
+      "note": "第55章/回原文上下文明确指 Catherine (Kitty) Bennet（称呼 'Catherine'）"
+    },
+    {
+      "sample_id": "s284",
+      "start": 606915,
+      "end": 606920,
+      "surface": "Kitty",
+      "chapter_index": 55,
+      "gold_id": "g011",
+      "note": "第55章/回原文上下文明确指 Catherine (Kitty) Bennet（称呼 'Kitty'）"
+    },
+    {
+      "sample_id": "s285",
+      "start": 607898,
+      "end": 607909,
+      "surface": "Mrs. Bennet",
+      "chapter_index": 55,
+      "gold_id": "g006",
+      "note": "第55章/回原文上下文明确指 Mrs. Bennet（称呼 'Mrs. Bennet'）"
+    },
+    {
+      "sample_id": "s286",
+      "start": 608432,
+      "end": 608443,
+      "surface": "Mrs. Bennet",
+      "chapter_index": 55,
+      "gold_id": "g006",
+      "note": "第55章/回原文上下文明确指 Mrs. Bennet（称呼 'Mrs. Bennet'）"
+    },
+    {
+      "sample_id": "s287",
+      "start": 609254,
+      "end": 609261,
+      "surface": "Bingley",
+      "chapter_index": 55,
+      "gold_id": "g004",
+      "note": "第55章/回原文上下文明确指 Charles Bingley（称呼 'Bingley'）"
+    },
+    {
+      "sample_id": "s288",
+      "start": 609857,
+      "end": 609864,
+      "surface": "Bingley",
+      "chapter_index": 55,
+      "gold_id": "g004",
+      "note": "第55章/回原文上下文明确指 Charles Bingley（称呼 'Bingley'）"
+    },
+    {
+      "sample_id": "s289",
+      "start": 610411,
+      "end": 610420,
+      "surface": "Elizabeth",
+      "chapter_index": 55,
+      "gold_id": "g001",
+      "note": "第55章/回原文上下文明确指 Elizabeth Bennet（称呼 'Elizabeth'）"
+    },
+    {
+      "sample_id": "s290",
+      "start": 612859,
+      "end": 612864,
+      "surface": "Kitty",
+      "chapter_index": 55,
+      "gold_id": "g011",
+      "note": "第55章/回原文上下文明确指 Catherine (Kitty) Bennet（称呼 'Kitty'）"
+    },
+    {
+      "sample_id": "s291",
+      "start": 613054,
+      "end": 613061,
+      "surface": "Bingley",
+      "chapter_index": 55,
+      "gold_id": "g004",
+      "note": "第55章/回原文上下文明确指 Charles Bingley（称呼 'Bingley'）"
+    },
+    {
+      "sample_id": "s292",
+      "start": 617852,
+      "end": 617859,
+      "surface": "Meryton",
+      "chapter_index": 55,
+      "gold_id": "g037",
+      "note": "第55章/回原文上下文明确指 Meryton（称呼 'Meryton'）"
+    },
+    {
+      "sample_id": "s293",
+      "start": 618700,
+      "end": 618711,
+      "surface": "Miss Bennet",
+      "chapter_index": 56,
+      "gold_id": "g002",
+      "note": "第56章按班纳特家排行称长女简为 Miss Bennet"
+    },
+    {
+      "sample_id": "s294",
+      "start": 618973,
+      "end": 618997,
+      "surface": "Lady Catherine de Bourgh",
+      "chapter_index": 56,
+      "gold_id": "g013",
+      "note": "第56章/回原文上下文明确指 Lady Catherine de Bourgh（称呼 'Lady Catherine de Bourgh'）"
+    },
+    {
+      "sample_id": "s295",
+      "start": 619767,
+      "end": 619778,
+      "surface": "Miss Bennet",
+      "chapter_index": 56,
+      "gold_id": "g002",
+      "note": "第56章按班纳特家排行称长女简为 Miss Bennet"
+    },
+    {
+      "sample_id": "s296",
+      "start": 620660,
+      "end": 620672,
+      "surface": "Mrs. Collins",
+      "chapter_index": 56,
+      "gold_id": "g010",
+      "note": "第56章/回原文上下文明确指 Charlotte Lucas（称呼 'Mrs. Collins'）"
+    },
+    {
+      "sample_id": "s297",
+      "start": 622222,
+      "end": 622233,
+      "surface": "Miss Bennet",
+      "chapter_index": 56,
+      "gold_id": "g002",
+      "note": "第56章按班纳特家排行称长女简为 Miss Bennet"
+    },
+    {
+      "sample_id": "s298",
+      "start": 622506,
+      "end": 622517,
+      "surface": "Miss Bennet",
+      "chapter_index": 56,
+      "gold_id": "g002",
+      "note": "第56章按班纳特家排行称长女简为 Miss Bennet"
+    },
+    {
+      "sample_id": "s299",
+      "start": 623009,
+      "end": 623030,
+      "surface": "Miss Elizabeth Bennet",
+      "chapter_index": 56,
+      "gold_id": "g001",
+      "note": "第56章/回原文上下文明确指 Elizabeth Bennet（称呼 'Miss Elizabeth Bennet'）"
+    },
+    {
+      "sample_id": "s300",
+      "start": 624633,
+      "end": 624644,
+      "surface": "Miss Bennet",
+      "chapter_index": 56,
+      "gold_id": "g002",
+      "note": "第56章按班纳特家排行称长女简为 Miss Bennet"
+    },
+    {
+      "sample_id": "s301",
+      "start": 626509,
+      "end": 626520,
+      "surface": "Miss Bennet",
+      "chapter_index": 56,
+      "gold_id": "g002",
+      "note": "第56章按班纳特家排行称长女简为 Miss Bennet"
+    },
+    {
+      "sample_id": "s302",
+      "start": 627222,
+      "end": 627233,
+      "surface": "Miss Bennet",
+      "chapter_index": 56,
+      "gold_id": "g002",
+      "note": "第56章按班纳特家排行称长女简为 Miss Bennet"
+    },
+    {
+      "sample_id": "s303",
+      "start": 632193,
+      "end": 632204,
+      "surface": "Miss Bennet",
+      "chapter_index": 56,
+      "gold_id": "g002",
+      "note": "第56章按班纳特家排行称长女简为 Miss Bennet"
+    },
+    {
+      "sample_id": "s304",
+      "start": 632496,
+      "end": 632507,
+      "surface": "Miss Bennet",
+      "chapter_index": 56,
+      "gold_id": "g002",
+      "note": "第56章按班纳特家排行称长女简为 Miss Bennet"
+    },
+    {
+      "sample_id": "s305",
+      "start": 633651,
+      "end": 633665,
+      "surface": "Lady Catherine",
+      "chapter_index": 57,
+      "gold_id": "g013",
+      "note": "第57章/回原文上下文明确指 Lady Catherine de Bourgh（称呼 'Lady Catherine'）"
+    },
+    {
+      "sample_id": "s306",
+      "start": 634576,
+      "end": 634590,
+      "surface": "Lady Catherine",
+      "chapter_index": 57,
+      "gold_id": "g013",
+      "note": "第57章/回原文上下文明确指 Lady Catherine de Bourgh（称呼 'Lady Catherine'）"
+    },
+    {
+      "sample_id": "s307",
+      "start": 639412,
+      "end": 639436,
+      "surface": "Lady Catherine de Bourgh",
+      "chapter_index": 57,
+      "gold_id": "g013",
+      "note": "第57章/回原文上下文明确指 Lady Catherine de Bourgh（称呼 'Lady Catherine de Bourgh'）"
+    },
+    {
+      "sample_id": "s308",
+      "start": 641414,
+      "end": 641423,
+      "surface": "Charlotte",
+      "chapter_index": 57,
+      "gold_id": "g010",
+      "note": "第57章/回原文上下文明确指 Charlotte Lucas（称呼 'Charlotte'）"
+    },
+    {
+      "sample_id": "s309",
+      "start": 642991,
+      "end": 643002,
+      "surface": "Mr. Bingley",
+      "chapter_index": 58,
+      "gold_id": "g004",
+      "note": "第58章/回原文上下文明确指 Charles Bingley（称呼 'Mr. Bingley'）"
+    },
+    {
+      "sample_id": "s310",
+      "start": 653415,
+      "end": 653424,
+      "surface": "Georgiana",
+      "chapter_index": 58,
+      "gold_id": "g014",
+      "note": "第58章/回原文上下文明确指 Georgiana Darcy（称呼 'Georgiana'）"
+    },
+    {
+      "sample_id": "s311",
+      "start": 657120,
+      "end": 657125,
+      "surface": "Darcy",
+      "chapter_index": 59,
+      "gold_id": "g003",
+      "note": "第59章/回原文上下文明确指 Fitzwilliam Darcy（称呼 'Darcy'）"
+    },
+    {
+      "sample_id": "s312",
+      "start": 657684,
+      "end": 657695,
+      "surface": "Miss Bennet",
+      "chapter_index": 59,
+      "gold_id": "g002",
+      "note": "第59章按班纳特家排行称长女简为 Miss Bennet"
+    },
+    {
+      "sample_id": "s313",
+      "start": 659128,
+      "end": 659133,
+      "surface": "Lizzy",
+      "chapter_index": 59,
+      "gold_id": "g001",
+      "note": "第59章/回原文上下文明确指 Elizabeth Bennet（称呼 'Lizzy'）"
+    },
+    {
+      "sample_id": "s314",
+      "start": 661858,
+      "end": 661869,
+      "surface": "Mr. Bingley",
+      "chapter_index": 59,
+      "gold_id": "g004",
+      "note": "第59章/回原文上下文明确指 Charles Bingley（称呼 'Mr. Bingley'）"
+    },
+    {
+      "sample_id": "s315",
+      "start": 663105,
+      "end": 663115,
+      "surface": "Mr. Bennet",
+      "chapter_index": 59,
+      "gold_id": "g005",
+      "note": "第59章/回原文上下文明确指 Mr. Bennet（称呼 'Mr. Bennet'）"
+    },
+    {
+      "sample_id": "s316",
+      "start": 663699,
+      "end": 663704,
+      "surface": "Kitty",
+      "chapter_index": 59,
+      "gold_id": "g011",
+      "note": "第59章/回原文上下文明确指 Catherine (Kitty) Bennet（称呼 'Kitty'）"
+    },
+    {
+      "sample_id": "s317",
+      "start": 675897,
+      "end": 675911,
+      "surface": "Lady Catherine",
+      "chapter_index": 60,
+      "gold_id": "g013",
+      "note": "第60章/回原文上下文明确指 Lady Catherine de Bourgh（称呼 'Lady Catherine'）"
+    },
+    {
+      "sample_id": "s318",
+      "start": 678959,
+      "end": 678970,
+      "surface": "Mrs. Bennet",
+      "chapter_index": 61,
+      "gold_id": "g006",
+      "note": "第61章/回原文上下文明确指 Mrs. Bennet（称呼 'Mrs. Bennet'）"
+    },
+    {
+      "sample_id": "s319",
+      "start": 680646,
+      "end": 680658,
+      "surface": "Mrs. Wickham",
+      "chapter_index": 61,
+      "gold_id": "g007",
+      "note": "第61章/回原文上下文明确指 Lydia Bennet（称呼 'Mrs. Wickham'）"
+    },
+    {
+      "sample_id": "s320",
+      "start": 684163,
+      "end": 684172,
+      "surface": "Georgiana",
+      "chapter_index": 61,
+      "gold_id": "g014",
+      "note": "第61章/回原文上下文明确指 Georgiana Darcy（称呼 'Georgiana'）"
+    }
+  ]
+}

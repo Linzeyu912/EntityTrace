@@ -1,0 +1,257 @@
+{
+  "book": "02_英文短篇_The_Adventure_of_the_Second_Stain.txt",
+  "book_id": "second-stain",
+  "source_sha256": "dc72af1c7296f9abd4aa6dba1e09f2845dca40bbeb900c6918a7c7542bd59e71",
+  "labeler": "agent:gemini-4-argon",
+  "human_review": "pending",
+  "entities": [
+    {
+      "gold_id": "g001",
+      "kind": "person",
+      "canonical": "Sherlock Holmes",
+      "aliases": [
+        "Mr. Sherlock Holmes",
+        "Sherlock Holmes",
+        "Mr. Holmes",
+        "Holmes"
+      ],
+      "note": "侦探歇洛克·福尔摩斯；首见原文码点 [152,171) 'Mr. Sherlock Holmes'"
+    },
+    {
+      "gold_id": "g002",
+      "kind": "person",
+      "canonical": "Dr. John Watson",
+      "aliases": [
+        "Dr. Watson",
+        "Watson"
+      ],
+      "note": "华生医生；首见原文码点 [8618,8628) 'Dr. Watson'"
+    },
+    {
+      "gold_id": "g003",
+      "kind": "person",
+      "canonical": "Lord Bellinger",
+      "aliases": [
+        "Lord Bellinger",
+        "Bellinger",
+        "The Premier",
+        "Premier",
+        "The Prime Minister",
+        "Prime Minister"
+      ],
+      "note": "英国首相贝林杰勋爵；首见原文码点 [1910,1924) 'Lord Bellinger'"
+    },
+    {
+      "gold_id": "g004",
+      "kind": "person",
+      "canonical": "Trelawney Hope",
+      "aliases": [
+        "Mr. Trelawney Hope",
+        "Trelawney Hope",
+        "The European Secretary",
+        "European Secretary"
+      ],
+      "note": "欧洲事务大臣特里劳尼·霍普；首见原文码点 [3626,3644) 'Mr. Trelawney Hope'"
+    },
+    {
+      "gold_id": "g005",
+      "kind": "person",
+      "canonical": "Lady Hilda Trelawney Hope",
+      "aliases": [
+        "Lady Hilda Trelawney Hope",
+        "Lady Hilda",
+        "Hilda"
+      ],
+      "note": "希尔达·特里劳尼·霍普夫人；首见原文码点 [18898,18923) 'Lady Hilda Trelawney Hope'"
+    },
+    {
+      "gold_id": "g006",
+      "kind": "person",
+      "canonical": "Eduardo Lucas (Henri Fournaye)",
+      "aliases": [
+        "Mr. Eduardo Lucas",
+        "Eduardo Lucas",
+        "Lucas",
+        "Henri Fournaye",
+        "Fournaye"
+      ],
+      "note": "双重身份间谍爱德华多·卢卡斯（化名亨利·富尔奈）；首见原文码点 [15860,15877) 'Mr. Eduardo Lucas'"
+    },
+    {
+      "gold_id": "g007",
+      "kind": "person",
+      "canonical": "Mme. Henri Fournaye",
+      "aliases": [
+        "Mme. Henri Fournaye",
+        "Mme. Fournaye"
+      ],
+      "note": "从巴黎追至伦敦行刺丈夫的富尔奈夫人；首见原文码点 [28149,28168) 'Mme. Henri Fournaye'"
+    },
+    {
+      "gold_id": "g008",
+      "kind": "person",
+      "canonical": "Inspector Lestrade",
+      "aliases": [
+        "Inspector Lestrade",
+        "Lestrade"
+      ],
+      "note": "苏格兰场雷斯垂德探长；首见原文码点 [27462,27480) 'Inspector Lestrade'"
+    },
+    {
+      "gold_id": "g009",
+      "kind": "person",
+      "canonical": "Constable MacPherson",
+      "aliases": [
+        "Constable MacPherson",
+        "MacPherson"
+      ],
+      "note": "被希尔达夫人收买的警员麦克弗森；首见原文码点 [38323,38343) 'Constable MacPherson'"
+    },
+    {
+      "gold_id": "g010",
+      "kind": "person",
+      "canonical": "Constable Barrett",
+      "aliases": [
+        "Barrett"
+      ],
+      "note": "戈多尔芬街值勤警员巴雷特；首见原文码点 [16501,16508) 'Barrett'"
+    },
+    {
+      "gold_id": "g011",
+      "kind": "person",
+      "canonical": "John Mitton",
+      "aliases": [
+        "John Mitton",
+        "Mitton"
+      ],
+      "note": "卢卡斯的贴身男仆约翰·米顿；首见原文码点 [25167,25178) 'John Mitton'"
+    },
+    {
+      "gold_id": "g012",
+      "kind": "person",
+      "canonical": "Mrs. Hudson",
+      "aliases": [
+        "Mrs. Hudson",
+        "Hudson"
+      ],
+      "note": "贝克街房东哈德森太太；首见原文码点 [18762,18773) 'Mrs. Hudson'"
+    },
+    {
+      "gold_id": "g013",
+      "kind": "person",
+      "canonical": "Hugo Oberstein",
+      "aliases": [
+        "Oberstein"
+      ],
+      "note": "国际间谍奥伯斯坦；首见原文码点 [14950,14959) 'Oberstein'"
+    },
+    {
+      "gold_id": "g014",
+      "kind": "person",
+      "canonical": "Louis La Rothiere",
+      "aliases": [
+        "La Rothiere"
+      ],
+      "note": "国际间谍拉·罗蒂埃；首见原文码点 [14961,14972) 'La Rothiere'"
+    },
+    {
+      "gold_id": "g015",
+      "kind": "place",
+      "canonical": "London",
+      "aliases": [
+        "London"
+      ],
+      "note": "伦敦；首见原文码点 [766,772) 'London'"
+    },
+    {
+      "gold_id": "g016",
+      "kind": "place",
+      "canonical": "Paris",
+      "aliases": [
+        "Paris"
+      ],
+      "note": "巴黎；首见原文码点 [27083,27088) 'Paris'"
+    },
+    {
+      "gold_id": "g017",
+      "kind": "place",
+      "canonical": "Godolphin Street",
+      "aliases": [
+        "Godolphin Street"
+      ],
+      "note": "卢卡斯遇害住所所在的戈多尔芬街；首见原文码点 [15078,15094) 'Godolphin Street'"
+    },
+    {
+      "gold_id": "g018",
+      "kind": "place",
+      "canonical": "Whitehall Terrace",
+      "aliases": [
+        "Whitehall Terrace"
+      ],
+      "note": "霍普夫妇居住的白厅露台；首见原文码点 [4010,4027) 'Whitehall Terrace'"
+    },
+    {
+      "gold_id": "g019",
+      "kind": "place",
+      "canonical": "Westminster",
+      "aliases": [
+        "Westminster"
+      ],
+      "note": "威斯敏斯特；首见原文码点 [18361,18372) 'Westminster'"
+    },
+    {
+      "gold_id": "g020",
+      "kind": "place",
+      "canonical": "Baker Street",
+      "aliases": [
+        "Baker Street"
+      ],
+      "note": "福尔摩斯住所所在的贝克街；首见原文码点 [1804,1816) 'Baker Street'"
+    },
+    {
+      "gold_id": "g021",
+      "kind": "place",
+      "canonical": "Rue Austerlitz",
+      "aliases": [
+        "Rue Austerlitz"
+      ],
+      "note": "富尔奈在巴黎的住所奥斯特利茨街；首见原文码点 [28201,28215) 'Rue Austerlitz'"
+    },
+    {
+      "gold_id": "g022",
+      "kind": "place",
+      "canonical": "Charing Cross",
+      "aliases": [
+        "Charing Cross"
+      ],
+      "note": "查令十字车站；首见原文码点 [29214,29227) 'Charing Cross'"
+    },
+    {
+      "gold_id": "g023",
+      "kind": "place",
+      "canonical": "Europe",
+      "aliases": [
+        "Europe"
+      ],
+      "note": "欧洲；首见原文码点 [10415,10421) 'Europe'"
+    },
+    {
+      "gold_id": "g024",
+      "kind": "place",
+      "canonical": "Britain",
+      "aliases": [
+        "Britain"
+      ],
+      "note": "英国；首见原文码点 [1943,1950) 'Britain'"
+    }
+  ],
+  "ambiguous_surfaces": [
+    {
+      "surface": "Hope",
+      "gold_ids": [
+        "g004"
+      ],
+      "note": "作为专名指欧洲事务大臣特里劳尼·霍普（g004），句首普通名词 Hope 作动词/名词时为 not_entity"
+    }
+  ]
+}

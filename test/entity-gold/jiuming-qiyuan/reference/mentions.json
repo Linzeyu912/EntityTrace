@@ -1,0 +1,6417 @@
+{
+  "book": "03_中文长篇_九命奇冤_36回.txt",
+  "book_id": "jiuming-qiyuan",
+  "source_sha256": "96b254bc40b75e2b38a99360500dafd29624982f9e8e06c5dd6632188b3b36b8",
+  "labeler": "agent:gemini-manual-context-r3",
+  "human_review": "pending",
+  "sampling_version": "r3-stratified-v1",
+  "seed": 20261030,
+  "major_entity_min_occurrences": 20,
+  "major_entity_ids": [
+    "g001",
+    "g002",
+    "g003",
+    "g004",
+    "g005",
+    "g006",
+    "g007",
+    "g008",
+    "g010",
+    "g011",
+    "g013",
+    "g014",
+    "g015",
+    "g016",
+    "g017",
+    "g019",
+    "g022",
+    "g024",
+    "g026",
+    "g027",
+    "g029",
+    "g030",
+    "g031",
+    "g032",
+    "g033",
+    "g035",
+    "g038",
+    "g039",
+    "g040",
+    "g041",
+    "g044"
+  ],
+  "entity_occurrence_counts": {
+    "g001": 477,
+    "g002": 748,
+    "g003": 255,
+    "g004": 326,
+    "g005": 61,
+    "g006": 112,
+    "g007": 120,
+    "g008": 33,
+    "g009": 15,
+    "g010": 79,
+    "g011": 121,
+    "g012": 9,
+    "g013": 87,
+    "g014": 128,
+    "g015": 21,
+    "g016": 25,
+    "g017": 52,
+    "g018": 18,
+    "g019": 24,
+    "g020": 16,
+    "g021": 5,
+    "g022": 74,
+    "g023": 13,
+    "g024": 42,
+    "g025": 16,
+    "g026": 27,
+    "g027": 100,
+    "g028": 6,
+    "g029": 42,
+    "g030": 28,
+    "g031": 30,
+    "g032": 32,
+    "g033": 35,
+    "g034": 17,
+    "g035": 22,
+    "g036": 11,
+    "g037": 7,
+    "g038": 85,
+    "g039": 49,
+    "g040": 43,
+    "g041": 42,
+    "g042": 19,
+    "g043": 9,
+    "g044": 24,
+    "g045": 12,
+    "g046": 8,
+    "g047": 9,
+    "g048": 4,
+    "g049": 2,
+    "g050": 8
+  },
+  "out_of_roster_entities": [
+    {
+      "gold_id": "x001",
+      "kind": "person",
+      "canonical": "何杰臣",
+      "note": "梁天来朋友、幕友何杰臣"
+    },
+    {
+      "gold_id": "x002",
+      "kind": "person",
+      "canonical": "凌越文",
+      "note": "凌家宗人党羽凌越文"
+    },
+    {
+      "gold_id": "x003",
+      "kind": "person",
+      "canonical": "凌越武",
+      "note": "凌家宗人强徒凌越武"
+    },
+    {
+      "gold_id": "x004",
+      "kind": "person",
+      "canonical": "殷成",
+      "note": "黄知县妻弟殷成"
+    },
+    {
+      "gold_id": "x005",
+      "kind": "person",
+      "canonical": "李阿添",
+      "note": "凌贵兴雇募的盗伙李阿添"
+    },
+    {
+      "gold_id": "x006",
+      "kind": "person",
+      "canonical": "万福",
+      "note": "韶州总兵万福"
+    },
+    {
+      "gold_id": "x007",
+      "kind": "person",
+      "canonical": "陈邦禄",
+      "note": "广州府书办陈邦禄"
+    },
+    {
+      "gold_id": "x008",
+      "kind": "person",
+      "canonical": "何达安",
+      "note": "凌贵兴丈人、何氏之父何达安"
+    },
+    {
+      "gold_id": "x009",
+      "kind": "person",
+      "canonical": "连太守",
+      "note": "肇庆府知府连太守"
+    },
+    {
+      "gold_id": "x010",
+      "kind": "person",
+      "canonical": "杨氏",
+      "note": "凌贵兴侍妾杨氏"
+    },
+    {
+      "gold_id": "x011",
+      "kind": "person",
+      "canonical": "雍正皇帝",
+      "note": "清朝雍正帝"
+    },
+    {
+      "gold_id": "x012",
+      "kind": "person",
+      "canonical": "文华殿大学士",
+      "note": "兼翰林院掌院的朝廷文华殿大学士"
+    },
+    {
+      "gold_id": "x013",
+      "kind": "person",
+      "canonical": "广东主考",
+      "note": "陈大人同年、丙午科广东乡试主考官王某"
+    },
+    {
+      "gold_id": "x014",
+      "kind": "place",
+      "canonical": "广东",
+      "note": "广东省"
+    },
+    {
+      "gold_id": "x015",
+      "kind": "place",
+      "canonical": "茶村",
+      "note": "梁天来兄弟前往收糖帐的村落茶村"
+    },
+    {
+      "gold_id": "x016",
+      "kind": "place",
+      "canonical": "第八甫",
+      "note": "省城第八甫（梁天来开设天和糖行所在街区）"
+    },
+    {
+      "gold_id": "x017",
+      "kind": "person",
+      "canonical": "凌宗和",
+      "note": "凌氏族人强徒凌宗和"
+    },
+    {
+      "gold_id": "x018",
+      "kind": "person",
+      "canonical": "凌易行",
+      "note": "凌贵兴族叔、梁母凌氏堂弟、郑氏之夫凌易行"
+    },
+    {
+      "gold_id": "x019",
+      "kind": "person",
+      "canonical": "何达先",
+      "note": "凌贵兴叔丈、何达安之弟何达先"
+    },
+    {
+      "gold_id": "x020",
+      "kind": "place",
+      "canonical": "聚仙馆",
+      "note": "林大有在省城小北门外开设的鸦片烟馆聚仙馆"
+    },
+    {
+      "gold_id": "x021",
+      "kind": "place",
+      "canonical": "裕耕堂",
+      "note": "凌贵兴家聚众饮酒议事的厅堂裕耕堂"
+    },
+    {
+      "gold_id": "x022",
+      "kind": "place",
+      "canonical": "卑田院",
+      "note": "谭村乞丐张凤流落栖身的卑田院"
+    },
+    {
+      "gold_id": "x026",
+      "kind": "person",
+      "canonical": "黎阿二",
+      "note": "凌贵兴党羽、林大有烟馆伙计及臬署夹棍手黎阿二"
+    },
+    {
+      "gold_id": "x027",
+      "kind": "person",
+      "canonical": "高全",
+      "note": "两广总督孔大鹏之妻舅高全"
+    },
+    {
+      "gold_id": "x028",
+      "kind": "person",
+      "canonical": "萧抚院",
+      "note": "广东巡抚萧抚院"
+    },
+    {
+      "gold_id": "x029",
+      "kind": "person",
+      "canonical": "梁祈富",
+      "note": "梁天来随侍家仆梁祈富"
+    },
+    {
+      "gold_id": "x030",
+      "kind": "place",
+      "canonical": "臬台衙门",
+      "note": "广东按察使司衙门"
+    },
+    {
+      "gold_id": "x031",
+      "kind": "person",
+      "canonical": "蔡顺",
+      "note": "凌贵兴党羽蔡顺"
+    },
+    {
+      "gold_id": "x032",
+      "kind": "person",
+      "canonical": "李时枚",
+      "note": "李丰叔父、钦差刑部侍郎李时枚"
+    }
+  ],
+  "annotation_started_at": "2026-10-30T14:53:48+08:00",
+  "annotation_finished_at": "2026-10-30T15:08:40+08:00",
+  "annotation_seconds": 1460.0,
+  "entity_stratum_count": 372,
+  "hard_stratum_count": 150,
+  "total_mentions": 522,
+  "mentions": [
+    {
+      "sample_id": "s001",
+      "start": 163,
+      "end": 166,
+      "surface": "林大哥",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g005",
+      "note": "前文强盗攻打梁家二门铁门时听见炮响说“这响炮是林大哥到了”，后文自称“俺老林横行江湖十多年”并命放火烧门，指凶徒首领林大有。"
+    },
+    {
+      "sample_id": "s002",
+      "start": 173,
+      "end": 176,
+      "surface": "林大哥",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g005",
+      "note": "前文“这响炮是林大哥到了”，后文盗伙呼喊“这里两扇铁牢门，攻打不开呢”，对方自称“俺老林”命拿牛油柴草放火，指林大有。"
+    },
+    {
+      "sample_id": "s003",
+      "start": 352,
+      "end": 354,
+      "surface": "石室",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g040",
+      "note": "前文强盗烧塌门楼抢进去后惊叹“怪道人说梁家”，后文“原来门也是石的”，指梁天来家避祸的梁家石室。"
+    },
+    {
+      "sample_id": "s004",
+      "start": 367,
+      "end": 370,
+      "surface": "林大哥",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g005",
+      "note": "前文盗伙见梁家石室也是石门，后文向头目请示“铁门是用火攻开了！这石门只怕火力难施，又有甚么妙法”，对方以“我老林”自称，指林大有。"
+    },
+    {
+      "sample_id": "s005",
+      "start": 1009,
+      "end": 1011,
+      "surface": "阿七",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g024",
+      "note": "前文林大有向凌大爷献计在门缝喷桐油烟，后文唤其“你飞檐走壁的功夫，还使得么”并命其上屋塞住四面小窗放火，指会飞檐走壁的盗伙熊阿七。"
+    },
+    {
+      "sample_id": "s006",
+      "start": 1513,
+      "end": 1515,
+      "surface": "石室",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 1,
+      "gold_id": "g040",
+      "note": "前文叙述强盗熏烧两个多时辰散去闹出九命奇冤大案，“那个主使的甚么凌大爷……志不在钱财，只想弄杀”，后文“中人”，指梁家石室。"
+    },
+    {
+      "sample_id": "s007",
+      "start": 1793,
+      "end": 1797,
+      "surface": "雍正皇帝",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster"
+      ],
+      "chapter_index": 1,
+      "gold_id": "x011",
+      "note": "前文交代“这件事出在本朝雍正年间，这位”，后文“据故老相传，是一位英明神武的皇帝”，指清朝雍正皇帝。"
+    },
+    {
+      "sample_id": "s008",
+      "start": 1900,
+      "end": 1902,
+      "surface": "广东",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 1,
+      "gold_id": "x014",
+      "note": "前文说雍正朝吏治本是顶好，后文转折“然而这个故事，后来闹成一个极大案子，却是贪官污吏布满广东，弄到天日无光”，指广东省。"
+    },
+    {
+      "sample_id": "s009",
+      "start": 2042,
+      "end": 2044,
+      "surface": "江西",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 2,
+      "gold_id": "g044",
+      "note": "前文第二回开头叙述广东商贾云集，“从前海路未通，往来北省的人，多是取道”，后文“这江西与广东交界的地方，有一座南雄岭”，指江西省。"
+    },
+    {
+      "sample_id": "s010",
+      "start": 2046,
+      "end": 2048,
+      "surface": "江西",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 2,
+      "gold_id": "g044",
+      "note": "前文紧承“往来北省的人，多是取道江西”，后文“与广东交界的地方，有一座南雄岭”，指与广东交界的江西省。"
+    },
+    {
+      "sample_id": "s011",
+      "start": 2065,
+      "end": 2068,
+      "surface": "南雄岭",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 2,
+      "gold_id": "g041",
+      "note": "前文“这江西与广东交界的地方，有一座南雄岭”，后文“是广东省南雄州所属的地方，过往之人都要在此地经过”，指粤赣交界南雄州所属的南雄岭。"
+    },
+    {
+      "sample_id": "s012",
+      "start": 2211,
+      "end": 2214,
+      "surface": "番禺县",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 2,
+      "gold_id": "g035",
+      "note": "前文介绍南雄广源绸缎铺由姓梁名朝大与姓凌名宗客郎舅两个合伙开设，“都是广州府”，后文“人氏”，指广州府番禺县。"
+    },
+    {
+      "sample_id": "s013",
+      "start": 2279,
+      "end": 2281,
+      "surface": "南雄",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 2,
+      "gold_id": "g041",
+      "note": "前文说凌宗客发横财后先回省城安闲度日，“所有”，后文“生意，都归与朝大经营”，指广源绸缎铺所在的南雄。"
+    },
+    {
+      "sample_id": "s014",
+      "start": 2386,
+      "end": 2388,
+      "surface": "南雄",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 2,
+      "gold_id": "g041",
+      "note": "前文说凌宗客死后其子凌贵兴丁忧，“谁知过得年馀，梁朝大在”，后文“，也一病身亡。朝大两个儿子……星夜奔丧而去”，指梁朝大经商病故之地南雄。"
+    },
+    {
+      "sample_id": "s015",
+      "start": 2409,
+      "end": 2411,
+      "surface": "君来",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 2,
+      "gold_id": "g008",
+      "note": "前文说梁朝大在南雄病亡，“朝大两个儿子，长名天来，次名”，后文“，其时正在番禺谭村居住。一朝得讣……星夜奔丧而去”，指梁朝大次子梁君来。"
+    },
+    {
+      "sample_id": "s016",
+      "start": 2416,
+      "end": 2418,
+      "surface": "番禺",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 2,
+      "gold_id": "g035",
+      "note": "前文介绍梁朝大两子天来、君来，“其时正在”，后文“谭村居住”，指广州府番禺县。"
+    },
+    {
+      "sample_id": "s017",
+      "start": 2418,
+      "end": 2420,
+      "surface": "谭村",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 2,
+      "gold_id": "g039",
+      "note": "前文“朝大两个儿子，长名天来，次名君来，其时正在番禺”，后文“居住。一朝得讣，不必说，自是星夜奔丧而去”，指梁家祖居村落谭村。"
+    },
+    {
+      "sample_id": "s018",
+      "start": 3317,
+      "end": 3319,
+      "surface": "谭村",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 2,
+      "gold_id": "g039",
+      "note": "前文南雄广源店拆股算清后，“表兄弟三人一同买舟返省。天来兄弟，自回”，后文“不提。且说贵兴与天来分手之后”，指梁天来兄弟回返的番禺谭村。"
+    },
+    {
+      "sample_id": "s019",
+      "start": 3406,
+      "end": 3408,
+      "surface": "江西",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 2,
+      "gold_id": "g044",
+      "note": "前文凌贵兴走过马鞍街见一家门首挂着簇新招牌，后文招牌写着“马半仙，专参六壬神课，兼精命相，阴阳地理”，指马半仙原籍江西省。"
+    },
+    {
+      "sample_id": "s020",
+      "start": 4678,
+      "end": 4680,
+      "surface": "半仙",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 2,
+      "gold_id": "g033",
+      "note": "前文马半仙夸赞贵兴八字比年大将军还高十倍，贵兴问“请先生批个大批，要多少笔金呢？”，后文答道“不如批个成本的好”，指算命先生马半仙。"
+    },
+    {
+      "sample_id": "s021",
+      "start": 4737,
+      "end": 4739,
+      "surface": "半仙",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 2,
+      "gold_id": "g033",
+      "note": "前文凌贵兴问“就批个成本，不知要多少笔金？”，后文答道“小弟这里的规矩，平常人多算，批成本是五钱银子”，指算命先生马半仙。"
+    },
+    {
+      "sample_id": "s022",
+      "start": 4911,
+      "end": 4913,
+      "surface": "半仙",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 2,
+      "gold_id": "g033",
+      "note": "前文凌贵兴送一两银子笔金并问几天可批好，后文答道“批成本的，不是含糊可以了事……大约十天之后，方可应命”，指算命先生马半仙。"
+    },
+    {
+      "sample_id": "s023",
+      "start": 5111,
+      "end": 5113,
+      "surface": "半仙",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 2,
+      "gold_id": "g033",
+      "note": "前文凌贵兴问“招牌上还有阴阳地理，想必也是高明？”，后文答道在家乡因看风水灵被送诨号“钻穿石”，指算命先生马半仙。"
+    },
+    {
+      "sample_id": "s024",
+      "start": 5245,
+      "end": 5248,
+      "surface": "陈大人",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 2,
+      "gold_id": "g026",
+      "note": "前文小厮来请安说“隔壁陈大人来拜候呢”，贵兴辞了马半仙回家，后文引出“不知陈大人是甚么人，来拜贵兴何事？”，指住贵兴隔壁卖关节的陈大人。"
+    },
+    {
+      "sample_id": "s025",
+      "start": 5321,
+      "end": 5324,
+      "surface": "陈大人",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 3,
+      "gold_id": "g026",
+      "note": "前文第三回凌贵兴别过马半仙带小厮回家，“一路上细问：‘”，后文“找我有何事故？’那小厮名唤喜来……便答道”，指来找凌贵兴的隔壁陈大人。"
+    },
+    {
+      "sample_id": "s026",
+      "start": 5369,
+      "end": 5371,
+      "surface": "喜来",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 3,
+      "gold_id": "g014",
+      "note": "前文介绍“那小厮名唤喜来，说小也不小了，年纪也有十五六岁了，贵兴向来以心腹相待。当下”，后文“便答道：‘小人也不知有甚要事，自从大爷动身的第二天就来过’”，指凌贵兴心腹小厮喜来。"
+    },
+    {
+      "sample_id": "s027",
+      "start": 5409,
+      "end": 5411,
+      "surface": "南雄",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 3,
+      "gold_id": "g041",
+      "note": "前文喜来回禀陈大人自大爷动身第二天就来打听，“小人回他说，大爷到”，后文“去了。他问几时回来，小人回说不知”，指凌贵兴此前去拆股的南雄。"
+    },
+    {
+      "sample_id": "s028",
+      "start": 5546,
+      "end": 5549,
+      "surface": "陈大人",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 3,
+      "gold_id": "g026",
+      "note": "前文喜来寻着算命的凌贵兴，“一面说著，回到家中，贵兴即到书房与”，后文“相见。原来这陈大人是浙江人氏”，指在书房等候凌贵兴的陈大人。"
+    },
+    {
+      "sample_id": "s029",
+      "start": 5557,
+      "end": 5560,
+      "surface": "陈大人",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 3,
+      "gold_id": "g026",
+      "note": "前文“贵兴即到书房与陈大人相见。原来这”，后文“是浙江人氏，本来是一个翰林院编修，放过一任学政”，指革职编修陈大人。"
+    },
+    {
+      "sample_id": "s030",
+      "start": 5591,
+      "end": 5594,
+      "surface": "陈大人",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 3,
+      "gold_id": "g026",
+      "note": "前文说他本来是翰林院编修、放过一任学政，“因此人家都叫他”，后文“。后来因为犯了清议，被御史参了一本，奉旨革职”，指陈大人。"
+    },
+    {
+      "sample_id": "s031",
+      "start": 5689,
+      "end": 5692,
+      "surface": "陈大人",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 3,
+      "gold_id": "g026",
+      "note": "前文说陈大人赁居在贵兴隔壁，“当下彼此相见，寒暄已毕，”，后文“凑近一步说道：‘前几天屡次奉访，又值老兄公出未回’”，指与凌贵兴寒暄密谈的陈大人。"
+    },
+    {
+      "sample_id": "s032",
+      "start": 5736,
+      "end": 5739,
+      "surface": "陈大人",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 3,
+      "gold_id": "g026",
+      "note": "前文凌贵兴抢着问道“不知有何见教？”，后文“道：‘弟接了京里一位同年的信，这位同年姓王……要卖一两个关节’”，指兜售乡试关节的陈大人。"
+    },
+    {
+      "sample_id": "s033",
+      "start": 5797,
+      "end": 5803,
+      "surface": "文华殿大学士",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster"
+      ],
+      "chapter_index": 3,
+      "gold_id": "x012",
+      "note": "前文陈大人提起京里王姓同年，“明年是雍正四年丙午乡试年期，这位敝同年，是当今”，后文“兼翰林院掌院的得意门生。已经暗暗的许了他一个广东主考”，指朝廷掌院的文华殿大学士。"
+    },
+    {
+      "sample_id": "s034",
+      "start": 5825,
+      "end": 5829,
+      "surface": "广东主考",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster"
+      ],
+      "chapter_index": 3,
+      "gold_id": "x013",
+      "note": "前文说王姓同年是文华殿大学士兼翰林院掌院的得意门生，“已经暗暗的许了他一个”，后文“，因写信与弟，要卖一两个关节”，指内定出任丙午科广东乡试的主考官王某。"
+    },
+    {
+      "sample_id": "s035",
+      "start": 5913,
+      "end": 5916,
+      "surface": "马半仙",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 3,
+      "gold_id": "g033",
+      "note": "前文陈大人问凌贵兴有没有人肯买乡试关节，“贵兴听了暗暗欢喜，道：‘”，后文“之言验矣！’屈指一算，自己恰好明年五月就满服了”，指算命先生马半仙。"
+    },
+    {
+      "sample_id": "s036",
+      "start": 5942,
+      "end": 5945,
+      "surface": "陈大人",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 3,
+      "gold_id": "g026",
+      "note": "前文凌贵兴算定自己明年五月满服，“因对”，后文“道：‘不知这个关节怎么买法？有甚凭据？’”，指卖关节的陈大人。"
+    },
+    {
+      "sample_id": "s037",
+      "start": 5965,
+      "end": 5968,
+      "surface": "陈大人",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 3,
+      "gold_id": "g026",
+      "note": "前文凌贵兴问“不知这个关节怎么买法？有甚凭据？”，后文“道：‘老兄没有干过这等事，无怪不知此中玄妙……把他说的那几个字嵌在首艺的破题里面’”，指解释买关节办法的陈大人。"
+    },
+    {
+      "sample_id": "s038",
+      "start": 6078,
+      "end": 6081,
+      "surface": "陈大人",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 3,
+      "gold_id": "g026",
+      "note": "前文凌贵兴问“此刻不能同主考当面，又怎么行呢？”，后文“道：‘这也容易！倘是有人买了，少不得我要进京走一次’”，指答应亲自进京接洽主考的陈大人。"
+    },
+    {
+      "sample_id": "s039",
+      "start": 6300,
+      "end": 6302,
+      "surface": "举人",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short",
+        "title_or_official"
+      ],
+      "chapter_index": 3,
+      "gold_id": "not_entity",
+      "note": "前文陈大人劝贵兴说科名不贵，“并且贵省的”，后文“比别省来得体面，一朝中了举人，上自衙门差役，下至赌馆娼寮，哪一处不来巴结奉承”，此处指科举功名群体泛称，非特定单一人名实体。"
+    },
+    {
+      "sample_id": "s040",
+      "start": 6716,
+      "end": 6719,
+      "surface": "陈大人",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 3,
+      "gold_id": "g026",
+      "note": "前文凌贵兴踌躇问道“万一贵同年放不著敝省主考，就怎样呢？”，后文“道：‘这个自然他会打算，既是放了别人，他也可以临时转卖出去’”，指陈大人。"
+    },
+    {
+      "sample_id": "s041",
+      "start": 7026,
+      "end": 7029,
+      "surface": "陈大人",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 3,
+      "gold_id": "g026",
+      "note": "前文凌贵兴向妻子何氏盘算买闱姓，说买“凌”字的人一定少，“加以”，后文“那里已经有了两个人。这两个人姓甚么，我明日索性去问了来”，指已卖出两个举人关节的陈大人。"
+    },
+    {
+      "sample_id": "s042",
+      "start": 7103,
+      "end": 7105,
+      "surface": "喜来",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 3,
+      "gold_id": "g014",
+      "note": "前文凌贵兴正与何氏说话间，后文“进来道：‘大宅的易行太爷来了，说给大爷请安呢。’”并遵命出去回绝，指凌贵兴家小厮喜来。"
+    },
+    {
+      "sample_id": "s043",
+      "start": 7380,
+      "end": 7383,
+      "surface": "陈大人",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 3,
+      "gold_id": "g026",
+      "note": "前文“且说贵兴过得一天，就去打了一张一万两的汇票，又取了三千两现银，到”，后文“那里去回拜。一面交托这件事，要了关节的几个字”，指收受凌贵兴买关节银两的陈大人。"
+    },
+    {
+      "sample_id": "s044",
+      "start": 7475,
+      "end": 7478,
+      "surface": "陈大人",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 3,
+      "gold_id": "g026",
+      "note": "前文凌贵兴送交一万三千两并托其进京代拜王大人，后文“照数收下，先向贵兴道喜，贵兴更是乐不可支”，指收银道喜的陈大人。"
+    },
+    {
+      "sample_id": "s045",
+      "start": 7514,
+      "end": 7517,
+      "surface": "陈大人",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 3,
+      "gold_id": "g026",
+      "note": "前文“再过一天，又置酒与陈大人饯行。”，后文“又教了他在就近买荐卷、买誊录等事，贵兴一一谨记在心”，指临行指点凌贵兴场屋关节的陈大人。"
+    },
+    {
+      "sample_id": "s046",
+      "start": 7576,
+      "end": 7578,
+      "surface": "半仙",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 3,
+      "gold_id": "g033",
+      "note": "前文凌贵兴送过陈大人后过了十天，“便叫喜来到马半仙处取批的命本。”，后文“见了喜来，送茶送烟的同他交谈起来。用言语打听了好些贵兴家事”，指算命先生马半仙。"
+    },
+    {
+      "sample_id": "s047",
+      "start": 11180,
+      "end": 11183,
+      "surface": "马半仙",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 4,
+      "gold_id": "g033",
+      "note": "前文凌宗孔对落第的贵兴说疑心阴宅风水未见得十分好，“我闻得”，后文“看风水的本事极好，浑名叫‘钻穿石’，何不请他去看看阴宅呢？”，指兼通阴阳地理的马半仙。"
+    },
+    {
+      "sample_id": "s048",
+      "start": 11242,
+      "end": 11244,
+      "surface": "叔父",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 4,
+      "gold_id": "g003",
+      "note": "前文宗孔建议请马半仙看阴宅，凌贵兴对宗孔道“这等说，就烦”，后文“去请他来，同去看看。”宗孔巴不得一声答应去请马半仙，故贵兴所称“叔父”指族叔凌宗孔。"
+    },
+    {
+      "sample_id": "s049",
+      "start": 11306,
+      "end": 11308,
+      "surface": "谭村",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 4,
+      "gold_id": "g039",
+      "note": "前文宗孔请了马半仙，“一同到贵兴家来，叫了船摇到”，后文“去。原来贵兴祖坟，葬在谭村”，指凌家祖坟所在的谭村。"
+    },
+    {
+      "sample_id": "s050",
+      "start": 11349,
+      "end": 11352,
+      "surface": "马半仙",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 4,
+      "gold_id": "g033",
+      "note": "前文“当时船泊了岸，贵兴、宗孔、半仙一同登岸，来到坟上。”，后文“开了罗盘，看了方向，又四面看了大局，就发起他那荒谬议论来”，指看阴宅风水的马半仙。"
+    },
+    {
+      "sample_id": "s051",
+      "start": 11465,
+      "end": 11468,
+      "surface": "马半仙",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 4,
+      "gold_id": "g033",
+      "note": "前文马半仙称赞阴宅是“猫儿伸懒”之局，贵兴谦称“尚望指教，不可过誉！”，后文“道：‘我是依书直说，毫无褒奖。’”，指算命兼看风水的马半仙。"
+    },
+    {
+      "sample_id": "s052",
+      "start": 11903,
+      "end": 11905,
+      "surface": "石室",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 4,
+      "gold_id": "g040",
+      "note": "前文马半仙说前边梁天来家石室犯煞需拆平，宗孔取了回用后“又回到贵兴家来，讨这差使，要去见梁天来，商量买他的”，指梁家石室。"
+    },
+    {
+      "sample_id": "s053",
+      "start": 12028,
+      "end": 12031,
+      "surface": "马半仙",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 5,
+      "gold_id": "g033",
+      "note": "前文第五回交代凌贵兴在省城和老宅两面住，“此次因同”，后文“来看风水，就便回老宅去，所以打发半仙先走”，指同去谭村看风水的马半仙。"
+    },
+    {
+      "sample_id": "s054",
+      "start": 12491,
+      "end": 12493,
+      "surface": "宗孔",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 5,
+      "gold_id": "g003",
+      "note": "前文凌宗孔向妻子谢氏讨首饰去当，谢氏赌气把铜耳环、铜压发除下劈面掼去，后文“嬉皮笑脸的拾起来，也不言语，往外就走……一直走到贵兴家中”，指凌宗孔。"
+    },
+    {
+      "sample_id": "s055",
+      "start": 13358,
+      "end": 13361,
+      "surface": "第八甫",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster"
+      ],
+      "chapter_index": 5,
+      "gold_id": "x016",
+      "note": "前文“且说宗孔离了家门，叫了一只小船，摇到省城，一迳到”，后文“天和糖行来寻梁天来。原来梁天来自从南雄拆股以后，就在省城第八甫开设天和糖行”，指梁天来天和糖行所在的省城第八甫。"
+    },
+    {
+      "sample_id": "s056",
+      "start": 13387,
+      "end": 13389,
+      "surface": "省城",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 5,
+      "gold_id": "g038",
+      "note": "前文“原来梁天来自从南雄拆股以后，就在”，后文“第八甫开设天和糖行，自己带著兄弟君来、儿子养福，在行中经理一切”，指广东布政司所在省城。"
+    },
+    {
+      "sample_id": "s057",
+      "start": 13410,
+      "end": 13412,
+      "surface": "养福",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 5,
+      "gold_id": "g030",
+      "note": "前文说梁天来在省城第八甫开设天和糖行，“自己带著兄弟君来、儿子”，后文“，在行中经理一切，生意倒也兴旺”，指梁天来之子梁养福。"
+    },
+    {
+      "sample_id": "s058",
+      "start": 13619,
+      "end": 13621,
+      "surface": "宗孔",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 5,
+      "gold_id": "g003",
+      "note": "前文凌宗孔向梁天来兜揽“有几倍利的生意”，天来笑称不在行古董，后文“道：‘这个虽不是贩古董，却也同古董差不多，只要贤甥肯做，我便说出来’”，指来糖行说项买石室的凌宗孔。"
+    },
+    {
+      "sample_id": "s059",
+      "start": 13732,
+      "end": 13734,
+      "surface": "乡试",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 5,
+      "gold_id": "not_entity",
+      "note": "前文凌宗孔对梁天来说“我那位祈伯舍侄，今年”，后文“，主考瞎了眼睛，没有中他”，此处“乡试”指科举乡试制度名称，非人物或地点实体。"
+    },
+    {
+      "sample_id": "s060",
+      "start": 13965,
+      "end": 13967,
+      "surface": "石室",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 5,
+      "gold_id": "g040",
+      "note": "前文宗孔劝梁天来把石室让与祈伯，“当日你令尊翁盖造这座”，后文“，我是知道的，不过花了千把银子”，指梁朝大手建的梁家石室。"
+    },
+    {
+      "sample_id": "s061",
+      "start": 13985,
+      "end": 13987,
+      "surface": "天来",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 5,
+      "gold_id": "not_entity",
+      "note": "前文宗孔说“当日你令尊翁盖造这座石室，我是知道的，不过花了千把银子。我今”，后文“时，到祈伯那里请示，问他肯出多少钱”，原文为“我今天来时”（今日前来之时）的跨词切分，非人名梁天来。"
+    },
+    {
+      "sample_id": "s062",
+      "start": 14529,
+      "end": 14531,
+      "surface": "养福",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 5,
+      "gold_id": "g030",
+      "note": "前文梁君来驳斥凌宗孔后，“天来的儿子”，后文“插嘴道：‘说来也是笑话，人家好好的住宅房子，又是碍了风水了！’”，指梁天来之子梁养福。"
+    },
+    {
+      "sample_id": "s063",
+      "start": 14764,
+      "end": 14766,
+      "surface": "君来",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 5,
+      "gold_id": "g008",
+      "note": "前文梁天来喝住养福并对宗孔赔礼，“宗孔受了”，后文“、养福两个抢白，正没有下场。今得天来转了个弯，便一言不发，搭讪著走了”，指刚抢白了宗孔的梁君来。"
+    },
+    {
+      "sample_id": "s064",
+      "start": 14827,
+      "end": 14829,
+      "surface": "养福",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 5,
+      "gold_id": "g030",
+      "note": "前文宗孔搭讪走后，“天来转身，埋怨君来、”，后文“道：‘就是不卖给他，也要好好的打发他，你叔侄两个不该出言激怒他。’”，指与叔父君来一同抢白宗孔的梁养福。"
+    },
+    {
+      "sample_id": "s065",
+      "start": 14865,
+      "end": 14867,
+      "surface": "谭村",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 5,
+      "gold_id": "g039",
+      "note": "前文梁天来埋怨君来、养福不该出言激怒宗孔，“你们可知”，后文“一带，乡民有两个歌谣，叫做‘不怕雷公，只怕宗孔；不怕菩萨，只怕祈伯’”，指梁、凌两家所在的谭村。"
+    },
+    {
+      "sample_id": "s066",
+      "start": 14964,
+      "end": 14966,
+      "surface": "君来",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 5,
+      "gold_id": "g008",
+      "note": "前文梁天来告诫叔侄二人须防宗孔惹祸，“一席话说得”，后文“、养福默默无言”，指梁天来之弟梁君来。"
+    },
+    {
+      "sample_id": "s067",
+      "start": 14967,
+      "end": 14969,
+      "surface": "养福",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 5,
+      "gold_id": "g030",
+      "note": "前文梁天来告诫不可激怒绰号“落地蜈蚣”的宗孔，“一席话说得君来、”，后文“默默无言”，指梁天来之子梁养福。"
+    },
+    {
+      "sample_id": "s068",
+      "start": 15025,
+      "end": 15027,
+      "surface": "天来",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 5,
+      "gold_id": "g001",
+      "note": "前文宗孔受抢白后摇船回慕德里司，“一口气奔入贵兴家中，将”，后文“、君来、养福各人说话，一字不讳，滔滔汨汨的说了出来”，指梁天来。"
+    },
+    {
+      "sample_id": "s069",
+      "start": 15028,
+      "end": 15030,
+      "surface": "君来",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 5,
+      "gold_id": "g008",
+      "note": "前文宗孔奔入贵兴家中，“将天来、”，后文“、养福各人说话，一字不讳，滔滔汨汨的说了出来”，指梁君来。"
+    },
+    {
+      "sample_id": "s070",
+      "start": 15031,
+      "end": 15033,
+      "surface": "养福",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 5,
+      "gold_id": "g030",
+      "note": "前文宗孔奔入贵兴家中，“将天来、君来、”，后文“各人说话，一字不讳，滔滔汨汨的说了出来”，指梁养福。"
+    },
+    {
+      "sample_id": "s071",
+      "start": 15519,
+      "end": 15521,
+      "surface": "南雄",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 6,
+      "gold_id": "g041",
+      "note": "前文宗孔添油加醋挑拨说梁天来称凌宗客靠梁父提携，贵兴大怒道“无论省城，无论”，后文“，哪一个不知梁朝大是我父亲携带起来的？”，指梁、凌两家早年合伙开店的南雄。"
+    },
+    {
+      "sample_id": "s072",
+      "start": 16117,
+      "end": 16119,
+      "surface": "凌氏",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 6,
+      "gold_id": "g027",
+      "note": "前文海顺带无赖挖掘梁朝大坟头，家人祈富奔告老主母凌氏，后文“听说，老大吃了一惊，忙到后面，开了后门观看”，指梁天来之母凌氏。"
+    },
+    {
+      "sample_id": "s073",
+      "start": 16272,
+      "end": 16274,
+      "surface": "翰昭",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 6,
+      "gold_id": "g031",
+      "note": "前文海顺挖掘梁坟并对凌氏吼骂，“却说天来有一位叔叔，名唤”，后文“，住在邻近，闻声出来相劝”，指梁天来叔父梁翰昭。"
+    },
+    {
+      "sample_id": "s074",
+      "start": 16540,
+      "end": 16542,
+      "surface": "石室",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 6,
+      "gold_id": "g040",
+      "note": "前文宗孔对贵兴献计逼梁天来双手奉上石室，贵兴问有何妙计，宗孔道“他那”，后文“正对著一座土山，我们可将那土山前面，削平一块，竖起木板，在木板上面画一只白虎，对著他那石室的明堂”，指梁家石室。"
+    },
+    {
+      "sample_id": "s075",
+      "start": 16698,
+      "end": 16700,
+      "surface": "凌氏",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 6,
+      "gold_id": "g027",
+      "note": "前文宗孔在土山脚下竖木板画了一只张牙舞爪的白虎对着石室，后文“见了又气又恼，叫人请了翰昭来商量”，指梁母凌氏。"
+    },
+    {
+      "sample_id": "s076",
+      "start": 16711,
+      "end": 16713,
+      "surface": "翰昭",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 6,
+      "gold_id": "g031",
+      "note": "前文凌氏见土山脚下画了白虎又气又恼，“叫人请了”，后文“来商量。翰昭道：‘我们何不在后墙上，画一只貔貅挡著他呢？’”，指梁天来叔父梁翰昭。"
+    },
+    {
+      "sample_id": "s077",
+      "start": 17092,
+      "end": 17094,
+      "surface": "白虎",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 6,
+      "gold_id": "not_entity",
+      "note": "前文泥水匠告诉宗孔梁家在后墙画貔貅克制白虎，宗孔愕然问道“貔貅可以克制”，后文“么？不知又有甚么东西，可以克制貔貅？”，此处指木板上所画的风水白虎图像，非人物或地点实体。"
+    },
+    {
+      "sample_id": "s078",
+      "start": 17156,
+      "end": 17158,
+      "surface": "石室",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 6,
+      "gold_id": "g040",
+      "note": "前文宗孔听泥水匠说梁家画貔貅克制白虎后没好气回家，“思前想后，总不得一个善法，弄了那”，后文“过来，巴结贵兴。越想越气……招了十多个无赖，迳奔梁宅后面”，指梁家石室。"
+    },
+    {
+      "sample_id": "s079",
+      "start": 17795,
+      "end": 17798,
+      "surface": "番禺县",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 6,
+      "gold_id": "g035",
+      "note": "前文梁天来回乡看到宗孔拆毁后墙、填塞鱼池，怒道“如此，哪里还成个世界！我明天就到”，后文“里告他一状，请官勘验，好歹要罚他赔偿！”，指番禺县衙门/番禺县。"
+    },
+    {
+      "sample_id": "s080",
+      "start": 18060,
+      "end": 18062,
+      "surface": "省城",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 6,
+      "gold_id": "g038",
+      "note": "前文梁天来遵母命不打官司，叫匠人修理坟墓后墙，“过了几天，商量仍回”，后文“料理生意。君来道：‘茶村有一笔帐，我们何妨去取了回来，再到省城呢？’”，指天和糖行所在的省城。"
+    },
+    {
+      "sample_id": "s081",
+      "start": 18251,
+      "end": 18253,
+      "surface": "茶村",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 6,
+      "gold_id": "x015",
+      "note": "前文天来、君来取道茶村收帐被宗孔看见，宗孔奔告贵兴说“我碰见他兄弟两个到”，后文“去，想来一定是叫人写状去了”，指梁天来兄弟前往讨糖帐的茶村。"
+    },
+    {
+      "sample_id": "s082",
+      "start": 19081,
+      "end": 19083,
+      "surface": "天来",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 7,
+      "gold_id": "g001",
+      "note": "前文区爵兴献计伪造借票并由宗孔约十四名强徒分布要隘拦截，“也是”，后文“合当有事，倘使他兄弟收了帐，就在茶村叫了船，一迳到省城去，他就没事了”，指收帐回谭村遭截劫的梁天来。"
+    },
+    {
+      "sample_id": "s083",
+      "start": 19368,
+      "end": 19370,
+      "surface": "贵兴",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 7,
+      "gold_id": "g002",
+      "note": "前文梁天来兄弟登岸见凌贵兴在茶亭里迎出来，想要假装不见掠过去，后文“哪里肯放过，高声叫道：‘梁老表台！请了！’”，指在码头茶亭拦截索债的凌贵兴。"
+    },
+    {
+      "sample_id": "s084",
+      "start": 19577,
+      "end": 19579,
+      "surface": "宗孔",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 7,
+      "gold_id": "g003",
+      "note": "前文凌贵兴向梁天来索要“从前姑丈那一笔帐”，天来愕然反问先父有何帐目未清，后文“冷笑道：‘侄老爹！是不是呢？我明知他是要赖的。喜得字样没有遗失，何不拿出来给他看呢？’”，指帮腔逼债的凌宗孔。"
+    },
+    {
+      "sample_id": "s085",
+      "start": 20522,
+      "end": 20524,
+      "surface": "天来",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 7,
+      "gold_id": "g001",
+      "note": "前文柳郁等八人一拥上前将天来兄弟捉住搜出三百两银子、殴打一顿后簇拥贵兴而去，后文“兄弟，抱头鼠窜而逃”，指被抢被殴的梁天来。"
+    },
+    {
+      "sample_id": "s086",
+      "start": 20607,
+      "end": 20609,
+      "surface": "宗和",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 7,
+      "gold_id": "x017",
+      "note": "前文天来兄弟逃到转弯处撞见海顺，海顺大叫“赖债贼在这里了”，“叫声未绝，只见美闲、宗孟、宗季、宗孝、”，后文“，一拥而来，把天来兄弟围住，拳脚交下”，指参与围殴截抢的凌氏族人强徒凌宗和。"
+    },
+    {
+      "sample_id": "s087",
+      "start": 20645,
+      "end": 20647,
+      "surface": "贵兴",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 7,
+      "gold_id": "g002",
+      "note": "前文海顺、美闲、宗和等将天来兄弟又打了一顿后呼啸而去，“赶上”，后文“，一同簇拥而回。贵兴当中坐下，爵兴在左，宗孔在右”，指率众截抢后回家的凌贵兴。"
+    },
+    {
+      "sample_id": "s088",
+      "start": 20714,
+      "end": 20716,
+      "surface": "贵兴",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 7,
+      "gold_id": "g002",
+      "note": "前文凌贵兴要论功行赏，区爵兴递过一件东西道“贤侄且收好了”，后文“接来一看，却是那张假借票”，指接回假借票的凌贵兴。"
+    },
+    {
+      "sample_id": "s089",
+      "start": 21489,
+      "end": 21491,
+      "surface": "贵兴",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 7,
+      "gold_id": "g002",
+      "note": "前文凌贵兴出每一下一担米叫族叔易行去打梁天来，易行摇头说“天来同我有恩无怨，我如何下得手？”，后文“听了，大为不悦。恰好宗孔走到，问是甚事”，指唆使易行殴打梁天来的凌贵兴。"
+    },
+    {
+      "sample_id": "s090",
+      "start": 22155,
+      "end": 22157,
+      "surface": "郑氏",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short",
+        "x_shi"
+      ],
+      "chapter_index": 8,
+      "gold_id": "g029",
+      "note": "前文易行受贵兴指使打了天来五下，回家告知妻子郑氏有五担米送来，被郑氏兜脸一巴掌，第八回紧承“却说”，后文“知道易行听了贵兴指使，打了梁天来，不觉勃然大怒”，指易行之妻郑氏。"
+    },
+    {
+      "sample_id": "s091",
+      "start": 22347,
+      "end": 22349,
+      "surface": "易行",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 8,
+      "gold_id": "x018",
+      "note": "前文郑氏扭住易行大哭大骂引来街邻相劝，“有两个男子，看见”，后文“呆呆的站著，郑氏却扭著丈夫，一味哭喊……便向易行问道：‘易行哥！你们为著甚么事来？’”，指受贵兴五担米指使打了天来的凌易行。"
+    },
+    {
+      "sample_id": "s092",
+      "start": 22420,
+      "end": 22422,
+      "surface": "郑氏",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 8,
+      "gold_id": "g029",
+      "note": "前文街邻问易行何事，易行说不知，后文“见塞满了一屋子的人，料想易行逃走不去，一松手，把他放了，整了整鬓发，对众人说道”，向众人哭诉梁家大恩与丈夫忘恩负义，指郑氏。"
+    },
+    {
+      "sample_id": "s093",
+      "start": 22841,
+      "end": 22843,
+      "surface": "郑氏",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 8,
+      "gold_id": "g029",
+      "note": "前文叙述去年婆婆死时贵兴不肯借钱、全靠梁家姑太太送棺木衣服和二十两葬费，后文“说到这里，又大哭起来，哭了一回，又说道：‘我受了姑太太这回厚恩，做梦也不敢忘记’”，指对街邻哭诉的郑氏。"
+    },
+    {
+      "sample_id": "s094",
+      "start": 23202,
+      "end": 23204,
+      "surface": "郑氏",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 8,
+      "gold_id": "g029",
+      "note": "前文郑氏向街邻揭露易行为五担米去打天来外甥，众人对易行狠啐两口，后文“又道：‘亏他还有脸回来对著我嬉皮笑脸的说呢！’”并要撞墙拼命，指郑氏。"
+    },
+    {
+      "sample_id": "s095",
+      "start": 23624,
+      "end": 23626,
+      "surface": "嫂嫂",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 8,
+      "gold_id": "g029",
+      "note": "前文郑氏痛骂丈夫易行变心打天来，邻人中一个老人劝道，后文“！你不要动气了……此刻不如你夫妻两个，同到梁家，在你们姑太太那里，赔个罪就罢了。”郑氏问易行去不去，故老人所称“嫂嫂”指郑氏。"
+    },
+    {
+      "sample_id": "s096",
+      "start": 23823,
+      "end": 23825,
+      "surface": "郑氏",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 8,
+      "gold_id": "g029",
+      "note": "前文易行羞得满面通红答应“去就是了”，后文“起来，拉了他的辫子要去，众人一哄都出了门外。郑氏又托了那伍老伯伯照应门户”，指押着丈夫去梁家赔罪的郑氏。"
+    },
+    {
+      "sample_id": "s097",
+      "start": 23896,
+      "end": 23898,
+      "surface": "郑氏",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 8,
+      "gold_id": "g029",
+      "note": "前文郑氏同易行出门说“去便去，你去依我”，易行问“依甚么”，后文“道：‘到那里去，见了姑太太，跪了，不准你起来……’”，指叮嘱易行下跪请罪的郑氏。"
+    },
+    {
+      "sample_id": "s098",
+      "start": 24029,
+      "end": 24031,
+      "surface": "易行",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 8,
+      "gold_id": "x018",
+      "note": "前文“且说郑氏一面数落著”，后文“，望梁家而来。恰好走出街口，遇见贵兴那里送米的，一行五六个人，挑了来，见了易行便道：‘易行大叔！’”，指被妻子郑氏押去梁家请罪的凌易行。"
+    },
+    {
+      "sample_id": "s099",
+      "start": 24202,
+      "end": 24204,
+      "surface": "郑氏",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 8,
+      "gold_id": "g029",
+      "note": "前文郑氏骂退了凌贵兴家送米的人，后文“同易行一迳来到梁家，叩了叩门，祈富出来开了”，指带丈夫来梁家请罪的郑氏。"
+    },
+    {
+      "sample_id": "s100",
+      "start": 24226,
+      "end": 24228,
+      "surface": "郑氏",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 8,
+      "gold_id": "g029",
+      "note": "前文“郑氏同易行一迳来到梁家，叩了叩门，祈富出来开了。”，后文“同易行走进去，抬头一望，见凌氏、天来等，一家人都在堂屋里坐著”，指凌易行之妻郑氏。"
+    },
+    {
+      "sample_id": "s101",
+      "start": 24259,
+      "end": 24261,
+      "surface": "郑氏",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 8,
+      "gold_id": "g029",
+      "note": "前文郑氏同易行走进去看见凌氏、天来等坐在堂屋里，后文“一手拉了易行，抢上几步，走了进去，对著凌氏扑通一声双双跪下”，指拉丈夫向凌氏下跪的郑氏。"
+    },
+    {
+      "sample_id": "s102",
+      "start": 24412,
+      "end": 24414,
+      "surface": "天来",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 8,
+      "gold_id": "g001",
+      "note": "前文天来被易行打后回家告知母亲凌氏，正议论间“忽见易行夫妻，一同跑了进来，形状十分狼狈。”，后文“暗暗叫苦道：‘不好了！路上打了不算数，要打上门来了！’”，指梁天来。"
+    },
+    {
+      "sample_id": "s103",
+      "start": 24632,
+      "end": 24634,
+      "surface": "凌氏",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 8,
+      "gold_id": "g027",
+      "note": "前文郑氏跪在堂前抽噎叫了一声“姑太太”又哭，后文“十分著急，又看看易行，也在那里流泪。因说道：‘嫂嫂有话就说呀。’”，指郑氏所称呼的“姑太太”梁母凌氏。"
+    },
+    {
+      "sample_id": "s104",
+      "start": 24735,
+      "end": 24737,
+      "surface": "郑氏",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short",
+        "x_shi"
+      ],
+      "chapter_index": 8,
+      "gold_id": "g029",
+      "note": "前文凌氏着急顿足问“嫂嫂！你这是甚么话，我不明白呀！”，后文“止了哭，方才把易行如何受贵兴指使，打了天来，自己在家如何同他吵闹……一直说到此刻特地来请罪”，指郑氏。"
+    },
+    {
+      "sample_id": "s105",
+      "start": 24756,
+      "end": 24758,
+      "surface": "天来",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 8,
+      "gold_id": "g001",
+      "note": "前文“郑氏止了哭，方才把易行如何受贵兴指使，打了”，后文“，自己在家如何同他吵闹，邻人如何相劝，一直说到此刻特地来请罪”，指被易行当街打了五下的梁天来。"
+    },
+    {
+      "sample_id": "s106",
+      "start": 25044,
+      "end": 25046,
+      "surface": "郑氏",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 8,
+      "gold_id": "g029",
+      "note": "前文郑氏求姑太太教训易行，凌氏说“何苦呢！嫂嫂，他知错就是了”，后文“道：‘姑太太！今天不是我做弟媳妇的，到府上来撒泼打男人，我这里代姑太太教训了。’”并拿拐杖打易行，指郑氏。"
+    },
+    {
+      "sample_id": "s107",
+      "start": 25049,
+      "end": 25052,
+      "surface": "姑太太",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster",
+        "title_or_official"
+      ],
+      "chapter_index": 8,
+      "gold_id": "g027",
+      "note": "前文凌氏劝郑氏“他知错就是了”，郑氏对凌氏说道“！今天不是我做弟媳妇的，到府上来撒泼打男人，我这里代姑太太教训了”，并取凌氏身后的拐杖打易行，故郑氏所称“姑太太”指梁母凌氏。"
+    },
+    {
+      "sample_id": "s108",
+      "start": 25220,
+      "end": 25222,
+      "surface": "郑氏",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 8,
+      "gold_id": "g029",
+      "note": "前文郑氏斥责易行后易行方才起来，后文“又走到天来、刘氏前，各福了一福道：‘甥少爷！少奶奶！千万不要动气！’”，指向天来夫妇赔礼的郑氏。"
+    },
+    {
+      "sample_id": "s109",
+      "start": 25240,
+      "end": 25243,
+      "surface": "甥少爷",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster",
+        "title_or_official"
+      ],
+      "chapter_index": 8,
+      "gold_id": "g001",
+      "note": "前文“郑氏又走到天来、刘氏前，各福了一福道”，后文“！少奶奶！千万不要动气！……天来、刘氏尚未答言”，郑氏作为梁母凌氏的娘家弟媳，对天来所称“甥少爷”指梁天来。"
+    },
+    {
+      "sample_id": "s110",
+      "start": 25582,
+      "end": 25584,
+      "surface": "郑氏",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 8,
+      "gold_id": "g029",
+      "note": "前文梁天来劝慰母亲凌氏后凌氏说这是自问良心的话，“又对”，后文“道：‘嫂嫂，我一向对著儿子媳妇，为了这件事，总觉得自己脸上没光彩……你夫妻今天这一来，却增了我多少光彩！’”，指郑氏。"
+    },
+    {
+      "sample_id": "s111",
+      "start": 25884,
+      "end": 25886,
+      "surface": "凌家",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 8,
+      "gold_id": "not_entity",
+      "note": "前文凌氏夸赞郑氏贤慧、易行勇于悔过，“非但我脸上有光彩，连我”，后文“门里也有了光彩呢！总不惹人家说是凌家没有一个不是糊涂盗！”，此处“凌家”指凌氏宗族门第泛称，非特定单一人名或地名实体。"
+    },
+    {
+      "sample_id": "s112",
+      "start": 25902,
+      "end": 25904,
+      "surface": "凌家",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 8,
+      "gold_id": "not_entity",
+      "note": "前文“非但我脸上有光彩，连我凌家门里也有了光彩呢！总不惹人家说是”，后文“没有一个不是糊涂盗！”，此处“凌家”指凌姓家族群体泛称，非特定单一人名或地名实体。"
+    },
+    {
+      "sample_id": "s113",
+      "start": 26168,
+      "end": 26170,
+      "surface": "郑氏",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 8,
+      "gold_id": "g029",
+      "note": "前文正吃饭间祈富慌张来报“不好了！宗孔舅老爷……”，吓得凌氏、天来、刘氏、易行或惊或呆，“只有”，后文“大怒道：‘这天杀的做甚么！’”，指疾恶如仇的郑氏。"
+    },
+    {
+      "sample_id": "s114",
+      "start": 26856,
+      "end": 26858,
+      "surface": "省城",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 9,
+      "gold_id": "g038",
+      "note": "前文郑氏求甥少爷天来在省城为易行谋个粗工生活以离开恶党，天来答应道“这好极了！我明天就要动身到”，后文“去，可就叫舅父同著去，先在我糖行住下”，指天和糖行所在的省城。"
+    },
+    {
+      "sample_id": "s115",
+      "start": 26863,
+      "end": 26865,
+      "surface": "舅父",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 9,
+      "gold_id": "x018",
+      "note": "前文郑氏求梁天来带易行去省城谋生，天来答应道“我明天就要动身到省城去，可就叫”，后文“同著去，先在我糖行住下……到了次日，易行果然过来，跟天来到省城去”，故天来所称“舅父”指凌易行。"
+    },
+    {
+      "sample_id": "s116",
+      "start": 26974,
+      "end": 26976,
+      "surface": "省城",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 9,
+      "gold_id": "g038",
+      "note": "前文天来答应带易行到省城糖行住下，“到了次日，易行果然过来，跟天来到”，后文“去，不多几时，天来就荐他一个事”，指省城。"
+    },
+    {
+      "sample_id": "s117",
+      "start": 27448,
+      "end": 27450,
+      "surface": "姑妈",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 9,
+      "gold_id": "g027",
+      "note": "前文凌贵兴之妹凌桂仙中秋夜来到梁家，凌氏问“今夜是甚么风，吹得贤侄女来？”，桂仙掉泪对凌氏道“！我父亲当日……怎奈生了我这个哥哥”，故桂仙所称“姑妈”指其姑母梁母凌氏。"
+    },
+    {
+      "sample_id": "s118",
+      "start": 27494,
+      "end": 27496,
+      "surface": "哥哥",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 9,
+      "gold_id": "g002",
+      "note": "前文交代来人是“贵兴的妹子桂仙”，桂仙对姑妈凌氏哭诉父亲发财后，“怎奈生了我这个”，后文“，近来我看见他的举动，很是担心，恐怕不闹到灭族还不止呢！”，故桂仙所说“哥哥”指凌贵兴。"
+    },
+    {
+      "sample_id": "s119",
+      "start": 28047,
+      "end": 28049,
+      "surface": "爵兴",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 9,
+      "gold_id": "g004",
+      "note": "前文桂仙向凌氏叙述哥哥贵兴在家形同山贼强盗，“后来叫了喜来来，逐细盘问，方才知道是”，后文“那狗才，不知在哪里买了一部书来给他看，这部书叫做甚么水浒”，指教唆凌贵兴学《水浒》的区爵兴。"
+    },
+    {
+      "sample_id": "s120",
+      "start": 28535,
+      "end": 28537,
+      "surface": "凌氏",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 9,
+      "gold_id": "g027",
+      "note": "前文桂仙来给姑妈送信提防贵兴抢割北沙田稻后起身辞去，“说著站起来，又对”，后文“道：‘姑妈！我有一件事，要求姑妈照应。’”，指梁母凌氏。"
+    },
+    {
+      "sample_id": "s121",
+      "start": 29092,
+      "end": 29094,
+      "surface": "翰昭",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 9,
+      "gold_id": "g031",
+      "note": "前文凌氏请翰昭去千总衙门禀报有人要抢割北沙田稻，黄千总推托说兵不够看守田地，后文“无话可答。黄千总又道：‘这样吧，果然有人来抢时，你即刻来报’”，指替凌氏去报信的梁翰昭。"
+    },
+    {
+      "sample_id": "s122",
+      "start": 30637,
+      "end": 30640,
+      "surface": "区爵兴",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 10,
+      "gold_id": "g004",
+      "note": "前文桂仙上吊死后贵兴殴打儿子应科和妻子何氏，走出来后众强徒劝解无果渐渐散去，“只剩下”，后文“一人，花言巧语的，劝得贵兴回过笑脸来，便拉他到烟榻上烧烟解闷”，指凌贵兴表叔区爵兴。"
+    },
+    {
+      "sample_id": "s123",
+      "start": 30854,
+      "end": 30856,
+      "surface": "阿七",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 10,
+      "gold_id": "g024",
+      "note": "前文区爵兴请贵兴代收一盒满的鸦片烟，说自己家里闲人太多供应不起，“第一是一个姓熊得朋友，叫做熊”，后文“，也是江湖上一条好汉，因此我很敬重他。只是他的烟量太大”，指盗伙熊阿七。"
+    },
+    {
+      "sample_id": "s124",
+      "start": 32446,
+      "end": 32448,
+      "surface": "喜来",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 10,
+      "gold_id": "g014",
+      "note": "前文何氏吞鸦片烟自尽，贵兴半夜擂门把喜来惊醒，贵兴惊喘着说“不好了！奶奶不见了！”，后文“大惊道：‘到哪里去了？大门早就上锁的呀！’”，指小厮喜来。"
+    },
+    {
+      "sample_id": "s125",
+      "start": 32869,
+      "end": 32871,
+      "surface": "喜来",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 10,
+      "gold_id": "g014",
+      "note": "前文贵兴听到房里哭声吓得大叫“僵尸来了”，喜来劝道是奶奶回过气来不是僵尸，后文“一手拉住贵兴，回进来，大叫道：‘大家快出来，没有僵尸，是奶奶回过来了。’”，指小厮喜来。"
+    },
+    {
+      "sample_id": "s126",
+      "start": 33179,
+      "end": 33181,
+      "surface": "爵兴",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 10,
+      "gold_id": "g004",
+      "note": "前文何氏死后贵兴叫人请众恶徒来帮忙，“不一会，众恶徒陆续到了，只有”，后文“未来，忽听得门外一片声嚷了进来，抬头看时，却是丈人何达安，叔丈何达先……忙叫喜来，飞跑去请爵兴来调停这事”，指尚未赶到的区爵兴。"
+    },
+    {
+      "sample_id": "s127",
+      "start": 33613,
+      "end": 33615,
+      "surface": "宗孔",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 11,
+      "gold_id": "g003",
+      "note": "前文何达安、何达先质问何氏死因，达先走上去打了贵兴两个巴掌，后文“跳起来，指著达先道：‘哙！朋友！有话好好的说，怎么就打起人来！’”并与达先扭打，指凌宗孔。"
+    },
+    {
+      "sample_id": "s128",
+      "start": 33799,
+      "end": 33801,
+      "surface": "达先",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 11,
+      "gold_id": "x019",
+      "note": "前文宗孔与何达先扭打，“把达先当胸推了一掌，达先立不稳，倒退过去，恰倒在当中天然几上，把一个三四尺高的古磁花瓶，砰然一声，跌个粉碎。”，后文“顺手在几上取起一块英德石，对著宗孔摔来”，指凌贵兴叔丈何达先。"
+    },
+    {
+      "sample_id": "s129",
+      "start": 34220,
+      "end": 34222,
+      "surface": "达先",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 11,
+      "gold_id": "x019",
+      "note": "前文宗孔接过美闲递来的瓦罐，“对著达先，看得真切，举起瓦罐，照头打去……瓦罐破了，豁剌剌醍醐灌顶般淋了一身粪汁。”，后文“不觉大叫一声，这口一张流了许多粪汁到嘴里”，指被淋粪汁的何达先。"
+    },
+    {
+      "sample_id": "s130",
+      "start": 34473,
+      "end": 34475,
+      "surface": "贵兴",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 11,
+      "gold_id": "g002",
+      "note": "前文贵兴、达安、达先三人沾满粪花后脱下衣服，“贵兴便得飞跑，要到里面去躲避。谁知里面的丫环仆妇……吓得把腰门关了，”，后文“不得进去。忽又听得天崩地塌的一声怪响”，指凌贵兴。"
+    },
+    {
+      "sample_id": "s131",
+      "start": 34509,
+      "end": 34511,
+      "surface": "大匾",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 11,
+      "gold_id": "not_entity",
+      "note": "前文“忽又听得天崩地塌的一声怪响，原来上面挂著‘裕耕堂’三个字的”，后文“，被他们用竹竿挑下来了”，此处“大匾”指堂前悬挂的匾额器物，非人物或地点实体。"
+    },
+    {
+      "sample_id": "s132",
+      "start": 35079,
+      "end": 35081,
+      "surface": "达安",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 11,
+      "gold_id": "x008",
+      "note": "前文区爵兴拉何达安到书房洗脸换衣，达安怒斥凌贵兴逼死女儿，爵兴问道“依阁下便要怎样办法呢？”，后文“道：‘既然死于非命，少不免要经官相验，听候官断。’”，指何氏之父、凌贵兴丈人何达安。"
+    },
+    {
+      "sample_id": "s133",
+      "start": 37849,
+      "end": 37851,
+      "surface": "翰昭",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 12,
+      "gold_id": "g031",
+      "note": "前文北沙佃户向凌氏哭报强盗把田禾都抢割了，众佃户出去后，“凌氏便叫请了”，后文“过来，告知此事，翰昭飞也似的，去报了千总”，指梁天来叔父梁翰昭。"
+    },
+    {
+      "sample_id": "s134",
+      "start": 37859,
+      "end": 37861,
+      "surface": "翰昭",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 12,
+      "gold_id": "g031",
+      "note": "前文“凌氏便叫请了翰昭过来，告知此事，”，后文“飞也似的，去报了千总。那黄千总皱眉道：‘可巧我今天泻肚子，还没有吃饭’”，指去千总衙门报案的梁翰昭。"
+    },
+    {
+      "sample_id": "s135",
+      "start": 38040,
+      "end": 38042,
+      "surface": "翰昭",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 12,
+      "gold_id": "g031",
+      "note": "前文黄千总怒斥翰昭后过了两个多时辰才跨上马带了几十个兵出来，后文“跟著走。翰昭起先还恐怕跟不上，谁知他倒是按辔徐行”，指跟随黄千总去北沙勘查的梁翰昭。"
+    },
+    {
+      "sample_id": "s136",
+      "start": 38169,
+      "end": 38171,
+      "surface": "翰昭",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 12,
+      "gold_id": "g031",
+      "note": "前文到了北沙只剩蹂躏之迹、两面毗连田禾未动，黄千总问“这两面毗连的田，也是你的么？”，后文“道：‘两面都是别人家的。’”，指回答黄千总问话的梁翰昭。"
+    },
+    {
+      "sample_id": "s137",
+      "start": 38375,
+      "end": 38377,
+      "surface": "翰昭",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 12,
+      "gold_id": "g031",
+      "note": "前文黄千总喝骂翰昭后拨马离去，“翰昭目定口呆的怔了一会，只得回去告知凌氏，凌氏听了，也是无法可施。”，后文“道：‘不如通个信给天来侄儿，叫他回来计较。’”，指梁翰昭。"
+    },
+    {
+      "sample_id": "s138",
+      "start": 38588,
+      "end": 38590,
+      "surface": "养福",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 12,
+      "gold_id": "g030",
+      "note": "前文“交到雍正六年戊申了。天来在行中料理生意，直到年三十夜，方才同了君来、”，后文“回家度岁……所以天来兄弟父子，就得在家多盘桓几日”，指梁天来之子梁养福。"
+    },
+    {
+      "sample_id": "s139",
+      "start": 38794,
+      "end": 38796,
+      "surface": "宗孔",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 12,
+      "gold_id": "g003",
+      "note": "前文凌贵兴在裕耕堂置酒赏兰，“饮酒中间，贵兴忽然停下酒杯，叹了一口气。”，后文“又忽然扭扭捏捏摇摇摆摆的问道：‘吾问侄老爹者，为何忽然而叹气之乎？’”，指学区爵兴掉文的凌宗孔。"
+    },
+    {
+      "sample_id": "s140",
+      "start": 38814,
+      "end": 38817,
+      "surface": "侄老爹",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster",
+        "title_or_official"
+      ],
+      "chapter_index": 12,
+      "gold_id": "g002",
+      "note": "前文裕耕堂饮酒时贵兴停杯叹气，凌宗孔扭捏问道“吾问”，后文“者，为何忽然而叹气之乎？”贵兴噗嗤笑道“叔父怎么掉起文来了”，故宗孔所称“侄老爹”指其族侄凌贵兴。"
+    },
+    {
+      "sample_id": "s141",
+      "start": 39420,
+      "end": 39422,
+      "surface": "喜来",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 12,
+      "gold_id": "g014",
+      "note": "前文区爵兴献计先礼后兵借玉石花盆和花梨木桌椅，“贵兴大喜，就写了个字条，叫喜来去借。”，后文“去了许久，回来说道：‘不肯，不肯，他说东西都在省城，被人家借去了。’”，指奉命去梁家借物的小厮喜来。"
+    },
+    {
+      "sample_id": "s142",
+      "start": 39445,
+      "end": 39447,
+      "surface": "省城",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 12,
+      "gold_id": "g038",
+      "note": "前文喜来去梁家借花盆桌椅，回来禀报说“不肯，不肯，他说东西都在”，后文“，被人家借去了”，指梁天来借口器物存放的省城。"
+    },
+    {
+      "sample_id": "s143",
+      "start": 39466,
+      "end": 39468,
+      "surface": "爵兴",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 12,
+      "gold_id": "g004",
+      "note": "前文喜来回报梁家不肯借花盆桌椅，“宗孔跳起来就要去抢。”，后文“道：‘你们且慢，等我分派这件事，要贤侄带了头，先叫开了门，只说一来拜年，二来当面求借东西’”，指阻拦宗孔并定计由贵兴带头的区爵兴。"
+    },
+    {
+      "sample_id": "s144",
+      "start": 39593,
+      "end": 39595,
+      "surface": "爵兴",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 12,
+      "gold_id": "g004",
+      "note": "前文区爵兴让贵兴带头去梁家以免被报案，贵兴问“我亲去了，怎么就没事了呢？”，后文“道：‘贤侄自己去了，他哪里还好告，就是告到官司，只说我们中表至亲，闹著玩得’”，指区爵兴。"
+    },
+    {
+      "sample_id": "s145",
+      "start": 39731,
+      "end": 39734,
+      "surface": "侄老爹",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster",
+        "title_or_official"
+      ],
+      "chapter_index": 12,
+      "gold_id": "g002",
+      "note": "前文凌宗孔夸赞爵兴妙计并说“不要多说了，”，后文“，走吧。”拉着就走，众人一拥到了梁家门首，贵兴去敲门，故宗孔所称“侄老爹”指凌贵兴。"
+    },
+    {
+      "sample_id": "s146",
+      "start": 39919,
+      "end": 39921,
+      "surface": "叶盛",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 13,
+      "gold_id": "g015",
+      "note": "前文第十二回末凌贵兴去敲梁家门，第十三回回目“爵兴宗孔双荐凶徒 ”，后文“简当一场败北”，指凌宗孔荐来的打手头目叶盛。"
+    },
+    {
+      "sample_id": "s147",
+      "start": 39921,
+      "end": 39923,
+      "surface": "简当",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 13,
+      "gold_id": "g016",
+      "note": "前文第十三回回目“爵兴宗孔双荐凶徒 叶盛”，后文“一场败北”，指与叶盛同被凌宗孔荐来的打手头目简当。"
+    },
+    {
+      "sample_id": "s148",
+      "start": 40097,
+      "end": 40099,
+      "surface": "凌氏",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short",
+        "x_shi"
+      ],
+      "chapter_index": 13,
+      "gold_id": "g027",
+      "note": "前文凌氏命祈富开门放贵兴进来，不料祈富飞奔大喊“老太太！官人！不好了！强盗来了！”，后文“母子大吃一惊，只见贵兴跟在祈富后面，嘻嘻哈哈，一路笑著，赶了进来”，指梁母凌氏。"
+    },
+    {
+      "sample_id": "s149",
+      "start": 40158,
+      "end": 40160,
+      "surface": "越文",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 13,
+      "gold_id": "x002",
+      "note": "前文凌贵兴率一大群人闯入梁家，“后面跟著一大群人，也不知多少，仿佛只认得宗孔、美闲、”，后文“、越武几个，其馀乱哄哄的，一时也难分辨”，指随贵兴闯梁家抢夺的凌家宗人凌越文。"
+    },
+    {
+      "sample_id": "s150",
+      "start": 40161,
+      "end": 40163,
+      "surface": "越武",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 13,
+      "gold_id": "x003",
+      "note": "前文凌贵兴率众闯入梁家，“仿佛只认得宗孔、美闲、越文、”，后文“几个，其馀乱哄哄的，一时也难分辨”，指随贵兴闯梁家抢夺的凌家宗人凌越武。"
+    },
+    {
+      "sample_id": "s151",
+      "start": 40632,
+      "end": 40634,
+      "surface": "宗孔",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 13,
+      "gold_id": "g003",
+      "note": "前文宗孔扭住天来走出大门，见众强徒已散，便撒手顺手一推，天来几乎跌了一跤，后文“便扬长去了，一迳奔回贵兴家中”，指凌宗孔。"
+    },
+    {
+      "sample_id": "s152",
+      "start": 41250,
+      "end": 41252,
+      "surface": "阿七",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 13,
+      "gold_id": "g024",
+      "note": "前文区爵兴引熊阿七见凌贵兴，熊阿七讲使刀弄棒法门，爵兴道“这都不是”，后文“哥的本行，他擅长的是飞檐走壁，夤夜之间，取人首级，如探囊取物”，指盗伙熊阿七。"
+    },
+    {
+      "sample_id": "s153",
+      "start": 41291,
+      "end": 41293,
+      "surface": "阿七",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 13,
+      "gold_id": "g024",
+      "note": "前文区爵兴夸赞熊阿七擅长飞檐走壁，贵兴益加喜悦，后文“道：‘在下何足道！敝友李阿添，真有万夫不当之勇，大爷礼贤下士，早晚当带来相见。’”，指自谦并举荐李阿添的熊阿七。"
+    },
+    {
+      "sample_id": "s154",
+      "start": 41350,
+      "end": 41352,
+      "surface": "阿七",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 13,
+      "gold_id": "g024",
+      "note": "前文熊阿七说早晚带好友李阿添来见，贵兴大喜问“不知几时可以同来？”，后文“道：‘就在近处，如果大爷不弃，明天准定同来。’”，指熊阿七。"
+    },
+    {
+      "sample_id": "s155",
+      "start": 41398,
+      "end": 41400,
+      "surface": "阿七",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 13,
+      "gold_id": "g024",
+      "note": "前文贵兴嘱咐明天准定带李阿添同来，“酒饭已罢，”，后文“要吃鸦片烟，贵兴叫人买了一两来，阿七呼呼的吃个干净，方才别去”，指好吸鸦片烟的熊阿七。"
+    },
+    {
+      "sample_id": "s156",
+      "start": 41416,
+      "end": 41418,
+      "surface": "阿七",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 13,
+      "gold_id": "g024",
+      "note": "前文“酒饭已罢，阿七要吃鸦片烟，贵兴叫人买了一两来，”，后文“呼呼的吃个干净，方才别去。到了明日，果然引了李阿添来”，指把一两鸦片烟吃个干净的熊阿七。"
+    },
+    {
+      "sample_id": "s157",
+      "start": 41747,
+      "end": 41749,
+      "surface": "宗孔",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 13,
+      "gold_id": "g003",
+      "note": "前文凌宗孔说自己请了心腹朋友简当、叶盛在家，贵兴说“请来同众人叙叙，多几个人，到底好商量些”，后文“道：‘侄老爹！你聪明一世，为甚要懵懂一时？这是一件机密大事，只要一两个人知道，方才妥当。’”，指凌宗孔。"
+    },
+    {
+      "sample_id": "s158",
+      "start": 41872,
+      "end": 41874,
+      "surface": "爵兴",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 13,
+      "gold_id": "g004",
+      "note": "前文贵兴决定请简当、叶盛来重托，凌宗孔问道“”，后文“荐来那四个呢？”贵兴道“我不叫他们知道便是”，指举荐了熊阿七、李阿添、甘阿定、尤阿美四人的区爵兴。"
+    },
+    {
+      "sample_id": "s159",
+      "start": 41937,
+      "end": 41939,
+      "surface": "简当",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 13,
+      "gold_id": "g016",
+      "note": "前文宗孔起身作别，“不一会带了”，后文“、叶盛两个来。贵兴大喜，一一相见”，指宗孔从陈村请来的打手头目简当。"
+    },
+    {
+      "sample_id": "s160",
+      "start": 41940,
+      "end": 41942,
+      "surface": "叶盛",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 13,
+      "gold_id": "g015",
+      "note": "前文宗孔起身作别，“不一会带了简当、”，后文“两个来。贵兴大喜，一一相见。宗孔便对两人道：‘我侄老爹同梁天来兄弟，结下了不解之仇’”，指与简当同来的打手头目叶盛。"
+    },
+    {
+      "sample_id": "s161",
+      "start": 42135,
+      "end": 42137,
+      "surface": "简当",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 13,
+      "gold_id": "g016",
+      "note": "前文贵兴许诺弄死梁天来兄弟一个谢五百两、两个谢一千两，宗孔催促二人勿错过发财机会，后文“道：‘大爷要差使我们，自当效力。’”，指应承差使的简当。"
+    },
+    {
+      "sample_id": "s162",
+      "start": 42181,
+      "end": 42183,
+      "surface": "简当",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 13,
+      "gold_id": "g016",
+      "note": "前文贵兴大喜问“如此就重托你两位，但不知怎样下手？”，后文“道：‘这个可不能预定，好在他兄弟开店在省城，住家在这里，早晚总有往来，最好觑个便，在路上下手，结果他了。’”，指回答下手计策的简当。"
+    },
+    {
+      "sample_id": "s163",
+      "start": 42236,
+      "end": 42238,
+      "surface": "贵兴",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 13,
+      "gold_id": "g002",
+      "note": "前文简当说觑便在路上结果天来兄弟，后文“大喜，即刻取出五十两银子，送给二人道：‘两位先拿去做茶资，事成之后，另外再谢。’”，指取出五十两茶资送给简、叶二人的凌贵兴。"
+    },
+    {
+      "sample_id": "s164",
+      "start": 42388,
+      "end": 42390,
+      "surface": "叶盛",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 13,
+      "gold_id": "g015",
+      "note": "前文简当、叶盛被宗孔扣了十两回用后均分余下四十两别去，后文“拉了简当，走出村外僻静的去处道：‘今日这事，是你答应的，我并没有开口。我想杀人偿命是一定的，这个勾当我可干不来。’”，指畏惧杀人偿命的叶盛。"
+    },
+    {
+      "sample_id": "s165",
+      "start": 42567,
+      "end": 42569,
+      "surface": "叶盛",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 13,
+      "gold_id": "g015",
+      "note": "前文简当认为万一逃不脱可逼凌贵兴料理或供出他主使，后文“道：‘你说我呆，你才呆呢！到了那时，任凭你供了他，他有的是金子银子，拼著花个一万八千两，到衙门里，怕不洗刷的干干净净’”，指反驳简当的叶盛。"
+    },
+    {
+      "sample_id": "s166",
+      "start": 42728,
+      "end": 42730,
+      "surface": "简当",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 13,
+      "gold_id": "g016",
+      "note": "前文叶盛剖析官府受贿洗刷豪绅、拿凶手抵命之弊，后文“听了呆了一呆道：‘据你这样说，万一干下事情，逃走不脱，就是他肯设法，也是无用的了。’”，指被叶盛说动心怯的简当。"
+    },
+    {
+      "sample_id": "s167",
+      "start": 42823,
+      "end": 42825,
+      "surface": "叶盛",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 13,
+      "gold_id": "g015",
+      "note": "前文简当说“此刻银子已经受了他的了，这个雪亮的东西，好容易到手，难道还了他不成？”，后文“道：‘我们不如到省城走一道，在番摊馆里碰个机会，如果发了财，我们就远远的走开了’”，指提议去省城番摊馆赌博的叶盛。"
+    },
+    {
+      "sample_id": "s168",
+      "start": 42833,
+      "end": 42835,
+      "surface": "省城",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 13,
+      "gold_id": "g038",
+      "note": "前文叶盛对简当提议“我们不如到”，后文“走一道，在番摊馆里碰个机会，如果发了财，我们就远远的走开了”，指叶盛、简当打算前往赌博的省城。"
+    },
+    {
+      "sample_id": "s169",
+      "start": 42894,
+      "end": 42896,
+      "surface": "省城",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 13,
+      "gold_id": "g038",
+      "note": "前文简当拍手称妙，“二人当下就唤了船，到”，后文“去，一连四五天，十分得手，每人拿著二十两的本钱，不到几天，大家身上都有了百十两银子了”，指二人乘船前往押番摊的省城。"
+    },
+    {
+      "sample_id": "s170",
+      "start": 42982,
+      "end": 42984,
+      "surface": "简当",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 13,
+      "gold_id": "g016",
+      "note": "前文叶盛赢了钱提议做贩私盐生意，后文“道：‘私盐太累赘了，我看还是贩鸦片烟好。这里又有聚仙馆的林大有，他是个私贩烟土的头脑’”，指提议向林大有买烟土贩卖的简当。"
+    },
+    {
+      "sample_id": "s171",
+      "start": 43008,
+      "end": 43011,
+      "surface": "聚仙馆",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster"
+      ],
+      "chapter_index": 13,
+      "gold_id": "x020",
+      "note": "前文简当对叶盛说“我看还是贩鸦片烟好。这里又有”，后文“的林大有，他是个私贩烟土的头脑，我们就到他那里买了烟，贩到四乡去”，指林大有开设的烟馆聚仙馆。"
+    },
+    {
+      "sample_id": "s172",
+      "start": 43050,
+      "end": 43052,
+      "surface": "叶盛",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 13,
+      "gold_id": "g015",
+      "note": "前文简当提议到聚仙馆林大有处买鸦片烟贩到四乡去，后文“道：‘那么我们就办起来！’简当道：‘且慢！我们的本钱还少，明日再去押两个宝’”，指赞成贩烟的叶盛。"
+    },
+    {
+      "sample_id": "s173",
+      "start": 43316,
+      "end": 43318,
+      "surface": "宗孔",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 14,
+      "gold_id": "g003",
+      "note": "前文第十四回说凌贵兴打发简、叶两人去后天天盼望，直到端阳又过仍无音信，后文“也帮著在那里著急……日日只盼二人得手，一则自己面子上好看，免得被区爵兴荐来的人夺了头功”，指简、叶二人的荐主凌宗孔。"
+    },
+    {
+      "sample_id": "s174",
+      "start": 43355,
+      "end": 43358,
+      "surface": "裕耕堂",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster"
+      ],
+      "chapter_index": 14,
+      "gold_id": "x021",
+      "note": "前文“此时熊阿七、李阿添、甘阿定、尤阿美……等，却天天在贵兴的”，后文“内啸聚，还有旧日的一班强人，无非是大酒大肉”，指凌贵兴家聚众饮酒的厅堂裕耕堂。"
+    },
+    {
+      "sample_id": "s175",
+      "start": 43774,
+      "end": 43776,
+      "surface": "省城",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 14,
+      "gold_id": "g038",
+      "note": "前文宗孔听说简、叶两个流落在省城，与贵兴商量停当，“等到吃罢了酒，贵兴、宗孔带了喜来，就赶到”，后文“。原来此时贵兴却在省城开了一家绸缎号，招牌叫做‘三德’”，指凌贵兴开设三德绸缎号的省城。"
+    },
+    {
+      "sample_id": "s176",
+      "start": 44002,
+      "end": 44004,
+      "surface": "简当",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 14,
+      "gold_id": "g016",
+      "note": "前文叶盛说事关人命最好多找人商量，贵兴问“你们意中可有甚么朋友可靠的么？”，后文“道：‘我有一个朋友，姓林，名叫大有……在小北门外，开设一间聚仙馆’”，指举荐林大有的简当。"
+    },
+    {
+      "sample_id": "s177",
+      "start": 46821,
+      "end": 46823,
+      "surface": "贤侄",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 15,
+      "gold_id": "g002",
+      "note": "前文区爵兴接了贵兴五百两票子，对贵兴说“这个法子，只要贤侄多破费一头牛、一腔羊、一口猪，以后便万事皆妥，不知”，后文“肯么？”贵兴答道“这是小事，有何不肯”，故爵兴所称“贤侄”指其表侄凌贵兴。"
+    },
+    {
+      "sample_id": "s178",
+      "start": 47210,
+      "end": 47212,
+      "surface": "祈伯",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 15,
+      "gold_id": "g002",
+      "note": "前文贵兴与爵兴计议已定出来入席，爵兴站起来对众人说道“今日”，后文“贤侄，要同众位商量大事，一切都托我主持”，指表字祈伯的凌贵兴。"
+    },
+    {
+      "sample_id": "s179",
+      "start": 47270,
+      "end": 47272,
+      "surface": "喜来",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 15,
+      "gold_id": "g014",
+      "note": "前文区爵兴当众主事，“爵兴又对贵兴道：‘贤侄可叫”，后文“，督率家人，把各处闲房，都打扫起来应用，限明日便要齐备’”，指凌贵兴家管事小厮喜来。"
+    },
+    {
+      "sample_id": "s180",
+      "start": 47447,
+      "end": 47449,
+      "surface": "宗孔",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 15,
+      "gold_id": "g003",
+      "note": "前文爵兴吩咐众人明日午时取齐，“爵兴又对”，后文“道：‘有一件事，要烦老表台，明日一早，到省城走一趟。’宗孔道：‘可是要我去叫天来兄弟回来就死？’”，指被爵兴支去省城买羊的凌宗孔。"
+    },
+    {
+      "sample_id": "s181",
+      "start": 47620,
+      "end": 47623,
+      "surface": "林大有",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 15,
+      "gold_id": "g005",
+      "note": "前文众强徒散去后，“爵兴就留在书房，同林大有、周赞先……等人谈天，只见”，后文“果然精悍，是一条好汉，因拉他在一旁，同他如此这般的说了一遍。林大有连连答应”，指聚仙馆凶徒首领林大有。"
+    },
+    {
+      "sample_id": "s182",
+      "start": 48272,
+      "end": 48275,
+      "surface": "林大有",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 15,
+      "gold_id": "g005",
+      "note": "前文区爵兴问众人可肯今夜设誓，后文“上前一步，手拍胸膛道：‘这个正合我意！’爵兴喝一声‘好！’”，指带头响应斩鸡设誓的林大有。"
+    },
+    {
+      "sample_id": "s183",
+      "start": 48814,
+      "end": 48817,
+      "surface": "林大有",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 15,
+      "gold_id": "g005",
+      "note": "前文林大有拔出二尺长尖刀插在桌上，先提鸡斩头立誓，众人本有胆怯想退缩，“后来见了”，后文“这等恶狠狠的举动，只得一个个的上前斩过了”，指拔刀劫盟的林大有。"
+    },
+    {
+      "sample_id": "s184",
+      "start": 49621,
+      "end": 49624,
+      "surface": "卑田院",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster"
+      ],
+      "chapter_index": 15,
+      "gold_id": "x022",
+      "note": "前文介绍谭村贫苦人张凤因好抱不平被人不容，“闹得他走投无路，就流落到”，后文“中去了。日间在街头叫化，夜来在古庙栖身”，指乞丐张凤栖身的卑田院。"
+    },
+    {
+      "sample_id": "s185",
+      "start": 49908,
+      "end": 49911,
+      "surface": "梁天来",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 15,
+      "gold_id": "g001",
+      "note": "前文张凤在凌宅夹弄窗外听见强徒对话，一人对阿七哥说“你真是不经事！你可知”，后文“同个痨病儿一般，他那兄弟君来，也是骨瘦如柴的，莫说杀他两个，就是再多两个，也不禁杀呢”，指强徒密谋杀害的梁天来。"
+    },
+    {
+      "sample_id": "s186",
+      "start": 50347,
+      "end": 50349,
+      "surface": "谭村",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 16,
+      "gold_id": "g039",
+      "note": "前文第十六回开头说内地村镇人家祖居，“一村之中，无论富贵贫贱，彼此多是认得的。”，后文“亦复如是。所以张凤也是认得梁天来的。谭村村中之人，也没有一个不知道这个张凤”，指张凤与梁、凌两家所在的谭村。"
+    },
+    {
+      "sample_id": "s187",
+      "start": 50384,
+      "end": 50386,
+      "surface": "张凤",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 16,
+      "gold_id": "g006",
+      "note": "前文“所以张凤也是认得梁天来的。谭村村中之人，也没有一个不知道这个”，后文“。闲话少提。且说张凤在窗外听了那一番言语，知道天来今夜有难，急急要去报告”，指给梁天来报信的乞丐张凤。"
+    },
+    {
+      "sample_id": "s188",
+      "start": 50750,
+      "end": 50752,
+      "surface": "养福",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 16,
+      "gold_id": "g030",
+      "note": "前文张凤在梁家门前被祈富阻拦大闹，惊动了养福出来喝问，张凤说“我送凌贵兴的信来！”，后文“听得‘凌贵兴’三个字，心中吃了一惊道：‘是凌贵兴叫你送来得么？’”，指梁天来之子梁养福。"
+    },
+    {
+      "sample_id": "s189",
+      "start": 50821,
+      "end": 50823,
+      "surface": "养福",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 16,
+      "gold_id": "g030",
+      "note": "前文张凤对养福说“是我听了一个信息，特来通报的！”，后文“道：‘是甚么信息？你给我说了，可不是一样？’张凤道：‘这是个性命交关的要紧信，不见了你们大官人，是不说的。’”，指追问张凤何信的梁养福。"
+    },
+    {
+      "sample_id": "s190",
+      "start": 51106,
+      "end": 51108,
+      "surface": "凌氏",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 16,
+      "gold_id": "g027",
+      "note": "前文张凤将窗下听见密话告知天来，天来赏了一块银子后，“天来回到后堂，告知”，后文“。凌氏道：‘这个宁可信其有，不可不提防他！’”，指梁天来之母凌氏。"
+    },
+    {
+      "sample_id": "s191",
+      "start": 51109,
+      "end": 51111,
+      "surface": "凌氏",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 16,
+      "gold_id": "g027",
+      "note": "前文“天来回到后堂，告知凌氏。”，后文“道：‘这个宁可信其有，不可不提防他！’君来道：‘这是张凤穷极了，想出这些谣言来骗赏钱的’”，指提醒不可不防的梁母凌氏。"
+    },
+    {
+      "sample_id": "s192",
+      "start": 51756,
+      "end": 51758,
+      "surface": "君来",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 16,
+      "gold_id": "g008",
+      "note": "前文张凤退还银子以表并非混骗，凌氏催促天来父子兄弟三个赶紧走，天来道“这个如何使得？不如另行设法”，后文“道：‘不如同母亲同到省城去吧。’”，指梁天来之弟梁君来。"
+    },
+    {
+      "sample_id": "s193",
+      "start": 51774,
+      "end": 51776,
+      "surface": "凌氏",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 16,
+      "gold_id": "g027",
+      "note": "前文君来提议“不如同母亲同到省城去吧”，后文“道：‘此时已经将近黄昏，还有甚法可设？我又何必同你们到省城去，终不成贵兴敢来杀我！……你们三个赶紧走吧！’”，指坚持留守家中、催促儿孙逃生的梁母凌氏。"
+    },
+    {
+      "sample_id": "s194",
+      "start": 52083,
+      "end": 52085,
+      "surface": "喜来",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 16,
+      "gold_id": "g014",
+      "note": "前文十八日申牌时分凌贵兴聚众吃酒，“区爵兴就当席发号施令起来。先叫”，后文“听令道：‘往常吃酒，都是你执席招呼，今日可免了你这差使……你可去邀了当段地保李义来……灌他一个烂醉’”，指奉命灌醉地保李义的小厮喜来。"
+    },
+    {
+      "sample_id": "s195",
+      "start": 52658,
+      "end": 52660,
+      "surface": "简当",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 16,
+      "gold_id": "g016",
+      "note": "前文区爵兴分派攻打梁家队伍，“又叫凌美闲听令道：‘你带领越文、越武、越顺、越和、”，后文“、叶盛，一共七人，做先锋先去攻开大门’”，指编入第一队先锋攻打梁家大门的打手简当。"
+    },
+    {
+      "sample_id": "s196",
+      "start": 52661,
+      "end": 52663,
+      "surface": "叶盛",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 16,
+      "gold_id": "g015",
+      "note": "前文区爵兴叫凌美闲听令，“你带领越文、越武、越顺、越和、简当、”，后文“，一共七人，做先锋先去攻开大门，到梁家门首时，先放一响炮”，指编入第一队先锋的打手叶盛。"
+    },
+    {
+      "sample_id": "s197",
+      "start": 52705,
+      "end": 52708,
+      "surface": "林大有",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 16,
+      "gold_id": "g005",
+      "note": "前文区爵兴分派凌美闲等七人做先锋攻打大门，“又叫”，后文“听令道：‘你带领周赞先、黎阿二、李阿添、尤阿美、熊阿七、甘阿定，一共六人，作第二队’”，指率领第二队凶徒的头目林大有。"
+    },
+    {
+      "sample_id": "s198",
+      "start": 52891,
+      "end": 52893,
+      "surface": "喜来",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 16,
+      "gold_id": "g014",
+      "note": "前文区爵兴命勒先、蔡顺伏在巡检司衙门来路，“倘遇见衙门差役来时，就分一个，引了来，送到门房，交”，后文“管待吃酒。却仍要回原处伺候”，指在门房管待差役吃酒的小厮喜来。"
+    },
+    {
+      "sample_id": "s199",
+      "start": 54473,
+      "end": 54475,
+      "surface": "养福",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 17,
+      "gold_id": "g030",
+      "note": "前文天来父子兄弟在省城糖行，管账先生责备他们把女人丢在家里，对养福说“此刻男人都走了，他寻不出一个男人来，岂不要迁怒女子么？”，后文“听得，顿时呆了”，指管账先生所称“小东人”梁养福。"
+    },
+    {
+      "sample_id": "s200",
+      "start": 54843,
+      "end": 54845,
+      "surface": "天来",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 17,
+      "gold_id": "g001",
+      "note": "前文天来三人在糖行坐守到天明，各店伙起来张罗开门，后文“坐立不安，就走到外面看一回，又走进来叹几口气，忽见祈富踉踉跄跄，赤著脚，满头是汗的，奔了进来”，指焦急等待家中消息的梁天来。"
+    },
+    {
+      "sample_id": "s201",
+      "start": 54945,
+      "end": 54947,
+      "surface": "君来",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 17,
+      "gold_id": "g008",
+      "note": "前文祈富奔进糖行哭喊“官人呀！不好了！”跌在地下放声大哭，“只吓得”，后文“魂不附体，要著急问时，却又说不出半个字来。养福早已浑身冰冷”，指梁天来之弟梁君来。"
+    },
+    {
+      "sample_id": "s202",
+      "start": 55059,
+      "end": 55061,
+      "surface": "养福",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 17,
+      "gold_id": "g030",
+      "note": "前文天来听闻恶耗面色如白纸，“养福方要叫爹爹时，只见他猛地里往后一翻，直挺挺的仰跌在地下，吓的”，后文“哇的一声，哭了出来。君来也急的叫得出来了”，指见父亲天来昏倒而大哭的梁养福。"
+    },
+    {
+      "sample_id": "s203",
+      "start": 55071,
+      "end": 55073,
+      "surface": "君来",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 17,
+      "gold_id": "g008",
+      "note": "前文天来仰跌在地，吓得养福哇的一声哭出来，后文“也急的叫得出来了，大叫道：‘哥哥！这是怎么呀？’”，指呼喊哥哥天来的梁君来。"
+    },
+    {
+      "sample_id": "s204",
+      "start": 55134,
+      "end": 55136,
+      "surface": "君来",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 17,
+      "gold_id": "g008",
+      "note": "前文众伙友用姜汤、通关散将天来灌救回转过来，后文“、养福扶起来坐下。此时吓的祈富也不敢哭了”，指与养福一起扶起天来的梁君来。"
+    },
+    {
+      "sample_id": "s205",
+      "start": 55182,
+      "end": 55184,
+      "surface": "天来",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 17,
+      "gold_id": "g001",
+      "note": "前文天来被救醒扶起坐下，祈富反过来安慰“官人放心！家中只怕还未有大事！”，后文“道：‘夜来到底是怎样情形？你快说！’”，指追问昨夜遭劫情形的梁天来。"
+    },
+    {
+      "sample_id": "s206",
+      "start": 55369,
+      "end": 55371,
+      "surface": "石室",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 17,
+      "gold_id": "g040",
+      "note": "前文祈富述说四更时强盗退去，“小的爬出来，到里面去看，只见”，后文“大门紧闭，门外头堆著一大堆烧不尽的草灰，那火还是烘烘的著呢！小的当下便叫开门，谁知叫破了喉咙，也没有人答应”，指被火熏烧的梁家石室。"
+    },
+    {
+      "sample_id": "s207",
+      "start": 55494,
+      "end": 55496,
+      "surface": "养福",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 17,
+      "gold_id": "g030",
+      "note": "前文祈富请官人速回定夺，“天来听说，明知是凶多吉少，然而也只能作一丝之望，赶忙带了君来、”，后文“、祈富，叫了快艇，飞棹向谭村而来”，指随父叔赶回谭村的梁养福。"
+    },
+    {
+      "sample_id": "s208",
+      "start": 55542,
+      "end": 55544,
+      "surface": "翰昭",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 17,
+      "gold_id": "g031",
+      "note": "前文天来等乘快艇赶回谭村，“到得家时，只见馀烬尚燃，十分狼藉，只有石室大门，依然紧闭，”，后文“已在那里搓手顿足。天来兄弟见了，也不及说话，便拨开草灰，乱去打门号叫”，指先在梁家焦急等候的叔父梁翰昭。"
+    },
+    {
+      "sample_id": "s209",
+      "start": 55665,
+      "end": 55667,
+      "surface": "石室",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 17,
+      "gold_id": "g040",
+      "note": "前文李巡检勘视后对天来说“幸而还没有偷了东西，还算好”，天来道“此刻”，后文“里面，没有声息，说不定还有人命在内，并且外面又是放火毁门，明明是强盗”，指关着八口女眷的梁家石室。"
+    },
+    {
+      "sample_id": "s210",
+      "start": 55977,
+      "end": 55979,
+      "surface": "石室",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 17,
+      "gold_id": "g040",
+      "note": "前文天来坚持若石室八口女眷有变故便自行报县，李巡检觉得蹊跷，因说道“这样吧，你一面叫石匠来凿开”，后文“，一面叫地保去报县，我也就回去办详文就是了”，指门栓在里面紧闭的梁家石室。"
+    },
+    {
+      "sample_id": "s211",
+      "start": 56721,
+      "end": 56723,
+      "surface": "凌氏",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 17,
+      "gold_id": "g027",
+      "note": "前文石室凿开抬出八口女尸，养福摸见祖母胸前尚有气，灌救后凌氏苏醒，“原来当时各人俱被烟闷倒，仆妇程氏，已是直挺挺的躺在地下，”，后文“暗中摸索时，踢在她头上，绊倒伏下来……得了些些空隙，所以不死”，指幸存的梁母凌氏。"
+    },
+    {
+      "sample_id": "s212",
+      "start": 56804,
+      "end": 56806,
+      "surface": "天来",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 17,
+      "gold_id": "g001",
+      "note": "前文凌氏醒来“看见尸骸遍地，纵横狼藉，不觉大哭起来。”，后文“只得劝住，扶入上房，央了邻舍妇人来陪伴，自己仍旧出来当官答话”，指劝住母亲并出来向黄知县答话的梁天来。"
+    },
+    {
+      "sample_id": "s213",
+      "start": 57484,
+      "end": 57486,
+      "surface": "鞭炮",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 18,
+      "gold_id": "not_entity",
+      "note": "前文凌贵兴家庆功，其誉、海顺、柳郁、柳权回报说“一共放了十二箩”，后文“。”凌美闲、林大有又各叙攻打情形，此处“鞭炮”指掩盖攻打声响所燃放的爆竹器物，非人物或地点实体。"
+    },
+    {
+      "sample_id": "s214",
+      "start": 57504,
+      "end": 57506,
+      "surface": "喜来",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 18,
+      "gold_id": "g014",
+      "note": "前文众强徒纷纷向凌贵兴、区爵兴回报拦截千总和放鞭炮情形，后文“却进来报说：‘地保李义，从入黑时便醉了，到此刻还没有醒。’”，指负责灌醉地保李义的小厮喜来。"
+    },
+    {
+      "sample_id": "s215",
+      "start": 57568,
+      "end": 57570,
+      "surface": "石室",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 18,
+      "gold_id": "g040",
+      "note": "前文众强徒回报战果，区爵兴呵呵大笑道“今番可以算得大获全胜了，此时叫他一窝儿死在”，后文“里，没了个苦主，地方官哪里还肯认真缉捕？这才是斩草除根呢！”，指区爵兴以为梁家全家闷死其中的梁家石室。"
+    },
+    {
+      "sample_id": "s216",
+      "start": 58433,
+      "end": 58435,
+      "surface": "宗孔",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 18,
+      "gold_id": "g003",
+      "note": "前文宗孔献计用三千两假借票占据糖行被爵兴否定，后文“方欲说话时，只见喜来报道：‘大爷，不好了，昨夜梁天来并没有死，所死的都是女人，此刻报了番禺县，在那里相验呢！’”，指凌宗孔。"
+    },
+    {
+      "sample_id": "s217",
+      "start": 58612,
+      "end": 58614,
+      "surface": "宗孔",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 18,
+      "gold_id": "g003",
+      "note": "前文喜来回报亲眼在尸场看见天来父子兄弟三个未死，“一席话听得贵兴目定口呆，”，后文“摩拳擦掌，爵兴搓手顿足……宗孔是一不做二不休，道：‘他既然未死，何妨今夜再去结果了他？’”，指凌宗孔。"
+    },
+    {
+      "sample_id": "s218",
+      "start": 58843,
+      "end": 58845,
+      "surface": "石室",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 18,
+      "gold_id": "g040",
+      "note": "前文区爵兴分析有人通信使天来预先避过，说若天来乖巧，“先招呼了更练，又召集些佃户，分伏在”，后文“里面，以及外进几间，等你们攻石室时，里应外合，怕我们不束手就缚”，指梁家石室。"
+    },
+    {
+      "sample_id": "s219",
+      "start": 59332,
+      "end": 59334,
+      "surface": "张凤",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 18,
+      "gold_id": "g006",
+      "note": "前文梁天来盛殓尸骸、勉强安慰母亲凌氏，“这一天”，后文“也来吊问，天来感他的情，就留他在家，吃口闲饭”，指此前报信救了天来父子性命的乞丐张凤。"
+    },
+    {
+      "sample_id": "s220",
+      "start": 59365,
+      "end": 59367,
+      "surface": "省城",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 18,
+      "gold_id": "g038",
+      "note": "前文天来留张凤在家吃闲饭，“过得几天，又想到”，后文“生意要紧，只好留下养福侍奉凌氏，带著守孝，又叫君来随时往来两面，自己带了张凤，到省城而来”，指天和糖行所在的省城。"
+    },
+    {
+      "sample_id": "s221",
+      "start": 59376,
+      "end": 59378,
+      "surface": "养福",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 18,
+      "gold_id": "g030",
+      "note": "前文天来想到省城生意要紧，“只好留下”，后文“侍奉凌氏，带著守孝，又叫君来随时往来两面，自己带了张凤，到省城而来”，指留在谭村侍奉祖母凌氏的梁养福。"
+    },
+    {
+      "sample_id": "s222",
+      "start": 59403,
+      "end": 59405,
+      "surface": "张凤",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 18,
+      "gold_id": "g006",
+      "note": "前文天来留下养福侍奉凌氏、叫君来往来两面，“自己带了”，后文“，到省城而来。一众伙友，自有一番唁慰”，指作为人证随梁天来到省城的张凤。"
+    },
+    {
+      "sample_id": "s223",
+      "start": 59874,
+      "end": 59876,
+      "surface": "杰臣",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 18,
+      "gold_id": "x001",
+      "note": "前文天来至友何杰臣约相好朋友走过糖行，“天来便邀杰臣到行里少坐，”，后文“就邀了那人一同进来。天来请问姓名，始知那人姓施，表字智伯”，指引荐施智伯给梁天来的至友何杰臣。"
+    },
+    {
+      "sample_id": "s224",
+      "start": 60053,
+      "end": 60055,
+      "surface": "天来",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 18,
+      "gold_id": "g001",
+      "note": "前文天来将与凌贵兴交涉情节告知施智伯，智伯问“不知可有个见证？”，后文“道：‘见证便有一个。’又把张凤报信一节，说了一遍”，指梁天来。"
+    },
+    {
+      "sample_id": "s225",
+      "start": 60080,
+      "end": 60082,
+      "surface": "智伯",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 18,
+      "gold_id": "g010",
+      "note": "前文天来把张凤报信做见证一节说了一遍，后文“道：‘有了这个见证，就好单告主使的人了！这个叫做“擒贼擒王”。’”，指精通刑名律例的施智伯。"
+    },
+    {
+      "sample_id": "s226",
+      "start": 60357,
+      "end": 60359,
+      "surface": "张凤",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 18,
+      "gold_id": "g006",
+      "note": "前文何杰臣担心寻常写状人受凌贵兴贿嘱，施智伯沉吟道“不知那个见证的”，后文“，可靠得住？”天来把张凤叫来给智伯当面看，指证人张凤。"
+    },
+    {
+      "sample_id": "s227",
+      "start": 60371,
+      "end": 60373,
+      "surface": "张凤",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 18,
+      "gold_id": "g006",
+      "note": "前文智伯问“不知那个见证的张凤，可靠得住？”，“天来把”，后文“叫来，给智伯当面看了。张凤先说道：‘小人当日，确在凌家窗外，听见强徒说话’”，指当面慷慨陈词的证人张凤。"
+    },
+    {
+      "sample_id": "s228",
+      "start": 60377,
+      "end": 60379,
+      "surface": "智伯",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 18,
+      "gold_id": "g010",
+      "note": "前文施智伯问张凤是否靠得住，“天来把张凤叫来，给”，后文“当面看了。张凤先说道……莫说是到官做见证，就是叫我赴汤蹈火，也是要去的”，指考察证人张凤的施智伯。"
+    },
+    {
+      "sample_id": "s229",
+      "start": 60960,
+      "end": 60962,
+      "surface": "智伯",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 19,
+      "gold_id": "g010",
+      "note": "前文第十九回开头天来送润笔银一百两，智伯不肯受，“天来再三相强，杰臣对智伯递了个眼色，”，后文“就受了。又坐谈了一会，二人方才别去。走出一箭之地，智伯取出那一百两银子，递给杰臣”，指施智伯。"
+    },
+    {
+      "sample_id": "s230",
+      "start": 61149,
+      "end": 61151,
+      "surface": "智伯",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 19,
+      "gold_id": "g010",
+      "note": "前文施智伯得知杰臣让他收银是怕天来多心，便翻身到天来行里当面还银，天来大惊问“莫非嫌菲薄么？”，后文“把杰臣的话述了一遍，又道：‘我向来代人写状子，不肯受钱的，不过是个抱不平的意思。’”，指施智伯。"
+    },
+    {
+      "sample_id": "s231",
+      "start": 61724,
+      "end": 61727,
+      "surface": "黄知县",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 19,
+      "gold_id": "g017",
+      "note": "前文梁天来当堂呈上状词，黄知县问为何迟至今日补呈，天来答因料理家中丧事耽搁，后文“道：‘你这证人张凤，靠得住么？’梁天来道：‘是张凤亲见亲闻，坚愿作证’”，指坐堂受状的番禺县令黄知县。"
+    },
+    {
+      "sample_id": "s232",
+      "start": 61773,
+      "end": 61776,
+      "surface": "黄知县",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 19,
+      "gold_id": "g017",
+      "note": "前文黄知县问证人张凤是否靠得住，梁天来答随时可到案听审，后文“道：‘你退去候著吧。’天来叩谢退出。黄知县就当堂签出值日原差陈德，到谭村提凌贵兴去”，指番禺知县黄知县。"
+    },
+    {
+      "sample_id": "s233",
+      "start": 61810,
+      "end": 61812,
+      "surface": "谭村",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 19,
+      "gold_id": "g039",
+      "note": "前文梁天来递呈后叩谢退出，“黄知县就当堂签出值日原差陈德，到”，后文“提凌贵兴去。陈德领了牌票，次日一早，带领众小差，来到谭村，到得贵兴家时”，指凌贵兴居住的谭村。"
+    },
+    {
+      "sample_id": "s234",
+      "start": 62773,
+      "end": 62775,
+      "surface": "贵兴",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 19,
+      "gold_id": "g002",
+      "note": "前文原差陈德得了凌贵兴二百两银子，应允略缓几天到堂并带领众小差欢天喜地而去，后文“拍手大笑道：‘这样容易打发的官司，怕他甚的！’”，指初涉官司、以为二百两银子便可打发的凌贵兴。"
+    },
+    {
+      "sample_id": "s235",
+      "start": 62857,
+      "end": 62859,
+      "surface": "贵兴",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 19,
+      "gold_id": "g002",
+      "note": "前文区爵兴告诫贵兴此案告得很凶，必须赶紧到省城打点，后文“连忙同爵兴带了喜来，叫船同往省城，到三德号住下”，指随区爵兴赶往省城三德号的凌贵兴。"
+    },
+    {
+      "sample_id": "s236",
+      "start": 63132,
+      "end": 63135,
+      "surface": "番禺县",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 19,
+      "gold_id": "g035",
+      "note": "前文爵兴抄到呈词底稿后对贵兴说要快些预备，“我记得简勒先在”，后文“里有个卯名，不知他在里面有甚么路子？明日一早叫喜来去找了他来”，指简勒先挂有卯名的番禺县衙门/番禺县。"
+    },
+    {
+      "sample_id": "s237",
+      "start": 63179,
+      "end": 63181,
+      "surface": "谭村",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 19,
+      "gold_id": "g039",
+      "note": "前文爵兴让贵兴明日找简勒先，“你在店里，另外派一个伙计到”，后文“去，把那两个买定了的耆民，先邀了来，教他口供”，指买定两个耆民钱裕国、文昌明所在的谭村。"
+    },
+    {
+      "sample_id": "s238",
+      "start": 63294,
+      "end": 63297,
+      "surface": "简勒先",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 19,
+      "gold_id": "g007",
+      "note": "前文“次日一早，贵兴就起来，先打发一个伙计到谭村去，又叫喜来去寻”，后文“。到了巳牌时分……喜来也带了简勒先来，爵兴便把天来已经告发的事告诉了他”，指在番禺县有卯名、替贵兴奔走行贿的简勒先。"
+    },
+    {
+      "sample_id": "s239",
+      "start": 63698,
+      "end": 63700,
+      "surface": "江西",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 19,
+      "gold_id": "g044",
+      "note": "前文简勒先去找番禺县舅老爷，叙述“原来黄知县是个穷读书人出身，在”，后文“原籍时，穷的无可过活，甚至在街头卖字，曾经娶了个小户人家的女儿为妻”，指黄知县的原籍江西省。"
+    },
+    {
+      "sample_id": "s240",
+      "start": 63870,
+      "end": 63872,
+      "surface": "江西",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 19,
+      "gold_id": "g044",
+      "note": "前文说黄知县中进士后签分广东知县，领了部文到省而去，“路过他”，后文“原籍时，便许下他妻子殷孺人，一朝得缺，即来相接”，指黄知县与殷孺人原籍江西省。"
+    },
+    {
+      "sample_id": "s241",
+      "start": 63905,
+      "end": 63908,
+      "surface": "番禺县",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 19,
+      "gold_id": "g035",
+      "note": "前文黄知县路过江西原籍时许下妻子殷孺人得缺即来相接，“不到几年，就题补了”，后文“缺。殷孺人得信，也不等丈夫来接，便携带了兄弟殷成，投奔广东而来”，指黄知县题补实授的番禺县。"
+    },
+    {
+      "sample_id": "s242",
+      "start": 64226,
+      "end": 64228,
+      "surface": "勒先",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 20,
+      "gold_id": "g007",
+      "note": "前文殷成从衙门出来劈头遇见简勒先，第二十回开头“却说殷成见了”，后文“，便道：‘老简！我同你赶老羊去。’”，指设计引诱殷成受贿的简勒先。"
+    },
+    {
+      "sample_id": "s243",
+      "start": 64245,
+      "end": 64247,
+      "surface": "勒先",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 20,
+      "gold_id": "g007",
+      "note": "前文“却说殷成见了勒先，便道：‘老简！我同你赶老羊去。’”，后文“笑道：‘好好！你来的正好！你要赶老羊也可以，只是小了不来！’”，指用赌博激将殷成的简勒先。"
+    },
+    {
+      "sample_id": "s244",
+      "start": 64435,
+      "end": 64437,
+      "surface": "勒先",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 20,
+      "gold_id": "g007",
+      "note": "前文简勒先故意嫌赌注太小，殷成问“你要赌多大才来？”，后文“道：‘古人有说的，“一掷千金”，你要依得这个，押下一千两黄金，我就同你赌。’”，指提出一掷千金赌注的简勒先。"
+    },
+    {
+      "sample_id": "s245",
+      "start": 64903,
+      "end": 64905,
+      "surface": "勒先",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 20,
+      "gold_id": "g007",
+      "note": "前文殷成与简勒先赌骰子输了一千两黄金那注，“殷成一撤手，翻身就跑。”，后文“连忙赶上，一把拉住。殷成著急道：‘你剥我的皮！’”，指拉住殷成借机说项行贿的简勒先。"
+    },
+    {
+      "sample_id": "s246",
+      "start": 64929,
+      "end": 64931,
+      "surface": "勒先",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 20,
+      "gold_id": "g007",
+      "note": "前文简勒先拉住跑路的殷成，“殷成著急道：‘你剥我的皮！’”，后文“道：‘舅老爷！不要这样，我有句说话和你商量！’”，指对殷成说项的简勒先。"
+    },
+    {
+      "sample_id": "s247",
+      "start": 64981,
+      "end": 64984,
+      "surface": "舅老爷",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster",
+        "title_or_official"
+      ],
+      "chapter_index": 20,
+      "gold_id": "x004",
+      "note": "前文殷成赌输要跑被简勒先拉住，殷成说“没有商量，除了剥我的皮！”，勒先捺他坐下道，后文“！请坐，我们不过取笑，谁来认真呢！”，故勒先所称“舅老爷”指黄知县的小舅子殷成。"
+    },
+    {
+      "sample_id": "s248",
+      "start": 65079,
+      "end": 65081,
+      "surface": "勒先",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 20,
+      "gold_id": "g007",
+      "note": "前文简勒先说有千两黄金问殷成要不要，殷成问“你莫非在这里做梦么？”，后文“道：‘我并不做梦，却是梦也想不到的，这注横财，只要你有本事拿！’”并说出梁天来告凌贵兴一节，指简勒先。"
+    },
+    {
+      "sample_id": "s249",
+      "start": 65419,
+      "end": 65422,
+      "surface": "黄知县",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 20,
+      "gold_id": "g017",
+      "note": "前文殷成盘算许给姊夫五百金子，一头想一头走到签押房来，后文“正在那里看公事呢。殷成走了进去，叫了一声姊夫！”，指殷成的姊夫、番禺县令黄知县。"
+    },
+    {
+      "sample_id": "s250",
+      "start": 65431,
+      "end": 65433,
+      "surface": "殷成",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 20,
+      "gold_id": "x004",
+      "note": "前文殷成走到签押房见黄知县正在看公事，后文“走了进去，叫了一声姊夫！黄知县抬头一看道：‘你这几天干甚么事来了’”，指进签押房向姊夫黄知县说情的殷成。"
+    },
+    {
+      "sample_id": "s251",
+      "start": 65652,
+      "end": 65655,
+      "surface": "黄知县",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 20,
+      "gold_id": "g017",
+      "note": "前文殷成对姊夫说“我此刻倒送金子给你，好不好呢？”，后文“道：‘你不要和我胡说，里头去吧！’”，指斥责殷成胡说的黄知县。"
+    },
+    {
+      "sample_id": "s252",
+      "start": 65783,
+      "end": 65786,
+      "surface": "黄知县",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 20,
+      "gold_id": "g017",
+      "note": "前文殷成对姊夫说凌贵兴冤枉，“他此刻托人来说，求姊夫代他伸冤，他情愿送八百两黄金给你用呢。”，后文“大惊，怒喝道：‘你在外面胡混罢了，怎么干预我的词讼起来，你小心点，还不快滚出去！’”，指黄知县。"
+    },
+    {
+      "sample_id": "s253",
+      "start": 66027,
+      "end": 66029,
+      "surface": "江西",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 20,
+      "gold_id": "g044",
+      "note": "前文殷成碰钉子后跑到姊姊殷孺人床上哭，抽咽着对姊姊说“你借给我几个盘费，我回”，后文“去，姊夫撵我呢！”，指殷成与殷孺人的家乡江西省。"
+    },
+    {
+      "sample_id": "s254",
+      "start": 66031,
+      "end": 66033,
+      "surface": "姊夫",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 20,
+      "gold_id": "g017",
+      "note": "前文殷成被黄知县怒斥滚出去后，跑到姊姊殷孺人房里哭诉“你借给我几个盘费，我回江西去，”，后文“撵我呢！”殷孺人听了大惊叫丫头请老爷黄知县进来，故殷成所说“姊夫”指黄知县。"
+    },
+    {
+      "sample_id": "s255",
+      "start": 66374,
+      "end": 66377,
+      "surface": "黄知县",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 20,
+      "gold_id": "g017",
+      "note": "前文殷孺人对进房的丈夫又哭又闹催卷铺盖回江西，后文“道：‘好端端的闹甚么？我不懂呀！’”，指被妻子殷孺人吵闹的黄知县。"
+    },
+    {
+      "sample_id": "s256",
+      "start": 66481,
+      "end": 66484,
+      "surface": "黄知县",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 20,
+      "gold_id": "g017",
+      "note": "前文殷孺人撒泼自称是偷跑跟汉子的、骂兄弟是王八乌龟崽子，后文“怒道：‘孺人！你这是甚么话？他只管在外头混闹，自己也不顾惜自己的身份……’”，指对殷孺人解释的黄知县。"
+    },
+    {
+      "sample_id": "s257",
+      "start": 66807,
+      "end": 66810,
+      "surface": "番禺县",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 20,
+      "gold_id": "g035",
+      "note": "前文殷成爬起来向姊姊诉苦，说做官本是大秤称金小秤称银，“我们这个”，后文“，又是有名的好缺，衙门里却是冰清水冷的，外面的人说起来，都说如今这个县官是个呆子”，指黄知县所任的番禺县。"
+    },
+    {
+      "sample_id": "s258",
+      "start": 67212,
+      "end": 67215,
+      "surface": "黄知县",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 20,
+      "gold_id": "g017",
+      "note": "前文殷孺人得知有人送八百两黄金，质问丈夫“老爷！你为甚放著送上门的金子都不要？是甚么道理？难道你穷的还不怕么？”，后文“道：‘他这个公行贿赂得，我哪里好胡乱受他？’”，指起初拒绝受贿的黄知县。"
+    },
+    {
+      "sample_id": "s259",
+      "start": 67498,
+      "end": 67501,
+      "surface": "黄知县",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 20,
+      "gold_id": "g017",
+      "note": "前文殷成说八百两金子是姓凌的读书人送来求伸冤的，“殷孺人忽的一下翻了脸，对”，后文“道：‘这等顺水人情，你也不肯做，难道我嫁了你，就应该穷一辈子，不应该享一天福的么？’”，指黄知县。"
+    },
+    {
+      "sample_id": "s260",
+      "start": 67791,
+      "end": 67794,
+      "surface": "读书人",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster"
+      ],
+      "chapter_index": 20,
+      "gold_id": "not_entity",
+      "note": "前文殷孺人强词夺理说读书人不会纠合强盗，斥责黄知县“你看！你还是这样糊涂呢！你要疑心到”，后文“是强盗，你为甚不疑心你自己也是强盗？”，此处“读书人”为泛指读书人群体的普通名词，非特定单一人名实体。"
+    },
+    {
+      "sample_id": "s261",
+      "start": 67911,
+      "end": 67913,
+      "surface": "江西",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 20,
+      "gold_id": "g044",
+      "note": "前文殷孺人逼丈夫收下八百两金子，说“好的大家享用，不好的我就拿了它做盘缠，回”，后文“去，由得你在这里做清官！”，指殷孺人原籍江西省。"
+    },
+    {
+      "sample_id": "s262",
+      "start": 67982,
+      "end": 67985,
+      "surface": "黄知县",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 20,
+      "gold_id": "g017",
+      "note": "前文殷孺人逼迫丈夫受贿八百两金子并命殷成出去兑金，后文“要阻挡时，哪里还阻挡得住”表明此处“黄知县”指番禺知县黄知县。"
+    },
+    {
+      "sample_id": "s263",
+      "start": 68143,
+      "end": 68145,
+      "surface": "勒先",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 21,
+      "gold_id": "g007",
+      "note": "前文殷成从衙内出来遇见简勒先询问行贿是否得手，后文“走到勒先寓处，方才问道：‘老简！’”表明此处“勒先”指替凌贵兴奔走行贿的简勒先。"
+    },
+    {
+      "sample_id": "s264",
+      "start": 68203,
+      "end": 68205,
+      "surface": "殷成",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 21,
+      "gold_id": "x004",
+      "note": "前文简勒先称其为“舅老爷”询问内衙关节办得如何，后文索要一千两金子与自己的一千两银子，表明此处指黄知县妻弟殷成。"
+    },
+    {
+      "sample_id": "s265",
+      "start": 68414,
+      "end": 68416,
+      "surface": "勒先",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 21,
+      "gold_id": "g007",
+      "note": "前文殷成催促当天必须把金银送进衙内，后文请殷成在烟榻上吸鸦片烟等候自己去通报，表明此处“勒先”指简勒先。"
+    },
+    {
+      "sample_id": "s266",
+      "start": 68895,
+      "end": 68897,
+      "surface": "殷成",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 21,
+      "gold_id": "x004",
+      "note": "前文简勒先带区爵兴及扛包裹跟班进屋，后文引介“这位便是殷舅老爷”，表明此处指黄知县妻弟殷成。"
+    },
+    {
+      "sample_id": "s267",
+      "start": 69004,
+      "end": 69006,
+      "surface": "勒先",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 21,
+      "gold_id": "g007",
+      "note": "前文殷成唤“老简”追问情形，后文答称凌大爷托区师爷把金银送到并请舅老爷写收条，表明此处“勒先”指简勒先。"
+    },
+    {
+      "sample_id": "s268",
+      "start": 69017,
+      "end": 69020,
+      "surface": "凌大爷",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "title_or_official"
+      ],
+      "chapter_index": 21,
+      "gold_id": "g002",
+      "note": "前文区爵兴称“舍亲的讼事”，后文“托区师爷送来，请舅老爷给了收条”表明此处“凌大爷”指托区爵兴送黄金一千两行贿番禺县的凌贵兴。"
+    },
+    {
+      "sample_id": "s269",
+      "start": 69282,
+      "end": 69284,
+      "surface": "爵兴",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 21,
+      "gold_id": "g004",
+      "note": "前文殷成在“收到黄金白银各一千两正”收条上画十字递过，后文收下收条并命跟班打开四个包裹点交一千两金子，表明此处“爵兴”指区爵兴。"
+    },
+    {
+      "sample_id": "s270",
+      "start": 69436,
+      "end": 69438,
+      "surface": "殷成",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 21,
+      "gold_id": "x004",
+      "note": "前文收到区爵兴递来的一千两银票并拉简勒先询问真假，后文自称向来未用过银票需小心放入贴肉衣袋，表明此处指殷成。"
+    },
+    {
+      "sample_id": "s271",
+      "start": 69491,
+      "end": 69493,
+      "surface": "票子",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 21,
+      "gold_id": "not_entity",
+      "note": "前文“取出一张一千两的银票”及“讨了一张白纸，把那”，后文“包好了。解开衣襟，放在贴肉的衣袋里”表明此处“票子”指银票这一普通财物，非人物或地点实体。"
+    },
+    {
+      "sample_id": "s272",
+      "start": 69975,
+      "end": 69977,
+      "surface": "南雄",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 21,
+      "gold_id": "g041",
+      "note": "前文凌贵兴诉词追述其父凌宗客与梁天来之父梁朝大，后文“合股经商，二十馀年”表明此处指二人早年合伙经商的广东南雄。"
+    },
+    {
+      "sample_id": "s273",
+      "start": 70482,
+      "end": 70485,
+      "surface": "梁翰昭",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 21,
+      "gold_id": "g031",
+      "note": "前文黄知县堂审询问梁天来状告凌贵兴纠合强徒的见证人、张凤先禀，后文“当夜小人亲眼看见贼伙中，多半是凌家子弟”表明此处指同堂作证的梁天来叔父梁翰昭。"
+    },
+    {
+      "sample_id": "s274",
+      "start": 70588,
+      "end": 70590,
+      "surface": "翰昭",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 21,
+      "gold_id": "g031",
+      "note": "前文梁翰昭当堂作证看见凌家子弟行劫，后文黄知县喝断并将其与张凤一并责打三十小板，表明此处“翰昭”指梁翰昭。"
+    },
+    {
+      "sample_id": "s275",
+      "start": 70674,
+      "end": 70676,
+      "surface": "谭村",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 21,
+      "gold_id": "g039",
+      "note": "前文钱裕国、文昌明当堂冒充耆老作保，后文“素来知道凌贵兴在家读书”表明此处指凌、梁两家所在的番禺谭村。"
+    },
+    {
+      "sample_id": "s276",
+      "start": 70707,
+      "end": 70709,
+      "surface": "太爷",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short",
+        "title_or_official"
+      ],
+      "chapter_index": 21,
+      "gold_id": "g017",
+      "note": "前文钱裕国、文昌明在番禺县堂上具保凌贵兴被诬告，后文“不信时，小老人两个都肯具结”及“黄知县道”表明此处“太爷”指升堂审案的番禺黄知县。"
+    },
+    {
+      "sample_id": "s277",
+      "start": 70782,
+      "end": 70785,
+      "surface": "黄知县",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 21,
+      "gold_id": "g017",
+      "note": "前文张凤当堂揭穿具保人是剃头阿三与杀猪阿二，后文自称“本县”反诘张凤生业并喝令重打八十板，表明此处指番禺黄知县。"
+    },
+    {
+      "sample_id": "s278",
+      "start": 71072,
+      "end": 71074,
+      "surface": "翰昭",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 21,
+      "gold_id": "g031",
+      "note": "前文番禺知县退堂后梁天来心怀怨气，后文“、张凤，无端被打……天来只得同了翰昭、张凤，回到天和行里”表明此处指随同梁天来听审挨打的叔父梁翰昭。"
+    },
+    {
+      "sample_id": "s279",
+      "start": 71275,
+      "end": 71277,
+      "surface": "智伯",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 21,
+      "gold_id": "g010",
+      "note": "前文梁天来回天和行向施智伯述说堂审经过，后文摇头断定知县受贿并在打张凤时退堂，表明此处指讼师施智伯。"
+    },
+    {
+      "sample_id": "s280",
+      "start": 71441,
+      "end": 71443,
+      "surface": "智伯",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 22,
+      "gold_id": "g010",
+      "note": "前文梁天来惊讶询问“先生哪便得知”知县退堂细节，后文剖析“这是赃官伎俩……一定是受了贿了”，表明此处指施智伯。"
+    },
+    {
+      "sample_id": "s281",
+      "start": 71474,
+      "end": 71476,
+      "surface": "张凤",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 22,
+      "gold_id": "g006",
+      "note": "前文施智伯断定县官受贿，后文忍着板伤之痛请施智伯再写状纸赴府衙控告并誓言到阎罗殿也要作证，表明此处指见证人张凤。"
+    },
+    {
+      "sample_id": "s282",
+      "start": 71602,
+      "end": 71605,
+      "surface": "番禺县",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 22,
+      "gold_id": "g035",
+      "note": "前文施智伯向梁天来提议赴广州府上控“钱神用事”，后文“词中要牵涉到……的了”表明此处指初审受贿枉法的番禺县。"
+    },
+    {
+      "sample_id": "s283",
+      "start": 71651,
+      "end": 71653,
+      "surface": "智伯",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 22,
+      "gold_id": "g010",
+      "note": "前文梁天来恳请“又要费先生的心”撰写上控呈词，后文应允明日写好呈词送来并辞去，表明此处指施智伯。"
+    },
+    {
+      "sample_id": "s284",
+      "start": 72078,
+      "end": 72080,
+      "surface": "贵兴",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 22,
+      "gold_id": "g002",
+      "note": "前文打发小厮喜来回谭村家中取丫头美兰以实施凌宗孔收买张凤之计，后文命将美兰送到简勒先寓处住下，表明此处指凌贵兴。"
+    },
+    {
+      "sample_id": "s285",
+      "start": 72186,
+      "end": 72188,
+      "surface": "宗孔",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 22,
+      "gold_id": "g003",
+      "note": "前文“早被宗孔看见，一把拉住”向刚起床散步的张凤搭话，后文张凤暗自诧异并随其前往简勒先寓处，表明此处指凌宗孔。"
+    },
+    {
+      "sample_id": "s286",
+      "start": 72510,
+      "end": 72512,
+      "surface": "张凤",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 22,
+      "gold_id": "g006",
+      "note": "前文凌宗孔唤“阿凤哥”询问送茶丫头长相如何，后文正色斥责不应当面评质简勒先内眷或使女，表明此处指张凤。"
+    },
+    {
+      "sample_id": "s287",
+      "start": 72645,
+      "end": 72647,
+      "surface": "张凤",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 22,
+      "gold_id": "g006",
+      "note": "前文简勒先与凌宗孔摆出十个元宝和房契，后文凌宗孔唤“阿凤哥”利诱其不再为梁天来作证，表明此处指见证人张凤。"
+    },
+    {
+      "sample_id": "s288",
+      "start": 73094,
+      "end": 73097,
+      "surface": "施智伯",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 22,
+      "gold_id": "g010",
+      "note": "前文张凤严词拒绝凌宗孔贿赂后走回天和行，后文“恰好在那里，催天来进禀”并叹惜张凤未假意应允取赃告发，表明此处指讼师施智伯。"
+    },
+    {
+      "sample_id": "s289",
+      "start": 73392,
+      "end": 73394,
+      "surface": "邦禄",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 22,
+      "gold_id": "x007",
+      "note": "前文“早又有人送信给他去了。这个人姓陈，名”，后文“是府衙里的一名书办，向来和爵兴相好”表明此处指广州府书办陈邦禄。"
+    },
+    {
+      "sample_id": "s290",
+      "start": 73511,
+      "end": 73513,
+      "surface": "爵兴",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 22,
+      "gold_id": "g004",
+      "note": "前文府衙书办陈邦禄看到梁天来控府呈词后急忙前来报信，后文“爵兴便引他见了贵兴，大家商量如何设法”表明此处指区爵兴。"
+    },
+    {
+      "sample_id": "s291",
+      "start": 73620,
+      "end": 73622,
+      "surface": "爵兴",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 22,
+      "gold_id": "g004",
+      "note": "前文陈邦禄提起广州府最倚重鲍师爷但未闻其受关节，后文唤“陈兄”嘱托其用心斡旋并许以事后重谢，表明此处指区爵兴。"
+    },
+    {
+      "sample_id": "s292",
+      "start": 73718,
+      "end": 73721,
+      "surface": "鲍师爷",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 22,
+      "gold_id": "g019",
+      "note": "前文陈邦禄试探广州府幕友后回来报信，后文“确是向来不受关节的，并且生平没有嗜好”及新娶姨太太看中珍珠手钏，表明此处指广州府鲍师爷。"
+    },
+    {
+      "sample_id": "s293",
+      "start": 73864,
+      "end": 73866,
+      "surface": "师爷",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 22,
+      "gold_id": "g019",
+      "note": "前文“鲍师爷新近娶了一个姨太太……看上了一副珍珠手钏……鲍”，后文“却只有四千，还缺六千买不成功”表明此处“师爷”与前字连称“鲍师爷”。"
+    },
+    {
+      "sample_id": "s294",
+      "start": 73967,
+      "end": 73970,
+      "surface": "鲍师爷",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 22,
+      "gold_id": "g019",
+      "note": "前文凌贵兴打出六千两银票交陈邦禄代还手钏价，后文“可巧鲍师爷拿著那手钏来玩弄”表明此处指陈邦禄前去寻访行贿的鲍师爷。"
+    },
+    {
+      "sample_id": "s295",
+      "start": 73973,
+      "end": 73976,
+      "surface": "鲍师爷",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 22,
+      "gold_id": "g019",
+      "note": "前文陈邦禄携六千两银票来寻鲍师爷，后文“拿著那手钏来玩弄，正要拿去退还”表明此处指鲍师爷。"
+    },
+    {
+      "sample_id": "s296",
+      "start": 73979,
+      "end": 73981,
+      "surface": "手钏",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 22,
+      "gold_id": "not_entity",
+      "note": "前文鲍师爷姨太太看上一万两银子的珍珠手钏、鲍师爷拿着它，后文“来玩弄，正要拿去退还”表明此处“手钏”指首饰器物，非人物或地点实体。"
+    },
+    {
+      "sample_id": "s297",
+      "start": 74092,
+      "end": 74095,
+      "surface": "鲍师爷",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 22,
+      "gold_id": "g019",
+      "note": "前文陈邦禄递过六千两银票助其买下珍珠手钏，后文惊讶追问银票来历并听陈邦禄道出凌贵兴请托，表明此处指鲍师爷。"
+    },
+    {
+      "sample_id": "s298",
+      "start": 74130,
+      "end": 74133,
+      "surface": "鲍师爷",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 22,
+      "gold_id": "g019",
+      "note": "前文陈邦禄劝其只管拿六千两银票去用，后文察觉“这必是你有甚么要见教”而询问陈邦禄来意，表明此处指鲍师爷。"
+    },
+    {
+      "sample_id": "s299",
+      "start": 74157,
+      "end": 74160,
+      "surface": "鲍师爷",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 22,
+      "gold_id": "g019",
+      "note": "前文陈邦禄告知代凌贵兴关说讼事之来意，后文推辞尚未见过状子、随后适逢珠宝客上门便拿银票买下珍珠手钏，表明此处指鲍师爷。"
+    },
+    {
+      "sample_id": "s300",
+      "start": 74226,
+      "end": 74229,
+      "surface": "凌贵兴",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 22,
+      "gold_id": "g002",
+      "note": "前文陈邦禄向鲍师爷送上六千两银票关说案情，后文“是受了诬告，才敢来说”表明此处指行贿脱罪的被告凌贵兴。"
+    },
+    {
+      "sample_id": "s301",
+      "start": 74305,
+      "end": 74307,
+      "surface": "邦禄",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 22,
+      "gold_id": "x007",
+      "note": "前文鲍师爷将陈邦禄送来的六千两银票凑齐一万两交给珠宝客人，后文见鲍师爷已用掉银票便闪身躲出去，表明此处指府衙书办陈邦禄。"
+    },
+    {
+      "sample_id": "s302",
+      "start": 74323,
+      "end": 74326,
+      "surface": "鲍师爷",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 22,
+      "gold_id": "g019",
+      "note": "前文用六千两贿票凑钱买下手钏后陈邦禄躲出，后文送走珠宝客人并走进签押房见刘太守查阅梁天来状子，表明此处指鲍师爷。"
+    },
+    {
+      "sample_id": "s303",
+      "start": 74355,
+      "end": 74358,
+      "surface": "刘太守",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 22,
+      "gold_id": "g020",
+      "note": "前文鲍师爷走进广州府签押房见“本府”，后文放下笔称鲍师爷为“老夫子”并递过梁天来呈子，表明此处指广州府知府刘太守。"
+    },
+    {
+      "sample_id": "s304",
+      "start": 74368,
+      "end": 74371,
+      "surface": "鲍师爷",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 22,
+      "gold_id": "g019",
+      "note": "前文走进签押房见刘太守写字，后文刘太守唤“老夫子”请其看梁天来呈子，表明此处指鲍师爷。"
+    },
+    {
+      "sample_id": "s305",
+      "start": 74396,
+      "end": 74399,
+      "surface": "鲍师爷",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 22,
+      "gold_id": "g019",
+      "note": "前文刘太守放下笔请“老夫子”看呈子，后文接过梁天来状子看完并询问番禺县详文是否已到，表明此处指鲍师爷。"
+    },
+    {
+      "sample_id": "s306",
+      "start": 74443,
+      "end": 74446,
+      "surface": "鲍师爷",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 22,
+      "gold_id": "g019",
+      "note": "前文询问番禺县详文是否已到、刘太守取出案卷，后文看完详文案卷暗想番禺县断案糊涂但自己已花掉六千两银票，表明此处指鲍师爷。"
+    },
+    {
+      "sample_id": "s307",
+      "start": 74599,
+      "end": 74602,
+      "surface": "刘太守",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 22,
+      "gold_id": "g020",
+      "note": "前文鲍师爷看完案卷正为受贿六千两发急，后文称鲍师爷为“老夫子”询问此案谁虚谁实，表明此处指广州府知府刘太守。"
+    },
+    {
+      "sample_id": "s308",
+      "start": 74719,
+      "end": 74722,
+      "surface": "刘太守",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 23,
+      "gold_id": "g020",
+      "note": "前文回目“刘太守误听一席话”及“却说鲍师爷一时回答”，后文鲍师爷尊称其“太尊”反问看法，表明此处指广州府知府刘太守。"
+    },
+    {
+      "sample_id": "s309",
+      "start": 74860,
+      "end": 74863,
+      "surface": "鲍师爷",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 23,
+      "gold_id": "g019",
+      "note": "前文刘太守怀疑番禺县受贿未敢轻批，后文因六千两银子已花掉无法退还而决定破戒替凌贵兴进言开脱，表明此处指鲍师爷。"
+    },
+    {
+      "sample_id": "s310",
+      "start": 75175,
+      "end": 75178,
+      "surface": "刘太守",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 23,
+      "gold_id": "g020",
+      "note": "前文听信鲍师爷之言拍桌称是，后文追述其早年任浙江仁和县时因不听鲍师爷之言断错案几乎被参、此后对鲍师爷言听计从，表明此处指刘太守。"
+    },
+    {
+      "sample_id": "s311",
+      "start": 75200,
+      "end": 75203,
+      "surface": "鲍师爷",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 23,
+      "gold_id": "g019",
+      "note": "前文追述刘太守任浙江仁和县时办案经过，后文“的说话，断错了……从此之后，刘太守听从鲍师爷的活，比圣旨还厉害”表明此处指鲍师爷。"
+    },
+    {
+      "sample_id": "s312",
+      "start": 76234,
+      "end": 76236,
+      "surface": "大有",
+      "stratum": "hard",
+      "hard_features": [
+        "ambiguous_surface",
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 23,
+      "gold_id": "g005",
+      "note": "前文提及黎阿二住在自己烟馆中并向凌贵兴献计当堂害死张凤，后文提议打点臬台衙门让黎阿二充当夹棍手夹死张凤，表明此处“大有”指林大有。"
+    },
+    {
+      "sample_id": "s313",
+      "start": 76260,
+      "end": 76262,
+      "surface": "阿二",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 23,
+      "gold_id": "x026",
+      "note": "前文林大有提到住在烟馆的伙计“黎阿二”，后文“充了差役，最好是当了个夹棍手……这里便把他夹死了”表明此处“阿二”指凌贵兴党羽黎阿二。"
+    },
+    {
+      "sample_id": "s314",
+      "start": 76847,
+      "end": 76849,
+      "surface": "佛山",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 23,
+      "gold_id": "g043",
+      "note": "前文区爵兴让凌贵兴兑二万银子随他出行，后文凌贵兴问“怎么倒要到佛山去”及区爵兴答“我亲家在佛山呢”，表明此处指广东佛山。"
+    },
+    {
+      "sample_id": "s315",
+      "start": 77181,
+      "end": 77183,
+      "surface": "焦公",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 23,
+      "gold_id": "g021",
+      "note": "前文“按察”升堂传审梁天来与凌贵兴两造，后文“焦按司教且退下，又提张凤来问”表明此处“焦公”指广东按察使焦按察。"
+    },
+    {
+      "sample_id": "s316",
+      "start": 77412,
+      "end": 77415,
+      "surface": "焦按司",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster"
+      ],
+      "chapter_index": 23,
+      "gold_id": "g021",
+      "note": "前文“按察焦公”提审张凤并挑剔其“亲见亲闻”口供，后文自称“本司”大怒喝令给张凤上夹棍，表明此处“焦按司”指焦按察。"
+    },
+    {
+      "sample_id": "s317",
+      "start": 78014,
+      "end": 78016,
+      "surface": "张凤",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 23,
+      "gold_id": "g006",
+      "note": "前文张凤在按察司堂上死在夹棍之下、黎阿二假称其晕倒叫伙计松绑，后文“松了，有两个还故意的含著冷水，对著死张凤面上乱喷”表明此处指被夹死的证人张凤。"
+    },
+    {
+      "sample_id": "s318",
+      "start": 78316,
+      "end": 78318,
+      "surface": "南雄",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 24,
+      "gold_id": "g041",
+      "note": "前文追述梁天来与总角之交程万里成年后各营生业、“天来时时要到”，后文“后来又开了糖行”对应梁天来早年往来父店所在地南雄。"
+    },
+    {
+      "sample_id": "s319",
+      "start": 78449,
+      "end": 78452,
+      "surface": "何杰臣",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster"
+      ],
+      "chapter_index": 24,
+      "gold_id": "x001",
+      "note": "前文梁天来病愈不便出门而派人去请，后文“、施智伯同来商量。杰臣是没有甚主意的”表明此处指梁天来请来商议讼事的朋友何杰臣。"
+    },
+    {
+      "sample_id": "s320",
+      "start": 78479,
+      "end": 78482,
+      "surface": "焦按察",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 24,
+      "gold_id": "g021",
+      "note": "前文施智伯与梁天来、何杰臣商议案情，后文“审那一堂，便夹死了张义土”表明此处指在臬司堂上夹死张凤的焦按察。"
+    },
+    {
+      "sample_id": "s321",
+      "start": 79131,
+      "end": 79132,
+      "surface": "李",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 24,
+      "gold_id": "g013",
+      "note": "前文何杰臣提及“凌贵兴向来认得一个萧抚院的表弟，这个人我忘了他的名字，单知道他姓”，后文述其撮合萧中丞收凌贵兴为门生，表明此处指萧抚院表弟李丰。"
+    },
+    {
+      "sample_id": "s322",
+      "start": 79328,
+      "end": 79330,
+      "surface": "喜来",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 24,
+      "gold_id": "g014",
+      "note": "前文何杰臣讲述凌贵兴拜萧中丞为师的底细，后文“我家用的小厮，和他家……认得，所以知道这个底细”表明此处指凌贵兴家的小厮喜来。"
+    },
+    {
+      "sample_id": "s323",
+      "start": 80132,
+      "end": 80135,
+      "surface": "番禺县",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 24,
+      "gold_id": "g017",
+      "note": "前文梁天来在关帝庙外拦萧抚院轿舆递呈词，后文“认得是梁天来，更吓的心中乱跳，暗想到：‘今番坑了我了！’刘太守、焦按察也觉得心里不安”表明此处以官职“番禺县”代指番禺黄知县。"
+    },
+    {
+      "sample_id": "s324",
+      "start": 80168,
+      "end": 80171,
+      "surface": "焦按察",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 24,
+      "gold_id": "g021",
+      "note": "前文梁天来拦萧抚院轿舆递交连臬台都告在内的呈词，后文与番禺县、刘太守一同心里不安，表明此处指广东按察使焦按察。"
+    },
+    {
+      "sample_id": "s325",
+      "start": 80852,
+      "end": 80854,
+      "surface": "省城",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 24,
+      "gold_id": "g038",
+      "note": "前文抚台旗牌传唤凌贵兴“务必今日赶上省去，已经留下南门”，后文“入得城时，已是交过二鼓，贵兴向抚院行去”表明此处指广东巡抚衙门所在的广州省城。"
+    },
+    {
+      "sample_id": "s326",
+      "start": 80891,
+      "end": 80893,
+      "surface": "李丰",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 24,
+      "gold_id": "g013",
+      "note": "前文凌贵兴到巡抚辕门“劈头遇见李丰”，后文“便是萧抚院的表弟，贵兴一向结识他的”表明此处指李丰。"
+    },
+    {
+      "sample_id": "s327",
+      "start": 80950,
+      "end": 80952,
+      "surface": "李丰",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 24,
+      "gold_id": "g013",
+      "note": "前文在巡抚辕门一把拉住凌贵兴往自家房里去，后文劝阻凌贵兴暂勿去见肝气大发的萧抚院并拉入自己房中密商，表明此处指李丰。"
+    },
+    {
+      "sample_id": "s328",
+      "start": 81443,
+      "end": 81445,
+      "surface": "李丰",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 24,
+      "gold_id": "g013",
+      "note": "前文李丰在抚署告诉凌贵兴各师爷喜好何物、次日凌贵兴向区爵兴转述，后文“昨日说该送的礼物，你可都记得么”表明此处指开单指点送礼的李丰。"
+    },
+    {
+      "sample_id": "s329",
+      "start": 81580,
+      "end": 81582,
+      "surface": "李丰",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 24,
+      "gold_id": "g013",
+      "note": "前文凌贵兴备办礼物“交托李丰，代为致送”，后文趁萧抚院肝气病发与各位师爷“上下其手”批驳梁天来呈词，表明此处指李丰。"
+    },
+    {
+      "sample_id": "s330",
+      "start": 81915,
+      "end": 81917,
+      "surface": "东莱",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 25,
+      "gold_id": "g032",
+      "note": "前文梁天来寻访施智伯见座上有一和尚，施智伯引介“这位是海幢寺高僧，法号”，表明此处指海幢寺东莱僧。"
+    },
+    {
+      "sample_id": "s331",
+      "start": 82014,
+      "end": 82016,
+      "surface": "东莱",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 25,
+      "gold_id": "g032",
+      "note": "前文在施智伯座上的海幢寺高僧听梁天来背诵巡抚衙门批语，后文询问是何事并听施智伯讲述案情始末，表明此处指东莱僧。"
+    },
+    {
+      "sample_id": "s332",
+      "start": 82042,
+      "end": 82044,
+      "surface": "东莱",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 25,
+      "gold_id": "g032",
+      "note": "前文向施智伯询问梁天来案情始末，后文推断萧抚院批语系左右舞弊并建议再进一禀，表明此处指东莱僧。"
+    },
+    {
+      "sample_id": "s333",
+      "start": 82126,
+      "end": 82128,
+      "surface": "智伯",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 25,
+      "gold_id": "g010",
+      "note": "前文东莱僧建议再进一禀试探是否左右作弊，后文称赞“和尚高见不差”并犯难批语已死如何领起呈词，表明此处指讼师施智伯。"
+    },
+    {
+      "sample_id": "s334",
+      "start": 82182,
+      "end": 82184,
+      "surface": "智伯",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 25,
+      "gold_id": "g010",
+      "note": "前文施智伯犯难呈词如何领起，后文东莱向其“取过以前各呈词的底稿”并指点用“情愿该打死，该打死，不愿含冤屈死”顶批，表明此处指施智伯。"
+    },
+    {
+      "sample_id": "s335",
+      "start": 82307,
+      "end": 82309,
+      "surface": "东莱",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 25,
+      "gold_id": "g032",
+      "note": "前文指点施智伯用“情愿该打死，该打死，不愿含冤屈死”顶批令施智伯恍然大悟，后文从施智伯处告辞离去，表明此处指东莱僧。"
+    },
+    {
+      "sample_id": "s336",
+      "start": 82384,
+      "end": 82386,
+      "surface": "智伯",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 25,
+      "gold_id": "g010",
+      "note": "前文梁天来将巡抚衙门“业经查案，毋许多渎”批语告知施智伯，后文又代写“告为密云无雨，不得不渎事”呈词，表明此处指施智伯。"
+    },
+    {
+      "sample_id": "s337",
+      "start": 82522,
+      "end": 82524,
+      "surface": "智伯",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 25,
+      "gold_id": "g010",
+      "note": "前文梁天来打听得知末次呈禀未批被掷还后退出来去见，后文气得双眼昏花、折断毛笔吐血不止，表明此处指施智伯。"
+    },
+    {
+      "sample_id": "s338",
+      "start": 82528,
+      "end": 82530,
+      "surface": "智伯",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 25,
+      "gold_id": "g010",
+      "note": "前文梁天来将原禀被掷还的消息告知施智伯，后文“双眼昏花，一言不发”并折笔吐血，表明此处指施智伯。"
+    },
+    {
+      "sample_id": "s339",
+      "start": 82742,
+      "end": 82745,
+      "surface": "孔大人",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 25,
+      "gold_id": "g022",
+      "note": "前文施智伯临终向梁天来提及东莱和尚与“现任的两广总督”是两榜同年，表明此处“孔大人”指两广总督孔大鹏。"
+    },
+    {
+      "sample_id": "s340",
+      "start": 83097,
+      "end": 83099,
+      "surface": "君来",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 25,
+      "gold_id": "g008",
+      "note": "前文“这一日兄弟”，后文“从谭村来省，天来因为许久不曾回家，思念母亲，便将各事交代君来料理”表明此处指梁天来之弟梁君来。"
+    },
+    {
+      "sample_id": "s341",
+      "start": 83174,
+      "end": 83176,
+      "surface": "凌氏",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 25,
+      "gold_id": "g027",
+      "note": "前文梁天来回谭村与母亲“母子久别……说起那九命沉冤，不免相对痛哭”，后文劝儿子梁天来莫再告状以免带累旁人，表明此处指梁母凌氏。"
+    },
+    {
+      "sample_id": "s342",
+      "start": 83209,
+      "end": 83211,
+      "surface": "张凤",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 25,
+      "gold_id": "g006",
+      "note": "前文梁母凌氏感叹九命沉冤无处可告，后文“做了见证，被夹死了”与施智伯吐血而死并举，表明此处指在臬司堂上被夹死的见证人张凤。"
+    },
+    {
+      "sample_id": "s343",
+      "start": 83431,
+      "end": 83433,
+      "surface": "东莱",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 25,
+      "gold_id": "g032",
+      "note": "前文梁天来乘船入海幢寺“寻著了东莱和尚”，后文介绍这位和尚因一口好官话担任海幢寺知客，表明此处指东莱僧。"
+    },
+    {
+      "sample_id": "s344",
+      "start": 83749,
+      "end": 83751,
+      "surface": "君来",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 25,
+      "gold_id": "g008",
+      "note": "前文梁天来在海幢寺写信托人带回省城，后文“说明在海幢寺暂住几天，行中各事，仍叫他料理”并抄送历次呈词批语，表明此处指留守省城天和行的弟弟梁君来。"
+    },
+    {
+      "sample_id": "s345",
+      "start": 83823,
+      "end": 83825,
+      "surface": "东莱",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 25,
+      "gold_id": "g032",
+      "note": "前文梁天来依言在海幢寺住下七八天，后文“有甚消息。不觉心中纳闷。再去问东莱”获知总督孔大人将至，表明此处指东莱僧。"
+    },
+    {
+      "sample_id": "s346",
+      "start": 83858,
+      "end": 83861,
+      "surface": "孔大人",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 25,
+      "gold_id": "g022",
+      "note": "前文东莱僧向梁天来透露“就在这几天里头，总督”，后文“这一天孔大人果然到了。原来这位两广总督孔大鹏”表明此处指孔大鹏。"
+    },
+    {
+      "sample_id": "s347",
+      "start": 83926,
+      "end": 83929,
+      "surface": "孔大人",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 25,
+      "gold_id": "g022",
+      "note": "前文梁天来在海幢寺等候总督到访，后文“果然到了。原来这位两广总督孔大鹏，山东人氏，居官清正”表明此处指两广总督孔大鹏。"
+    },
+    {
+      "sample_id": "s348",
+      "start": 84002,
+      "end": 84004,
+      "surface": "东莱",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 25,
+      "gold_id": "g032",
+      "note": "前文两广总督孔大鹏到河南稽查盐政顺路到海幢寺拜望同年，后文“东莱便让到方丈里献茶，又叫预备斋筵”表明此处指东莱僧。"
+    },
+    {
+      "sample_id": "s349",
+      "start": 84100,
+      "end": 84103,
+      "surface": "小和尚",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "title_or_official"
+      ],
+      "chapter_index": 25,
+      "gold_id": "not_entity",
+      "note": "前文“只见一个”，后文“不过十二三岁，笑嘻嘻的嘴里唱著山歌进去”表明此处为海幢寺内无名小沙弥的泛称，非特定命名人物实体。"
+    },
+    {
+      "sample_id": "s350",
+      "start": 84207,
+      "end": 84209,
+      "surface": "东莱",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 25,
+      "gold_id": "g032",
+      "note": "前文孔制台拦住唱山歌的小和尚要问话，后文故意推说“这是外面小孩子们胡诌的”以激发孔制台追问童谣，表明此处指设局引孔大鹏查案的东莱僧。"
+    },
+    {
+      "sample_id": "s351",
+      "start": 84427,
+      "end": 84430,
+      "surface": "小和尚",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "title_or_official"
+      ],
+      "chapter_index": 25,
+      "gold_id": "not_entity",
+      "note": "前文孔制台询问唱“广州城里没清官”童谣的寺中十二三岁沙弥，后文回答“我是这几天才学会的”，系寺中无名小和尚的普通身份称呼，非特定命名人物实体。"
+    },
+    {
+      "sample_id": "s352",
+      "start": 84474,
+      "end": 84476,
+      "surface": "东莱",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 25,
+      "gold_id": "g032",
+      "note": "前文孔制台听童谣后纳闷何为“九命冤”，后文故意假作诧异反问“这个案，大人都没有闻过么”并道出梁天来冤情，表明此处指东莱僧。"
+    },
+    {
+      "sample_id": "s353",
+      "start": 84584,
+      "end": 84586,
+      "surface": "张凤",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 25,
+      "gold_id": "g006",
+      "note": "前文东莱僧向孔制台讲述梁天来被凌贵兴抄杀七尸八命、“后来打官司，又夹死了见证”，表明此处指为梁天来作证而被夹死的张凤。"
+    },
+    {
+      "sample_id": "s354",
+      "start": 84666,
+      "end": 84668,
+      "surface": "东莱",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 25,
+      "gold_id": "g032",
+      "note": "前文孔制台询问欲剃度出家的梁天来现在是否还在寺中，后文答称“在这里”，表明此处指东莱僧。"
+    },
+    {
+      "sample_id": "s355",
+      "start": 84732,
+      "end": 84734,
+      "surface": "东莱",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 25,
+      "gold_id": "g032",
+      "note": "前文梁天来闯入方丈室对孔制台跪下痛哭，后文叮嘱梁天来“大人问你话，你不要哭，有甚冤枉，快告上去”，表明此处指东莱僧。"
+    },
+    {
+      "sample_id": "s356",
+      "start": 84788,
+      "end": 84791,
+      "surface": "孔制台",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 25,
+      "gold_id": "g022",
+      "note": "前文梁天来当面诉冤并呈上历次呈词批语，后文逐宗看完讯问并自称“本部堂同你伸冤”，表明此处指两广总督孔大鹏。"
+    },
+    {
+      "sample_id": "s357",
+      "start": 84931,
+      "end": 84933,
+      "surface": "东莱",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 25,
+      "gold_id": "g032",
+      "note": "前文从衣袖取出代写好的呈词递给孔制台、被孔制台笑问为何设圈套，后文解释系因广州各官左右舞弊故安排当面呈控，表明此处指东莱僧。"
+    },
+    {
+      "sample_id": "s358",
+      "start": 84992,
+      "end": 84995,
+      "surface": "广州城",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster"
+      ],
+      "chapter_index": 25,
+      "gold_id": "g038",
+      "note": "前文小和尚唱“广州城里没清官”及东莱解释“诺大一个”，后文提及城中刘太尊、萧中丞等省府大员，表明此处指广州省城。"
+    },
+    {
+      "sample_id": "s359",
+      "start": 85229,
+      "end": 85231,
+      "surface": "省城",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 25,
+      "gold_id": "g038",
+      "note": "前文梁天来在河南海幢寺向孔制台当面递状并谢过东莱，后文“却说天来回到省城，将一切事情，告诉了君来”表明此处指广州省城。"
+    },
+    {
+      "sample_id": "s360",
+      "start": 85242,
+      "end": 85245,
+      "surface": "孔制台",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 25,
+      "gold_id": "g022",
+      "note": "前文孔制台在海幢寺收下梁天来呈词并回衙，后文“讯结？且听下回分解”及下回回目“孔制台夜审喜来”，表明此处指两广总督孔大鹏。"
+    },
+    {
+      "sample_id": "s361",
+      "start": 85371,
+      "end": 85373,
+      "surface": "谭村",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 26,
+      "gold_id": "g039",
+      "note": "前文孔制台委派武巡捕杨福、千总苏安率刀牌手飞速前往，后文“到了凌家，不论老少上下，是男子一概拿来”表明此处指凌贵兴家所在的谭村。"
+    },
+    {
+      "sample_id": "s362",
+      "start": 85466,
+      "end": 85468,
+      "surface": "谭村",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 26,
+      "gold_id": "g039",
+      "note": "前文凌贵兴因巡抚衙门官司摆平而邀众强徒同来，后文“在裕耕堂中，大排筵席庆贺……来家演唱”表明此处指凌贵兴谭村老家。"
+    },
+    {
+      "sample_id": "s363",
+      "start": 85956,
+      "end": 85958,
+      "surface": "贵兴",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 26,
+      "gold_id": "g002",
+      "note": "前文杨福、苏安率刀牌手闯入裕耕堂绑缚众强徒与区爵兴，后文“面如土色，跪在地下叩头”求饶并说“快点放了我，我到里面取些茶资奉送”，表明此处指家主凌贵兴。"
+    },
+    {
+      "sample_id": "s364",
+      "start": 86091,
+      "end": 86093,
+      "surface": "爵兴",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 26,
+      "gold_id": "g004",
+      "note": "前文斥骂凌贵兴叩头并讥讽官兵不给公事便拿人、遭千总苏安掌掴，后文回眼看见杨福手中令箭而暗叫“今番要死了”，表明此处指区爵兴。"
+    },
+    {
+      "sample_id": "s365",
+      "start": 86966,
+      "end": 86969,
+      "surface": "孔制台",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 26,
+      "gold_id": "g022",
+      "note": "前文两司府县上辕时问起梁、凌一案并听刘太守称系挟嫌诬告，后文“点了点头，也不多说。等众官退去，孔制台便开堂亲自审讯”，表明此处指两广总督孔大鹏。"
+    },
+    {
+      "sample_id": "s366",
+      "start": 86985,
+      "end": 86988,
+      "surface": "孔制台",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 26,
+      "gold_id": "g022",
+      "note": "前文打发上辕众官退去，后文亲自开堂审讯、释放戏子并重打登屋拒捕的林大有三百大板，表明此处指两广总督孔大鹏。"
+    },
+    {
+      "sample_id": "s367",
+      "start": 87522,
+      "end": 87525,
+      "surface": "孔制台",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 26,
+      "gold_id": "g022",
+      "note": "前文夜间在花厅单提喜来审问、许诺出脱其罪，后文逼问喜来“情愿杀头，还是情愿活著”令其如实供出全案，表明此处指孔大鹏。"
+    },
+    {
+      "sample_id": "s368",
+      "start": 87619,
+      "end": 87622,
+      "surface": "马半仙",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 26,
+      "gold_id": "g033",
+      "note": "前文喜来向孔制台叩头实供全案起因，后文“算命供起，中间如何看风水；如何要买天来的石室”表明此处指最初给凌贵兴算命批书的马半仙。"
+    },
+    {
+      "sample_id": "s369",
+      "start": 87642,
+      "end": 87644,
+      "surface": "石室",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 26,
+      "gold_id": "g040",
+      "note": "前文喜来供述凌贵兴看风水后“如何要买天来的”，后文“如何宗孔来献计，画白虎，拆后墙……攻打石室不入”表明此处指梁家石室。"
+    },
+    {
+      "sample_id": "s370",
+      "start": 87715,
+      "end": 87717,
+      "surface": "叶盛",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 26,
+      "gold_id": "g015",
+      "note": "前文喜来供述凌宗孔、区爵兴“如何差遣简当、”，后文“简、叶两个，一去无踪”表明此处指与简当一同受遣的打手头目叶盛。"
+    },
+    {
+      "sample_id": "s371",
+      "start": 87790,
+      "end": 87792,
+      "surface": "石室",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 26,
+      "gold_id": "g040",
+      "note": "前文喜来供述当夜行劫经过及“区爵兴如何调度、攻打”，后文“不入，如何放火，搅烟入室”表明此处指梁天来家避祸的梁家石室。"
+    },
+    {
+      "sample_id": "s372",
+      "start": 87890,
+      "end": 87893,
+      "surface": "简勒先",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 26,
+      "gold_id": "g007",
+      "note": "前文喜来供述送番禺县一千两金子行贿经过，后文“经手，那里还有一个甚么舅老爷”表明此处指居中联系殷成行贿番禺县的简勒先。"
+    },
+    {
+      "sample_id": "s373",
+      "start": 88413,
+      "end": 88416,
+      "surface": "番禺县",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 26,
+      "gold_id": "g017",
+      "note": "前文孔制台挡驾众官“只请臬台、首府、”，后文“到签押房相见。这三个人……内中惟有黄知县格外提心吊胆”表明此处以官职“番禺县”指代番禺知县黄知县。"
+    },
+    {
+      "sample_id": "s374",
+      "start": 88535,
+      "end": 88538,
+      "surface": "黄知县",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 26,
+      "gold_id": "g017",
+      "note": "前文孔制台单请经手梁、凌一案的臬台、首府、番禺县三人到签押房，后文“格外提心吊胆……硬著头皮，跟了进去”表明此处指番禺黄知县。"
+    },
+    {
+      "sample_id": "s375",
+      "start": 88626,
+      "end": 88629,
+      "surface": "黄知县",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 27,
+      "gold_id": "g017",
+      "note": "前文承接上回被孔制台传见，后文“跟了焦按察、刘太守，进了签押房”并被孔制台讯问“贵县审过几堂”，表明此处指番禺黄知县。"
+    },
+    {
+      "sample_id": "s376",
+      "start": 88631,
+      "end": 88634,
+      "surface": "焦按察",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 27,
+      "gold_id": "g021",
+      "note": "前文孔制台单请臬台、首府、番禺县三人，“却说黄知县跟了”，后文“、刘太守，进了签押房，见了孔制台”表明此处指广东按察使焦按察。"
+    },
+    {
+      "sample_id": "s377",
+      "start": 88647,
+      "end": 88650,
+      "surface": "孔制台",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 27,
+      "gold_id": "g022",
+      "note": "前文黄知县、焦按察、刘太守三人进督署签押房参见，后文询问黄知县与刘太守如何审理梁、凌一案，表明此处指两广总督孔大鹏。"
+    },
+    {
+      "sample_id": "s378",
+      "start": 88662,
+      "end": 88665,
+      "surface": "孔制台",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 27,
+      "gold_id": "g022",
+      "note": "前文在督署签押房与焦按察、刘太守、黄知县分宾主坐下，后文质问黄知县“梁、凌那一案，贵县审过几堂”，表明此处指两广总督孔大鹏。"
+    },
+    {
+      "sample_id": "s379",
+      "start": 88880,
+      "end": 88883,
+      "surface": "焦按察",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 27,
+      "gold_id": "g021",
+      "note": "前文刘太守向孔制台辩称见证人张凤只是流丐不能凭信，后文附和斥责张凤“专门唆揽讼事，最是可恶”，表明此处指曾将张凤夹死的焦按察。"
+    },
+    {
+      "sample_id": "s380",
+      "start": 89076,
+      "end": 89078,
+      "surface": "喜来",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 27,
+      "gold_id": "g014",
+      "note": "前文孔制台传带喜来当着三官之面重述昨夜口供，后文见座上三官左张右望不敢开口、经孔制台鼓励后从头至尾复述一遍，表明此处指凌家小厮喜来。"
+    },
+    {
+      "sample_id": "s381",
+      "start": 89181,
+      "end": 89184,
+      "surface": "黄知县",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 27,
+      "gold_id": "g017",
+      "note": "前文喜来当着焦按察、刘太守与番禺知县复述口供，后文“听到喜来说送一千金子的活，犹如青天起个霹雳一般”并出位请参，表明此处指收受一千两金子的番禺黄知县。"
+    },
+    {
+      "sample_id": "s382",
+      "start": 89244,
+      "end": 89247,
+      "surface": "孔制台",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 27,
+      "gold_id": "g022",
+      "note": "前文让喜来当面复述口供毕，后文命人带下喜来并质问焦按察、刘太守、黄知县三人此案该如何办，表明此处指两广总督孔大鹏。"
+    },
+    {
+      "sample_id": "s383",
+      "start": 89322,
+      "end": 89325,
+      "surface": "黄知县",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 27,
+      "gold_id": "g017",
+      "note": "前文听喜来供出送番禺县一千两黄金后孔制台质问三官，后文“更出位请参，孔制台道：‘贵县放心！’”表明此处指番禺黄知县。"
+    },
+    {
+      "sample_id": "s384",
+      "start": 89331,
+      "end": 89334,
+      "surface": "孔制台",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 27,
+      "gold_id": "g022",
+      "note": "前文黄知县惊惧出位请参，后文直言结案出奏时必定逐条叙出、连萧中丞也不回护，表明此处指两广总督孔大鹏。"
+    },
+    {
+      "sample_id": "s385",
+      "start": 89435,
+      "end": 89438,
+      "surface": "孔制台",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 27,
+      "gold_id": "g022",
+      "note": "前文在督署签押房举茶送走焦、刘、黄三官，后文下札委派候补道赴发审局会审此案并将人犯押送审局，表明此处指两广总督孔大鹏。"
+    },
+    {
+      "sample_id": "s386",
+      "start": 89644,
+      "end": 89646,
+      "surface": "李丰",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 27,
+      "gold_id": "g013",
+      "note": "前文凌贵兴侍妾杨氏到省城求见并许诺用钱由“李老爷做主”，后文去找发审员与孔制台妻舅高全关说行贿，表明此处指李丰。"
+    },
+    {
+      "sample_id": "s387",
+      "start": 89688,
+      "end": 89691,
+      "surface": "孔制台",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 27,
+      "gold_id": "g022",
+      "note": "前文发审局委员被李丰关说吓得吐舌，后文“的面嘱，说：‘此案自始至终，都是贿成……倘查出了，要严参的！’”表明此处指严嘱发审员的两广总督孔大鹏。"
+    },
+    {
+      "sample_id": "s388",
+      "start": 89749,
+      "end": 89752,
+      "surface": "孔制台",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 27,
+      "gold_id": "g022",
+      "note": "前文发审员受过孔制台严禁受贿的面嘱，后文“又亲自问过了喜来的口供，存了底子的”表明此处指亲自夜审喜来录存口供底子的孔大鹏。"
+    },
+    {
+      "sample_id": "s389",
+      "start": 90103,
+      "end": 90105,
+      "surface": "高全",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 27,
+      "gold_id": "x027",
+      "note": "前文李丰向孔制台的妻舅高全跪求并唤“高兄”，后文扶起李丰答应去向孔制台试探说情，表明此处指孔大鹏妻舅高全。"
+    },
+    {
+      "sample_id": "s390",
+      "start": 90408,
+      "end": 90411,
+      "surface": "孔制台",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 27,
+      "gold_id": "g022",
+      "note": "前文接朝廷上谕因山东黄河决口，后文“即刻驰驿前去督工修理，所有两广总督印信，著交与萧抚院署理”表明此处指奉旨赴山东督修河工的两广总督孔大鹏。"
+    },
+    {
+      "sample_id": "s391",
+      "start": 90434,
+      "end": 90437,
+      "surface": "萧抚院",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "title_or_official"
+      ],
+      "chapter_index": 27,
+      "gold_id": "x028",
+      "note": "前文上谕命孔制台赴山东督修河工、“所有两广总督印信，著交与”，后文“署理……请萧中丞来接了印”表明此处指广东巡抚萧抚院（萧中丞）。"
+    },
+    {
+      "sample_id": "s392",
+      "start": 90747,
+      "end": 90749,
+      "surface": "张凤",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 27,
+      "gold_id": "g006",
+      "note": "前文凌宗孔在肇庆府监向简勒先哭诉受夹棍之苦“夹得几乎跟了”，后文“去，此刻脚上还痛呢”意指差点像此前被夹死的证人张凤一样丧命，表明此处指张凤。"
+    },
+    {
+      "sample_id": "s393",
+      "start": 90783,
+      "end": 90786,
+      "surface": "老表台",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster"
+      ],
+      "chapter_index": 27,
+      "gold_id": "g003",
+      "note": "前文凌宗孔在监中大呼小叫求简勒先救命，后文区爵兴喝令“你禁声”且“宗孔道：‘你不要和我说’”反唇相讥，表明此处区爵兴所称“老表台”指凌宗孔。"
+    },
+    {
+      "sample_id": "s394",
+      "start": 91573,
+      "end": 91576,
+      "surface": "连太守",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "title_or_official"
+      ],
+      "chapter_index": 27,
+      "gold_id": "x009",
+      "note": "前文介绍肇庆府幕友徐凤跟随“这一位连太守，到肇庆府任”，后文徐凤转求本官将亲戚杜勤荐到盐厂，表明此处指肇庆府知府连太守。"
+    },
+    {
+      "sample_id": "s395",
+      "start": 91998,
+      "end": 92000,
+      "surface": "勒先",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 28,
+      "gold_id": "g007",
+      "note": "前文简勒先到肇庆府监向凌贵兴报信说妥翻案关节，后文凌贵兴命其即刻乘快船回谭村取十二万两银子，表明此处指简勒先。"
+    },
+    {
+      "sample_id": "s396",
+      "start": 92130,
+      "end": 92132,
+      "surface": "杨氏",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short",
+        "x_shi"
+      ],
+      "chapter_index": 28,
+      "gold_id": "x010",
+      "note": "前文简勒先连夜赶回谭村凌家敲开门，后文“、潘氏说明了来意。二妾大喜，即将平日的窖藏，取了十二万出来”表明此处指凌贵兴侍妾杨氏。"
+    },
+    {
+      "sample_id": "s397",
+      "start": 92302,
+      "end": 92305,
+      "surface": "番禺县",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 28,
+      "gold_id": "g035",
+      "note": "前文肇庆知府连太守收受十万两白银后“即刻派差，赍了公事，到”，后文“去，叫他派差协传天来到肇庆去听审”表明此处指原告梁天来原籍管辖的番禺县。"
+    },
+    {
+      "sample_id": "s398",
+      "start": 92453,
+      "end": 92455,
+      "surface": "凌氏",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 28,
+      "gold_id": "g027",
+      "note": "前文梁天来从肇庆脱身回家“与母亲说知，彼此一场痛哭”，后文劝儿子休了告状报仇念头，表明此处指梁天来之母梁母凌氏。"
+    },
+    {
+      "sample_id": "s399",
+      "start": 92566,
+      "end": 92568,
+      "surface": "君来",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 28,
+      "gold_id": "g008",
+      "note": "前文梁天来回省城后暂放报仇之心，“只代兄弟”，后文“续娶了一房妻子，侍奉凌氏”表明此处指梁天来之弟梁君来。"
+    },
+    {
+      "sample_id": "s400",
+      "start": 92578,
+      "end": 92580,
+      "surface": "凌氏",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 28,
+      "gold_id": "g027",
+      "note": "前文梁天来代弟弟梁君来续娶妻子以便在家“侍奉”，结合上文“与母亲说知……凌氏道”表明此处指梁母凌氏。"
+    },
+    {
+      "sample_id": "s401",
+      "start": 92939,
+      "end": 92941,
+      "surface": "天来",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 28,
+      "gold_id": "g001",
+      "note": "前文凌贵兴在双门底拦住梁天来羞辱并举泥金折扇向其头上乱打，后文“竭力挣脱”表明此处指梁天来。"
+    },
+    {
+      "sample_id": "s402",
+      "start": 93228,
+      "end": 93231,
+      "surface": "孔大鹏",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 28,
+      "gold_id": "g022",
+      "note": "前文凌宗孔不以为然地反驳区爵兴，后文“那厮又走了，新任的两广总督杨大人”表明此处指奉旨调离广东的前任两广总督孔大鹏。"
+    },
+    {
+      "sample_id": "s403",
+      "start": 93840,
+      "end": 93842,
+      "surface": "喜来",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 28,
+      "gold_id": "g014",
+      "note": "前文凌贵兴交代喜来在外查察梁天来踪迹，后文过了一个多月回来禀报“天来病重，大约不久就死，大爷可请放心了”，表明此处指小厮喜来。"
+    },
+    {
+      "sample_id": "s404",
+      "start": 93995,
+      "end": 93997,
+      "surface": "养福",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 28,
+      "gold_id": "g030",
+      "note": "前文喜来在梁天来的天和糖行门首窥探程万里进去看病，后文“那程万里走了，却是……送出来的”表明此处指在行中照料父亲的梁天来之子梁养福。"
+    },
+    {
+      "sample_id": "s405",
+      "start": 94299,
+      "end": 94301,
+      "surface": "谭村",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 28,
+      "gold_id": "g039",
+      "note": "前文凌贵兴听说梁天来重病后提议离开省城回家享乐，后文“说罢，便约了爵兴，一同雇了船，回谭村去”表明此处指凌贵兴老家谭村。"
+    },
+    {
+      "sample_id": "s406",
+      "start": 94511,
+      "end": 94514,
+      "surface": "侄老爷",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster",
+        "title_or_official"
+      ],
+      "chapter_index": 28,
+      "gold_id": "g002",
+      "note": "前文凌宗孔听说凌贵兴回到谭村连忙登门探望并大呼小叫，后文解释凌宗孔因得凌贵兴三千两银子与房田而对其狐媚巴结，表明此处凌宗孔所叫“侄老爷”指其族侄凌贵兴。"
+    },
+    {
+      "sample_id": "s407",
+      "start": 94576,
+      "end": 94578,
+      "surface": "宗孔",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 28,
+      "gold_id": "g003",
+      "note": "前文凌贵兴翻案后重赏受刑党羽，后文“便得了三千银子，贵兴又格外指给他一所房子，几亩田地，因此宗孔平白地便变了个素封之家”表明此处指凌宗孔。"
+    },
+    {
+      "sample_id": "s408",
+      "start": 95058,
+      "end": 95060,
+      "surface": "贵兴",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 28,
+      "gold_id": "g002",
+      "note": "前文凌宗孔替侄儿将一班党羽约到谭村裕耕堂，后文作为东道主以肥鱼大肉、山珍海错设筵庆贺，表明此处指凌贵兴。"
+    },
+    {
+      "sample_id": "s409",
+      "start": 95331,
+      "end": 95333,
+      "surface": "勒先",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 29,
+      "gold_id": "g007",
+      "note": "前文“连忙看时，却是简勒先。贵兴忙问：‘是甚么祸事？’”，后文叙述自己从肇庆乘船经佛山时隔船听到梁天来主仆进京的对话，表明此处指简勒先。"
+    },
+    {
+      "sample_id": "s410",
+      "start": 95521,
+      "end": 95522,
+      "surface": "船",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 29,
+      "gold_id": "not_entity",
+      "note": "前文“船到佛山，忽然对面来了一只船，我看见”，后文“上一个人，很象祈富”表明此处“船”指水上交通工具，非人物或地点实体。"
+    },
+    {
+      "sample_id": "s411",
+      "start": 95953,
+      "end": 95958,
+      "surface": "足智多谋的",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster"
+      ],
+      "chapter_index": 29,
+      "gold_id": "not_entity",
+      "note": "前文区爵兴抱怨凌宗孔“开口‘赛诸葛’，闭口‘”，后文“’，叫我听得难受”表明此处“足智多谋的”是引述凌宗孔讥讽他的形容词短语，非实体名称。"
+    },
+    {
+      "sample_id": "s412",
+      "start": 95968,
+      "end": 95970,
+      "surface": "宗孔",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 29,
+      "gold_id": "g003",
+      "note": "前文区爵兴抱怨“宗孔表台”拿“赛诸葛”等话讥刺自己，后文冷哼反问“恭维你还不好么”，表明此处指凌宗孔。"
+    },
+    {
+      "sample_id": "s413",
+      "start": 96674,
+      "end": 96676,
+      "surface": "爵兴",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 29,
+      "gold_id": "g004",
+      "note": "前文众强徒散席安歇后凌贵兴前来计议拦截梁天来之策，后文部署众人次日赴省城并留熊阿七与凌宗孔在谭村打探，表明此处指区爵兴。"
+    },
+    {
+      "sample_id": "s414",
+      "start": 96708,
+      "end": 96710,
+      "surface": "省城",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 29,
+      "gold_id": "g038",
+      "note": "前文区爵兴部署众人离开谭村，“明日一早，大家陆续起身，都到”，后文“都约定在三德号取齐……叫船到省城去”表明此处指广州省城。"
+    },
+    {
+      "sample_id": "s415",
+      "start": 96744,
+      "end": 96746,
+      "surface": "阿七",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 29,
+      "gold_id": "g024",
+      "note": "前文区爵兴提议留两人在谭村、“一个是熊”，后文“一个便是令叔宗孔……阿七是有用的”表明此处指会飞檐走壁的盗伙熊阿七。"
+    },
+    {
+      "sample_id": "s416",
+      "start": 96797,
+      "end": 96799,
+      "surface": "阿七",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 29,
+      "gold_id": "g024",
+      "note": "前文区爵兴解释留下熊阿七有用，后文说明留凌宗孔只是为了在家陪着这位外人以免家中只有女眷不便，表明此处指盗伙熊阿七。"
+    },
+    {
+      "sample_id": "s417",
+      "start": 96890,
+      "end": 96892,
+      "surface": "阿七",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 29,
+      "gold_id": "g024",
+      "note": "前文次日打发众人赴省城，“单只留下宗孔、”，后文区爵兴拉其到一旁附耳叮嘱暗探梁家，表明此处指熊阿七。"
+    },
+    {
+      "sample_id": "s418",
+      "start": 96896,
+      "end": 96898,
+      "surface": "阿七",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 29,
+      "gold_id": "g024",
+      "note": "前文留下凌宗孔与熊阿七在谭村，后文区爵兴拉其到一旁附耳密嘱夜间去梁家屋顶探听梁天来是否当真进京，表明此处指熊阿七。"
+    },
+    {
+      "sample_id": "s419",
+      "start": 96956,
+      "end": 96958,
+      "surface": "阿七",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 29,
+      "gold_id": "g024",
+      "note": "前文区爵兴拉阿七到一旁附耳叮嘱探听实信后赴省城禀报，后文“点头答应了”表明此处指熊阿七。"
+    },
+    {
+      "sample_id": "s420",
+      "start": 97016,
+      "end": 97018,
+      "surface": "南雄",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 29,
+      "gold_id": "g041",
+      "note": "前文区爵兴在省城三德号调拨众强徒拦截进京的梁天来，“此时要首先派人到”，后文派李阿添、甘阿定及越文等四人前往，表明此处指北上必经关隘南雄。"
+    },
+    {
+      "sample_id": "s421",
+      "start": 97264,
+      "end": 97266,
+      "surface": "喜来",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 29,
+      "gold_id": "g014",
+      "note": "前文区爵兴指定“这个差使却要喜来走一趟”并让账房打出三万两南雄汇单，后文交付书信与汇票命其赴南雄千总衙门投递，表明此处指凌家小厮喜来。"
+    },
+    {
+      "sample_id": "s422",
+      "start": 97278,
+      "end": 97280,
+      "surface": "南雄",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 29,
+      "gold_id": "g041",
+      "note": "前文打出“三万银子南雄的汇单”，后文“到千总衙门去投递。南雄千总刘昇，与我有八拜之交”表明此处指广东南雄。"
+    },
+    {
+      "sample_id": "s423",
+      "start": 97327,
+      "end": 97329,
+      "surface": "南雄",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 29,
+      "gold_id": "g041",
+      "note": "前文区爵兴叮嘱喜来携带三万两南雄汇票与书信赴南雄千总衙门，后文“先取一万，送与刘千总，馀下二万，就存在银号里”表明此处指广东南雄。"
+    },
+    {
+      "sample_id": "s424",
+      "start": 97582,
+      "end": 97584,
+      "surface": "喜来",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 29,
+      "gold_id": "g014",
+      "note": "前文凌贵兴叮嘱“你伺候我多年，知道你能办事，所以派了你去”，后文诺诺连声并随众人出北门踏上赴南雄之路，表明此处指小厮喜来。"
+    },
+    {
+      "sample_id": "s425",
+      "start": 97922,
+      "end": 97925,
+      "surface": "林大有",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 29,
+      "gold_id": "g005",
+      "note": "前文周赞先、黎阿二请缨同去助“林大哥”截击和平岭一路，后文夸口“包管你手到擒来”并率众领盘缠往和平岭去，表明此处指林大有。"
+    },
+    {
+      "sample_id": "s426",
+      "start": 98066,
+      "end": 98068,
+      "surface": "天来",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 29,
+      "gold_id": "g001",
+      "note": "前文区爵兴派简勒先去韶州太平关前水上看守北上验关船只，后文“你就先赶到南雄，到关上报知李阿添等，好留心下手”表明此处指被截击的目标梁天来。"
+    },
+    {
+      "sample_id": "s427",
+      "start": 98074,
+      "end": 98076,
+      "surface": "南雄",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 29,
+      "gold_id": "g041",
+      "note": "前文区爵兴嘱咐简勒先在韶州太平关水上看守，一旦发现梁天来便先行赶往，后文“到关上报知李阿添等，好留心下手”表明此处指李阿添等人驻守的南雄。"
+    },
+    {
+      "sample_id": "s428",
+      "start": 98134,
+      "end": 98136,
+      "surface": "爵兴",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 29,
+      "gold_id": "g004",
+      "note": "前文凌贵兴见各路人马调拨停当后发问，后文详解托南雄刘千总在关上栽赃梁天来私带军火的毒计，表明此处指区爵兴。"
+    },
+    {
+      "sample_id": "s429",
+      "start": 98252,
+      "end": 98254,
+      "surface": "爵兴",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 29,
+      "gold_id": "g004",
+      "note": "前文凌贵兴疑问梁天来未带军火如何诬陷，后文唤凌贵兴“贤侄”并说明让刘千总预备火药火枪栽赃，表明此处指凌贵兴表叔区爵兴。"
+    },
+    {
+      "sample_id": "s430",
+      "start": 98426,
+      "end": 98428,
+      "surface": "勒先",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 29,
+      "gold_id": "g007",
+      "note": "前文区爵兴推算梁天来北上水路行程，后文“在佛山遇见他……这不过是简勒先一面之辞”表明此处指此前在佛山隔船听见梁天来主仆说话的简勒先。"
+    },
+    {
+      "sample_id": "s431",
+      "start": 98819,
+      "end": 98821,
+      "surface": "君来",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 30,
+      "gold_id": "g008",
+      "note": "前文熊阿七述说夜间潜伏谭村梁家房顶探听，后文“回家去，等他母亲烧过香，方才回房……只听见君来说得一句道：‘这全亏了姓蔡的，不是他赠了盘缠，哥哥怎么去得成呢？’”表明此处指梁天来之弟梁君来。"
+    },
+    {
+      "sample_id": "s432",
+      "start": 100318,
+      "end": 100320,
+      "surface": "天来",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 30,
+      "gold_id": "g001",
+      "note": "前文凌宗孔听信程万里说梁天来病入膏肓，后文区爵兴指出“程万里和……是莫逆之交”故意放风掩护其进京，表明此处指梁天来。"
+    },
+    {
+      "sample_id": "s433",
+      "start": 101264,
+      "end": 101266,
+      "surface": "南雄",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 30,
+      "gold_id": "g041",
+      "note": "前文尤阿美报信喜来失踪后区爵兴决定“亲自赶到南雄打听”，后文“如果已经过去了，我就在……转汇到京城”表明此处指广东南雄。"
+    },
+    {
+      "sample_id": "s434",
+      "start": 101274,
+      "end": 101277,
+      "surface": "陈大人",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 30,
+      "gold_id": "g026",
+      "note": "前文区爵兴计划若梁天来已过南雄便将银两转汇京城去寻，后文“好打听他告得准告不准”对应凌贵兴早年结识的京官陈大人。"
+    },
+    {
+      "sample_id": "s435",
+      "start": 101586,
+      "end": 101588,
+      "surface": "南雄",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 30,
+      "gold_id": "g041",
+      "note": "前文区爵兴带尤阿美、熊阿七兼程赶路六天，后文“就投到朱怡和店里住下……好顺便打听喜来的踪迹”表明此处指广东南雄。"
+    },
+    {
+      "sample_id": "s436",
+      "start": 101861,
+      "end": 101863,
+      "surface": "爵兴",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 30,
+      "gold_id": "g004",
+      "note": "前文在南雄朱怡和店中秋酒席上向店主朱怡甫打听喜来下落，后文追问喜来去向并被同席苏沛之称呼“区兄”，表明此处指区爵兴。"
+    },
+    {
+      "sample_id": "s437",
+      "start": 102298,
+      "end": 102300,
+      "surface": "沛之",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 31,
+      "gold_id": "g011",
+      "note": "前文区爵兴询问“沛之兄善于风鉴么”，后文自称“弟自幼就学就了星命堪舆”准备赴广东行道，表明此处指苏沛之。"
+    },
+    {
+      "sample_id": "s438",
+      "start": 103026,
+      "end": 103028,
+      "surface": "爵兴",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 31,
+      "gold_id": "g004",
+      "note": "前文向苏沛之谈及舍亲讼事，后文请苏沛之直说风鉴吉凶并听信“百日之内，恐怕不免有牢狱之灾”之言，表明此处指区爵兴。"
+    },
+    {
+      "sample_id": "s439",
+      "start": 103508,
+      "end": 103511,
+      "surface": "李阿添",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster"
+      ],
+      "chapter_index": 31,
+      "gold_id": "x005",
+      "note": "前文区爵兴在南雄到黄元合行栈寻着先行派驻南雄守候的党羽，后文嘱咐他们回省城向凌大爷复命而自己赴湖南暂避，表明此处指盗伙李阿添。"
+    },
+    {
+      "sample_id": "s440",
+      "start": 103762,
+      "end": 103764,
+      "surface": "沛之",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 31,
+      "gold_id": "g011",
+      "note": "前文区爵兴查知三万两银子已被喜来取走后回到朱怡和店寓所，后文询问尤阿美、熊阿七姓名并劝区爵兴带二人同去湖南长沙，表明此处指苏沛之。"
+    },
+    {
+      "sample_id": "s441",
+      "start": 103835,
+      "end": 103837,
+      "surface": "爵兴",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 31,
+      "gold_id": "g004",
+      "note": "前文向苏沛之请教能否带尤阿美、熊阿七同往，后文大喜收拾行李带着苏沛之的信同往湖南长沙避祸，表明此处指区爵兴。"
+    },
+    {
+      "sample_id": "s442",
+      "start": 104192,
+      "end": 104197,
+      "surface": "凌贵兴这厮",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster"
+      ],
+      "chapter_index": 31,
+      "gold_id": "g002",
+      "note": "前文蔡显洪叮嘱梁天来进京御告不可变卖产业，后文“耳目众多，一经变产，他必定知道。贤契同他又是至亲”表明此处“凌贵兴这厮”指梁天来的表弟兼仇家凌贵兴。"
+    },
+    {
+      "sample_id": "s443",
+      "start": 104739,
+      "end": 104741,
+      "surface": "祈富",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 31,
+      "gold_id": "x029",
+      "note": "前文梁天来装病瞒过凌贵兴耳目后“带了……悄悄起身，由水路进发”，后文“入夜时，祈富有事出外……主仆两个，默默相对”表明此处指随侍梁天来进京的家仆梁祈富。"
+    },
+    {
+      "sample_id": "s444",
+      "start": 104945,
+      "end": 104948,
+      "surface": "苏沛之",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 31,
+      "gold_id": "g011",
+      "note": "前文梁天来在南雄朱怡和店遇喜来投宿而在房中垂泪，“此时惊动了这一位专好管闲事的”，后文乘凉走过房门听见抽咽并叩门拜访，表明此处指苏沛之。"
+    },
+    {
+      "sample_id": "s445",
+      "start": 105866,
+      "end": 105868,
+      "surface": "喜来",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 32,
+      "gold_id": "g014",
+      "note": "前文梁天来告知苏沛之在店中遇见喜来，后文苏沛之询问“是凌贵兴的什么人呢”及梁天来答“是一个服侍的小厮”，表明此处指凌贵兴心腹小厮喜来。"
+    },
+    {
+      "sample_id": "s446",
+      "start": 105869,
+      "end": 105872,
+      "surface": "凌贵兴",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 32,
+      "gold_id": "g002",
+      "note": "前文梁天来述说仇家派喜来追赶拦截自己进京御控，后文苏沛之问喜来是其什么人、梁天来答系服侍的小厮，表明此处指主犯凌贵兴。"
+    },
+    {
+      "sample_id": "s447",
+      "start": 106160,
+      "end": 106162,
+      "surface": "喜来",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 32,
+      "gold_id": "g014",
+      "note": "前文苏沛之安顿好梁天来后到客堂查看面生寓客，后文靠在其身旁高谈算命相面引其上钩，表明此处指杂在寓客中的喜来。"
+    },
+    {
+      "sample_id": "s448",
+      "start": 106545,
+      "end": 106547,
+      "surface": "沛之",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 32,
+      "gold_id": "g011",
+      "note": "前文给喜来相面一口道破其奴仆出身，后文以“发财就在眼前”及“阴骘纹将现、恐有官刑”诱使喜来弃恶拐款，表明此处指苏沛之。"
+    },
+    {
+      "sample_id": "s449",
+      "start": 107183,
+      "end": 107186,
+      "surface": "苏沛之",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 32,
+      "gold_id": "g011",
+      "note": "前文喜来夜思决定拐走三万两银子放过梁天来，天明后去寻“那先生”，后文求其指教经商去路并获指点去江西南昌，表明此处指苏沛之。"
+    },
+    {
+      "sample_id": "s450",
+      "start": 107207,
+      "end": 107209,
+      "surface": "沛之",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 32,
+      "gold_id": "g011",
+      "note": "前文喜来假称出来经商去寻苏沛之，后文指点喜来“江西省城，便是个富庶之地，到那里去最好”，表明此处指苏沛之。"
+    },
+    {
+      "sample_id": "s451",
+      "start": 107281,
+      "end": 107283,
+      "surface": "沛之",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 32,
+      "gold_id": "g011",
+      "note": "前文喜来视苏沛之如神仙、听从其建议决定去南昌，后文辞别后去银号取出三万两银子转汇南昌，表明此处指苏沛之。"
+    },
+    {
+      "sample_id": "s452",
+      "start": 107750,
+      "end": 107752,
+      "surface": "天来",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 32,
+      "gold_id": "g001",
+      "note": "前文苏沛之登上朱怡和店小楼向“梁兄”告知已支走喜来与区爵兴并叮嘱过岭后走水路，后文“一一应命”并于次日收拾行李赴京，表明此处指梁天来。"
+    },
+    {
+      "sample_id": "s453",
+      "start": 108068,
+      "end": 108070,
+      "surface": "省城",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 32,
+      "gold_id": "g038",
+      "note": "前文苏沛之离开南雄朱怡和店南下，后文“寻个客栈住下，安顿好行李，就到三德号来访贵兴。谁知贵兴已回谭村去了”表明此处指三德号所在的广州省城。"
+    },
+    {
+      "sample_id": "s454",
+      "start": 108100,
+      "end": 108102,
+      "surface": "谭村",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 32,
+      "gold_id": "g039",
+      "note": "前文苏沛之到省城三德号访凌贵兴不遇，后文“沛之雇了船，到谭村去访他。恰好贵兴在家”表明此处指凌贵兴老家谭村。"
+    },
+    {
+      "sample_id": "s455",
+      "start": 108512,
+      "end": 108514,
+      "surface": "沛之",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 32,
+      "gold_id": "g011",
+      "note": "前文持区爵兴书信到谭村拜见凌贵兴，后文受凌贵兴之请遍看众强徒相貌并夸奖林大有为一时豪杰，表明此处指苏沛之。"
+    },
+    {
+      "sample_id": "s456",
+      "start": 108900,
+      "end": 108903,
+      "surface": "林大有",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 33,
+      "gold_id": "g005",
+      "note": "前文第三十三回回目及闯入书房向凌贵兴献妙计，后文提议派人先到江西境上迎候钦差打点、不成则乘海船逃往澳门或新加坡，表明此处指林大有。"
+    },
+    {
+      "sample_id": "s457",
+      "start": 108990,
+      "end": 108992,
+      "surface": "江西",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 33,
+      "gold_id": "g044",
+      "note": "前文林大有献计在钦差抵粤前先行拦截打点，后文“境上去等著，等钦差过境时，就在那里打点”表明此处指入粤必经的江西。"
+    },
+    {
+      "sample_id": "s458",
+      "start": 109096,
+      "end": 109098,
+      "surface": "沛之",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 33,
+      "gold_id": "g011",
+      "note": "前文林大有献计去江西打点钦差或乘海船远逃，后文拍手称妙并顺势在晚宴上查阅凌贵兴历次行贿案卷套取实情，表明此处指苏沛之。"
+    },
+    {
+      "sample_id": "s459",
+      "start": 109202,
+      "end": 109204,
+      "surface": "沛之",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 33,
+      "gold_id": "g011",
+      "note": "前文凌贵兴与林大有踌躇派谁去江西，后文与凌贵兴谈天论命相并为讼事卜吉凶，表明此处指苏沛之。"
+    },
+    {
+      "sample_id": "s460",
+      "start": 109384,
+      "end": 109386,
+      "surface": "李丰",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 33,
+      "gold_id": "g013",
+      "note": "前文苏沛之查阅萧抚院案卷时提及过付人李丰，后文凌贵兴猛然想起去江西打点钦差非此人不可并次日到省城请其前来，表明此处指李丰。"
+    },
+    {
+      "sample_id": "s461",
+      "start": 109460,
+      "end": 109462,
+      "surface": "沛之",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 33,
+      "gold_id": "g011",
+      "note": "前文凌贵兴留其在谭村歇宿约定次日同赴省城，后文与凌贵兴乘船到省城三德号并被介绍与李丰相见，表明此处指苏沛之。"
+    },
+    {
+      "sample_id": "s462",
+      "start": 109505,
+      "end": 109507,
+      "surface": "沛之",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 33,
+      "gold_id": "g011",
+      "note": "前文凌贵兴到三德号请来李丰，后文“相见，彼此通过姓名，贵兴便叫置酒相待。因笑著说道：‘我今日一来与苏兄接风’”表明此处指苏沛之。"
+    },
+    {
+      "sample_id": "s463",
+      "start": 109742,
+      "end": 109744,
+      "surface": "贵兴",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 33,
+      "gold_id": "g002",
+      "note": "前文告知李丰“梁天来进京御控去了”，后文请李丰走一趟江西迎候钦差打点并说起喜来拐银逃走之事，表明此处指凌贵兴。"
+    },
+    {
+      "sample_id": "s464",
+      "start": 110055,
+      "end": 110058,
+      "surface": "区舍亲",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster"
+      ],
+      "chapter_index": 33,
+      "gold_id": "g004",
+      "note": "前文凌贵兴向李丰述说喜来拐银后“我又托”，后文“带了银子，到京里去打点……走到南雄，遇了这位苏兄……避到湖南去了”表明此处“区舍亲”指区爵兴。"
+    },
+    {
+      "sample_id": "s465",
+      "start": 111262,
+      "end": 111264,
+      "surface": "沛之",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 33,
+      "gold_id": "g011",
+      "note": "前文在酒席上谈星命把凌贵兴恭维得手舞足蹈，后文凌贵兴约定日子请其去看风水、李丰也缠着要看相，表明此处指苏沛之。"
+    },
+    {
+      "sample_id": "s466",
+      "start": 111298,
+      "end": 111300,
+      "surface": "江西",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 33,
+      "gold_id": "g044",
+      "note": "前文凌贵兴请李丰赴江西迎候钦差行贿，后文苏沛之询问“打算如何打点”及凌贵兴问哪家银号通汇兑，表明此处指江西。"
+    },
+    {
+      "sample_id": "s467",
+      "start": 111463,
+      "end": 111465,
+      "surface": "江西",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 33,
+      "gold_id": "g044",
+      "note": "前文李丰提议行贿钦差只需打银票不必带现银，后文凌贵兴问“但不知哪一家银号通……的汇兑”，表明此处指李丰将前往的江西。"
+    },
+    {
+      "sample_id": "s468",
+      "start": 111673,
+      "end": 111675,
+      "surface": "江西",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 33,
+      "gold_id": "g044",
+      "note": "前文苏沛之催促李丰尽早动身莫等折差回信，后文恭维李丰交入印堂运“这番到……去，不定还有意外的喜事”，表明此处指江西。"
+    },
+    {
+      "sample_id": "s469",
+      "start": 111872,
+      "end": 111875,
+      "surface": "林大有",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 33,
+      "gold_id": "g005",
+      "note": "前文凌贵兴送走苏沛之后与李丰商量打银票数目，后文告知李丰预先雇海船出海逃跑之计并请该人来商议雇船，表明此处指献此计的林大有。"
+    },
+    {
+      "sample_id": "s470",
+      "start": 112532,
+      "end": 112535,
+      "surface": "林大有",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 34,
+      "gold_id": "g005",
+      "note": "前文凌贵兴派人去北门外林聚仙馆请林大有，后文聚仙馆伙计来报其从大爷处回去准备雇海船时被两个南海县差拿硬签提走，表明此处指林大有。"
+    },
+    {
+      "sample_id": "s471",
+      "start": 112881,
+      "end": 112883,
+      "surface": "宗孔",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 34,
+      "gold_id": "g003",
+      "note": "前文凌贵兴怀疑林大有被抓并非私贩烟土案，后文安慰凌贵兴“任凭他甚么案，总不是我们这一案，我敢保的”，表明此处指凌宗孔。"
+    },
+    {
+      "sample_id": "s472",
+      "start": 113635,
+      "end": 113637,
+      "surface": "阿二",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 34,
+      "gold_id": "x026",
+      "note": "前文凌贵兴派简勒先、黎阿二连夜打听林大有下落，三更时“简、黎两个气喘吁吁地回来了”，后文禀报臬台衙门昨晚派两名家人带走犯人之事，表明此处“阿二”指黎阿二。"
+    },
+    {
+      "sample_id": "s473",
+      "start": 114353,
+      "end": 114357,
+      "surface": "臬台衙门",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "title_or_official"
+      ],
+      "chapter_index": 34,
+      "gold_id": "x030",
+      "note": "前文黎阿二猜测原告告到臬台那里、简勒先次日一早独自前往，后文探知“阖署上下，除了臬台自家知道……听说一直提到内宅里去”，表明此处指广东按察司衙门（臬台衙门）。"
+    },
+    {
+      "sample_id": "s474",
+      "start": 114652,
+      "end": 114654,
+      "surface": "勒先",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 34,
+      "gold_id": "g007",
+      "note": "前文从臬台衙门打听林大有被提内宅的消息回来，后文对凌贵兴说“此刻要救他，也没有个下手的地方”，表明此处指简勒先。"
+    },
+    {
+      "sample_id": "s475",
+      "start": 114704,
+      "end": 114706,
+      "surface": "简当",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 34,
+      "gold_id": "g016",
+      "note": "前文简勒先与凌贵兴、凌宗孔议论林大有被抓之事，后文“、叶盛也到了。他二人同林大有最是相好”并述说新臬台开单访拿地棍十二人，表明此处指简当。"
+    },
+    {
+      "sample_id": "s476",
+      "start": 114738,
+      "end": 114740,
+      "surface": "简当",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 34,
+      "gold_id": "g016",
+      "note": "前文与叶盛一同来到三德号商量林大有之事，后文告知凌贵兴“我打听得是新臬台访拿地棍，开了一张名单，交给两县，内中头一名就是大有”，表明此处指简当。"
+    },
+    {
+      "sample_id": "s477",
+      "start": 114748,
+      "end": 114751,
+      "surface": "新臬台",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "title_or_official"
+      ],
+      "chapter_index": 34,
+      "gold_id": "g011",
+      "note": "前文简勒先称前天接印的新臬台姓陈、简当打听得其开单访拿地棍头一名即林大有，结合第三十六回（s516）揭晓陈臬台即在南雄、谭村改装私访的苏沛之，表明此处指苏沛之。"
+    },
+    {
+      "sample_id": "s478",
+      "start": 114898,
+      "end": 114900,
+      "surface": "贵兴",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 34,
+      "gold_id": "g002",
+      "note": "前文凌宗孔拍手称新臬台访拿地棍与自家无干，后文向简当、叶盛询问“你两个可有甚么法子，可以救得他出来呢”，表明此处指凌贵兴。"
+    },
+    {
+      "sample_id": "s479",
+      "start": 114923,
+      "end": 114925,
+      "surface": "叶盛",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 34,
+      "gold_id": "g015",
+      "note": "前文凌贵兴问简当、叶盛二人有何法子救林大有，后文回答“此刻只有先到监里打点打点，免了他受苦”，表明此处指叶盛。"
+    },
+    {
+      "sample_id": "s480",
+      "start": 114980,
+      "end": 114982,
+      "surface": "叶盛",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 34,
+      "gold_id": "g015",
+      "note": "前文简勒先告知林大有不在外监也不在内监，后文惊讶反问“不在监里在哪里？难道请他在花厅里坐坐么”，表明此处指叶盛。"
+    },
+    {
+      "sample_id": "s481",
+      "start": 115025,
+      "end": 115027,
+      "surface": "简当",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 34,
+      "gold_id": "g016",
+      "note": "前文简勒先说出林大有被关在臬署内宅，后文“、叶盛听了，又是一番疑虑”，表明此处指与叶盛同来的简当。"
+    },
+    {
+      "sample_id": "s482",
+      "start": 115028,
+      "end": 115030,
+      "surface": "叶盛",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 34,
+      "gold_id": "g015",
+      "note": "前文简勒先告知林大有被关在臬署内宅而非监牢，后文与简当听了又是一番疑虑，表明此处指叶盛。"
+    },
+    {
+      "sample_id": "s483",
+      "start": 115239,
+      "end": 115241,
+      "surface": "江西",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 34,
+      "gold_id": "g044",
+      "note": "前文李丰奉凌贵兴之托赴江西迎候钦差，过了两个多月到冬月中旬，后文“专差飞报的一封信”称“钦使已抵江西”，表明此处指江西。"
+    },
+    {
+      "sample_id": "s484",
+      "start": 115266,
+      "end": 115268,
+      "surface": "钦使",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 34,
+      "gold_id": "g022",
+      "note": "前文李丰从江西寄信给凌贵兴，后文“已抵江西，仍是前督孔公。幸副使为家叔”表明此处“钦使”指正使、前两广总督孔大鹏。"
+    },
+    {
+      "sample_id": "s485",
+      "start": 115277,
+      "end": 115279,
+      "surface": "孔公",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 34,
+      "gold_id": "g022",
+      "note": "前文李丰信中写“钦使已抵江西，仍是前督”，后文“幸副使为家叔”表明此处“孔公”指奉旨查办此案的前任两广总督孔大鹏。"
+    },
+    {
+      "sample_id": "s486",
+      "start": 115386,
+      "end": 115388,
+      "surface": "李丰",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 34,
+      "gold_id": "g013",
+      "note": "前文凌贵兴拆看李丰从江西寄来的信称“幸副使为家叔”，后文大喜称“难得钦差恰是……的令叔，这回差他去得著也”，表明此处指李丰。"
+    },
+    {
+      "sample_id": "s487",
+      "start": 115428,
+      "end": 115430,
+      "surface": "省城",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 34,
+      "gold_id": "g038",
+      "note": "前文凌贵兴接信后约众强徒到谭村商量口供，“因为”，后文“耳目众多，而且凌氏众人多在谭村，只得要移樽就教”表明此处指广州省城。"
+    },
+    {
+      "sample_id": "s488",
+      "start": 115443,
+      "end": 115445,
+      "surface": "谭村",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 34,
+      "gold_id": "g039",
+      "note": "前文凌贵兴约众强徒到谭村商量口供，因省城耳目众多“而且凌氏众人多在”，后文“当日齐集裕耕堂上”表明此处指凌氏聚居的谭村。"
+    },
+    {
+      "sample_id": "s489",
+      "start": 116033,
+      "end": 116035,
+      "surface": "简当",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 35,
+      "gold_id": "g016",
+      "note": "前文韶州总镇亲兵包围裕耕堂、水晶顶子武官按单点名拿人，后文与甘阿定、叶盛、凌越文等强徒一并被点名锁拿，表明此处指简当。"
+    },
+    {
+      "sample_id": "s490",
+      "start": 116036,
+      "end": 116038,
+      "surface": "叶盛",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 35,
+      "gold_id": "g015",
+      "note": "前文武官在裕耕堂按名单点名拿捕凌贵兴党羽，位于“简当、”与“、凌越文”之间，表明此处指打手头目叶盛。"
+    },
+    {
+      "sample_id": "s491",
+      "start": 116039,
+      "end": 116042,
+      "surface": "凌越文",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster"
+      ],
+      "chapter_index": 35,
+      "gold_id": "x002",
+      "note": "前文武官在裕耕堂按名单点名锁拿众犯，位于“叶盛、”与“、凌越武、凌越顺”之间，表明此处指凌家宗人党羽凌越文。"
+    },
+    {
+      "sample_id": "s492",
+      "start": 116099,
+      "end": 116102,
+      "surface": "简勒先",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 35,
+      "gold_id": "g007",
+      "note": "前文武官在裕耕堂按名单点名锁拿众犯，位于“黎阿二、”与“、蔡顺”之间，表明此处指替凌贵兴奔走衙门的简勒先。"
+    },
+    {
+      "sample_id": "s493",
+      "start": 116103,
+      "end": 116105,
+      "surface": "蔡顺",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 35,
+      "gold_id": "x031",
+      "note": "前文武官在裕耕堂按名单点名锁拿众犯，位于“黎阿二、简勒先、”之后且为名单末一名，表明此处指凌贵兴党羽蔡顺。"
+    },
+    {
+      "sample_id": "s494",
+      "start": 116177,
+      "end": 116180,
+      "surface": "梁天来",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 35,
+      "gold_id": "g001",
+      "note": "前文武官点名追问林大有、区爵兴、喜来下落，凌贵兴面无人色暗想“莫非是”，后文“那一案？然而李丰来信，明明说是钦差收了礼”表明此处指进京御控的原告梁天来。"
+    },
+    {
+      "sample_id": "s495",
+      "start": 116563,
+      "end": 116565,
+      "surface": "宗孔",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 35,
+      "gold_id": "g003",
+      "note": "前文众犯被押入臬司内监后凌贵兴如做梦一般问“叔父，我们到底为了甚事，来到这里”，后文答道“便是我正要问你呢，莫非我们在这里做梦么”，表明此处指凌宗孔。"
+    },
+    {
+      "sample_id": "s496",
+      "start": 117245,
+      "end": 117247,
+      "surface": "石室",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 35,
+      "gold_id": "g040",
+      "note": "前文孔大鹏向雍正帝奏述两广总督任内亲提讯实凌贵兴伙劫梁天来家、“攻打”，后文“不进，用火烟熏毙七尸八命”表明此处指梁家石室。"
+    },
+    {
+      "sample_id": "s497",
+      "start": 117852,
+      "end": 117854,
+      "surface": "李丰",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 35,
+      "gold_id": "g013",
+      "note": "前文两位钦差带梁天来出京抵达江西，“李丰已经在那里候久了。当钦差未到以前，”，后文打听得钦差是孔制台与自己叔父李时枚而不敢行贿、决定出首，表明此处指李丰。"
+    },
+    {
+      "sample_id": "s498",
+      "start": 118412,
+      "end": 118415,
+      "surface": "孔大鹏",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 35,
+      "gold_id": "g022",
+      "note": "前文李丰到钦差行辕求见、李时枚发怒，后文询问李时枚“令侄向在哪里”并想起喜来口供中萧抚院处过付赃银者姓李而劝请入见，表明此处指孔大鹏。"
+    },
+    {
+      "sample_id": "s499",
+      "start": 118535,
+      "end": 118537,
+      "surface": "李丰",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 35,
+      "gold_id": "g013",
+      "note": "前文孔大鹏请李时枚传见其侄，“不一会，”，后文“进来，见过时枚，又对大鹏行了礼”并跪下请罪自首，表明此处指李丰。"
+    },
+    {
+      "sample_id": "s500",
+      "start": 118673,
+      "end": 118675,
+      "surface": "李丰",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 35,
+      "gold_id": "g013",
+      "note": "前文向叔父李时枚跪述在广东结识凌贵兴而遭叔父冷嘲“结识得好人”，后文涨红了脸坦白代凌贵兴经手两件事及此次受托来迎候打点钦差，表明此处指李丰。"
+    },
+    {
+      "sample_id": "s501",
+      "start": 118943,
+      "end": 118945,
+      "surface": "叔父",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 35,
+      "gold_id": "x032",
+      "note": "前文李丰向李时枚与孔大鹏自首，“不料恰遇”，后文“得了此差，为此特来叩见自首，求孔大人及叔父恕罪！时枚冷笑道”表明此处“叔父”指李丰叔父、钦差刑部侍郎李时枚。"
+    },
+    {
+      "sample_id": "s502",
+      "start": 118960,
+      "end": 118963,
+      "surface": "孔大人",
+      "stratum": "hard",
+      "hard_features": [
+        "title_or_official"
+      ],
+      "chapter_index": 35,
+      "gold_id": "g022",
+      "note": "前文李丰在江西行辕向两位钦差叩见自首，后文“及叔父恕罪”与李时枚并称，表明此处“孔大人”指钦差孔大鹏。"
+    },
+    {
+      "sample_id": "s503",
+      "start": 118964,
+      "end": 118966,
+      "surface": "叔父",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 35,
+      "gold_id": "x032",
+      "note": "前文李丰叩见两位钦差自首，“求孔大人及”，后文“恕罪！时枚冷笑道：‘遇了我，你便自首’”表明此处“叔父”指刑部侍郎李时枚。"
+    },
+    {
+      "sample_id": "s504",
+      "start": 119018,
+      "end": 119020,
+      "surface": "贵兴",
+      "stratum": "hard",
+      "hard_features": [
+        "surname_only_or_short"
+      ],
+      "chapter_index": 35,
+      "gold_id": "g002",
+      "note": "前文孔大鹏听李丰说凌贵兴准备浮海远逃，“此时且漫究此事。凌”，后文“那厮，既然预备逃走，我们要先用滚单到广东，先提了人再说”表明此处指主犯凌贵兴。"
+    },
+    {
+      "sample_id": "s505",
+      "start": 119387,
+      "end": 119390,
+      "surface": "番禺县",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 36,
+      "gold_id": "g035",
+      "note": "前文李丰指出若用滚单饬令先行提人恐走漏风声，后文“差，已经被贵兴结交得烂熟，倘使奉差之后，故意先给他一个信，岂不要误事”表明此处指番禺县衙门。"
+    },
+    {
+      "sample_id": "s506",
+      "start": 119477,
+      "end": 119479,
+      "surface": "李丰",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 36,
+      "gold_id": "g013",
+      "note": "前文李时枚警告侄儿莫花言巧语暗中通信给凌贵兴，后文答道“侄儿写了信，请叔父看过再发就是”并当场写假信诱凌贵兴聚众，表明此处指李丰。"
+    },
+    {
+      "sample_id": "s507",
+      "start": 119512,
+      "end": 119514,
+      "surface": "令侄",
+      "stratum": "hard",
+      "hard_features": [
+        "kinship_or_relation",
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 36,
+      "gold_id": "g013",
+      "note": "前文孔大鹏劝李时枚不必疑心，“李大人不必疑心。”，后文“既然诚心自首，断不如此。并且令侄写过信后，便可留在此处，和我们同行”表明此处孔大鹏所称“令侄”指李时枚之侄李丰。"
+    },
+    {
+      "sample_id": "s508",
+      "start": 119779,
+      "end": 119782,
+      "surface": "韶州府",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster"
+      ],
+      "chapter_index": 36,
+      "gold_id": "g046",
+      "note": "前文钦差带李丰、梁天来同行南下，“不日来到”，后文“地方，孔、李两钦差，便请了韶州总兵万福，到行辕来”表明此处指广东韶州府。"
+    },
+    {
+      "sample_id": "s509",
+      "start": 119854,
+      "end": 119856,
+      "surface": "万福",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "surname_only_or_short"
+      ],
+      "chapter_index": 36,
+      "gold_id": "x006",
+      "note": "前文孔、李两钦差请韶州总兵万福到行辕命其派员捉拿凌贵兴一众，后文“领命，便去委了守备叶坚”并准其带一哨人前往，表明此处指韶州总兵万福。"
+    },
+    {
+      "sample_id": "s510",
+      "start": 120164,
+      "end": 120168,
+      "surface": "两位钦差",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "title_or_official"
+      ],
+      "chapter_index": 36,
+      "gold_id": "not_entity",
+      "note": "前文“闲话少提。且说”，后文“打发叶守备去后，就在韶州驻节两日”表明此处“两位钦差”指孔大鹏与李时枚二人的合称，非单一实体。"
+    },
+    {
+      "sample_id": "s511",
+      "start": 120215,
+      "end": 120220,
+      "surface": "广州刘知府",
+      "stratum": "hard",
+      "hard_features": [
+        "out_of_roster",
+        "title_or_official"
+      ],
+      "chapter_index": 36,
+      "gold_id": "g020",
+      "note": "前文两位钦差在韶州行文广东巡抚撤任候参受贿官员，后文与“肇庆连知府，番禺黄知县”并列，表明此处“广州刘知府”指广州府知府刘太守。"
+    },
+    {
+      "sample_id": "s512",
+      "start": 120272,
+      "end": 120274,
+      "surface": "李丰",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 36,
+      "gold_id": "g013",
+      "note": "前文在韶州驻节期间梁天来与李丰谈得投机，后文“说起委员去拿凌贵兴一节，连犯眷都要拿来，这等严厉，贵兴不定要犯一个灭族呢”，表明此处指李丰。"
+    },
+    {
+      "sample_id": "s513",
+      "start": 120512,
+      "end": 120514,
+      "surface": "凌氏",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 36,
+      "gold_id": "not_entity",
+      "note": "前文梁天来念及表妹凌桂仙旧情，恳请李丰在李大人面前求情“可否赦免了他的儿子应科，以存”，后文“一脉”表明此处“凌氏”指凌姓家族宗族血脉，非单一人物或地点实体。"
+    },
+    {
+      "sample_id": "s514",
+      "start": 120553,
+      "end": 120555,
+      "surface": "李丰",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 36,
+      "gold_id": "g013",
+      "note": "前文梁天来恳请其代求李时枚赦免凌贵兴幼子应科以存凌氏一脉，后文“听了，想起从前和贵兴相好，心中也是不忍”并去见李时枚交出四十万两银票，表明此处指李丰。"
+    },
+    {
+      "sample_id": "s515",
+      "start": 120616,
+      "end": 120618,
+      "surface": "李丰",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 36,
+      "gold_id": "g013",
+      "note": "前文辞别梁天来去见叔父李时枚与孔大鹏，后文“行过常礼，侍坐一旁”并双手呈上凌贵兴所给八张共四十万两银票，表明此处指李丰。"
+    },
+    {
+      "sample_id": "s516",
+      "start": 122302,
+      "end": 122304,
+      "surface": "南雄",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 36,
+      "gold_id": "g041",
+      "note": "前文揭晓陈臬台正是在南雄朱怡和店遇见梁天来、喜来、区爵兴的苏沛之，“此时陈臬台把到了”，后文“以后，即变易姓名，改装私访的情形，对钦差略述一遍”表明此处指苏沛之入粤首站南雄。"
+    },
+    {
+      "sample_id": "s517",
+      "start": 122632,
+      "end": 122635,
+      "surface": "林大有",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 36,
+      "gold_id": "g005",
+      "note": "前文两钦差定案判凌贵兴凌迟处死，后文与凌宗孔、区爵兴、周赞先、简当、叶盛、简勒先等共十三名定为斩决，表明此处指林大有。"
+    },
+    {
+      "sample_id": "s518",
+      "start": 122660,
+      "end": 122662,
+      "surface": "简当",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 36,
+      "gold_id": "g016",
+      "note": "前文两钦差议定斩决十三名罪犯名单，位于“甘阿定、”与“、叶盛、简勒先十三名斩决”之间，表明此处指打手头目简当。"
+    },
+    {
+      "sample_id": "s519",
+      "start": 122787,
+      "end": 122790,
+      "surface": "番禺县",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 36,
+      "gold_id": "g035",
+      "note": "前文两钦差定案发落各犯完毕，“又札饬”，后文“立提马半仙到案，重责五百板，架号一个月，递籍”表明此处指负责提审发落马半仙的番禺县衙门。"
+    },
+    {
+      "sample_id": "s520",
+      "start": 122793,
+      "end": 122796,
+      "surface": "马半仙",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 36,
+      "gold_id": "g033",
+      "note": "前文两钦差札饬番禺县立提到案，后文“重责五百板，架号一个月，递籍”表明此处指当初给凌贵兴算命看风水挑起祸端的马半仙。"
+    },
+    {
+      "sample_id": "s521",
+      "start": 123009,
+      "end": 123012,
+      "surface": "黄知县",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 36,
+      "gold_id": "g017",
+      "note": "前文奏折到京奉上谕惩处受贿官员，位于“刘、连两知府，”与“，李巡检，都得了个军罪”之间，表明此处指番禺知县黄知县。"
+    },
+    {
+      "sample_id": "s522",
+      "start": 123050,
+      "end": 123052,
+      "surface": "张凤",
+      "stratum": "entity",
+      "hard_features": [],
+      "chapter_index": 36,
+      "gold_id": "g006",
+      "note": "前文奉上谕惩处广东涉案各官，“焦臬台因多了夹死”，后文“一案，拿交刑部，这都是一个‘贪’字的结果”表明此处指在按察司堂上被焦按察夹死的证人张凤。"
+    }
+  ]
+}

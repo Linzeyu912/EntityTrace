@@ -1,0 +1,502 @@
+{
+  "book": "04_英文长篇_Pride_and_Prejudice_61章.txt",
+  "book_id": "pride-prejudice",
+  "source_sha256": "bef40b0773f5f1857216fa56233e8a4851ab3a98c86b94d4356b005501e912ff",
+  "labeler": "agent:gemini-4-argon",
+  "human_review": "pending",
+  "entities": [
+    {
+      "gold_id": "g001",
+      "kind": "person",
+      "canonical": "Elizabeth Bennet",
+      "aliases": [
+        "Elizabeth",
+        "Lizzy",
+        "Eliza",
+        "Miss Elizabeth Bennet"
+      ],
+      "note": "主人公伊丽莎白·班纳特；首见原文码点 [5124,5133) 'Elizabeth'"
+    },
+    {
+      "gold_id": "g002",
+      "kind": "person",
+      "canonical": "Jane Bennet",
+      "aliases": [
+        "Jane",
+        "Mrs. Bingley"
+      ],
+      "note": "班纳特家长女简·班纳特；首见原文码点 [20,24) 'Jane'"
+    },
+    {
+      "gold_id": "g003",
+      "kind": "person",
+      "canonical": "Fitzwilliam Darcy",
+      "aliases": [
+        "Mr. Darcy",
+        "Darcy",
+        "Fitzwilliam Darcy"
+      ],
+      "note": "达西先生；首见原文码点 [11727,11736) 'Mr. Darcy'"
+    },
+    {
+      "gold_id": "g004",
+      "kind": "person",
+      "canonical": "Charles Bingley",
+      "aliases": [
+        "Mr. Bingley",
+        "Bingley",
+        "Charles"
+      ],
+      "note": "宾利先生；首见原文码点 [1991,2002) 'Mr. Bingley'"
+    },
+    {
+      "gold_id": "g005",
+      "kind": "person",
+      "canonical": "Mr. Bennet",
+      "aliases": [
+        "Mr. Bennet"
+      ],
+      "note": "班纳特先生；首见原文码点 [434,444) 'Mr. Bennet'"
+    },
+    {
+      "gold_id": "g006",
+      "kind": "person",
+      "canonical": "Mrs. Bennet",
+      "aliases": [
+        "Mrs. Bennet"
+      ],
+      "note": "班纳特太太；首见原文码点 [5486,5497) 'Mrs. Bennet'"
+    },
+    {
+      "gold_id": "g007",
+      "kind": "person",
+      "canonical": "Lydia Bennet",
+      "aliases": [
+        "Lydia",
+        "Miss Lydia",
+        "Mrs. Wickham"
+      ],
+      "note": "班纳特家幼女莉迪亚；首见原文码点 [3197,3202) 'Lydia'"
+    },
+    {
+      "gold_id": "g008",
+      "kind": "person",
+      "canonical": "George Wickham",
+      "aliases": [
+        "Mr. Wickham",
+        "Wickham",
+        "George Wickham"
+      ],
+      "note": "威컴（乔治·威컴）；首见原文码点 [120870,120881) 'Mr. Wickham'"
+    },
+    {
+      "gold_id": "g009",
+      "kind": "person",
+      "canonical": "William Collins",
+      "aliases": [
+        "Mr. Collins",
+        "Collins"
+      ],
+      "note": "柯林斯先生；首见原文码点 [101502,101513) 'Mr. Collins'"
+    },
+    {
+      "gold_id": "g010",
+      "kind": "person",
+      "canonical": "Charlotte Lucas",
+      "aliases": [
+        "Charlotte",
+        "Miss Lucas",
+        "Charlotte Lucas",
+        "Mrs. Collins"
+      ],
+      "note": "夏洛特·卢卡斯（婚后为柯林斯太太）；首见原文码点 [25787,25796) 'Charlotte'"
+    },
+    {
+      "gold_id": "g011",
+      "kind": "person",
+      "canonical": "Catherine (Kitty) Bennet",
+      "aliases": [
+        "Kitty",
+        "Catherine"
+      ],
+      "note": "班纳特家四女基蒂（凯瑟琳）；首见原文码点 [5624,5629) 'Kitty'"
+    },
+    {
+      "gold_id": "g012",
+      "kind": "person",
+      "canonical": "Mary Bennet",
+      "aliases": [
+        "Mary"
+      ],
+      "note": "班纳特家三女玛丽；首见原文码点 [6975,6979) 'Mary'"
+    },
+    {
+      "gold_id": "g013",
+      "kind": "person",
+      "canonical": "Lady Catherine de Bourgh",
+      "aliases": [
+        "Lady Catherine",
+        "Lady Catherine de Bourgh"
+      ],
+      "note": "凯瑟琳·德·包尔夫人；首见原文码点 [103528,103542) 'Lady Catherine'"
+    },
+    {
+      "gold_id": "g014",
+      "kind": "person",
+      "canonical": "Georgiana Darcy",
+      "aliases": [
+        "Miss Darcy",
+        "Georgiana",
+        "Georgiana Darcy"
+      ],
+      "note": "达西小姐（乔治安娜）；首见原文码点 [60807,60817) 'Miss Darcy'"
+    },
+    {
+      "gold_id": "g015",
+      "kind": "person",
+      "canonical": "Mr. Edward Gardiner",
+      "aliases": [
+        "Mr. Gardiner"
+      ],
+      "note": "嘉丁纳先生（班纳特太太之弟）；首见原文码点 [243514,243526) 'Mr. Gardiner'"
+    },
+    {
+      "gold_id": "g016",
+      "kind": "person",
+      "canonical": "Mrs. Gardiner",
+      "aliases": [
+        "Mrs. Gardiner"
+      ],
+      "note": "嘉丁纳太太；首见原文码点 [243802,243815) 'Mrs. Gardiner'"
+    },
+    {
+      "gold_id": "g017",
+      "kind": "person",
+      "canonical": "Colonel Fitzwilliam",
+      "aliases": [
+        "Colonel Fitzwilliam",
+        "Fitzwilliam"
+      ],
+      "note": "费茨威廉上校；首见原文码点 [298489,298508) 'Colonel Fitzwilliam'"
+    },
+    {
+      "gold_id": "g018",
+      "kind": "person",
+      "canonical": "Caroline Bingley",
+      "aliases": [
+        "Miss Bingley",
+        "Caroline",
+        "Caroline Bingley"
+      ],
+      "note": "宾利小姐（卡罗琳）；首见原文码点 [12848,12860) 'Miss Bingley'"
+    },
+    {
+      "gold_id": "g019",
+      "kind": "person",
+      "canonical": "Mrs. Louisa Hurst",
+      "aliases": [
+        "Mrs. Hurst",
+        "Louisa"
+      ],
+      "note": "赫斯特太太（路易莎，宾利之姊）；首见原文码点 [12823,12833) 'Mrs. Hurst'"
+    },
+    {
+      "gold_id": "g020",
+      "kind": "person",
+      "canonical": "Mr. Hurst",
+      "aliases": [
+        "Mr. Hurst"
+      ],
+      "note": "赫斯特先生；首见原文码点 [11672,11681) 'Mr. Hurst'"
+    },
+    {
+      "gold_id": "g021",
+      "kind": "person",
+      "canonical": "Sir William Lucas",
+      "aliases": [
+        "Sir William",
+        "Sir William Lucas"
+      ],
+      "note": "威廉·卢卡斯爵士；首见原文码点 [2560,2571) 'Sir William'"
+    },
+    {
+      "gold_id": "g022",
+      "kind": "person",
+      "canonical": "Lady Lucas",
+      "aliases": [
+        "Lady Lucas"
+      ],
+      "note": "卢卡斯夫人；首见原文码点 [2576,2586) 'Lady Lucas'"
+    },
+    {
+      "gold_id": "g023",
+      "kind": "person",
+      "canonical": "Maria Lucas",
+      "aliases": [
+        "Maria",
+        "Maria Lucas"
+      ],
+      "note": "玛丽亚·卢卡斯；首见原文码点 [17182,17187) 'Maria'"
+    },
+    {
+      "gold_id": "g024",
+      "kind": "person",
+      "canonical": "Mrs. Philips",
+      "aliases": [
+        "Mrs. Philips"
+      ],
+      "note": "菲利普斯太太（班纳特太太之妹）；首见原文码点 [44161,44173) 'Mrs. Philips'"
+    },
+    {
+      "gold_id": "g025",
+      "kind": "person",
+      "canonical": "Mr. Philips",
+      "aliases": [
+        "Mr. Philips"
+      ],
+      "note": "菲利普斯先生；首见原文码点 [43142,43153) 'Mr. Philips'"
+    },
+    {
+      "gold_id": "g026",
+      "kind": "person",
+      "canonical": "Anne de Bourgh",
+      "aliases": [
+        "Miss de Bourgh"
+      ],
+      "note": "德·包尔小姐（安妮）；首见原文码点 [111906,111920) 'Miss de Bourgh'"
+    },
+    {
+      "gold_id": "g027",
+      "kind": "person",
+      "canonical": "Colonel Forster",
+      "aliases": [
+        "Colonel Forster",
+        "Forster"
+      ],
+      "note": "福斯特上校；首见原文码点 [35781,35796) 'Colonel Forster'"
+    },
+    {
+      "gold_id": "g028",
+      "kind": "person",
+      "canonical": "Mrs. Harriet Forster",
+      "aliases": [
+        "Mrs. Forster",
+        "Harriet"
+      ],
+      "note": "福斯特太太（哈丽特）；首见原文码点 [387490,387502) 'Mrs. Forster'"
+    },
+    {
+      "gold_id": "g029",
+      "kind": "person",
+      "canonical": "Mrs. Reynolds",
+      "aliases": [
+        "Mrs. Reynolds",
+        "Reynolds"
+      ],
+      "note": "彭伯里管家雷诺兹太太；首见原文码点 [427947,427960) 'Mrs. Reynolds'"
+    },
+    {
+      "gold_id": "g030",
+      "kind": "person",
+      "canonical": "Mr. Denny",
+      "aliases": [
+        "Denny"
+      ],
+      "note": "军官丹尼；首见原文码点 [114932,114937) 'Denny'"
+    },
+    {
+      "gold_id": "g031",
+      "kind": "person",
+      "canonical": "Mrs. Younge",
+      "aliases": [
+        "Mrs. Younge",
+        "Younge"
+      ],
+      "note": "杨格太太；首见原文码点 [354675,354686) 'Mrs. Younge'"
+    },
+    {
+      "gold_id": "g032",
+      "kind": "person",
+      "canonical": "Mrs. Long",
+      "aliases": [
+        "Mrs. Long"
+      ],
+      "note": "朗格太太；首见原文码点 [602,611) 'Mrs. Long'"
+    },
+    {
+      "gold_id": "g033",
+      "kind": "person",
+      "canonical": "Mary King",
+      "aliases": [
+        "Miss King",
+        "Mary King"
+      ],
+      "note": "玛丽·金小姐；首见原文码点 [17147,17156) 'Miss King'"
+    },
+    {
+      "gold_id": "g034",
+      "kind": "person",
+      "canonical": "Mrs. Hill",
+      "aliases": [
+        "Mrs. Hill",
+        "Hill"
+      ],
+      "note": "浪博恩管家希尔太太；首见原文码点 [528023,528032) 'Mrs. Hill'"
+    },
+    {
+      "gold_id": "g035",
+      "kind": "place",
+      "canonical": "Longbourn",
+      "aliases": [
+        "Longbourn"
+      ],
+      "note": "班纳特家住地浪博恩；首见原文码点 [15929,15938) 'Longbourn'"
+    },
+    {
+      "gold_id": "g036",
+      "kind": "place",
+      "canonical": "Netherfield",
+      "aliases": [
+        "Netherfield",
+        "Netherfield Park"
+      ],
+      "note": "尼日斐花园；首见原文码点 [498,509) 'Netherfield'"
+    },
+    {
+      "gold_id": "g037",
+      "kind": "place",
+      "canonical": "Meryton",
+      "aliases": [
+        "Meryton"
+      ],
+      "note": "麦里屯；首见原文码点 [23450,23457) 'Meryton'"
+    },
+    {
+      "gold_id": "g038",
+      "kind": "place",
+      "canonical": "London",
+      "aliases": [
+        "London"
+      ],
+      "note": "伦敦；首见原文码点 [10949,10955) 'London'"
+    },
+    {
+      "gold_id": "g039",
+      "kind": "place",
+      "canonical": "Pemberley",
+      "aliases": [
+        "Pemberley",
+        "Pemberley House"
+      ],
+      "note": "达西庄园彭伯里；首见原文码点 [42516,42525) 'Pemberley'"
+    },
+    {
+      "gold_id": "g040",
+      "kind": "place",
+      "canonical": "Rosings",
+      "aliases": [
+        "Rosings",
+        "Rosings Park"
+      ],
+      "note": "凯瑟琳夫人庄园罗新斯；首见原文码点 [110407,110414) 'Rosings'"
+    },
+    {
+      "gold_id": "g041",
+      "kind": "place",
+      "canonical": "Hunsford",
+      "aliases": [
+        "Hunsford"
+      ],
+      "note": "柯林斯教区汉斯福；首见原文码点 [102853,102861) 'Hunsford'"
+    },
+    {
+      "gold_id": "g042",
+      "kind": "place",
+      "canonical": "Brighton",
+      "aliases": [
+        "Brighton"
+      ],
+      "note": "布赖顿；首见原文码点 [384331,384339) 'Brighton'"
+    },
+    {
+      "gold_id": "g043",
+      "kind": "place",
+      "canonical": "Lambton",
+      "aliases": [
+        "Lambton"
+      ],
+      "note": "兰顿镇；首见原文码点 [422091,422098) 'Lambton'"
+    },
+    {
+      "gold_id": "g044",
+      "kind": "place",
+      "canonical": "Derbyshire",
+      "aliases": [
+        "Derbyshire"
+      ],
+      "note": "德比郡；首见原文码点 [12334,12344) 'Derbyshire'"
+    },
+    {
+      "gold_id": "g045",
+      "kind": "place",
+      "canonical": "Hertfordshire",
+      "aliases": [
+        "Hertfordshire"
+      ],
+      "note": "赫特福德郡；首见原文码点 [10715,10728) 'Hertfordshire'"
+    },
+    {
+      "gold_id": "g046",
+      "kind": "place",
+      "canonical": "Kent",
+      "aliases": [
+        "Kent"
+      ],
+      "note": "肯特郡；首见原文码点 [102879,102883) 'Kent'"
+    },
+    {
+      "gold_id": "g047",
+      "kind": "place",
+      "canonical": "Gracechurch Street",
+      "aliases": [
+        "Gracechurch Street"
+      ],
+      "note": "嘉丁纳夫妇所居格雷斯丘奇街；首见原文码点 [248155,248173) 'Gracechurch Street'"
+    },
+    {
+      "gold_id": "g048",
+      "kind": "place",
+      "canonical": "Lucas Lodge",
+      "aliases": [
+        "Lucas Lodge"
+      ],
+      "note": "卢卡斯爵士住所卢卡斯山庄；首见原文码点 [24942,24953) 'Lucas Lodge'"
+    }
+  ],
+  "ambiguous_surfaces": [
+    {
+      "surface": "Miss Bennet",
+      "gold_ids": [
+        "g002",
+        "g001"
+      ],
+      "note": "通常指长女简·班纳特（g002），但在汉斯福/罗新斯简不在场时指伊丽莎白（g001）"
+    },
+    {
+      "surface": "Gardiner",
+      "gold_ids": [
+        "g015",
+        "g016"
+      ],
+      "note": "单独出现时随 brother/sister Gardiner 分别指嘉丁纳先生（g015）或嘉丁纳太太（g016）"
+    },
+    {
+      "surface": "Philips",
+      "gold_ids": [
+        "g025",
+        "g024"
+      ],
+      "note": "单独出现时随 uncle/aunt/sister Philips 分别指菲利普斯先生（g025）或太太（g024）"
+    }
+  ]
+}
