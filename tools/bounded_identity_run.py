@@ -21,6 +21,7 @@ def run(args):
     begin = time.perf_counter()
     report = {'started_at': utc_now(), 'input': str(args.input),
               'production_implementation_hash': implementation_hash(),
+              'identity_algorithm': args.identity_algorithm,
               'identity_rounds': args.identity_rounds, 'group_candidates': 3,
               'discovery_concurrency': 6, 'decision_concurrency': 3,
               'budget': {'max_requests': args.max_requests, 'max_seconds': args.max_seconds,
@@ -33,6 +34,7 @@ def run(args):
             args.input, args.db, args.output_root, args.config,
             identity_rounds=args.identity_rounds, group_candidates=3,
             max_requests=args.max_requests, max_seconds=args.max_seconds,
+            identity_algorithm=args.identity_algorithm,
             log=lambda message: print(message, flush=True),
         )
         manifest = json.loads((output / 'manifest.json').read_text(encoding='utf-8'))
@@ -62,6 +64,7 @@ def main():
     parser.add_argument('--db', type=Path, default=ROOT / 'data/entitytrace.sqlite3')
     parser.add_argument('--config', type=Path, default=ROOT / '.env.models.local')
     parser.add_argument('--output-root', type=Path, default=ROOT / 'outputs')
+    parser.add_argument('--identity-algorithm', choices=['roster', 'groups-v2'], default='roster')
     parser.add_argument('--identity-rounds', type=int, default=3)
     parser.add_argument('--max-requests', type=int, default=6500)
     parser.add_argument('--max-seconds', type=float, default=2700)

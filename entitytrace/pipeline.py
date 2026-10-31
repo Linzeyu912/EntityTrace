@@ -11,10 +11,23 @@ from .config import load_services
 from .discovery import discover
 from .identity import group_entities
 from .resolution import VERSION as RESOLUTION_VERSION, annotate_groups, resolve_groups
+from .roster import (
+    DIRECT_VERSION as ROSTER_DIRECT_VERSION,
+    VERSION as ROSTER_VERSION,
+    build_incomplete_roster_output,
+    resolve_roster,
+)
 from .models import BudgetError, Models, RequestBudget
 from .storage import Store
 from .text import import_text, validate_span
 from .util import digest, dumps, implementation_hash, utc_now, write_bytes, write_json
+
+IDENTITY_ALGORITHMS = {
+    "roster": ROSTER_VERSION,
+    ROSTER_VERSION: ROSTER_VERSION,
+    "groups-v2": RESOLUTION_VERSION,
+    RESOLUTION_VERSION: RESOLUTION_VERSION,
+}
 
 
 def metrics(store: Store, run_id: str, invocation: str | None = None) -> dict:
@@ -47,7 +60,7 @@ def metrics(store: Store, run_id: str, invocation: str | None = None) -> dict:
     return result
 
 
-def export_run(store: Store, run_id: str, output_root: Path) -> Path:
+def export_run(store: Store, run_id: str, output_root: Path, output_dir: Path | None = None) -> Path:
     run = store.run(run_id)
     source = store.source(run["source_id"])
     text, metadata = source["text"], source["metadata"]
@@ -57,14 +70,130 @@ def export_run(store: Store, run_id: str, output_root: Path) -> Path:
     mentions = store.records(run_id, "mention")
     observations = store.records(run_id, "observation")
     decisions = store.records(run_id, "decision")
-    identities = store.records(run_id, "identity")
     reviews = store.records(run_id, "review")
+    algo = run["config"].get("identity_algorithm")
+    roster_mode = algo in {ROSTER_VERSION, ROSTER_DIRECT_VERSION}
+    by_chapter = {c["id"]: c for c in chapters}
+    state = run["state"]
+    complete = all(state.get(name, {}).get("complete", False) for name in ("chapters", "discovery", "identity"))
+    output = output_dir if output_dir is not None else (output_root / run_id[:16])
+
+    if roster_mode:
+        raw_ids = {m["id"] for m in mentions}
+        saved_roster = store.records(run_id, "roster_output")
+        roster_out = saved_roster[0] if saved_roster else build_incomplete_roster_output(source, mentions, algorithm=algo)
+        entities = [dict(e) for e in roster_out["entities"]]
+        mentions = [dict(m) for m in roster_out["mentions"]]
+        non_identity_reviews = [r for r in reviews if not str(r.get("stage", "")).startswith("roster")]
+        identity_reviews = [r for r in roster_out["reviews"] if str(r.get("stage", "")).startswith("roster")]
+        all_reviews = identity_reviews + non_identity_reviews
+        for mention in mentions:
+            validate_span(text, mention["address"], source["id"], mention["text"])
+            chapter = by_chapter[mention["chapter_id"]]
+            if not chapter["start"] <= mention["start"] < mention["end"] <= chapter["end"]:
+                raise ValueError("提及地址不属于对应章节")
+            mention["chapter_start"] = mention["start"] - chapter["start"]
+            mention["chapter_end"] = mention["end"] - chapter["start"]
+            for span in mention["evidence"]:
+                validate_span(text, span, source["id"])
+        ids = {m["id"] for m in mentions}
+        if ids != raw_ids or sorted(mid for e in entities for mid in e["mention_ids"]) != sorted(ids):
+            raise ValueError("实体分组未恰好覆盖所有提及")
+        status = "incomplete" if not complete else "completed_with_review" if all_reviews else "completed"
+        result = {
+            "schema_version": 3,
+            "run_id": run_id,
+            "status": status,
+            "source": metadata,
+            "chapters": chapters,
+            "mentions": mentions,
+            "observations": observations,
+            "entities": entities,
+            "roster_summary": roster_out["roster_summary"],
+            "ambiguous_surfaces": roster_out["ambiguous_surfaces"],
+            "scope": "实体提及与名册链接身份归组；不含描述、服饰或经历提取",
+            "limitations": [
+                "名册条目 ID 由成员首处地址与强称呼集合摘要生成，不是跨版本永久编号。",
+                "发现阶段未覆盖的提及不进入名册归组；原文定位通过不代表实体和身份语义正确。",
+                "无比较或未决的单独提及（unresolved_singleton）仅表示证据不足，不能据此断言与所有其他实体不同。",
+            ],
+        }
+        if run["config"].get("source_run_id"):
+            result["source_run_id"] = run["config"]["source_run_id"]
+        result["result_revision"] = digest(result)
+        write_json(output / "result.json", result)
+        write_json(output / "review.json", {
+            "schema_version": 1,
+            "run_id": run_id,
+            "result_revision": result["result_revision"],
+            "items": all_reviews,
+            "counts": {
+                "total": len(all_reviews),
+                "identity_reviews": len(identity_reviews),
+                "grounding_discovery_reviews": len(non_identity_reviews),
+            },
+            "instruction": "按 impact 降序排列；自动模型判断不冒充人工答案。",
+        })
+        write_bytes(output / "decisions.jsonl", "".join(dumps(d) + "\n" for d in decisions).encode("utf-8"))
+        requests = store.rows("SELECT DISTINCT r.* FROM request_cache r JOIN calls c ON r.id=c.request_id WHERE c.run_id=? ORDER BY r.id", (run_id,))
+        write_bytes(output / "requests.jsonl", "".join(dumps({"id": r["id"], "service": r["service"], "model": r["model"],
+            "request": json.loads(r["request"]), "response": json.loads(r["response"])}) + "\n" for r in requests).encode("utf-8"))
+        write_bytes(output / "source.txt", text.encode("utf-8"))
+        write_bytes(output / "source.original", source["raw"])
+        invocations = store.records(run_id, "invocation")
+        identity_seconds = round(
+            sum(
+                inv.get("stages", {}).get("identity", {}).get("seconds", 0.0)
+                for inv in invocations
+                if not inv.get("stages", {}).get("identity", {}).get("resumed", False)
+            ),
+            4,
+        )
+        manifest = {
+            "schema_version": 2,
+            "run_id": run_id,
+            "result_revision": result["result_revision"],
+            "status": status,
+            "source": metadata,
+            "config": run["config"],
+            "state": state,
+            "invocations": invocations,
+            "identity_seconds": identity_seconds,
+            "total_model_metrics": metrics(store, run_id),
+            "counts": {
+                "chapters": sum(c["kind"] == "chapter" for c in chapters),
+                "sections": len(chapters),
+                "mentions": len(mentions),
+                "observations": len(observations),
+                "entities": len(entities),
+                "singletons": sum(1 for e in entities if len(e["mention_ids"]) == 1),
+                "unlocated_observations": sum(o["status"] == "unlocated" for o in observations),
+                "decisions": len(decisions),
+                "review_items": len(all_reviews),
+                "identity_review_items": len(identity_reviews),
+                "grounding_discovery_review_items": len(non_identity_reviews),
+            },
+            "validation": {
+                "source_hashes": True,
+                "mention_addresses": True,
+                "entity_membership": True,
+                "semantic_accuracy_measured": False,
+            },
+            "files": ["result.json", "review.json", "decisions.jsonl", "requests.jsonl", "source.txt", "source.original"],
+        }
+        if run["config"].get("source_run_id"):
+            manifest["source_run_id"] = run["config"]["source_run_id"]
+        if run["config"].get("arm"):
+            manifest["arm"] = run["config"]["arm"]
+        write_json(output / "manifest.json", manifest)
+        return output
+
+    identities = store.records(run_id, "identity")
     entities, conflicts = group_entities(mentions, identities)
-    group_resolution = run["config"].get("identity_algorithm") == RESOLUTION_VERSION
+    group_resolution = algo == RESOLUTION_VERSION
     if group_resolution:
         entities = annotate_groups(entities, store.records(run_id, "entity_annotation"))
     reviews.extend(conflicts)
-    by_chapter = {c["id"]: c for c in chapters}
     for mention in mentions:
         validate_span(text, mention["address"], source["id"], mention["text"])
         chapter = by_chapter[mention["chapter_id"]]
@@ -80,8 +209,6 @@ def export_run(store: Store, run_id: str, output_root: Path) -> Path:
     for pair in identities:
         if pair["left"] not in ids or pair["right"] not in ids:
             raise ValueError("身份判断引用不存在的提及")
-    state = run["state"]
-    complete = all(state.get(name, {}).get("complete", False) for name in ("chapters", "discovery", "identity"))
     status = "incomplete" if not complete else "completed_with_review" if reviews else "completed"
     result = {"schema_version": 2 if group_resolution else 1, "run_id": run_id, "status": status, "source": metadata,
               "chapters": chapters, "mentions": mentions, "observations": observations, "entities": entities,
@@ -90,7 +217,6 @@ def export_run(store: Store, run_id: str, output_root: Path) -> Path:
                               "模型分数门槛尚未标注校准；原文定位通过不代表实体和身份语义正确。",
                               "无比较关系的单独提及为暂定实体，不能据此断言与所有其他实体不同。"]}
     result["result_revision"] = digest(result)
-    output = output_root / run_id[:16]
     write_json(output / "result.json", result)
     write_json(output / "review.json", {"schema_version": 1, "run_id": run_id, "result_revision": result["result_revision"],
                                         "items": reviews, "instruction": "按问题编号回答；自动模型判断不冒充人工答案。"})
@@ -121,11 +247,15 @@ def run_pipeline(input_path: Path, db_path: Path, output_root: Path, config_path
                  encoding: str = "utf-8", stop_after: str = "identity", log=print,
                  identity_rounds: int = 12, group_candidates: int = 3,
                  max_requests: int | None = None, max_seconds: float | None = None,
-                 max_network_failures: int = 9) -> tuple[str, Path, bool]:
+                 max_network_failures: int = 9,
+                 identity_algorithm: str = "roster") -> tuple[str, Path, bool]:
     wall_begin = time.monotonic()
+    if identity_algorithm not in IDENTITY_ALGORITHMS:
+        raise ValueError(f"不支持的身份归组算法：{identity_algorithm}")
+    algo_version = IDENTITY_ALGORITHMS[identity_algorithm]
     if not 1 <= discovery_concurrency <= 32 or not 1 <= decision_concurrency <= 16 or not 500 <= task_chars <= 20000:
         raise ValueError("并发数或任务长度超出本工具支持范围")
-    if not 1 <= identity_rounds <= 24 or not 1 <= group_candidates <= 3:
+    if algo_version == RESOLUTION_VERSION and (not 1 <= identity_rounds <= 24 or not 1 <= group_candidates <= 3):
         raise ValueError("身份轮次须为 1—24，候选组上限须为 1—3")
     budget = RequestBudget(max_requests, max_seconds, max_network_failures=max_network_failures)
     store = Store(db_path)
@@ -140,8 +270,10 @@ def run_pipeline(input_path: Path, db_path: Path, output_root: Path, config_path
         config = {"implementation": implementation_hash(), "models": {k: v.public() for k, v in services.items()},
                   "discovery_concurrency": discovery_concurrency, "decision_concurrency": decision_concurrency,
                   "task_chars": task_chars, "offset_unit": "unicode_code_point", "scope": "entity-identity-v2",
-                  "identity_algorithm": RESOLUTION_VERSION, "identity_rounds": identity_rounds,
-                  "group_candidates": group_candidates}
+                  "identity_algorithm": algo_version}
+        if algo_version == RESOLUTION_VERSION:
+            config["identity_rounds"] = identity_rounds
+            config["group_candidates"] = group_candidates
         run_id = digest([source["id"], config])
         store.execute("INSERT OR IGNORE INTO runs VALUES(?,?,?,?,?,?)", (run_id, source["id"], dumps(config), "{}", started, started))
         models = Models(store, run_id, invocation, services, discovery_concurrency, decision_concurrency, budget=budget)
@@ -158,6 +290,9 @@ def run_pipeline(input_path: Path, db_path: Path, output_root: Path, config_path
                 outcome.pop("chapters", None)
             elif name == "discovery":
                 outcome = discover(store, models, source, run_id, store.records(run_id, "chapter"), task_chars, discovery_concurrency, log)
+            elif algo_version == ROSTER_VERSION:
+                outcome = resolve_roster(store, models, source, run_id,
+                                         concurrency=discovery_concurrency, log=log, task_chars=task_chars)
             else:
                 outcome = resolve_groups(store, models, source, run_id, decision_concurrency, log,
                                          identity_rounds, group_candidates)

@@ -2380,3 +2380,49 @@ def resolve_roster(
         "identity_reviews": len(all_reviews),
         "link_methods": dict(method_totals),
     }
+
+
+def build_incomplete_roster_output(source: dict, mentions: list[dict], algorithm: str = VERSION) -> dict:
+    """未完成名册阶段时的导出薄封装：已发现提及各自作为暂定单项导出，不伪造跨章合并。"""
+    mentions_sorted = sorted(mentions, key=lambda m: (m["start"], m["end"], m["id"]))
+    entities = []
+    updated_mentions = []
+    for m in mentions_sorted:
+        singleton_id = digest(["roster-singleton", source["id"], [m["start"], m["end"]], [m["text"]]])
+        k_counts = collections.Counter(m.get("provisional_kinds", []))
+        entities.append({
+            "id": singleton_id,
+            "name": m["text"],
+            "names": [m["text"]],
+            "aliases": [],
+            "mention_ids": [m["id"]],
+            "mention_count": 1,
+            "start": m["start"],
+            "first_chapter_id": m["chapter_id"],
+            "kind": _choose_majority_kind(k_counts),
+            "identity_status": "unresolved_singleton",
+            "link_methods": {"unresolved": 1},
+        })
+        updated_mentions.append({
+            **m,
+            "entity_id": singleton_id,
+            "link_method": "unresolved",
+            "link_refs": [],
+        })
+    method_totals = {"unresolved": len(updated_mentions)} if updated_mentions else {}
+    return {
+        "entities": entities,
+        "mentions": updated_mentions,
+        "reviews": [],
+        "ambiguous_surfaces": [],
+        "roster_summary": {
+            "algorithm": algorithm,
+            "entity_count": len(entities),
+            "active_entity_count": len(entities),
+            "singleton_count": len(entities),
+            "link_methods": method_totals,
+            "c3_rejected_name_mismatch": 0,
+            "identity_review_count": 0,
+            "ambiguous_surface_count": 0,
+        },
+    }

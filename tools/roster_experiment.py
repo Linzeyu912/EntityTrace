@@ -17,11 +17,11 @@ from entitytrace.chapters import detect_chapters
 from entitytrace.config import load_services
 from entitytrace.discovery import discover, plan_tasks
 from entitytrace.models import ExperimentBudget, Models, RequestBudget
-from entitytrace.pipeline import metrics
+from entitytrace.pipeline import export_run, metrics
 from entitytrace.roster import DIRECT_VERSION, VERSION, resolve_roster, resolve_surface_direct
 from entitytrace.storage import Store
-from entitytrace.text import import_text, validate_span
-from entitytrace.util import digest, dumps, implementation_hash, utc_now, write_bytes, write_json
+from entitytrace.text import import_text
+from entitytrace.util import digest, dumps, implementation_hash, utc_now, write_json
 
 
 def read_source_run(source_db: Path, source_run_id: str) -> dict:
@@ -129,7 +129,7 @@ def export_experiment(
     src_bundle: dict,
     exp_run_id: str,
     exp_config: dict,
-    roster_out: dict,
+    roster_out: dict | None,
     output_dir: Path,
     complete: bool,
     identity_seconds: float,
@@ -141,85 +141,10 @@ def export_experiment(
     discovery_seconds: float = 0.0,
     full_cold_pipeline: bool = False,
 ) -> dict:
-    source = src_bundle["source"]
-    text, metadata = source["text"], source["metadata"]
-    chapters = src_bundle["chapters"]
-    observations = src_bundle["observations"]
-    grounding_reviews = [r for r in src_bundle["reviews"] if r.get("stage") in {"grounding", "discovery"}]
-
-    entities = roster_out["entities"]
-    mentions = roster_out["mentions"]
-    identity_reviews = [r for r in roster_out["reviews"] if r.get("stage") not in {"grounding", "discovery"}]
-    all_reviews = identity_reviews + grounding_reviews
-
-    by_chapter = {c["id"]: c for c in chapters}
-    for m in mentions:
-        validate_span(text, m["address"], source["id"], m["text"])
-        ch = by_chapter[m["chapter_id"]]
-        m["chapter_start"] = m["start"] - ch["start"]
-        m["chapter_end"] = m["end"] - ch["start"]
-        for span in m["evidence"]:
-            validate_span(text, span, source["id"])
-
-    ids = {m["id"] for m in mentions}
-    if sorted(mid for e in entities for mid in e["mention_ids"]) != sorted(ids):
-        raise ValueError("实验导出校验失败：实体分组未恰好覆盖所有提及")
-
-    status = "incomplete" if not complete else ("completed_with_review" if all_reviews else "completed")
-    result_doc = {
-        "schema_version": 3,
-        "run_id": exp_run_id,
-        "source_run_id": src_bundle["source_run_id"],
-        "status": status,
-        "source": metadata,
-        "chapters": chapters,
-        "mentions": mentions,
-        "observations": observations,
-        "entities": entities,
-        "roster_summary": roster_out["roster_summary"],
-        "ambiguous_surfaces": roster_out["ambiguous_surfaces"],
-        "scope": "实体提及与名册链接身份归组对照实验；复用已完成发现结果",
-    }
-    result_doc["result_revision"] = digest(result_doc)
-
-    output_dir.mkdir(parents=True, exist_ok=True)
-    write_json(output_dir / "result.json", result_doc)
-    write_json(
-        output_dir / "review.json",
-        {
-            "schema_version": 1,
-            "run_id": exp_run_id,
-            "result_revision": result_doc["result_revision"],
-            "items": all_reviews,
-            "counts": {
-                "total": len(all_reviews),
-                "identity_reviews": len(identity_reviews),
-                "grounding_discovery_reviews": len(grounding_reviews),
-            },
-            "instruction": "按 impact 降序排列；自动模型判断不冒充人工答案。",
-        },
-    )
-
-    requests = store.rows(
-        "SELECT DISTINCT r.* FROM request_cache r JOIN calls c ON r.id=c.request_id WHERE c.run_id=? ORDER BY r.id",
-        (exp_run_id,),
-    )
-    write_bytes(
-        output_dir / "requests.jsonl",
-        "".join(
-            dumps({
-                "id": r["id"],
-                "service": r["service"],
-                "model": r["model"],
-                "request": json.loads(r["request"]),
-                "response": json.loads(r["response"]),
-            })
-            + "\n"
-            for r in requests
-        ).encode("utf-8"),
-    )
-
-    total_model_metrics = metrics(store, exp_run_id)
+    """委托生产 export_run 统一导出 schema_version=3 产物，不保留第二份导出实现。"""
+    if roster_out is not None and not store.records(exp_run_id, "roster_output"):
+        store.put(exp_run_id, "roster_output", {"id": "roster_output", "start": 0, **roster_out})
+    store.state(exp_run_id, identity={"complete": complete, "algorithm": exp_config["identity_algorithm"]})
     inv_record = {
         "id": invocation_id,
         "started": utc_now(),
@@ -231,53 +156,15 @@ def export_experiment(
             "identity": {"seconds": round(identity_seconds, 4), "resumed": False, "complete": complete},
         },
         "model_metrics": metrics(store, exp_run_id, invocation_id),
-        "budget": {
-            "max_requests": budget.max_requests,
-            "max_seconds": budget.max_seconds,
-            "network_attempts": budget.count,
-            "stop_reason": budget.stop_reason,
-            "network_errors": dict(budget.network_errors),
-        },
+        "budget": budget.summary(),
         "error": error_msg,
     }
     store.put(exp_run_id, "invocation", inv_record)
-    invocations = store.records(exp_run_id, "invocation")
-    total_identity_seconds = round(
-        sum(
-            inv.get("stages", {}).get("identity", {}).get("seconds", 0.0)
-            for inv in invocations
-            if not inv.get("stages", {}).get("identity", {}).get("resumed", False)
-        ),
-        4,
-    )
-
-    manifest_doc = {
-        "schema_version": 2,
-        "run_id": exp_run_id,
-        "source_run_id": src_bundle["source_run_id"],
-        "arm": exp_config["arm"],
-        "result_revision": result_doc["result_revision"],
-        "status": status,
-        "source": metadata,
-        "config": exp_config,
-        "invocations": invocations,
-        "identity_seconds": total_identity_seconds,
-        "total_model_metrics": total_model_metrics,
-        "counts": {
-            "chapters": sum(c["kind"] == "chapter" for c in chapters),
-            "sections": len(chapters),
-            "mentions": len(mentions),
-            "observations": len(observations),
-            "entities": len(entities),
-            "singletons": sum(1 for e in entities if len(e["mention_ids"]) == 1),
-            "review_items": len(all_reviews),
-            "identity_review_items": len(identity_reviews),
-            "grounding_discovery_review_items": len(grounding_reviews),
-        },
-        "budget": inv_record["budget"],
-        "files": ["result.json", "review.json", "requests.jsonl", "manifest.json"],
-    }
-    write_json(output_dir / "manifest.json", manifest_doc)
+    store.state(exp_run_id, last_invocation=invocation_id, last_error=error_msg)
+    out_path = export_run(store, exp_run_id, output_dir, output_dir=output_dir)
+    manifest_doc = json.loads((out_path / "manifest.json").read_text(encoding="utf-8"))
+    manifest_doc["budget"] = inv_record["budget"]
+    write_json(out_path / "manifest.json", manifest_doc)
     return manifest_doc
 
 
@@ -323,7 +210,7 @@ def run_experiment(args: argparse.Namespace) -> int:
                 services,
                 discovery_concurrency=args.concurrency,
                 decision_concurrency=3,
-                opener=budget,
+                budget=budget,
             )
             log_fn = lambda msg: print(msg, flush=True)
             state = store.run(exp_run_id)["state"]
@@ -393,7 +280,7 @@ def run_experiment(args: argparse.Namespace) -> int:
                 services,
                 discovery_concurrency=args.concurrency,
                 decision_concurrency=3,
-                opener=budget,
+                budget=budget,
             )
 
         id_begin = time.perf_counter()
@@ -430,16 +317,6 @@ def run_experiment(args: argparse.Namespace) -> int:
             id_seconds = time.perf_counter() - id_begin
 
     try:
-        if roster_out is None and "src_bundle" in locals():
-            # 未完成时按已完成部分或暂定单项导出 incomplete 快照，保留断点
-            fallback = resolve_surface_direct(
-                src_bundle["source"],
-                src_bundle["chapters"],
-                src_bundle["mentions"],
-                [],
-                src_bundle["reviews"],
-            )
-            roster_out = fallback
         wall_seconds = time.perf_counter() - wall_begin
         manifest = export_experiment(
             store,

@@ -24,14 +24,16 @@ EntityTrace 是面向 agent 的插件，提供小说实体发现、身份判断�
 
 | 环节 | 当前可用 | 后续补齐 |
 | --- | --- | --- |
-| 启动与恢复 | `run` 执行全文处理，相同输入与配置复用断点 | 统一机器可读调用回执、错误分类、状态查询与总预算控制 |
+| 启动与恢复 | `run` 执行全文处理，相同输入与配置复用断点；支持 `--max-requests`、`--max-seconds` 预算与连续断网停止 | 统一机器可读调用回执、细粒度错误回执与独立状态查询 |
 | 读取与取证 | JSON／JSONL 文件、`export` 重导出、`quote` 取回原文 | 按需查询，减少 agent 读取整份大型产物 |
-| 待审与更正 | `review.json` 提供问题编号与证据，可由 agent 读取和解释 | 结构化答案写回、版本校验、撤回和受影响结果重算 |
+| 待审与更正 | `review.json` 按 `impact` 降序提供问题编号与证据，可由 agent 读取和解释 | 结构化答案写回、版本校验、撤回和受影响结果重算 |
 | 宿主接入 | 有命令执行和文件访问能力的 agent 可按本文调用 CLI | 核实目标宿主能力后封装适配，验证安装与完整调用流程 |
 
 当前 `run` 的终端输出包含进度文本，不能当作统一 JSON 响应；退出码、产物状态和待审项须结合读取。计算完成不代表全部身份已经确认，宿主 agent 的推断也不能记作用户已确认的答案。
 
 ## 当前流程
+
+默认身份流程为 **`entity-roster-v1`（实体名册链接，`--identity-algorithm roster`）**；旧版配对组消歧流程保留为 `--identity-algorithm groups-v2` 供对照与兼容导出。
 
 | 步骤 | 执行者 | 实际行为 |
 | --- | --- | --- |
@@ -39,39 +41,45 @@ EntityTrace 是面向 agent 的插件，提供小说实体发现、身份判断�
 | 章节识别 | Decision 为主，复杂标题调用大语言模型辅助定位 | 全文扫描；先顺序建立参考，再有限并行、按顺序确认；用后文回看开头 |
 | 地址核验 | 本地程序 | 检查章节范围完整覆盖原文，再建立发现任务 |
 | 提及发现 | DeepSeek + 本地并发任务池 | 各章独立发现称呼与引用，长章拆任务；逐字核对提及地址 |
-| 候选比较 | 本地程序 | 将名称与原文关系线索聚合成组候选；暂定粗类用于软排序，未知或跨类候选保留 |
-| 身份判断 | Decision + 有限轮次调度 | 使用明确目标位置及候选组的代表原文，低分扩大一次证据；核验异称、已有组、否定关系及竞争候选 |
-| 归组 | 本地程序 | 每轮任务的组快照互斥，依据接受关系归组，已知不同关系阻止冲突合并；组变化后重新规划 |
-| 类别、命名与导出 | Decision + 本地程序 | 归组后核定粗类，从已发现称呼选择展示名；名字不改变成员，待审按当前组对聚合 |
+| 章内归并（C1） | DeepSeek + 本地结构与边界校验 | 按发现片段整段上下文将称呼归入章内对象，区分专名／称谓／描述词，支持逐提及例外指派与非实体建议 |
+| 跨章名册与复核（C2） | 本地并查集 + DeepSeek 分区复核／补合并核验 | 仅 `proper_name` 参与跨章候选聚合；多名称、粗类冲突或弱专名送分区复核；按粗类与跨粗类提议补合并，经双侧 ≥600 码点原文核验确认，不可合并约束全程硬拦截 |
+| 未决与非专名链接（C3） | 本地唯一称呼直连 + DeepSeek 候选链接 | 章内对象确定性落入名册；只含非专名称呼的对象与章内未决提及在候选名册与原文证据下链接，受专名一致性硬约束保护 |
+| 待审排序与统一导出（C4） | 本地程序 | 汇总身份与定位待审并按受影响提及数（`impact`）降序排列，校验全部码点地址与覆盖完整性，导出 `schema_version=3` 产物 |
 
-使用 `deepseek-flash` 和固定版本 `jev-1.13.0`。暂定接受条件仍是所选选项概率至少 0.95、服务置信度至少 0.8；**这些阈值尚未人工标注校准，不代表 95% 准确率。** 组证据复核分歧、竞争候选无法交叉确认或类别冲突未获原文支持时转待审。暂定类别不同可经原文重新核定，不是永久隔离条件。未合并的单独提及仍可能是其他实体的别称。
-
-`entity-groups-v2` 为当前默认身份流程，最多 12 轮，每次最多 3 个候选组。候选比较耗尽不代表已找全关系；达到轮次预算时，未比较的当前组关系显式进入待审。旧运行和请求缓存保留，新源码生成独立运行编号。
-
-当前仍是待校准的实验流程：新版中文全文的分组碎片和待审均多于旧版，已知别称仍有漏合并。功能与数据一致性检查通过不代表质量优化已经完成。
+默认模型配置使用 `deepseek-flash`（发现与名册身份阶段）和固定版本 `jev-1.13.0`（章节阶段；切换 `--identity-algorithm groups-v2` 时亦用于配对身份消歧）。`entity-roster-v1` 不使用未校准概率分数作主路由，而是显式记录每处提及的链接来源（`chapter_local`、`c3_model`、`surface_unique`、`unresolved`、`c3_rejected_name_mismatch`、`not_entity_suggested`）与关联请求 ID。
 
 ## 运行
 
 以下命令既是宿主 agent 当前的调用入口，也可用于开发调试。以仓库目录为工作目录执行，或显式指定输入、配置、数据库和输出路径。新环境可从 `.env.example` 创建配置文件并填写自己的密钥；系统环境变量优先于文件。配置、数据库和运行产物均被 Git 忽略。
 
 ```powershell
-python -m entitytrace run "test/text-library/texts/03_中文长篇_九命奇冤_36回.txt"
-python -m entitytrace run "test/text-library/texts/04_英文长篇_Pride_and_Prejudice_61章.txt"
+python -X utf8 -m entitytrace run "test/text-library/texts/03_中文长篇_九命奇冤_36回.txt"
+python -X utf8 -m entitytrace run "test/text-library/texts/04_英文长篇_Pride_and_Prejudice_61章.txt"
 ```
 
-也可处理自己的 UTF-8 TXT：
+也可处理自己的 UTF-8 TXT，或按需附加请求／时间预算与身份算法开关：
 
 ```powershell
-python -m entitytrace run "D:\小说\样本.txt" --discovery-concurrency 6 --decision-concurrency 3
+python -X utf8 -m entitytrace run "D:\小说\样本.txt" --discovery-concurrency 6 --max-requests 1000 --max-seconds 2400
+python -X utf8 -m entitytrace run "D:\小说\样本.txt" --identity-algorithm groups-v2 --identity-rounds 12 --group-candidates 3
 ```
 
-默认发现任务最多约 9,000 个码点，默认同时最多 6 个发现请求、3 个 Decision 请求，均为**每个进程**的上限。多开进程会叠加并发；多 key 不代表账户额度相乘。模型调用、重试和等待均在 SQLite 事务外，任务结果与完成标记用短事务一起保存。
+默认发现与名册阶段同时最多 6 个生成请求、章节（及 `groups-v2`）同时最多 3 个 Decision 请求，发现任务最多约 9,000 个码点，均为**每个进程**的上限。多开进程会叠加并发；多 key 不代表账户额度相乘。模型调用、重试和等待均在 SQLite 事务外，任务结果与完成标记用短事务一起保存。
 
-重复同一命令会复用完成阶段和任务；失败任务可重试。输入、业务源码、模型或参数变化会产生新运行编号，内容完全相同的成功 HTTP 请求仍可命中缓存。需要独立无缓存验证时，使用新的 `--db` 路径；不要把开发缓存计时当成首次全文处理速度。
+重复同一命令会复用完成阶段和任务；失败任务可重试。输入、业务源码、模型或核心流程参数（如 `--identity-algorithm`、`--task-chars`）变化会产生新运行编号，内容完全相同的成功 HTTP 请求仍可命中缓存。**预算参数（`--max-requests`、`--max-seconds`）不写入 `run_id` 配置摘要**：当运行因预算耗尽或连续网络传输失败（默认连续 9 次）停止时，扩大预算或待网络恢复后重跑同一命令，将在同一 `run_id` 上断点续跑，已完成任务不会重复发起网络请求。需要独立无缓存验证时，使用新的 `--db` 路径；不要把缓存复用计时当成首次全文处理速度。
 
-服务明确返回余额或硬额度不足时，本次运行停止该服务的新请求，仍可读取成功缓存；未完成任务保留。额度恢复后可重新执行命令。服务错误不转换为身份裁决。
+服务明确返回余额或硬额度不足时，本次运行停止该服务的新请求，仍可读取成功缓存；未完成任务保留。额度恢复后可重新执行命令。服务错误、预算停止与断网不会转换为身份裁决。
 
-其他参数见 `python -m entitytrace run --help`：`--encoding` 指定编码，`--task-chars` 调整发现任务预算，`--identity-rounds` 设置 1—24 轮，`--group-candidates` 设置 1—3 个候选组，`--stop-after chapters` 或 `discovery` 在指定阶段停止。退出码 `0` 表示三个计算阶段完成（仍可能有待审项或预算内未决关系），`2` 表示未完成、阶段性停止或错误。
+`run` 主要参数（详见 `python -X utf8 -m entitytrace run --help`）：
+- `--identity-algorithm roster|groups-v2`：身份归组算法，默认 `roster`（`entity-roster-v1`）；`groups-v2` 为旧版实体组消歧。
+- `--max-requests N`、`--max-seconds S`：单次运行的新网络请求上限与运行秒数上限，默认不限；另内置连续 9 次传输层网络失败自动熔断停止。
+- `--encoding`、`--task-chars`、`--discovery-concurrency`、`--decision-concurrency`：输入编码、发现任务长度预算与各服务单进程并发上限。
+- `--stop-after chapters|discovery|identity`：在指定阶段完成后停止。
+- `--identity-rounds`（1—24，默认 12）、`--group-candidates`（1—3，默认 3）：**仅对 `--identity-algorithm groups-v2` 生效**。
+
+退出码约定：
+- `0`：`chapters`、`discovery`、`identity` 三个阶段全部完成并导出（`result.json` 的 `status` 为 `completed` 或含待审项的 `completed_with_review`）。
+- `2`：运行未完成或执行出错（包括达到 `--max-requests`／`--max-seconds` 预算上限、连续网络失败停止、`--stop-after` 提前停止，以及输入／配置／服务错误）。已建运行的未完成断点会导出 `status=incomplete`，并在 `manifest.json` 的 `state.last_error` 中记录类别（如 `budget`、`network`）以便后续恢复。
 
 ## 输出与回溯
 
@@ -79,34 +87,39 @@ python -m entitytrace run "D:\小说\样本.txt" --discovery-concurrency 6 --dec
 
 | 文件 | 内容 |
 | --- | --- |
-| `result.json` | 来源、章节、提及、原始发现记录、实体分组及身份关系；不含描述提取 |
-| `review.json` | 定位失败、身份证据不足和合并冲突等问题，包含稳定问题编号及证据引用 |
-| `decisions.jsonl` | 每次判断的问题、原文证据、概率／置信度及采用条件 |
+| `result.json` | 来源、章节、提及、原始发现记录、实体名册分组及汇总信息；不含描述提取 |
+| `review.json` | 身份证据不足、分歧未决与定位失败等待审问题，含稳定编号、影响范围（`impact`）及证据引用 |
+| `decisions.jsonl` | Decision 阶段（章节及 `groups-v2`）每次判断的问题、证据、概率与置信度 |
 | `requests.jsonl` | 本运行使用的成功模型请求和响应，不含 Authorization 或模型内部推理字段 |
-| `manifest.json` | 输入和源码版本、模型参数、阶段状态、请求／缓存／失败次数、耗时和数量 |
+| `manifest.json` | 输入和源码版本、配置、阶段状态、每次调用预算与请求／缓存／失败统计、耗时和数量 |
 | `source.txt`、`source.original` | 用于地址定位的冻结文本、原始输入字节 |
 
 `result.json` 的 `status` 为 `completed`、`completed_with_review` 或 `incomplete`。计算流程完成不等于实体名单全部确认；只有部分结果时不会标成全文完成。`identity_status=unresolved_singleton` 表示暂定的单独提及，不能据此断言它和全书其他对象都不同。
 
-新版结果使用 `schema_version=2`，保留原有成员与关系字段，实体增加 `kind`、`kind_status`、`classification_decision_ids`、`representative_mention_ids` 和展示名来源／决策引用。`kind_status=conflict`、`identity_status=needs_review` 表示类别核验发现可能混组；程序保留成员并提出审核，不凭类别投票擅自拆组。展示名只从组内已发现称呼中选择，未获明确选择时保留可追溯的默认名称。
+默认 `roster`（`entity-roster-v1`）运行输出 **`schema_version=3`**：
+- `entities[]`：包含 `id`、`name`、`names`、`aliases`（强称呼集合）、`mention_ids`、`mention_count`、`start`、`first_chapter_id`、`kind`、`identity_status`（`linked_by_roster`、`unresolved_singleton`、`not_entity_suggested`）和 `link_methods`（各链接方法计数）。**注意：名册条目 `id` 由成员首处地址与强称呼集合摘要生成，不是跨版本永久编号。**
+- `mentions[]`：在章节与原文地址、定位证据基础上，增加 `entity_id`、`link_method`、`link_refs`（以及非实体建议项的 `identity_status=not_entity_suggested`）。
+- 顶层附加 `roster_summary`（条目数、活跃条目数、单项数、各链接方法计数、`c3_rejected_name_mismatch`、身份待审数、歧义称呼数）与 `ambiguous_surfaces`（映射到多个名册条目的称呼及分布，仅作信息展示，不列为待审）。
+- `review.json`：合并身份待审与发现／定位待审，按 `impact` 降序排列，并在 `counts` 中分列 `identity_reviews` 与 `grounding_discovery_reviews`。
+- 使用 `--identity-algorithm groups-v2` 或重新导出历史旧运行时，`export` 仍按原 `schema_version=2`（或 `1`）导出，既有字段与结构保持不变。
 
-清单的 `resolution_rounds` 保存各轮前后组数、比较与选择数、增量及累计用时，不将这些计数称为准确率。运行的历史 `seconds` 字段继续表示计算阶段；新增 `wall_seconds` 包含初始化和主文件导出，排除最终计时回执写入及进程启动退出，`export_seconds` 单列导出。严格比较时另测整个命令的外部墙钟时间，并注明缓存。
+清单 `manifest.json` 记录每次调用的各阶段耗时、`wall_seconds`（从管线入口、数据库初始化至主输出导出完成，不含最终回执回写与进程启停）、`export_seconds`、`identity_seconds` 及 `budget` 执行摘要。严格比较时另测整个命令的外部墙钟时间，并注明冷／热缓存口径。
 
 地址为 `text_version_id + offset_unit + [start,end)`，从 0 开始、包含起点不含终点，单位是 Unicode 码点。原文换行和空格保留；UTF-8 BOM 仅从定位文本中去除，原始文件另存。章内偏移从整个章节范围起点计算，章节包含标题；`ordinal` 是含篇首／卷等分段的顺序，不等于作品印刷章号。
 
 从数据库取回原文或重新导出，不调用模型（将 `运行编号` 替换为终端打印的完整值）：
 
 ```powershell
-python -m entitytrace quote 运行编号 100 120
-python -m entitytrace export 运行编号
+python -X utf8 -m entitytrace quote 运行编号 100 120
+python -X utf8 -m entitytrace export 运行编号
 ```
 
-待审清单可以交给智能体读取，再按问题编号逐项讨论。首版尚未实现人工答案自动写回与局部重算命令。
+待审清单可以交给智能体读取，再按问题编号逐项讨论。当前版本尚未实现结构化答案写回与名册局部更正命令（规划于后续阶段）。
 
 ## 验证与当前限制
 
 ```powershell
-python -m unittest discover -s tests -v
+python -X utf8 -m unittest discover -s tests -v
 ```
 
 离线验证覆盖原文字节／换行／emoji 地址、重复提及、错误引用、身份冲突、请求大小与拆包、事务边界、并发补位、竞争候选、类别纠错、组快照恢复及缓存证据隔离。

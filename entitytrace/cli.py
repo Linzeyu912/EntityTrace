@@ -26,8 +26,12 @@ def main(argv=None) -> int:
     run.add_argument("--decision-concurrency", type=int, default=3)
     run.add_argument("--task-chars", type=int, default=9000)
     run.add_argument("--stop-after", choices=["chapters", "discovery", "identity"], default="identity")
-    run.add_argument("--identity-rounds", type=int, default=12, help="实体组消歧最大轮次，默认 12")
-    run.add_argument("--group-candidates", type=int, default=3, help="每次最多比较的候选组数，默认 3")
+    run.add_argument("--identity-algorithm", choices=["roster", "groups-v2"], default="roster",
+                     help="身份归组算法：roster（默认，entity-roster-v1 实体名册链接）或 groups-v2（旧版实体组消歧）")
+    run.add_argument("--identity-rounds", type=int, default=12,
+                     help="实体组消歧最大轮次，默认 12（仅对 --identity-algorithm groups-v2 生效）")
+    run.add_argument("--group-candidates", type=int, default=3,
+                     help="每次最多比较的候选组数，默认 3（仅对 --identity-algorithm groups-v2 生效）")
     run.add_argument("--max-requests", type=int, default=None, help="本次调用最大新网络请求预算，默认不限；超限保留断点并以退出码 2 停止")
     run.add_argument("--max-seconds", type=float, default=None, help="本次调用最大运行秒数预算，默认不限；超限保留断点并以退出码 2 停止")
     export = subs.add_parser("export", help="从已保存数据重新导出，不调用模型")
@@ -46,7 +50,8 @@ def main(argv=None) -> int:
                                          args.decision_concurrency, args.task_chars, args.encoding, args.stop_after,
                                          log=lambda message: print(message, flush=True),
                                          identity_rounds=args.identity_rounds, group_candidates=args.group_candidates,
-                                         max_requests=args.max_requests, max_seconds=args.max_seconds)
+                                         max_requests=args.max_requests, max_seconds=args.max_seconds,
+                                         identity_algorithm=args.identity_algorithm)
             return 0 if complete else 2
         store = Store(args.db)
         try:

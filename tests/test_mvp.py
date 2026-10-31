@@ -14,8 +14,9 @@ from entitytrace.chapters import build_chapters
 from entitytrace.config import Service
 from entitytrace.discovery import ground_result
 from entitytrace.identity import ask_identity_pairs, audit_aliases, group_entities, plan_pairs
+from entitytrace.cli import main as cli_main
 from entitytrace.models import ModelError, Models, bounded_map, check_choices, choice_question
-from entitytrace.pipeline import run_pipeline
+from entitytrace.pipeline import export_run, run_pipeline
 from entitytrace.storage import Store
 from entitytrace.text import address, import_text, units, validate_span
 from entitytrace.util import digest
@@ -331,13 +332,49 @@ class FakeModels:
                             "probabilities": {k: int(k == choice) for k in question["criteria"]}}
         return answers, digest([stage, state, questions])
 
-    def generate(self, system, state, stage, validate, *args):
+    def generate(self, system, state, stage, validate, *args, **kwargs):
         type(self).generated += 1
         if type(self).fail_once:
             type(self).fail_once = False
             raise ModelError("模拟单任务失败")
-        refs = [u["id"] for u in state["units"] if "林舟" in u["text"]]
-        value = {"mentions": [{"text": "林舟", "kind": "person", "refs": refs}], "links": []}
+        if stage == "roster-c1":
+            surfaces = [row["surface"] for row in state["surfaces"]]
+            ev_ref = state["units"][0]["id"]
+            entities = [{
+                "local_id": "e1",
+                "name": surfaces[0],
+                "kind": "person",
+                "surfaces": [{"surface": s, "surface_type": "proper_name"} for s in surfaces],
+                "evidence_ref": ev_ref,
+            }] if surfaces else []
+            value = {"entities": entities, "assignments": [], "not_entity": []}
+        elif stage == "roster-c2-propose":
+            value = {"proposals": []}
+        elif stage == "roster-c2-review":
+            value = {
+                "groups": [{
+                    "group_id": "g1",
+                    "name": state["rows"][0]["name"],
+                    "kind": "person",
+                    "row_ids": [r["row_id"] for r in state["rows"]],
+                    "member_ids": [],
+                    "reason": "同指",
+                }],
+                "unresolved_row_ids": [],
+                "unresolved_member_ids": [],
+            }
+        elif stage == "roster-c2-verify":
+            value = {"verdict": "same", "reason": "同指"}
+        elif stage == "roster-c3-link":
+            value = {
+                "links": [
+                    {"mention_id": it["mention_id"], "selected_entity_id": it["candidates"][0]["entity_id"], "reason": "同指"}
+                    for it in state["items"]
+                ]
+            }
+        else:
+            refs = [u["id"] for u in state["units"] if "林舟" in u["text"]]
+            value = {"mentions": [{"text": "林舟", "kind": "person", "refs": refs}], "links": []}
         validate(value)
         return value, digest([stage, state])
 
@@ -365,16 +402,24 @@ class PipelineTests(unittest.TestCase):
                 self.assertTrue(complete)
                 self.assertEqual(run_id, same_id)
                 self.assertEqual(output, same_output)
-                self.assertEqual(FakeModels.generated - before, 1 if fail else 0)
+                if fail:
+                    self.assertGreaterEqual(FakeModels.generated - before, 1)
+                else:
+                    self.assertEqual(FakeModels.generated - before, 0)
                 result = json.loads((output / "result.json").read_text(encoding="utf-8"))
                 if not fail:
                     self.assertEqual(FakeModels.chosen, choices_before)
                     self.assertEqual(result["result_revision"], revision_before)
                 self.assertEqual(len(result["mentions"]), 2)
                 self.assertEqual(len(result["entities"]), 1)
-                self.assertEqual(result["schema_version"], 2)
+                self.assertEqual(result["schema_version"], 3)
+                self.assertEqual(result["roster_summary"]["algorithm"], "entity-roster-v1")
                 self.assertEqual(result["entities"][0]["kind"], "person")
+                self.assertEqual(result["entities"][0]["aliases"], ["林舟"])
+                self.assertEqual(result["entities"][0]["mention_count"], 2)
+                self.assertTrue(all(m["link_method"] == "chapter_local" for m in result["mentions"]))
                 manifest = json.loads((output / "manifest.json").read_text(encoding="utf-8"))
+                self.assertEqual(manifest["config"]["identity_algorithm"], "entity-roster-v1")
                 latest = next(i for i in manifest["invocations"] if i["id"] == manifest["state"]["last_invocation"])
                 self.assertGreaterEqual(latest["wall_seconds"], latest["seconds"])
                 self.assertGreaterEqual(latest["export_seconds"], 0)
@@ -385,6 +430,111 @@ class PipelineTests(unittest.TestCase):
 
     def test_failed_unit_only_is_retried(self):
         self.run_case(True)
+
+    def test_groups_v2_fixture_export_unchanged_before_and_after_switch(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            text = root / "input.txt"
+            text.write_text("第一章 初见\n林舟来了。\n第二章 再见\n林舟走了。\n", encoding="utf-8")
+            config = root / ".env"
+            config.write_text("TYPESAFE_API_KEY=test\nDEEPSEEK_API_KEY=test\n", encoding="utf-8")
+            db_path = root / "db.sqlite3"
+            FakeModels.generated = 0
+            FakeModels.chosen = 0
+            FakeModels.fail_once = False
+            with patch("entitytrace.pipeline.Models", FakeModels), patch(
+                "entitytrace.pipeline.implementation_hash", return_value="fixed-v2-baseline"
+            ):
+                run_id, output, complete = run_pipeline(
+                    text, db_path, root / "out", config,
+                    identity_algorithm="groups-v2", log=lambda _: None,
+                )
+            self.assertTrue(complete)
+            raw_bytes = (output / "result.json").read_bytes()
+            result = json.loads(raw_bytes)
+            # 与本单修改前 groups-v2 夹具导出的 run_id、result_revision 与完整字节 SHA-256 逐位一致
+            self.assertEqual(run_id, "92c0a63e5b29e4d9afebef39eeaaf635118b8bc08f376e1296532afa947adbb7")
+            self.assertEqual(result["schema_version"], 2)
+            self.assertEqual(result["result_revision"], "a6fe9ea010f92620e50f312457bb16c67e5f1fd3447c3cfb03bad45dc646aea8")
+            self.assertEqual(
+                hashlib.sha256(raw_bytes).hexdigest(),
+                "b1d5ee3104a3a481eb4406a51658af9031cf020610eb39492a3c6ee06e77c741",
+            )
+            store = Store(db_path)
+            try:
+                reexported = export_run(store, run_id, root / "reexport")
+            finally:
+                store.close()
+            self.assertEqual((reexported / "result.json").read_bytes(), raw_bytes)
+
+    def test_cli_identity_algorithm_roster_default_and_groups_v2_option(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            text = root / "input.txt"
+            text.write_text("第一章 初见\n林舟来了。\n第二章 再见\n林舟走了。\n", encoding="utf-8")
+            config = root / ".env"
+            config.write_text("TYPESAFE_API_KEY=test\nDEEPSEEK_API_KEY=test\n", encoding="utf-8")
+            db_path = root / "db.sqlite3"
+            out_roster = root / "out_roster"
+            out_v2 = root / "out_v2"
+            FakeModels.fail_once = False
+            with patch("entitytrace.pipeline.Models", FakeModels):
+                self.assertEqual(
+                    cli_main(["run", str(text), "--db", str(db_path), "--output", str(out_roster), "--config", str(config)]),
+                    0,
+                )
+                self.assertEqual(
+                    cli_main([
+                        "run", str(text), "--db", str(db_path), "--output", str(out_v2),
+                        "--config", str(config), "--identity-algorithm", "groups-v2",
+                    ]),
+                    0,
+                )
+            roster_dir = next(p for p in out_roster.iterdir() if p.is_dir())
+            v2_dir = next(p for p in out_v2.iterdir() if p.is_dir())
+            roster_res = json.loads((roster_dir / "result.json").read_text(encoding="utf-8"))
+            v2_res = json.loads((v2_dir / "result.json").read_text(encoding="utf-8"))
+            self.assertEqual(roster_res["schema_version"], 3)
+            self.assertEqual(v2_res["schema_version"], 2)
+            self.assertNotEqual(roster_res["run_id"], v2_res["run_id"])
+
+    def test_roster_experiment_delegates_export_to_export_run(self):
+        from tools.roster_experiment import export_experiment, read_source_run, seed_experiment_store
+        from entitytrace.models import RequestBudget
+        from entitytrace.roster import DIRECT_VERSION, resolve_surface_direct
+
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            text = root / "input.txt"
+            text.write_text("第一章 初见\n林舟来了。\n第二章 再见\n林舟走了。\n", encoding="utf-8")
+            config = root / ".env"
+            config.write_text("TYPESAFE_API_KEY=test\nDEEPSEEK_API_KEY=test\n", encoding="utf-8")
+            src_db = root / "src.sqlite3"
+            FakeModels.fail_once = False
+            with patch("entitytrace.pipeline.Models", FakeModels):
+                src_run_id, _, _ = run_pipeline(text, src_db, root / "src_out", config, log=lambda _: None)
+            bundle = read_source_run(src_db, src_run_id)
+            exp_db = root / "exp.sqlite3"
+            exp_store = Store(exp_db)
+            try:
+                exp_cfg = {"identity_algorithm": DIRECT_VERSION, "source_run_id": src_run_id, "arm": "B"}
+                exp_run_id = "exp-b-run-0001"
+                seed_experiment_store(exp_store, bundle, exp_run_id, exp_cfg)
+                roster_out = resolve_surface_direct(
+                    bundle["source"], bundle["chapters"], bundle["mentions"], bundle["links"], bundle["reviews"]
+                )
+                exp_out = root / "exp_out"
+                manifest = export_experiment(
+                    exp_store, bundle, exp_run_id, exp_cfg, roster_out, exp_out,
+                    True, 0.01, 0.02, RequestBudget(10, 60), "inv-1", None,
+                )
+                self.assertEqual(manifest["schema_version"], 2)
+                self.assertEqual(manifest["source_run_id"], src_run_id)
+                exp_result = json.loads((exp_out / "result.json").read_text(encoding="utf-8"))
+                self.assertEqual(exp_result["schema_version"], 3)
+                self.assertEqual(exp_result["source_run_id"], src_run_id)
+            finally:
+                exp_store.close()
 
 
 if __name__ == "__main__":
