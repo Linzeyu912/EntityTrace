@@ -92,6 +92,23 @@ class Store:
         return [json.loads(r["data"]) for r in self.rows(
             "SELECT data FROM records WHERE run_id=? AND kind=? ORDER BY start,id", (run_id, kind))]
 
+    def corrections(self, run_id: str) -> list[dict]:
+        return self.records(run_id, "correction")
+
+    def append_correction(self, run_id: str, build_record) -> dict:
+        with self.lock, self.db:
+            row = self.db.execute(
+                "SELECT COALESCE(MAX(start), 0) AS max_seq FROM records WHERE run_id=? AND kind='correction'",
+                (run_id,),
+            ).fetchone()
+            seq = int(row["max_seq"]) + 1
+            record = build_record(seq)
+            self.db.execute(
+                "INSERT INTO records VALUES(?,?,?,?,?)",
+                (run_id, "correction", record["id"], seq, dumps(record)),
+            )
+            return record
+
     def task(self, run_id: str, task_id: str) -> dict | None:
         values = self.rows("SELECT * FROM tasks WHERE run_id=? AND id=?", (run_id, task_id))
         if not values:

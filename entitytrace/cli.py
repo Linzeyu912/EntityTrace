@@ -5,9 +5,21 @@ import json
 import sys
 from pathlib import Path
 
+from .corrections import apply_correction
 from .pipeline import export_run, run_pipeline
 from .storage import Store
 from .text import address, validate_span
+
+
+def _add_correct_common_args(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument("--source", choices=["user", "agent"], default=argparse.SUPPRESS,
+                        help="更正来源：user（立即生效）或 agent（仅写入建议）（必填）")
+    parser.add_argument("--expect-revision", default=argparse.SUPPRESS,
+                        help="期望的当前 result_revision，不一致时拒绝写入（必填）")
+    parser.add_argument("--resolves", default=argparse.SUPPRESS, help="本次更正对应解决的待审项 review_id")
+    parser.add_argument("--note", default=argparse.SUPPRESS, help="更正说明或依据备注")
+    parser.add_argument("--db", type=Path, default=argparse.SUPPRESS, help="数据库路径，默认 data/entitytrace.sqlite3")
+    parser.add_argument("--output", type=Path, default=argparse.SUPPRESS, help="输出根目录，默认 outputs")
 
 
 def main(argv=None) -> int:
@@ -43,6 +55,33 @@ def main(argv=None) -> int:
     quote.add_argument("start", type=int)
     quote.add_argument("end", type=int)
     quote.add_argument("--db", type=Path, default=Path("data/entitytrace.sqlite3"))
+
+    correct = subs.add_parser("correct", help="对已完成的名册运行叠加确定性更正或撤回，不调用模型")
+    correct.add_argument("run_id")
+    _add_correct_common_args(correct)
+    op_common = argparse.ArgumentParser(add_help=False)
+    _add_correct_common_args(op_common)
+    correct_ops = correct.add_subparsers(dest="op", required=True)
+
+    c_merge = correct_ops.add_parser("merge", parents=[op_common], help="将被并实体的全部提及并入目标实体（保留目标实体 ID）")
+    c_merge.add_argument("target_entity_id")
+    c_merge.add_argument("merged_entity_id")
+
+    c_split = correct_ops.add_parser("split-surface", parents=[op_common], help="将实体中指定称呼的提及拆为新实体")
+    c_split.add_argument("entity_id")
+    c_split.add_argument("surface")
+
+    c_assign = correct_ops.add_parser("assign", parents=[op_common], help="将单个提及指派到指定实体或新建实体（new）")
+    c_assign.add_argument("mention_id")
+    c_assign.add_argument("target")
+
+    c_not_ent = correct_ops.add_parser("not-entity", parents=[op_common], help="将单个提及确认为非实体")
+    c_not_ent.add_argument("mention_id")
+
+    c_revoke = correct_ops.add_parser("revoke", parents=[op_common], help="撤回指定更正记录")
+    c_revoke.add_argument("correction_id")
+    c_revoke.add_argument("--cascade", action="store_true", help="一并撤回依赖该更正的后续更正")
+
     args = parser.parse_args(argv)
     try:
         if args.command == "run":
@@ -53,10 +92,35 @@ def main(argv=None) -> int:
                                          max_requests=args.max_requests, max_seconds=args.max_seconds,
                                          identity_algorithm=args.identity_algorithm)
             return 0 if complete else 2
-        store = Store(args.db)
+        db_path = getattr(args, "db", Path("data/entitytrace.sqlite3"))
+        store = Store(db_path)
         try:
             if args.command == "export":
                 print(export_run(store, args.run_id, args.output).resolve())
+            elif args.command == "correct":
+                if args.op == "merge":
+                    op_args = {"target_entity_id": args.target_entity_id, "merged_entity_id": args.merged_entity_id}
+                elif args.op == "split-surface":
+                    op_args = {"entity_id": args.entity_id, "surface": args.surface}
+                elif args.op == "assign":
+                    op_args = {"mention_id": args.mention_id, "target": args.target}
+                elif args.op == "not-entity":
+                    op_args = {"mention_id": args.mention_id}
+                else:
+                    op_args = {"correction_id": args.correction_id}
+                receipt = apply_correction(
+                    store,
+                    args.run_id,
+                    args.op,
+                    op_args,
+                    source=getattr(args, "source", ""),
+                    expect_revision=getattr(args, "expect_revision", ""),
+                    output_root=getattr(args, "output", Path("outputs")),
+                    resolves=getattr(args, "resolves", None),
+                    note=getattr(args, "note", None),
+                    cascade=getattr(args, "cascade", False),
+                )
+                print(json.dumps(receipt, ensure_ascii=False))
             else:
                 source = store.source(store.run(args.run_id)["source_id"])
                 print(validate_span(source["text"], address(source["id"], args.start, args.end), source["id"]))

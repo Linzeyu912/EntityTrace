@@ -8,6 +8,7 @@ from pathlib import Path
 
 from .chapters import detect_chapters
 from .config import load_services
+from .corrections import partition_active_corrections, replay_user_corrections
 from .discovery import discover
 from .identity import group_entities
 from .resolution import VERSION as RESOLUTION_VERSION, annotate_groups, resolve_groups
@@ -60,7 +61,7 @@ def metrics(store: Store, run_id: str, invocation: str | None = None) -> dict:
     return result
 
 
-def export_run(store: Store, run_id: str, output_root: Path, output_dir: Path | None = None) -> Path:
+def build_export_bundle(store: Store, run_id: str) -> dict:
     run = store.run(run_id)
     source = store.source(run["source_id"])
     text, metadata = source["text"], source["metadata"]
@@ -76,17 +77,29 @@ def export_run(store: Store, run_id: str, output_root: Path, output_dir: Path | 
     by_chapter = {c["id"]: c for c in chapters}
     state = run["state"]
     complete = all(state.get(name, {}).get("complete", False) for name in ("chapters", "discovery", "identity"))
-    output = output_dir if output_dir is not None else (output_root / run_id[:16])
 
     if roster_mode:
         raw_ids = {m["id"] for m in mentions}
         saved_roster = store.records(run_id, "roster_output")
         roster_out = saved_roster[0] if saved_roster else build_incomplete_roster_output(source, mentions, algorithm=algo)
-        entities = [dict(e) for e in roster_out["entities"]]
-        mentions = [dict(m) for m in roster_out["mentions"]]
-        non_identity_reviews = [r for r in reviews if not str(r.get("stage", "")).startswith("roster")]
-        identity_reviews = [r for r in roster_out["reviews"] if str(r.get("stage", "")).startswith("roster")]
-        all_reviews = identity_reviews + non_identity_reviews
+        active_user, active_agent, _, _ = partition_active_corrections(store.corrections(run_id))
+        if active_user:
+            replayed = replay_user_corrections(roster_out, reviews, chapters, active_user, algorithm=algo)
+            entities = replayed["entities"]
+            mentions = replayed["mentions"]
+            identity_reviews = replayed["identity_reviews"]
+            non_identity_reviews = replayed["non_identity_reviews"]
+            all_reviews = replayed["all_reviews"]
+            roster_summary = replayed["roster_summary"]
+            ambiguous_surfaces = replayed["ambiguous_surfaces"]
+        else:
+            entities = [dict(e) for e in roster_out["entities"]]
+            mentions = [dict(m) for m in roster_out["mentions"]]
+            non_identity_reviews = [r for r in reviews if not str(r.get("stage", "")).startswith("roster")]
+            identity_reviews = [r for r in roster_out["reviews"] if str(r.get("stage", "")).startswith("roster")]
+            all_reviews = identity_reviews + non_identity_reviews
+            roster_summary = roster_out["roster_summary"]
+            ambiguous_surfaces = roster_out["ambiguous_surfaces"]
         for mention in mentions:
             validate_span(text, mention["address"], source["id"], mention["text"])
             chapter = by_chapter[mention["chapter_id"]]
@@ -99,7 +112,17 @@ def export_run(store: Store, run_id: str, output_root: Path, output_dir: Path | 
         ids = {m["id"] for m in mentions}
         if ids != raw_ids or sorted(mid for e in entities for mid in e["mention_ids"]) != sorted(ids):
             raise ValueError("实体分组未恰好覆盖所有提及")
-        status = "incomplete" if not complete else "completed_with_review" if all_reviews else "completed"
+        pending_identity = [r for r in identity_reviews if r.get("status", "pending") == "pending"]
+        pending_non_identity = [r for r in non_identity_reviews if r.get("status", "pending") == "pending"]
+        pending_all = pending_identity + pending_non_identity
+        status = "incomplete" if not complete else "completed_with_review" if pending_all else "completed"
+        limitations = [
+            "名册条目 ID 由成员首处地址与强称呼集合摘要生成，不是跨版本永久编号。",
+            "发现阶段未覆盖的提及不进入名册归组；原文定位通过不代表实体和身份语义正确。",
+            "无比较或未决的单独提及（unresolved_singleton）仅表示证据不足，不能据此断言与所有其他实体不同。",
+        ]
+        if active_user:
+            limitations.append("含用户更正，被更正实体的 ID 规则见 corrections")
         result = {
             "schema_version": 3,
             "run_id": run_id,
@@ -109,37 +132,34 @@ def export_run(store: Store, run_id: str, output_root: Path, output_dir: Path | 
             "mentions": mentions,
             "observations": observations,
             "entities": entities,
-            "roster_summary": roster_out["roster_summary"],
-            "ambiguous_surfaces": roster_out["ambiguous_surfaces"],
+            "roster_summary": roster_summary,
+            "ambiguous_surfaces": ambiguous_surfaces,
             "scope": "实体提及与名册链接身份归组；不含描述、服饰或经历提取",
-            "limitations": [
-                "名册条目 ID 由成员首处地址与强称呼集合摘要生成，不是跨版本永久编号。",
-                "发现阶段未覆盖的提及不进入名册归组；原文定位通过不代表实体和身份语义正确。",
-                "无比较或未决的单独提及（unresolved_singleton）仅表示证据不足，不能据此断言与所有其他实体不同。",
-            ],
+            "limitations": limitations,
         }
+        if active_user:
+            result["corrections"] = active_user
         if run["config"].get("source_run_id"):
             result["source_run_id"] = run["config"]["source_run_id"]
         result["result_revision"] = digest(result)
-        write_json(output / "result.json", result)
-        write_json(output / "review.json", {
+        review_counts = {
+            "total": len(all_reviews),
+            "identity_reviews": len(identity_reviews),
+            "grounding_discovery_reviews": len(non_identity_reviews),
+        }
+        if active_user:
+            review_counts["pending"] = len(pending_all)
+            review_counts["resolved"] = len(all_reviews) - len(pending_all)
+        review_doc = {
             "schema_version": 1,
             "run_id": run_id,
             "result_revision": result["result_revision"],
             "items": all_reviews,
-            "counts": {
-                "total": len(all_reviews),
-                "identity_reviews": len(identity_reviews),
-                "grounding_discovery_reviews": len(non_identity_reviews),
-            },
+            "counts": review_counts,
             "instruction": "按 impact 降序排列；自动模型判断不冒充人工答案。",
-        })
-        write_bytes(output / "decisions.jsonl", "".join(dumps(d) + "\n" for d in decisions).encode("utf-8"))
-        requests = store.rows("SELECT DISTINCT r.* FROM request_cache r JOIN calls c ON r.id=c.request_id WHERE c.run_id=? ORDER BY r.id", (run_id,))
-        write_bytes(output / "requests.jsonl", "".join(dumps({"id": r["id"], "service": r["service"], "model": r["model"],
-            "request": json.loads(r["request"]), "response": json.loads(r["response"])}) + "\n" for r in requests).encode("utf-8"))
-        write_bytes(output / "source.txt", text.encode("utf-8"))
-        write_bytes(output / "source.original", source["raw"])
+        }
+        if active_agent:
+            review_doc["agent_suggestions"] = active_agent
         invocations = store.records(run_id, "invocation")
         identity_seconds = round(
             sum(
@@ -170,9 +190,9 @@ def export_run(store: Store, run_id: str, output_root: Path, output_dir: Path | 
                 "singletons": sum(1 for e in entities if len(e["mention_ids"]) == 1),
                 "unlocated_observations": sum(o["status"] == "unlocated" for o in observations),
                 "decisions": len(decisions),
-                "review_items": len(all_reviews),
-                "identity_review_items": len(identity_reviews),
-                "grounding_discovery_review_items": len(non_identity_reviews),
+                "review_items": len(pending_all) if active_user else len(all_reviews),
+                "identity_review_items": len(pending_identity) if active_user else len(identity_reviews),
+                "grounding_discovery_review_items": len(pending_non_identity) if active_user else len(non_identity_reviews),
             },
             "validation": {
                 "source_hashes": True,
@@ -186,8 +206,7 @@ def export_run(store: Store, run_id: str, output_root: Path, output_dir: Path | 
             manifest["source_run_id"] = run["config"]["source_run_id"]
         if run["config"].get("arm"):
             manifest["arm"] = run["config"]["arm"]
-        write_json(output / "manifest.json", manifest)
-        return output
+        return {"result": result, "review": review_doc, "manifest": manifest, "decisions": decisions, "text": text, "raw": source["raw"]}
 
     identities = store.records(run_id, "identity")
     entities, conflicts = group_entities(mentions, identities)
@@ -218,15 +237,8 @@ def export_run(store: Store, run_id: str, output_root: Path, output_dir: Path | 
                               "模型分数门槛尚未标注校准；原文定位通过不代表实体和身份语义正确。",
                               "无比较关系的单独提及为暂定实体，不能据此断言与所有其他实体不同。"]}
     result["result_revision"] = digest(result)
-    write_json(output / "result.json", result)
-    write_json(output / "review.json", {"schema_version": 1, "run_id": run_id, "result_revision": result["result_revision"],
-                                        "items": reviews, "instruction": "按问题编号回答；自动模型判断不冒充人工答案。"})
-    write_bytes(output / "decisions.jsonl", "".join(dumps(d) + "\n" for d in decisions).encode("utf-8"))
-    requests = store.rows("SELECT DISTINCT r.* FROM request_cache r JOIN calls c ON r.id=c.request_id WHERE c.run_id=? ORDER BY r.id", (run_id,))
-    write_bytes(output / "requests.jsonl", "".join(dumps({"id": r["id"], "service": r["service"], "model": r["model"],
-        "request": json.loads(r["request"]), "response": json.loads(r["response"])}) + "\n" for r in requests).encode("utf-8"))
-    write_bytes(output / "source.txt", text.encode("utf-8"))
-    write_bytes(output / "source.original", source["raw"])
+    review_doc = {"schema_version": 1, "run_id": run_id, "result_revision": result["result_revision"],
+                  "items": reviews, "instruction": "按问题编号回答；自动模型判断不冒充人工答案。"}
     invocations = store.records(run_id, "invocation")
     manifest = {"schema_version": 1, "run_id": run_id, "result_revision": result["result_revision"], "status": status,
                 "source": metadata, "config": run["config"], "state": state, "invocations": invocations,
@@ -239,8 +251,26 @@ def export_run(store: Store, run_id: str, output_root: Path, output_dir: Path | 
                 "files": ["result.json", "review.json", "decisions.jsonl", "requests.jsonl", "source.txt", "source.original"]}
     if group_resolution:
         manifest["resolution_rounds"] = store.records(run_id, "resolution_round")
-    write_json(output / "manifest.json", manifest)
+    return {"result": result, "review": review_doc, "manifest": manifest, "decisions": decisions, "text": text, "raw": source["raw"]}
+
+
+def write_export_bundle(store: Store, run_id: str, bundle: dict, output_root: Path, output_dir: Path | None = None) -> Path:
+    output = output_dir if output_dir is not None else (output_root / run_id[:16])
+    write_json(output / "result.json", bundle["result"])
+    write_json(output / "review.json", bundle["review"])
+    write_bytes(output / "decisions.jsonl", "".join(dumps(d) + "\n" for d in bundle["decisions"]).encode("utf-8"))
+    requests = store.rows("SELECT DISTINCT r.* FROM request_cache r JOIN calls c ON r.id=c.request_id WHERE c.run_id=? ORDER BY r.id", (run_id,))
+    write_bytes(output / "requests.jsonl", "".join(dumps({"id": r["id"], "service": r["service"], "model": r["model"],
+        "request": json.loads(r["request"]), "response": json.loads(r["response"])}) + "\n" for r in requests).encode("utf-8"))
+    write_bytes(output / "source.txt", bundle["text"].encode("utf-8"))
+    write_bytes(output / "source.original", bundle["raw"])
+    write_json(output / "manifest.json", bundle["manifest"])
     return output
+
+
+def export_run(store: Store, run_id: str, output_root: Path, output_dir: Path | None = None) -> Path:
+    bundle = build_export_bundle(store, run_id)
+    return write_export_bundle(store, run_id, bundle, output_root, output_dir)
 
 
 def run_pipeline(input_path: Path, db_path: Path, output_root: Path, config_path: Path,

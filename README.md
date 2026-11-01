@@ -26,7 +26,7 @@ EntityTrace 是面向 agent 的插件，提供小说实体发现、身份判断�
 | --- | --- | --- |
 | 启动与恢复 | `run` 执行全文处理，相同输入与配置复用断点；支持 `--max-requests`、`--max-seconds` 预算与连续断网停止 | 统一机器可读调用回执、细粒度错误回执与独立状态查询 |
 | 读取与取证 | JSON／JSONL 文件、`export` 重导出、`quote` 取回原文 | 按需查询，减少 agent 读取整份大型产物 |
-| 待审与更正 | `review.json` 按 `impact` 降序提供问题编号与证据，可由 agent 读取和解释 | 结构化答案写回、版本校验、撤回和受影响结果重算 |
+| 待审与更正 | `review.json` 按 `impact` 降序提供问题编号与证据；已完成名册运行支持 `correct` 叠加式更正、待审消解（`--resolves`）、版本校验与撤回（零模型调用） | 与按需查询回执联动简化宿主编排 |
 | 宿主接入 | 有命令执行和文件访问能力的 agent 可按本文调用 CLI | 核实目标宿主能力后封装适配，验证安装与完整调用流程 |
 
 当前 `run` 的终端输出包含进度文本，不能当作统一 JSON 响应；退出码、产物状态和待审项须结合读取。计算完成不代表全部身份已经确认，宿主 agent 的推断也不能记作用户已确认的答案。
@@ -114,7 +114,21 @@ python -X utf8 -m entitytrace quote 运行编号 100 120
 python -X utf8 -m entitytrace export 运行编号
 ```
 
-待审清单可以交给智能体读取，再按问题编号逐项讨论。当前版本尚未实现结构化答案写回与名册局部更正命令（规划于后续阶段）。
+对已完成的默认 `entity-roster-v1` 运行，可通过 `correct` 叠加确定性更正或撤回（零模型调用，`groups-v2` 与未完成运行不支持）：
+
+```powershell
+python -X utf8 -m entitytrace correct 运行编号 merge 目标实体ID 被并实体ID --source user --expect-revision 当前result_revision
+python -X utf8 -m entitytrace correct 运行编号 split-surface 实体ID "称呼" --source user --expect-revision 当前result_revision
+python -X utf8 -m entitytrace correct 运行编号 assign 提及ID 实体ID或new --source user --expect-revision 当前result_revision --resolves 待审ID
+python -X utf8 -m entitytrace correct 运行编号 not-entity 提及ID --source user --expect-revision 当前result_revision
+python -X utf8 -m entitytrace correct 运行编号 revoke 更正ID --cascade --source user --expect-revision 当前result_revision
+```
+
+`correct` 生效规则：
+- `--expect-revision` 必须与当前 `result.json` 的 `result_revision` 一致，否则拒绝写入；`--resolves` 须指向当前 `review.json` 中存在的待审项，生效后标为 `resolved` 并记录 `resolved_by`。
+- **只有 `--source user` 且未撤回的更正参与重放并改变 `result.json`**；`--source agent` 仅作为建议写入 `review.json` 的 `agent_suggestions`，不改变 `result.json` 与 `result_revision`。`user` 可撤回任意更正，`agent` 仅可撤回 `agent` 建议；有后续更正依赖目标更正时须显式加 `--cascade` 一并撤回。
+- 同一生效操作重复提交幂等返回 `status="duplicate"`；`split-surface` 后原实体剩余的 `c3_model` 提及会生成 `correction-c3-affected` 待审项提示复核而不自动搬移；零生效用户更正或全部撤回后，`result.json`、`review.json`（无未撤回建议时）与 `manifest.json` 逐字节复原。
+- 成功时 stdout 仅输出一行 JSON：`{"correction_id","status":"applied|suggested|duplicate|revoked","result_revision_before","result_revision","affected_entity_ids","output_dir"}`。
 
 ## 验证与当前限制
 
