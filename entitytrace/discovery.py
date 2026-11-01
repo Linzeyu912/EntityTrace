@@ -19,14 +19,19 @@ refs 只能逐字复制 units 中的 id。每条只需 text、kind、refs；不�
 
 
 def check_discovery(value: dict) -> None:
-    if not isinstance(value, dict) or not isinstance(value.get("mentions"), list) or not isinstance(value.get("links"), list):
+    if not isinstance(value, dict) or not isinstance(value.get("mentions"), list):
+        raise ModelError("提及输出缺少 mentions 或 links")
+    links = value.get("links")
+    if links is None:
+        links = []
+    elif not isinstance(links, list):
         raise ModelError("提及输出缺少 mentions 或 links")
     for item in value["mentions"]:
         if not isinstance(item, dict) or not isinstance(item.get("text"), str) or not item["text"].strip() or len(item["text"]) > 300:
             raise ModelError("提及称呼不合法")
         if item.get("kind") not in KINDS or not isinstance(item.get("refs"), list) or any(not isinstance(x, str) for x in item["refs"]):
             raise ModelError("提及类别或引用格式错误")
-    for link in value["links"]:
+    for link in links:
         if not isinstance(link, dict) or any(not isinstance(link.get(k), str) or not link[k] for k in ("left", "right", "ref")):
             raise ModelError("关系线索格式错误")
 
@@ -56,6 +61,8 @@ def _word_boundary(text: str, start: int, end: int, surface: str) -> bool:
 
 def ground_result(source: dict, task: dict, value: dict, request_id: str) -> dict:
     check_discovery(value)
+    if value.get("links") is None:
+        value["links"] = []
     text, source_id = source["text"], source["id"]
     by_id = {u["id"]: u for u in task["units"]}
     mentions, observations, reviews, links = {}, [], [], []
