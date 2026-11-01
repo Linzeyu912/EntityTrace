@@ -10,7 +10,7 @@ import urllib.error
 from pathlib import Path
 from unittest.mock import patch
 
-from entitytrace.chapters import build_chapters
+from entitytrace.chapters import CRITERIA, build_chapters, scan_window
 from entitytrace.config import Service
 from entitytrace.discovery import ground_result
 from entitytrace.identity import ask_identity_pairs, audit_aliases, group_entities, plan_pairs
@@ -535,6 +535,198 @@ class PipelineTests(unittest.TestCase):
                 self.assertEqual(exp_result["source_run_id"], src_run_id)
             finally:
                 exp_store.close()
+
+    def test_roster_experiment_stops_when_chapters_incomplete(self):
+        import argparse
+        from tools.roster_experiment import read_source_run, run_experiment, seed_experiment_store
+
+        class BlockingChapterFakeModels(FakeModels):
+            def choices(self, state, questions, stage):
+                answers = {}
+                for key in questions:
+                    probs = {k: 0.0 for k in CRITERIA}
+                    probs["uncertain"] = 1.0
+                    answers[key] = {"type": "choice", "choice": "uncertain", "confidence": 0.4, "probabilities": probs}
+                return answers, f"req-{stage}"
+
+            def generate(self, system, state, stage, validate, *args, **kwargs):
+                if stage == "chapter-repair":
+                    val = {"headings": []}
+                    validate(val)
+                    return val, "req-repair"
+                return super().generate(system, state, stage, validate, *args, **kwargs)
+
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            text = root / "input.txt"
+            text.write_text("第一章 初见\n林舟来了。\n", encoding="utf-8")
+            config = root / ".env"
+            config.write_text("TYPESAFE_API_KEY=test\nDEEPSEEK_API_KEY=test\n", encoding="utf-8")
+            src_db = root / "src.sqlite3"
+            with patch("entitytrace.pipeline.Models", BlockingChapterFakeModels):
+                src_run_id, _, complete = run_pipeline(text, src_db, root / "src_out", config, log=lambda _: None)
+            self.assertFalse(complete)
+            bundle = read_source_run(src_db, src_run_id)
+            self.assertFalse(bundle["source_state"]["chapters"]["complete"])
+
+            exp_db = root / "exp.sqlite3"
+            exp_store = Store(exp_db)
+            try:
+                seed_experiment_store(exp_store, bundle, "exp-incomplete-01", {"identity_algorithm": "entity-roster-v1"})
+                seeded_state = exp_store.run("exp-incomplete-01")["state"]
+                self.assertFalse(seeded_state["chapters"]["complete"])
+            finally:
+                exp_store.close()
+
+            exp_out = root / "exp_out"
+            args = argparse.Namespace(
+                source_db=src_db,
+                source_run=src_run_id,
+                source_file=None,
+                task_chars=9000,
+                recompute_from_cache=False,
+                arm="C",
+                db=root / "exp_run.sqlite3",
+                output=exp_out,
+                config=config,
+                concurrency=1,
+                max_requests=100,
+                max_seconds=60,
+            )
+            with patch("tools.roster_experiment.Models", BlockingChapterFakeModels):
+                code = run_experiment(args)
+            self.assertEqual(code, 2)
+            res_doc = json.loads((exp_out / "result.json").read_text(encoding="utf-8"))
+            self.assertEqual(res_doc["status"], "incomplete")
+
+
+class ChapterConsistencyTests(unittest.TestCase):
+    def _make_probs(self, mapping: dict[str, float]) -> dict[str, float]:
+        probs = {k: 0.0 for k in CRITERIA}
+        probs.update(mapping)
+        return probs
+
+    def test_consistent_non_heading_passes_for_colophon_and_ending_forms(self):
+        # 构造两种文末非标题形态（合成文本，不取自测试书）：
+        # u0 正常正文（主通道 p>=0.8 放行）；
+        # u1 日期尾注形态（初判 body 0.55 < 0.8 进复核；复核生成摘录为空，Decision 首选 body 0.57 / metadata 0.36 / extra 0.07）；
+        # u2 结束标记形态（初判 extra 0.45 进复核；复核生成摘录为空，Decision 首选 body 0.68 / extra 0.29 / uncertain 0.03）。
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            store = Store(root / "db.sqlite3")
+            try:
+                path = root / "story.txt"
+                path.write_text("春夜微雨，林舟独自收拾行囊。\n乙丑年冬月记于南窗\nFINIS\n", encoding="utf-8")
+                source = import_text(store, path)
+                batch = units(source["text"])
+                self.assertEqual(len(batch), 3)
+                u0, u1, u2 = batch
+
+                class CustomModels:
+                    def choices(s, state, questions, stage):
+                        if stage == "chapters":
+                            return {
+                                u0["id"]: {"type": "choice", "choice": "body", "confidence": 0.95, "probabilities": self._make_probs({"body": 0.95, "uncertain": 0.05})},
+                                u1["id"]: {"type": "choice", "choice": "body", "confidence": 0.55, "probabilities": self._make_probs({"body": 0.55, "metadata": 0.40, "extra": 0.05})},
+                                u2["id"]: {"type": "choice", "choice": "extra", "confidence": 0.50, "probabilities": self._make_probs({"extra": 0.45, "body": 0.45, "metadata": 0.10})},
+                            }, "req-init"
+                        return {
+                            u1["id"]: {"type": "choice", "choice": "body", "confidence": 0.54, "probabilities": self._make_probs({"body": 0.57, "metadata": 0.36, "extra": 0.07})},
+                            u2["id"]: {"type": "choice", "choice": "body", "confidence": 0.66, "probabilities": self._make_probs({"body": 0.68, "extra": 0.29, "uncertain": 0.03})},
+                        }, "req-verify"
+
+                    def generate(s, system, state, stage, validate, *args, **kwargs):
+                        val = {"headings": []}
+                        validate(val)
+                        return val, "req-repair"
+
+                res = scan_window(CustomModels(), source, batch, [])
+                self.assertEqual(res["issues"], [])
+                self.assertEqual(res["headings"], [])
+                self.assertEqual(res["path_counts"]["primary"], 1)
+                self.assertEqual(res["path_counts"]["primary_pass"], 1)
+                self.assertEqual(res["path_counts"]["consistent"], 2)
+                self.assertEqual(res["path_counts"]["consistent_pass"], 2)
+                self.assertEqual(res["path_counts"]["review"], 0)
+            finally:
+                store.close()
+
+    def test_consistent_heading_adopted_when_style_known_and_blocked_when_new_style_or_disagreed(self):
+        # 合成文本测试：
+        # 1) 已知样式（references 中已有“第一回 ...”），复核时生成摘录精确匹配整行且与 Decision 首选同为 chapter（p=0.78 < 0.80）-> 采纳；
+        # 2) 新样式（references 为空或样式不同）-> 仍阻断进待审；
+        # 3) 两边不一致（生成摘录给标题但 Decision 首选 body，或生成摘录为空但 Decision 首选 chapter p=0.75）-> 仍阻断进待审。
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            store = Store(root / "db.sqlite3")
+            try:
+                path = root / "ch.txt"
+                path.write_text("第二回 驿路逢旧友 山亭话别情\n林舟拱手道别。\n", encoding="utf-8")
+                source = import_text(store, path)
+                batch = units(source["text"])
+                u_head, u_body = batch
+                title_str = u_head["text"].rstrip("\r\n")
+                known_refs = [{"start": 0, "end": 13, "title": "第一回 江干立契约 古寺起风波", "kind": "chapter"}]
+
+                class AgreeHeadingModels:
+                    def choices(s, state, questions, stage):
+                        if stage == "chapters":
+                            return {
+                                u_head["id"]: {"type": "choice", "choice": "chapter", "confidence": 0.65, "probabilities": self._make_probs({"chapter": 0.68, "mixed": 0.22, "body": 0.10})},
+                                u_body["id"]: {"type": "choice", "choice": "body", "confidence": 0.95, "probabilities": self._make_probs({"body": 0.95, "uncertain": 0.05})},
+                            }, "req-init"
+                        return {
+                            u_head["id"]: {"type": "choice", "choice": "chapter", "confidence": 0.75, "probabilities": self._make_probs({"chapter": 0.78, "mixed": 0.10, "body": 0.12})},
+                        }, "req-verify"
+
+                    def generate(s, system, state, stage, validate, *args, **kwargs):
+                        val = {"headings": [{"title": title_str, "kind": "chapter", "before": "", "after": ""}]}
+                        validate(val)
+                        return val, "req-repair"
+
+                # 情形 1：样式已在 references 中出现 -> 一致通道采纳
+                adopted = scan_window(AgreeHeadingModels(), source, batch, known_refs)
+                self.assertEqual(adopted["issues"], [])
+                self.assertEqual(len(adopted["headings"]), 1)
+                self.assertEqual(adopted["headings"][0]["title"], title_str)
+                self.assertEqual(adopted["headings"][0]["kind"], "chapter")
+                self.assertEqual(adopted["path_counts"]["consistent_heading"], 1)
+                self.assertEqual(adopted["path_counts"]["review"], 0)
+
+                # 情形 2：新样式（references 为空）-> 阻断进待审
+                blocked_new_style = scan_window(AgreeHeadingModels(), source, batch, [])
+                self.assertEqual(len(blocked_new_style["issues"]), 1)
+                self.assertEqual(blocked_new_style["headings"], [])
+                self.assertEqual(blocked_new_style["path_counts"]["consistent_heading"], 0)
+                self.assertEqual(blocked_new_style["path_counts"]["review"], 1)
+
+                # 情形 3a：两边不一致（生成摘录返回标题，但 Decision 复核首选 body）-> 阻断进待审
+                class DisagreeBodyModels(AgreeHeadingModels):
+                    def choices(s, state, questions, stage):
+                        if stage == "chapters":
+                            return super().choices(state, questions, stage)
+                        return {
+                            u_head["id"]: {"type": "choice", "choice": "body", "confidence": 0.70, "probabilities": self._make_probs({"body": 0.72, "chapter": 0.28})},
+                        }, "req-verify-body"
+
+                blocked_disagree_a = scan_window(DisagreeBodyModels(), source, batch, known_refs)
+                self.assertEqual(len(blocked_disagree_a["issues"]), 1)
+                self.assertEqual(blocked_disagree_a["headings"], [])
+                self.assertEqual(blocked_disagree_a["path_counts"]["review"], 1)
+
+                # 情形 3b：两边不一致（生成摘录返回空数组，但 Decision 复核首选 chapter 0.78）-> 阻断进待审
+                class DisagreeEmptyLocalModels(AgreeHeadingModels):
+                    def generate(s, system, state, stage, validate, *args, **kwargs):
+                        val = {"headings": []}
+                        validate(val)
+                        return val, "req-repair-empty"
+
+                blocked_disagree_b = scan_window(DisagreeEmptyLocalModels(), source, batch, known_refs)
+                self.assertEqual(len(blocked_disagree_b["issues"]), 1)
+                self.assertEqual(blocked_disagree_b["headings"], [])
+                self.assertEqual(blocked_disagree_b["path_counts"]["review"], 1)
+            finally:
+                store.close()
 
 
 if __name__ == "__main__":

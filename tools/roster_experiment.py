@@ -69,12 +69,15 @@ def read_source_run(source_db: Path, source_run_id: str) -> dict:
         conn.close()
 
     task_chars = int(run_config.get("task_chars", 9000))
-    rebuilt_tasks = plan_tasks(source, chapters, task_chars)
-    rebuilt_ids = {t["id"] for t in rebuilt_tasks}
-    if rebuilt_ids != saved_task_ids:
-        raise ValueError(
-            f"重建发现任务 ID 与源运行不一致：rebuilt={len(rebuilt_ids)}, saved={len(saved_task_ids)}"
-        )
+    ch_complete = bool(run_state.get("chapters", {}).get("complete", False))
+    disc_complete = bool(run_state.get("discovery", {}).get("complete", False))
+    if ch_complete and disc_complete:
+        rebuilt_tasks = plan_tasks(source, chapters, task_chars)
+        rebuilt_ids = {t["id"] for t in rebuilt_tasks}
+        if rebuilt_ids != saved_task_ids:
+            raise ValueError(
+                f"重建发现任务 ID 与源运行不一致：rebuilt={len(rebuilt_ids)}, saved={len(saved_task_ids)}"
+            )
 
     return {
         "source": source,
@@ -97,14 +100,22 @@ def seed_experiment_store(store: Store, src_bundle: dict, exp_run_id: str, exp_c
         "INSERT OR IGNORE INTO sources VALUES(?,?,?,?)",
         (source["id"], dumps(source["metadata"]), source["text"], source["raw"]),
     )
+    src_state = src_bundle.get("source_state", {})
+    ch_state = dict(src_state.get("chapters", {}))
+    disc_state = dict(src_state.get("discovery", {}))
+    ch_state["complete"] = bool(ch_state.get("complete", False))
+    ch_state["reused_from"] = src_bundle["source_run_id"]
+    disc_state["complete"] = bool(disc_state.get("complete", False))
+    disc_state["reused_from"] = src_bundle["source_run_id"]
     initial_state = {
-        "chapters": {"complete": True, "reused_from": src_bundle["source_run_id"]},
-        "discovery": {"complete": True, "reused_from": src_bundle["source_run_id"]},
+        "chapters": ch_state,
+        "discovery": disc_state,
     }
     store.execute(
         "INSERT OR IGNORE INTO runs VALUES(?,?,?,?,?,?)",
         (exp_run_id, source["id"], dumps(exp_config), dumps(initial_state), started, started),
     )
+    store.state(exp_run_id, **initial_state)
     # 批量写入复用的章节、提及、观察、关系线索和定位待审
     existing_mentions = store.rows("SELECT COUNT(*) AS n FROM records WHERE run_id=? AND kind='mention'", (exp_run_id,))[0]["n"]
     if existing_mentions == 0:
@@ -214,13 +225,13 @@ def run_experiment(args: argparse.Namespace) -> int:
             )
             log_fn = lambda msg: print(msg, flush=True)
             state = store.run(exp_run_id)["state"]
-            if not state.get("chapters", {}).get("complete", False) and not store.records(exp_run_id, "chapter"):
+            if not state.get("chapters", {}).get("complete", False):
                 ch_t0 = time.perf_counter()
                 ch_out = detect_chapters(store, models, source, exp_run_id, log_fn)
                 ch_out.pop("chapters", None)
                 chapters_seconds = time.perf_counter() - ch_t0
                 store.state(exp_run_id, chapters=ch_out)
-                if not store.records(exp_run_id, "chapter") or ch_out.get("scanned_code_points") != len(source["text"]):
+                if not ch_out.get("complete", False) or not store.records(exp_run_id, "chapter") or ch_out.get("scanned_code_points") != len(source["text"]):
                     raise RuntimeError("章节阶段未完成")
             if not state.get("discovery", {}).get("complete", False):
                 disc_t0 = time.perf_counter()
@@ -265,6 +276,11 @@ def run_experiment(args: argparse.Namespace) -> int:
             }
             exp_run_id = digest(["roster-exp-v1", src_bundle["source"]["id"], args.source_run, args.arm])
             seed_experiment_store(store, src_bundle, exp_run_id, exp_config)
+            exp_state = store.run(exp_run_id)["state"]
+            if not exp_state.get("chapters", {}).get("complete", False):
+                raise RuntimeError("章节阶段未完成")
+            if not exp_state.get("discovery", {}).get("complete", False):
+                raise RuntimeError("发现阶段未完成")
             if args.recompute_from_cache:
                 with store.lock, store.db:
                     store.db.execute("DELETE FROM tasks WHERE run_id=? AND stage LIKE 'roster%'", (exp_run_id,))

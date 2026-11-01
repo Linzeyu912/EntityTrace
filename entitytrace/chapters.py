@@ -69,6 +69,20 @@ def scan_window(models, source: dict, batch: list[dict], references: list[dict],
         elif kind in HEAD_KINDS | {"mixed", "uncertain"} or p < .8:
             doubtful.append(unit)
     issues = []
+    primary_heading = len(headings)
+    primary_pass = len(batch) - len(headings) - len(doubtful)
+    path_counts = {
+        "primary": primary_heading + primary_pass,
+        "verify_certain": 0,
+        "consistent": 0,
+        "review": 0,
+        "primary_heading": primary_heading,
+        "primary_pass": primary_pass,
+        "verify_certain_heading": 0,
+        "verify_certain_pass": 0,
+        "consistent_heading": 0,
+        "consistent_pass": 0,
+    }
     if doubtful:
         target_state = {"confirmed_headings": references[-8:], "target_units": [
             {**u, "before": text[max(0, u["start"] - 350):u["start"]], "after": text[u["end"]:u["end"] + 350]} for u in doubtful]}
@@ -97,6 +111,7 @@ def scan_window(models, source: dict, batch: list[dict], references: list[dict],
         verify_questions = {u["id"]: choice_question(
             f"单独判断 {u['id']} 的 text。目标是普通正文时，即使邻文有章题也选 body；明确主章编号的完整标题选 chapter。", CRITERIA) for u in doubtful}
         verify, verify_id = models.choices(verify_state, verify_questions, "chapter-verify")
+        reference_styles = {_style(r) for r in references}
         for unit in doubtful:
             answer = verify[unit["id"]]
             kind = answer["choice"]
@@ -106,17 +121,39 @@ def scan_window(models, source: dict, batch: list[dict], references: list[dict],
             records.append(decision)
             local = [h for h in grounded if h["start"] < unit["end"] and h["end"] > unit["start"]]
             certain = answer["probabilities"][kind] >= .8 and answer["confidence"] >= .6
+            title = unit["text"].rstrip("\r\n")
+            title_end = unit["start"] + len(title)
             if certain and kind in HEAD_KINDS and unit["complete_line"]:
-                title = unit["text"].rstrip("\r\n")
                 # 完整标题行直接使用原文范围；模型摘录只能作为辅助。
-                headings.append({"start": unit["start"], "end": unit["start"] + len(title), "title": title,
+                headings.append({"start": unit["start"], "end": title_end, "title": title,
                                  "kind": kind, "decision_id": decision["id"]})
+                path_counts["verify_certain"] += 1
+                path_counts["verify_certain_heading"] += 1
             elif certain and kind in {"body", "toc", "metadata"} and not local:
+                path_counts["verify_certain"] += 1
+                path_counts["verify_certain_pass"] += 1
+                continue
+            elif (
+                unit["complete_line"]
+                and kind in HEAD_KINDS
+                and len(local) == 1
+                and (local[0]["start"], local[0]["end"], local[0]["kind"]) == (unit["start"], title_end, kind)
+                and _style({"title": title, "kind": kind}) in reference_styles
+            ):
+                headings.append({"start": unit["start"], "end": title_end, "title": title,
+                                 "kind": kind, "decision_id": decision["id"]})
+                path_counts["consistent"] += 1
+                path_counts["consistent_heading"] += 1
+            elif kind in {"body", "toc", "metadata"} and not local:
+                path_counts["consistent"] += 1
+                path_counts["consistent_pass"] += 1
                 continue
             else:
+                path_counts["review"] += 1
                 issues.append({"reason": "章节局部复核仍不确定或与逐字摘录冲突", "decision_id": decision["id"],
                                "range": address(source_id, unit["start"], unit["end"])})
-    return {"headings": headings, "decisions": records, "issues": issues, "reference_version": reference_version, "start": a, "end": b}
+    return {"headings": headings, "decisions": records, "issues": issues, "reference_version": reference_version,
+            "start": a, "end": b, "path_counts": path_counts}
 
 
 def build_chapters(source: dict, headings: list[dict]) -> tuple[str, list[dict]]:
@@ -203,5 +240,21 @@ def detect_chapters(store, models, source: dict, run_id: str, log) -> dict:
     for chapter in chapters:
         store.put(run_id, "chapter", chapter)
     issues = [issue for result in results.values() for issue in result["issues"]]
+    path_counts = {
+        k: sum(result["path_counts"][k] for result in results.values())
+        for k in (
+            "primary",
+            "verify_certain",
+            "consistent",
+            "review",
+            "primary_heading",
+            "primary_pass",
+            "verify_certain_heading",
+            "verify_certain_pass",
+            "consistent_heading",
+            "consistent_pass",
+        )
+    }
     return {"chapter_set_version": version, "chapters": chapters, "scan_windows": len(batches),
-            "complete": not issues, "issues": len(issues), "scanned_code_points": len(source["text"])}
+            "complete": not issues, "issues": len(issues), "scanned_code_points": len(source["text"]),
+            "path_counts": path_counts}

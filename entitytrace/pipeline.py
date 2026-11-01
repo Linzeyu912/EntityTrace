@@ -163,6 +163,7 @@ def export_run(store: Store, run_id: str, output_root: Path, output_dir: Path | 
             "counts": {
                 "chapters": sum(c["kind"] == "chapter" for c in chapters),
                 "sections": len(chapters),
+                "chapter_path_counts": state.get("chapters", {}).get("path_counts", {}),
                 "mentions": len(mentions),
                 "observations": len(observations),
                 "entities": len(entities),
