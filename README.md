@@ -156,5 +156,6 @@ python -X utf8 -m unittest discover -s tests -v
 
 ## 文档与测试资料
 
+- [宿主 Agent 调用说明](plugin/README.md)：提供通用 CLI 调用说明（`entitytrace.v1` 回执、按需查询、退出码决策表与更正硬性约束），平台封装待核实。
 - [测试文本库](test/text-library/README.md)：六份中英文完整小说；正文、独立章节参考及来源许可分别保存，参考答案不进入模型输入。
 - [GitHub 仓库](https://github.com/Linzeyu912/EntityTrace)。
