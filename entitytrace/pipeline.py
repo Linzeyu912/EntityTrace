@@ -266,7 +266,7 @@ def run_pipeline(input_path: Path, db_path: Path, output_root: Path, config_path
     caught_exc: Exception | None = None
     try:
         source = import_text(store, input_path, encoding)
-        services = load_services(config_path)
+        services = load_services(config_path, require_decision=(algo_version == RESOLUTION_VERSION))
         # 预算参数（max_requests / max_seconds / max_network_failures）不写入 config 摘要，保证扩大预算可续跑同一 run_id
         config = {"implementation": implementation_hash(), "models": {k: v.public() for k, v in services.items()},
                   "discovery_concurrency": discovery_concurrency, "decision_concurrency": decision_concurrency,

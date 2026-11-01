@@ -6,7 +6,7 @@ EntityTrace 是面向 agent 的插件，提供小说实体发现、身份判断�
 
 **面向 agent 调用的插件（plugin）**，回答“以什么形式被使用”。目标调用方包括各类宿主 agent；宿主负责理解用户需求、组织调用、解释结果及衔接后续工作。由此确定开发边界：不建设独立前端、实体编辑页面或人工操作工作台，需要人参与的确认由宿主在对话中承接。
 
-当前交付形态是可供 agent 执行的本地 CLI 与 JSON 文件，使用 Python 3.12+ 和标准库 SQLite，无额外运行依赖，不需要 Docker 或数据库服务。**尚未提供 特定平台的专用安装包、宿主适配或接入验证。** 插件定位已确定，具体分发与协议封装待落实。模型调用仍使用在线 DeepSeek 和 TypeSafe/Jev；宿主 agent 的模型与插件内部模型分工独立，本机运行不等于模型离线运行。
+当前交付形态是可供 agent 执行的本地 CLI 与 JSON 文件，使用 Python 3.12+ 和标准库 SQLite，无额外运行依赖，不需要 Docker 或数据库服务。**尚未提供 特定平台的专用安装包、宿主适配或接入验证。** 插件定位已确定，具体分发与协议封装待落实。默认流程仅调用在线 DeepSeek（仅在显式切换 `--identity-algorithm groups-v2` 时才需要 TypeSafe/Jev）；宿主 agent 的模型与插件内部模型分工独立，本机运行不等于模型离线运行。
 
 ## 功能定位
 
@@ -38,7 +38,7 @@ EntityTrace 是面向 agent 的插件，提供小说实体发现、身份判断�
 | 步骤 | 执行者 | 实际行为 |
 | --- | --- | --- |
 | 导入 TXT | 本地程序 | 保存原始字节、冻结文本及指纹，建立 Unicode 码点地址 |
-| 章节识别 | Decision 为主，复杂标题调用大语言模型辅助定位 | 全文扫描；先顺序建立参考，再有限并行、按顺序确认；用后文回看开头 |
+| 章节识别 | 本地程序候选筛选 + DeepSeek 按 ID 标注 + 本地结构核验 | 提取整行短候选并发标注（`temperature=0`），经“标题后须有正文”与“章号连续”两条确定性结构核验确认 |
 | 地址核验 | 本地程序 | 检查章节范围完整覆盖原文，再建立发现任务 |
 | 提及发现 | DeepSeek + 本地并发任务池 | 各章独立发现称呼与引用，长章拆任务；逐字核对提及地址 |
 | 章内归并（C1） | DeepSeek + 本地结构与边界校验 | 按发现片段整段上下文将称呼归入章内对象，区分专名／称谓／描述词，支持逐提及例外指派与非实体建议 |
@@ -46,11 +46,11 @@ EntityTrace 是面向 agent 的插件，提供小说实体发现、身份判断�
 | 未决与非专名链接（C3） | 本地唯一称呼直连 + DeepSeek 候选链接 | 章内对象确定性落入名册；只含非专名称呼的对象与章内未决提及在候选名册与原文证据下链接，受专名一致性硬约束保护 |
 | 待审排序与统一导出（C4） | 本地程序 | 汇总身份与定位待审并按受影响提及数（`impact`）降序排列，校验全部码点地址与覆盖完整性，导出 `schema_version=3` 产物 |
 
-默认模型配置使用 `deepseek-flash`（发现与名册身份阶段）和固定版本 `jev-1.13.0`（章节阶段；切换 `--identity-algorithm groups-v2` 时亦用于配对身份消歧）。`entity-roster-v1` 不使用未校准概率分数作主路由，而是显式记录每处提及的链接来源（`chapter_local`、`c3_model`、`surface_unique`、`unresolved`、`c3_rejected_name_mismatch`、`not_entity_suggested`）与关联请求 ID。
+默认模型配置仅使用 `deepseek-flash`（章节标注、提及发现与名册身份阶段），无需配置 `TYPESAFE_API_KEY`；仅在切换 `--identity-algorithm groups-v2` 时加载并使用固定版本 `jev-1.13.0` 执行配对身份消歧。`entity-roster-v1` 不使用未校准概率分数作主路由，而是显式记录每处提及的链接来源（`chapter_local`、`c3_model`、`surface_unique`、`unresolved`、`c3_rejected_name_mismatch`、`not_entity_suggested`）与关联请求 ID。
 
 ## 运行
 
-以下命令既是宿主 agent 当前的调用入口，也可用于开发调试。以仓库目录为工作目录执行，或显式指定输入、配置、数据库和输出路径。新环境可从 `.env.example` 创建配置文件并填写自己的密钥；系统环境变量优先于文件。配置、数据库和运行产物均被 Git 忽略。
+以下命令既是宿主 agent 当前的调用入口，也可用于开发调试。以仓库目录为工作目录执行，或显式指定输入、配置、数据库和输出路径。默认 `roster` 流程只需配置 `DEEPSEEK_API_KEY`（即使环境或配置文件中存在 TypeSafe 配置亦忽略，不影响 `run_id`）；仅 `--identity-algorithm groups-v2` 需要额外配置 `TYPESAFE_API_KEY`。新环境可从 `.env.example` 创建配置文件并填写自己的密钥；系统环境变量优先于文件。配置、数据库和运行产物均被 Git 忽略。
 
 ```powershell
 python -X utf8 -m entitytrace run "test/text-library/texts/03_中文长篇_九命奇冤_36回.txt"
@@ -64,7 +64,7 @@ python -X utf8 -m entitytrace run "D:\小说\样本.txt" --discovery-concurrency
 python -X utf8 -m entitytrace run "D:\小说\样本.txt" --identity-algorithm groups-v2 --identity-rounds 12 --group-candidates 3
 ```
 
-默认发现与名册阶段同时最多 6 个生成请求、章节（及 `groups-v2`）同时最多 3 个 Decision 请求，发现任务最多约 9,000 个码点，均为**每个进程**的上限。多开进程会叠加并发；多 key 不代表账户额度相乘。模型调用、重试和等待均在 SQLite 事务外，任务结果与完成标记用短事务一起保存。
+默认章节标注同时最多 3 个生成请求、发现与名册阶段同时最多 6 个生成请求（切换 `groups-v2` 时身份消歧同时最多 3 个 Decision 请求），发现任务最多约 9,000 个码点，均为**每个进程**的上限。多开进程会叠加并发；多 key 不代表账户额度相乘。模型调用、重试和等待均在 SQLite 事务外，任务结果与完成标记用短事务一起保存。
 
 重复同一命令会复用完成阶段和任务；失败任务可重试。输入、业务源码、模型或核心流程参数（如 `--identity-algorithm`、`--task-chars`）变化会产生新运行编号，内容完全相同的成功 HTTP 请求仍可命中缓存。**预算参数（`--max-requests`、`--max-seconds`）不写入 `run_id` 配置摘要**：当运行因预算耗尽或连续网络传输失败（默认连续 9 次）停止时，扩大预算或待网络恢复后重跑同一命令，将在同一 `run_id` 上断点续跑，已完成任务不会重复发起网络请求。需要独立无缓存验证时，使用新的 `--db` 路径；不要把缓存复用计时当成首次全文处理速度。
 
@@ -89,7 +89,7 @@ python -X utf8 -m entitytrace run "D:\小说\样本.txt" --identity-algorithm gr
 | --- | --- |
 | `result.json` | 来源、章节、提及、原始发现记录、实体名册分组及汇总信息；不含描述提取 |
 | `review.json` | 身份证据不足、分歧未决与定位失败等待审问题，含稳定编号、影响范围（`impact`）及证据引用 |
-| `decisions.jsonl` | Decision 阶段（章节及 `groups-v2`）每次判断的问题、证据、概率与置信度 |
+| `decisions.jsonl` | 章节候选标注追溯记录（`chapter-label`，含采纳或无正文丢弃结果），以及 `groups-v2` 模式下 Decision 每次判断的问题、证据、概率与置信度 |
 | `requests.jsonl` | 本运行使用的成功模型请求和响应，不含 Authorization 或模型内部推理字段 |
 | `manifest.json` | 输入和源码版本、配置、阶段状态、每次调用预算与请求／缓存／失败统计、耗时和数量 |
 | `source.txt`、`source.original` | 用于地址定位的冻结文本、原始输入字节 |

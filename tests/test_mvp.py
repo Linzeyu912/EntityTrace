@@ -978,6 +978,50 @@ class CredentialDecouplingAndTemperatureTests(unittest.TestCase):
             finally:
                 store.close()
 
+    def test_roster_loads_without_typesafe_key_and_groups_v2_errors_clearly(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            text = root / "input.txt"
+            text.write_text("第一章 初见\n林舟来了。\n第二章 再见\n林舟走了。\n", encoding="utf-8")
+            deepseek_only_cfg = root / "deepseek.env"
+            deepseek_only_cfg.write_text("DEEPSEEK_API_KEY=ds_only_secret\n", encoding="utf-8")
+            both_keys_cfg = root / "both.env"
+            both_keys_cfg.write_text("DEEPSEEK_API_KEY=ds_only_secret\nTYPESAFE_API_KEY=ts_extra_secret\n", encoding="utf-8")
+
+            clean_env = {k: v for k, v in os.environ.items() if not k.startswith("TYPESAFE_") and not k.startswith("DEEPSEEK_")}
+            with patch.dict(os.environ, clean_env, clear=True):
+                services = load_services(deepseek_only_cfg)
+                self.assertEqual(set(services), {"discovery"})
+
+                with self.assertRaises(ValueError) as ctx:
+                    load_services(deepseek_only_cfg, require_decision=True)
+                self.assertIn("groups-v2", str(ctx.exception))
+                self.assertIn("TypeSafe/Jev", str(ctx.exception))
+
+                FakeModels.fail_once = False
+                with patch("entitytrace.pipeline.Models", FakeModels):
+                    rid_ds_only, out_ds_only, ok1 = run_pipeline(
+                        text, root / "db1.sqlite3", root / "out1", deepseek_only_cfg, log=lambda _: None,
+                    )
+                    rid_with_ts, _, ok2 = run_pipeline(
+                        text, root / "db2.sqlite3", root / "out2", both_keys_cfg, log=lambda _: None,
+                    )
+                self.assertTrue(ok1)
+                self.assertTrue(ok2)
+                # 默认 roster 流程彻底忽略本机是否配有 TypeSafe，run_id 恒定不变
+                self.assertEqual(rid_ds_only, rid_with_ts)
+                manifest = json.loads((out_ds_only / "manifest.json").read_text(encoding="utf-8"))
+                self.assertEqual(set(manifest["config"]["models"]), {"discovery"})
+
+                with patch("entitytrace.pipeline.Models", FakeModels):
+                    with self.assertRaises(ValueError) as pipe_ctx:
+                        run_pipeline(
+                            text, root / "db3.sqlite3", root / "out3", deepseek_only_cfg,
+                            identity_algorithm="groups-v2", log=lambda _: None,
+                        )
+                self.assertIn("groups-v2", str(pipe_ctx.exception))
+                self.assertIn("TypeSafe/Jev", str(pipe_ctx.exception))
+
 
 if __name__ == "__main__":
     unittest.main()
