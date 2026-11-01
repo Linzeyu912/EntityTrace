@@ -217,6 +217,21 @@ def filter_headings_with_body(text: str, labeled: list[dict]) -> tuple[list[dict
     for h in reversed(ordered):
         boundary = next_kept["start"] if next_kept is not None else len(text)
         has_body = _has_non_heading_body(text, h["end"], boundary, dropped_spans)
+        if (
+            not has_body
+            and h["kind"] == "chapter"
+            and next_kept is not None
+            and next_kept["kind"] == "chapter"
+            and parse_chapter_number(h["title"]) is not None
+            and parse_chapter_number(next_kept["title"]) is None
+        ):
+            after_next = kept_reversed[-2]["start"] if len(kept_reversed) >= 2 else len(text)
+            if _has_non_heading_body(text, h["end"], after_next, dropped_spans):
+                demoted = kept_reversed.pop()
+                dropped_reversed.append({**demoted, "drop_reason": "dropped_unnumbered_adjacent"})
+                kept_reversed.append(h)
+                next_kept = h
+                continue
         if h["kind"] in {"chapter", "extra"}:
             keep = has_body
         else:
@@ -225,7 +240,7 @@ def filter_headings_with_body(text: str, labeled: list[dict]) -> tuple[list[dict
             kept_reversed.append(h)
             next_kept = h
         else:
-            dropped_reversed.append(h)
+            dropped_reversed.append({**h, "drop_reason": "dropped_no_body"})
             dropped_spans.append((h["start"], h["end"]))
     kept_reversed.reverse()
     dropped_reversed.reverse()
@@ -316,6 +331,7 @@ def detect_chapters(store, models, source: dict, run_id: str, log) -> dict:
     labeled = [item for i in sorted(batch_results) for item in batch_results[i]]
     adopted_raw, dropped_raw = filter_headings_with_body(text, labeled)
     adopted_ids = {h["id"] for h in adopted_raw}
+    dropped_reasons = {h["id"]: h.get("drop_reason", "dropped_no_body") for h in dropped_raw}
     for item in sorted(labeled, key=lambda h: h["start"]):
         store.put(run_id, "decision", {
             "id": digest([item["request_id"], item["id"]]),
@@ -325,7 +341,7 @@ def detect_chapters(store, models, source: dict, run_id: str, log) -> dict:
             "start": item["start"],
             "evidence": [address(source_id, item["start"], item["unit_end"])],
             "kind": item["kind"],
-            "result": "adopted" if item["id"] in adopted_ids else "dropped_no_body",
+            "result": "adopted" if item["id"] in adopted_ids else dropped_reasons.get(item["id"], "dropped_no_body"),
         })
     issues, unnumbered = check_chapter_numbering(source_id, adopted_raw)
     for idx, issue in enumerate(issues):
