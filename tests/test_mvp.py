@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import io
 import json
+import os
 import tempfile
 import threading
 import unittest
@@ -10,8 +11,16 @@ import urllib.error
 from pathlib import Path
 from unittest.mock import patch
 
-from entitytrace.chapters import CRITERIA, build_chapters, scan_window
-from entitytrace.config import Service
+from entitytrace.chapters import (
+    build_chapters,
+    check_chapter_numbering,
+    collect_candidates,
+    detect_chapters,
+    filter_headings_with_body,
+    parse_chapter_number,
+    scan_window,
+)
+from entitytrace.config import Service, load_services
 from entitytrace.discovery import ground_result
 from entitytrace.identity import ask_identity_pairs, audit_aliases, group_entities, plan_pairs
 from entitytrace.cli import main as cli_main
@@ -326,8 +335,7 @@ class FakeModels:
             elif "accept" in question["criteria"]:
                 choice = "accept"
             else:
-                unit = next(u for u in state["units"] if u["id"] == key)
-                choice = "chapter" if unit["text"].startswith("第") else "body"
+                raise AssertionError(f"choices 不应被章节阶段或未知阶段调用: {stage}")
             answers[key] = {"type": "choice", "choice": choice, "confidence": 1,
                             "probabilities": {k: int(k == choice) for k in question["criteria"]}}
         return answers, digest([stage, state, questions])
@@ -337,7 +345,15 @@ class FakeModels:
         if type(self).fail_once:
             type(self).fail_once = False
             raise ModelError("模拟单任务失败")
-        if stage == "roster-c1":
+        if stage == "chapter-label":
+            value = {
+                "headings": [
+                    {"id": c["id"], "kind": "chapter"}
+                    for c in state["candidates"]
+                    if c["text"].lstrip().startswith("第")
+                ]
+            }
+        elif stage == "roster-c1":
             surfaces = [row["surface"] for row in state["surfaces"]]
             ev_ref = state["units"][0]["id"]
             entities = [{
@@ -432,6 +448,8 @@ class PipelineTests(unittest.TestCase):
         self.run_case(True)
 
     def test_groups_v2_fixture_export_unchanged_before_and_after_switch(self):
+        from entitytrace.util import dumps
+
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)
             text = root / "input.txt"
@@ -439,6 +457,72 @@ class PipelineTests(unittest.TestCase):
             config = root / ".env"
             config.write_text("TYPESAFE_API_KEY=test\nDEEPSEEK_API_KEY=test\n", encoding="utf-8")
             db_path = root / "db.sqlite3"
+            expected_run_id = "92c0a63e5b29e4d9afebef39eeaaf635118b8bc08f376e1296532afa947adbb7"
+            # 预置历史固定夹具的章节记录（含旧版 decision_id），验证 groups-v2 身份归组与 export_run 字节级 SHA-256 完全不变
+            seed_store = Store(db_path)
+            try:
+                src = import_text(seed_store, text)
+                fixture_cfg = {
+                    "implementation": "fixed-v2-baseline",
+                    "models": {
+                        "decision": {"service": "decision", "url": "https://api.typesafe.ai/v1", "model": "jev-1.13.0"},
+                        "discovery": {"service": "discovery", "url": "https://api.deepseek.com", "model": "deepseek-flash"},
+                    },
+                    "discovery_concurrency": 6,
+                    "decision_concurrency": 3,
+                    "task_chars": 9000,
+                    "offset_unit": "unicode_code_point",
+                    "scope": "entity-identity-v2",
+                    "identity_algorithm": "entity-groups-v2",
+                    "identity_rounds": 12,
+                    "group_candidates": 3,
+                }
+                self.assertEqual(digest([src["id"], fixture_cfg]), expected_run_id)
+                fixture_chapters_state = {
+                    "chapter_set_version": "5657ba596cb7428bfcad86e96460083b65b1dad215e5f62d06291757df041f40",
+                    "complete": True,
+                    "issues": 0,
+                    "scan_windows": 1,
+                    "scanned_code_points": 30,
+                }
+                seed_store.execute(
+                    "INSERT INTO runs VALUES(?,?,?,?,?,?)",
+                    (expected_run_id, src["id"], dumps(fixture_cfg), dumps({"chapters": fixture_chapters_state}), "now", "now"),
+                )
+                for ch in [
+                    {
+                        "address": address(src["id"], 0, 15),
+                        "body_start": 6,
+                        "chapter_set_version": "5657ba596cb7428bfcad86e96460083b65b1dad215e5f62d06291757df041f40",
+                        "decision_id": "e045d042a1c2a2c6635f5b5659fbbe1a7836a2bc44449ecb50593bcac646f050",
+                        "end": 15,
+                        "heading_end": 6,
+                        "id": "c025b1b458473b38e19af83ec0c84c2c660c5fbf9aa5a6cf25592cd7d426f160",
+                        "kind": "chapter",
+                        "ordinal": 1,
+                        "parent_volume_id": None,
+                        "start": 0,
+                        "title": "第一章 初见",
+                    },
+                    {
+                        "address": address(src["id"], 15, 30),
+                        "body_start": 21,
+                        "chapter_set_version": "5657ba596cb7428bfcad86e96460083b65b1dad215e5f62d06291757df041f40",
+                        "decision_id": "6e8283c61291d855150783bcee830147d825ea5992b7cfe90e26bce71e1df946",
+                        "end": 30,
+                        "heading_end": 21,
+                        "id": "2c70ddf1f057d1848e4b45e024c95647ca573f2db570460494a68308ccdb3406",
+                        "kind": "chapter",
+                        "ordinal": 2,
+                        "parent_volume_id": None,
+                        "start": 15,
+                        "title": "第二章 再见",
+                    },
+                ]:
+                    seed_store.put(expected_run_id, "chapter", ch)
+            finally:
+                seed_store.close()
+
             FakeModels.generated = 0
             FakeModels.chosen = 0
             FakeModels.fail_once = False
@@ -466,6 +550,25 @@ class PipelineTests(unittest.TestCase):
             finally:
                 store.close()
             self.assertEqual((reexported / "result.json").read_bytes(), raw_bytes)
+
+            # 同时验证全新库下 groups-v2 配合新章节识别可端到端跑通且 chapter_set_version 不变
+            fresh_db = root / "fresh_v2.sqlite3"
+            with patch("entitytrace.pipeline.Models", FakeModels), patch(
+                "entitytrace.pipeline.implementation_hash", return_value="fixed-v2-baseline"
+            ):
+                fresh_id, fresh_out, fresh_complete = run_pipeline(
+                    text, fresh_db, root / "fresh_out", config,
+                    identity_algorithm="groups-v2", log=lambda _: None,
+                )
+            self.assertTrue(fresh_complete)
+            self.assertEqual(fresh_id, expected_run_id)
+            fresh_res = json.loads((fresh_out / "result.json").read_text(encoding="utf-8"))
+            self.assertEqual(fresh_res["schema_version"], 2)
+            self.assertEqual(
+                fresh_res["chapters"][0]["chapter_set_version"],
+                "5657ba596cb7428bfcad86e96460083b65b1dad215e5f62d06291757df041f40",
+            )
+            self.assertIn("request_id", fresh_res["chapters"][0])
 
     def test_cli_identity_algorithm_roster_default_and_groups_v2_option(self):
         with tempfile.TemporaryDirectory() as d:
@@ -540,30 +643,15 @@ class PipelineTests(unittest.TestCase):
         import argparse
         from tools.roster_experiment import read_source_run, run_experiment, seed_experiment_store
 
-        class BlockingChapterFakeModels(FakeModels):
-            def choices(self, state, questions, stage):
-                answers = {}
-                for key in questions:
-                    probs = {k: 0.0 for k in CRITERIA}
-                    probs["uncertain"] = 1.0
-                    answers[key] = {"type": "choice", "choice": "uncertain", "confidence": 0.4, "probabilities": probs}
-                return answers, f"req-{stage}"
-
-            def generate(self, system, state, stage, validate, *args, **kwargs):
-                if stage == "chapter-repair":
-                    val = {"headings": []}
-                    validate(val)
-                    return val, "req-repair"
-                return super().generate(system, state, stage, validate, *args, **kwargs)
-
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)
             text = root / "input.txt"
-            text.write_text("第一章 初见\n林舟来了。\n", encoding="utf-8")
+            # 章号从第一章直接跳至第三章，触发章号连续性阻断（chapters.complete == False）
+            text.write_text("第一章 初见\n林舟来了。\n第三章 跳章\n林舟走了。\n", encoding="utf-8")
             config = root / ".env"
-            config.write_text("TYPESAFE_API_KEY=test\nDEEPSEEK_API_KEY=test\n", encoding="utf-8")
+            config.write_text("DEEPSEEK_API_KEY=test\n", encoding="utf-8")
             src_db = root / "src.sqlite3"
-            with patch("entitytrace.pipeline.Models", BlockingChapterFakeModels):
+            with patch("entitytrace.pipeline.Models", FakeModels):
                 src_run_id, _, complete = run_pipeline(text, src_db, root / "src_out", config, log=lambda _: None)
             self.assertFalse(complete)
             bundle = read_source_run(src_db, src_run_id)
@@ -593,138 +681,300 @@ class PipelineTests(unittest.TestCase):
                 max_requests=100,
                 max_seconds=60,
             )
-            with patch("tools.roster_experiment.Models", BlockingChapterFakeModels):
+            with patch("tools.roster_experiment.Models", FakeModels):
                 code = run_experiment(args)
             self.assertEqual(code, 2)
             res_doc = json.loads((exp_out / "result.json").read_text(encoding="utf-8"))
             self.assertEqual(res_doc["status"], "incomplete")
 
 
-class ChapterConsistencyTests(unittest.TestCase):
-    def _make_probs(self, mapping: dict[str, float]) -> dict[str, float]:
-        probs = {k: 0.0 for k in CRITERIA}
-        probs.update(mapping)
-        return probs
+class ChapterCandidateAndStructureTests(unittest.TestCase):
+    def test_overlong_and_incomplete_lines_excluded_from_candidates(self):
+        exact_120 = "甲" * 120
+        over_121 = "乙" * 121
+        # 715 码点的单行被 units(limit=700) 拆成 700 + 15 两段，两段 complete_line 均为 False（含长度<=120的尾段）
+        over_700 = "丙" * 715
+        short_head = "第一章 启程"
+        text = f"{exact_120}\n{over_121}\n\n{short_head}\n{over_700}\n"
+        cands = collect_candidates(text)
+        titles = [c["title"] for c in cands]
+        self.assertEqual(titles, [exact_120, short_head])
+        head_cand = cands[1]
+        # 紧邻的非空物理行分别为 over_121 与 over_700，各截取到 80 码点
+        self.assertEqual(head_cand["prev"], "乙" * 80)
+        self.assertEqual(head_cand["next"], "丙" * 80)
+        self.assertEqual(text[head_cand["start"]:head_cand["end"]], short_head)
 
-    def test_consistent_non_heading_passes_for_colophon_and_ending_forms(self):
-        # 构造两种文末非标题形态（合成文本，不取自测试书）：
-        # u0 正常正文（主通道 p>=0.8 放行）；
-        # u1 日期尾注形态（初判 body 0.55 < 0.8 进复核；复核生成摘录为空，Decision 首选 body 0.57 / metadata 0.36 / extra 0.07）；
-        # u2 结束标记形态（初判 extra 0.45 进复核；复核生成摘录为空，Decision 首选 body 0.68 / extra 0.29 / uncertain 0.03）。
+    def test_ending_line_labeled_extra_is_dropped_and_recorded(self):
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)
             store = Store(root / "db.sqlite3")
             try:
                 path = root / "story.txt"
-                path.write_text("春夜微雨，林舟独自收拾行囊。\n乙丑年冬月记于南窗\nFINIS\n", encoding="utf-8")
+                path.write_text("第一章 夜渡\n江风吹动灯火。\n——尾记完——\n\n", encoding="utf-8")
                 source = import_text(store, path)
-                batch = units(source["text"])
-                self.assertEqual(len(batch), 3)
-                u0, u1, u2 = batch
+                store.execute("INSERT INTO runs VALUES(?,?,?,?,?,?)", ("r1", source["id"], "{}", "{}", "now", "now"))
 
-                class CustomModels:
-                    def choices(s, state, questions, stage):
-                        if stage == "chapters":
-                            return {
-                                u0["id"]: {"type": "choice", "choice": "body", "confidence": 0.95, "probabilities": self._make_probs({"body": 0.95, "uncertain": 0.05})},
-                                u1["id"]: {"type": "choice", "choice": "body", "confidence": 0.55, "probabilities": self._make_probs({"body": 0.55, "metadata": 0.40, "extra": 0.05})},
-                                u2["id"]: {"type": "choice", "choice": "extra", "confidence": 0.50, "probabilities": self._make_probs({"extra": 0.45, "body": 0.45, "metadata": 0.10})},
-                            }, "req-init"
-                        return {
-                            u1["id"]: {"type": "choice", "choice": "body", "confidence": 0.54, "probabilities": self._make_probs({"body": 0.57, "metadata": 0.36, "extra": 0.07})},
-                            u2["id"]: {"type": "choice", "choice": "body", "confidence": 0.66, "probabilities": self._make_probs({"body": 0.68, "extra": 0.29, "uncertain": 0.03})},
-                        }, "req-verify"
+                class EndingExtraModels:
+                    def choices(s, *args, **kwargs):
+                        raise AssertionError("章节阶段禁止调用 choices")
 
                     def generate(s, system, state, stage, validate, *args, **kwargs):
-                        val = {"headings": []}
+                        self.assertEqual(kwargs.get("temperature"), 0)
+                        cands = state["candidates"]
+                        val = {
+                            "headings": [
+                                {"id": cands[0]["id"], "kind": "chapter"},
+                                {"id": cands[2]["id"], "kind": "extra"},
+                            ]
+                        }
                         validate(val)
-                        return val, "req-repair"
+                        return val, "req-label-ending"
 
-                res = scan_window(CustomModels(), source, batch, [])
-                self.assertEqual(res["issues"], [])
-                self.assertEqual(res["headings"], [])
-                self.assertEqual(res["path_counts"]["primary"], 1)
-                self.assertEqual(res["path_counts"]["primary_pass"], 1)
-                self.assertEqual(res["path_counts"]["consistent"], 2)
-                self.assertEqual(res["path_counts"]["consistent_pass"], 2)
-                self.assertEqual(res["path_counts"]["review"], 0)
+                outcome = detect_chapters(store, EndingExtraModels(), source, "r1", lambda _: None)
+                self.assertTrue(outcome["complete"])
+                self.assertEqual(outcome["issues"], 0)
+                self.assertEqual(outcome["path_counts"]["labeled"], 2)
+                self.assertEqual(outcome["path_counts"]["adopted"], 1)
+                self.assertEqual(outcome["path_counts"]["dropped_no_body"], 1)
+                self.assertEqual([c["title"] for c in outcome["chapters"]], ["第一章 夜渡"])
+                decisions = store.records("r1", "decision")
+                self.assertEqual(len(decisions), 2)
+                by_res = {rec["question_id"]: rec["result"] for rec in decisions}
+                self.assertEqual(sorted(by_res.values()), ["adopted", "dropped_no_body"])
             finally:
                 store.close()
 
-    def test_consistent_heading_adopted_when_style_known_and_blocked_when_new_style_or_disagreed(self):
-        # 合成文本测试：
-        # 1) 已知样式（references 中已有“第一回 ...”），复核时生成摘录精确匹配整行且与 Decision 首选同为 chapter（p=0.78 < 0.80）-> 采纳；
-        # 2) 新样式（references 为空或样式不同）-> 仍阻断进待审；
-        # 3) 两边不一致（生成摘录给标题但 Decision 首选 body，或生成摘录为空但 Decision 首选 chapter p=0.75）-> 仍阻断进待审。
+    def test_toc_run_drops_all_before_real_heading_or_keeps_only_last_before_body(self):
+        # 情形 A：目录串后紧跟正式章节标题（中间无正文）-> 目录串全部丢弃
+        text_a = (
+            "第一章 临江\n"
+            "第二章 宿驿\n"
+            "第三章 入城\n\n"
+            "第一章 临江\n"
+            "晨雾散尽，船靠北岸。\n"
+            "第二章 宿驿\n"
+            "灯下清点文书。\n"
+            "第三章 入城\n"
+            "城门刚刚开启。\n"
+        )
+        cands_a = collect_candidates(text_a)
+        labeled_a = [
+            {**c, "kind": "chapter", "request_id": "req-a"}
+            for c in cands_a
+            if c["title"].startswith("第")
+        ]
+        self.assertEqual(len(labeled_a), 6)
+        kept_a, dropped_a = filter_headings_with_body(text_a, labeled_a)
+        self.assertEqual(len(dropped_a), 3)
+        self.assertEqual(len(kept_a), 3)
+        self.assertTrue(all(h["start"] >= text_a.index("\n\n") for h in kept_a))
+
+        # 情形 B：目录串后面没有其他被标出的标题，直接接正文 -> 目录串只保留最后一条
+        text_b = "第一章 临江\n第二章 宿驿\n第三章 入城\n正文中没有再重复章题。\n"
+        cands_b = collect_candidates(text_b)
+        labeled_b = [
+            {**c, "kind": "chapter", "request_id": "req-b"}
+            for c in cands_b
+            if c["title"].startswith("第")
+        ]
+        self.assertEqual(len(labeled_b), 3)
+        kept_b, dropped_b = filter_headings_with_body(text_b, labeled_b)
+        self.assertEqual(len(dropped_b), 2)
+        self.assertEqual([h["title"] for h in kept_b], ["第三章 入城"])
+
+    def test_volume_immediately_followed_by_chapter_is_kept_but_empty_volume_dropped(self):
+        text = (
+            "空卷甲\n"
+            "第一卷 朔风\n"
+            "第一章 启行\n"
+            "车马出关。\n"
+            "末尾空卷\n"
+        )
+        cands = collect_candidates(text)
+        kind_map = {
+            "空卷甲": "volume",
+            "第一卷 朔风": "volume",
+            "第一章 启行": "chapter",
+            "末尾空卷": "volume",
+        }
+        labeled = [
+            {**c, "kind": kind_map[c["title"]], "request_id": "req-vol"}
+            for c in cands
+            if c["title"] in kind_map
+        ]
+        kept, dropped = filter_headings_with_body(text, labeled)
+        self.assertEqual([h["title"] for h in kept], ["第一卷 朔风", "第一章 启行"])
+        self.assertEqual([h["title"] for h in dropped], ["空卷甲", "末尾空卷"])
+
+    def test_chapter_number_parsing_chinese_roman_and_arabic_three_forms(self):
+        cases = [
+            ("第一章 初雪", 1),
+            ("第十回 夜审", 10),
+            ("第十一节 转折", 11),
+            ("第二十回 渡口", 20),
+            ("第三十六回 终局", 36),
+            ("第一百零八回 聚散", 108),
+            ("第一百〇九回 远帆", 109),
+            ("第一百十回 归途", 110),
+            ("第一百二十回 尾声", 120),
+            ("第两千章 纪年", 2000),
+            ("第15章 驿站", 15),
+            ("Chapter 1", 1),
+            ("CHAPTER XLIV.", 44),
+            ("part iii", 3),
+            ("PART 12", 12),
+            ("1. Dawn", 1),
+            ("135. Horizon", 135),
+            ("I. Opening", 1),
+            ("XIV. Crossing", 14),
+            ("Chapter One", None),
+            ("楔子", None),
+            ("3.14 Ratio", None),
+        ]
+        for title, expected in cases:
+            with self.subTest(title=title):
+                self.assertEqual(parse_chapter_number(title), expected)
+
+    def test_chapter_numbering_gap_or_duplicate_blocks_run(self):
+        # 缺号（中文与罗马数字点号形式）及重复号均产生阻断待审
+        gap_adopted = [
+            {"start": 0, "end": 3, "title": "第一章", "kind": "chapter"},
+            {"start": 10, "end": 13, "title": "第三章", "kind": "chapter"},
+        ]
+        issues_gap, unnum_gap = check_chapter_numbering("src-1", gap_adopted)
+        self.assertEqual(unnum_gap, 0)
+        self.assertEqual(len(issues_gap), 1)
+        self.assertEqual(issues_gap[0]["reason"], "章号序列不连续")
+        self.assertEqual(len(issues_gap[0]["evidence"]), 2)
+
+        roman_dot_gap = [
+            {"start": 0, "end": 7, "title": "I. East", "kind": "chapter"},
+            {"start": 20, "end": 29, "title": "III. West", "kind": "chapter"},
+        ]
+        issues_roman, _ = check_chapter_numbering("src-2", roman_dot_gap)
+        self.assertEqual(len(issues_roman), 1)
+        self.assertEqual(issues_roman[0]["reason"], "章号序列不连续")
+
+        dup_adopted = [
+            {"start": 0, "end": 9, "title": "Chapter 2", "kind": "chapter"},
+            {"start": 20, "end": 29, "title": "Chapter 2", "kind": "chapter"},
+        ]
+        issues_dup, _ = check_chapter_numbering("src-3", dup_adopted)
+        self.assertEqual(len(issues_dup), 1)
+        self.assertEqual(issues_dup[0]["reason"], "章号序列不连续")
+
+        # 无编号章题不阻断但计数 unnumbered
+        unnum_adopted = [
+            {"start": 0, "end": 2, "title": "楔子", "kind": "chapter"},
+            {"start": 10, "end": 19, "title": "Chapter 5", "kind": "chapter"},
+            {"start": 30, "end": 39, "title": "Chapter 6", "kind": "chapter"},
+        ]
+        issues_ok, unnum_cnt = check_chapter_numbering("src-4", unnum_adopted)
+        self.assertEqual(issues_ok, [])
+        self.assertEqual(unnum_cnt, 1)
+
+    def test_chapter_numbering_restarts_from_one_after_volume_without_blocking(self):
+        adopted = [
+            {"start": 0, "end": 3, "title": "第一卷", "kind": "volume"},
+            {"start": 10, "end": 13, "title": "第一章", "kind": "chapter"},
+            {"start": 30, "end": 33, "title": "第二章", "kind": "chapter"},
+            {"start": 50, "end": 53, "title": "第二卷", "kind": "volume"},
+            {"start": 60, "end": 63, "title": "第一章", "kind": "chapter"},
+            {"start": 80, "end": 83, "title": "第二章", "kind": "chapter"},
+        ]
+        issues, unnumbered = check_chapter_numbering("src-vol", adopted)
+        self.assertEqual(issues, [])
+        self.assertEqual(unnumbered, 0)
+
+    def test_unknown_candidate_id_raises_format_model_error(self):
+        cands = collect_candidates("第一章 启程\n天气晴朗。\n")
+
+        class BadIdModels:
+            def choices(s, *args, **kwargs):
+                raise AssertionError("章节阶段禁止调用 choices")
+
+            def generate(s, system, state, stage, validate, *args, **kwargs):
+                bad = {"headings": [{"id": "u999999_999999", "kind": "chapter"}]}
+                validate(bad)
+                return bad, "req-bad"
+
+        with self.assertRaises(ModelError):
+            scan_window(BadIdModels(), cands)
+
+    def test_chapter_stage_never_calls_choices(self):
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)
-            store = Store(root / "db.sqlite3")
+            text = root / "novel.txt"
+            text.write_text("第一章 山路\n林舟前行。\n第二章 渡河\n林舟登船。\n", encoding="utf-8")
+            cfg = root / ".env"
+            cfg.write_text("DEEPSEEK_API_KEY=test\n", encoding="utf-8")
+
+            class StrictNoChoicesModels(FakeModels):
+                def choices(self, *args, **kwargs):
+                    raise AssertionError("章节阶段一旦调用 choices 即判定失败")
+
+            with patch("entitytrace.pipeline.Models", StrictNoChoicesModels):
+                _, output, complete = run_pipeline(
+                    text, root / "db.sqlite3", root / "out", cfg,
+                    stop_after="chapters", log=lambda _: None,
+                )
+            self.assertFalse(complete)
+            manifest = json.loads((output / "manifest.json").read_text(encoding="utf-8"))
+            self.assertTrue(manifest["state"]["chapters"]["complete"])
+            self.assertEqual(manifest["state"]["chapters"]["issues"], 0)
+            self.assertEqual(
+                manifest["counts"]["chapter_path_counts"],
+                {
+                    "candidates": 4,
+                    "labeled": 2,
+                    "adopted": 2,
+                    "dropped_no_body": 0,
+                    "unnumbered": 0,
+                    "numbering_issues": 0,
+                    "label_requests": 1,
+                },
+            )
+
+
+class CredentialDecouplingAndTemperatureTests(unittest.TestCase):
+    def test_generate_without_temperature_preserves_exact_payload_and_cache_key(self):
+        from entitytrace.util import dumps
+
+        with tempfile.TemporaryDirectory() as d:
+            store = Store(Path(d) / "db.sqlite3")
             try:
-                path = root / "ch.txt"
-                path.write_text("第二回 驿路逢旧友 山亭话别情\n林舟拱手道别。\n", encoding="utf-8")
-                source = import_text(store, path)
-                batch = units(source["text"])
-                u_head, u_body = batch
-                title_str = u_head["text"].rstrip("\r\n")
-                known_refs = [{"start": 0, "end": 13, "title": "第一回 江干立契约 古寺起风波", "kind": "chapter"}]
+                sent_payloads: list[dict] = []
 
-                class AgreeHeadingModels:
-                    def choices(s, state, questions, stage):
-                        if stage == "chapters":
-                            return {
-                                u_head["id"]: {"type": "choice", "choice": "chapter", "confidence": 0.65, "probabilities": self._make_probs({"chapter": 0.68, "mixed": 0.22, "body": 0.10})},
-                                u_body["id"]: {"type": "choice", "choice": "body", "confidence": 0.95, "probabilities": self._make_probs({"body": 0.95, "uncertain": 0.05})},
-                            }, "req-init"
-                        return {
-                            u_head["id"]: {"type": "choice", "choice": "chapter", "confidence": 0.75, "probabilities": self._make_probs({"chapter": 0.78, "mixed": 0.10, "body": 0.12})},
-                        }, "req-verify"
+                def opener(request, **kwargs):
+                    sent_payloads.append(json.loads(request.data.decode("utf-8")))
+                    body = {"choices": [{"finish_reason": "stop", "message": {"content": "{}"}}]}
+                    return io.BytesIO(json.dumps(body).encode("utf-8"))
 
-                    def generate(s, system, state, stage, validate, *args, **kwargs):
-                        val = {"headings": [{"title": title_str, "kind": "chapter", "before": "", "after": ""}]}
-                        validate(val)
-                        return val, "req-repair"
+                svc = Service("discovery", "https://api.deepseek.com", "deepseek-flash", "TEST_SECRET")
+                model = Models(store, "r", "i", {"discovery": svc}, opener=opener)
+                sys_prompt = "测试提示词"
+                user_state = {"units": [{"id": "u0_5", "text": "测试"}]}
+                expected_legacy_payload = {
+                    "model": "deepseek-flash",
+                    "messages": [
+                        {"role": "system", "content": sys_prompt},
+                        {"role": "user", "content": dumps(user_state)},
+                    ],
+                    "response_format": {"type": "json_object"},
+                    "thinking": {"type": "disabled"},
+                    "max_tokens": 8000,
+                }
+                expected_legacy_id = digest(["http-v1", svc.public(), "/chat/completions", expected_legacy_payload])
 
-                # 情形 1：样式已在 references 中出现 -> 一致通道采纳
-                adopted = scan_window(AgreeHeadingModels(), source, batch, known_refs)
-                self.assertEqual(adopted["issues"], [])
-                self.assertEqual(len(adopted["headings"]), 1)
-                self.assertEqual(adopted["headings"][0]["title"], title_str)
-                self.assertEqual(adopted["headings"][0]["kind"], "chapter")
-                self.assertEqual(adopted["path_counts"]["consistent_heading"], 1)
-                self.assertEqual(adopted["path_counts"]["review"], 0)
+                _, req_id_default = model.generate(sys_prompt, user_state, "discovery", lambda v: None)
+                self.assertEqual(req_id_default, expected_legacy_id)
+                self.assertNotIn("temperature", sent_payloads[0])
+                self.assertEqual(dumps(sent_payloads[0]), dumps(expected_legacy_payload))
 
-                # 情形 2：新样式（references 为空）-> 阻断进待审
-                blocked_new_style = scan_window(AgreeHeadingModels(), source, batch, [])
-                self.assertEqual(len(blocked_new_style["issues"]), 1)
-                self.assertEqual(blocked_new_style["headings"], [])
-                self.assertEqual(blocked_new_style["path_counts"]["consistent_heading"], 0)
-                self.assertEqual(blocked_new_style["path_counts"]["review"], 1)
-
-                # 情形 3a：两边不一致（生成摘录返回标题，但 Decision 复核首选 body）-> 阻断进待审
-                class DisagreeBodyModels(AgreeHeadingModels):
-                    def choices(s, state, questions, stage):
-                        if stage == "chapters":
-                            return super().choices(state, questions, stage)
-                        return {
-                            u_head["id"]: {"type": "choice", "choice": "body", "confidence": 0.70, "probabilities": self._make_probs({"body": 0.72, "chapter": 0.28})},
-                        }, "req-verify-body"
-
-                blocked_disagree_a = scan_window(DisagreeBodyModels(), source, batch, known_refs)
-                self.assertEqual(len(blocked_disagree_a["issues"]), 1)
-                self.assertEqual(blocked_disagree_a["headings"], [])
-                self.assertEqual(blocked_disagree_a["path_counts"]["review"], 1)
-
-                # 情形 3b：两边不一致（生成摘录返回空数组，但 Decision 复核首选 chapter 0.78）-> 阻断进待审
-                class DisagreeEmptyLocalModels(AgreeHeadingModels):
-                    def generate(s, system, state, stage, validate, *args, **kwargs):
-                        val = {"headings": []}
-                        validate(val)
-                        return val, "req-repair-empty"
-
-                blocked_disagree_b = scan_window(DisagreeEmptyLocalModels(), source, batch, known_refs)
-                self.assertEqual(len(blocked_disagree_b["issues"]), 1)
-                self.assertEqual(blocked_disagree_b["headings"], [])
-                self.assertEqual(blocked_disagree_b["path_counts"]["review"], 1)
+                _, req_id_temp0 = model.generate(sys_prompt, user_state, "chapter-label", lambda v: None, temperature=0)
+                self.assertNotEqual(req_id_temp0, expected_legacy_id)
+                self.assertEqual(sent_payloads[1]["temperature"], 0)
             finally:
                 store.close()
 

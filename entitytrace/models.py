@@ -257,10 +257,12 @@ class Models:
         return raw["answers"], request_id
 
     def generate(self, system: str, state: dict, stage: str, validate: Callable,
-                 max_tokens: int = 8000) -> tuple[dict, str]:
+                 max_tokens: int = 8000, temperature: float | None = None) -> tuple[dict, str]:
         payload = {"model": self.services["discovery"].model,
                    "messages": [{"role": "system", "content": system}, {"role": "user", "content": dumps(state)}],
                    "response_format": {"type": "json_object"}, "thinking": {"type": "disabled"}, "max_tokens": max_tokens}
+        if temperature is not None:
+            payload["temperature"] = temperature
         def check(raw):
             try:
                 choice = raw["choices"][0]

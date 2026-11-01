@@ -41,8 +41,7 @@ def _make_fake_http_opener(fail_network=False):
                 elif "accept" in criteria:
                     choice = "accept"
                 else:
-                    unit = next(u for u in state["units"] if u["id"] == key)
-                    choice = "chapter" if unit["text"].startswith("第") else "body"
+                    raise AssertionError("章节阶段不应调用 /systemone")
                 answers[key] = {
                     "type": "choice",
                     "choice": choice,
@@ -55,7 +54,15 @@ def _make_fake_http_opener(fail_network=False):
         messages = payload["messages"]
         system_prompt = messages[0]["content"]
         user_state = json.loads(messages[1]["content"])
-        if "章节内实体称呼归并器" in system_prompt:
+        if "candidates" in user_state:
+            content = {
+                "headings": [
+                    {"id": c["id"], "kind": "chapter"}
+                    for c in user_state["candidates"]
+                    if c["text"].lstrip().startswith("第")
+                ]
+            }
+        elif "章节内实体称呼归并器" in system_prompt:
             surfaces = [row["surface"] for row in user_state["surfaces"]]
             ev_ref = user_state["units"][0]["id"]
             entities = []
@@ -218,9 +225,12 @@ class BudgetTests(unittest.TestCase):
             def discovery_outage_opener(request, timeout=None):
                 nonlocal discovery_attempts
                 if request.full_url.endswith("/chat/completions"):
-                    with lock:
-                        discovery_attempts += 1
-                    raise ConnectionResetError("模拟发现阶段断网")
+                    req_payload = json.loads(request.data.decode("utf-8"))
+                    req_state = json.loads(req_payload["messages"][1]["content"])
+                    if "candidates" not in req_state:
+                        with lock:
+                            discovery_attempts += 1
+                        raise ConnectionResetError("模拟发现阶段断网")
                 return base_opener(request, timeout=timeout)
 
             class OutageModels(Models):
