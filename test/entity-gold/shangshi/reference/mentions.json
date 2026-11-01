@@ -49,12 +49,6 @@
       "note": "吉兆胡同住所的房东小官太太（含房主人指称），因小油鸡等与子君暗斗并在子君被接走后告知涓生"
     },
     {
-      "gold_id": "x004",
-      "kind": "object",
-      "canonical": "油鸡",
-      "note": "涓生与子君在吉兆胡同饲养的四只小油鸡（及两家争执所涉小油鸡）"
-    },
-    {
       "gold_id": "x005",
       "kind": "org",
       "canonical": "局里",
@@ -413,7 +407,8 @@
         "surname_only_or_short"
       ],
       "chapter_index": 1,
-      "gold_id": "x004",
+      "gold_id": "not_entity",
+      "human_review": "confirmed_by_user_2026-11-01",
       "note": "前文“不一月，我们的眷属便骤然加得很多，四只小”与后文“，在小院子里和房主人的十多只在一同走”表明指涓生与子君饲养的四只小油鸡（x004）。"
     },
     {
@@ -563,7 +558,8 @@
         "surname_only_or_short"
       ],
       "chapter_index": 1,
-      "gold_id": "x004",
+      "gold_id": "not_entity",
+      "human_review": "propagated_from_s027",
       "note": "前文“幸而探听出来了，也还是和那小官太太的暗斗，导火线便是两家的小”与后文“。但又何必硬不告诉我呢？”表明指引发争端的油鸡（x004）。"
     },
     {
@@ -624,7 +620,8 @@
         "surname_only_or_short"
       ],
       "chapter_index": 1,
-      "gold_id": "x004",
+      "gold_id": "not_entity",
+      "human_review": "propagated_from_s027",
       "note": "前文“况且还要饲阿随，饲”与后文“，……都是非她不可的工作。我曾经忠告她”表明指子君每日亲自喂养的油鸡（x004）。"
     },
     {
@@ -779,7 +776,8 @@
         "surname_only_or_short"
       ],
       "chapter_index": 1,
-      "gold_id": "x004",
+      "gold_id": "not_entity",
+      "human_review": "propagated_from_s027",
       "note": "前文“然而又加以阿随，加以”与后文“们。加以油鸡们又大起来了，更容易成为两家争吵的引线”表明指家中饲养的油鸡（x004）。"
     },
     {
@@ -793,7 +791,8 @@
         "surname_only_or_short"
       ],
       "chapter_index": 1,
-      "gold_id": "x004",
+      "gold_id": "not_entity",
+      "human_review": "propagated_from_s027",
       "note": "前文“然而又加以阿随，加以油鸡们。加以”与后文“们又大起来了，更容易成为两家争吵的引线”表明指日渐长大、引发两家争吵的油鸡（x004）。"
     },
     {
@@ -833,7 +832,8 @@
         "surname_only_or_short"
       ],
       "chapter_index": 1,
-      "gold_id": "x004",
+      "gold_id": "not_entity",
+      "human_review": "propagated_from_s027",
       "note": "前文“吃了筹钱，筹来吃饭，还要喂阿随，饲”与后文“；她似乎将先前所知道的全都忘掉了”表明指子君每日喂食的油鸡（x004）。"
     },
     {
@@ -871,7 +871,8 @@
         "surname_only_or_short"
       ],
       "chapter_index": 1,
-      "gold_id": "x004",
+      "gold_id": "not_entity",
+      "human_review": "propagated_from_s027",
       "note": "前文“她说，阿随实在瘦得太可怜……\n\n于是吃我残饭的便只有”与后文“们。这是我积久才看出来的”表明指吃涓生残饭的油鸡（x004）。"
     },
     {
@@ -898,7 +899,8 @@
         "surname_only_or_short"
       ],
       "chapter_index": 1,
-      "gold_id": "x004",
+      "gold_id": "not_entity",
+      "human_review": "propagated_from_s027",
       "note": "前文“自觉了我在这里的位置：不过是叭儿狗和”与后文“之间。\n\n后来，经多次的抗争和催逼，油鸡们也逐渐成为肴馔”表明指吃涓生残饭的油鸡（x004）。"
     },
     {
@@ -912,7 +914,8 @@
         "surname_only_or_short"
       ],
       "chapter_index": 1,
-      "gold_id": "x004",
+      "gold_id": "not_entity",
+      "human_review": "propagated_from_s027",
       "note": "前文“后来，经多次的抗争和催逼，”与后文“们也逐渐成为肴馔，我们和阿随都享用了十多日的鲜肥”表明指被宰杀充作食物的油鸡（x004）。"
     },
     {

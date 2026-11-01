@@ -182,6 +182,12 @@
       "kind": "person",
       "canonical": "Mrs. Wickham (senior)",
       "note": "老威克姆之妻、乔治·威克姆之母（因挥霍导致丈夫贫困），如 s274 'his wife'"
+    },
+    {
+      "gold_id": "x027",
+      "kind": "organization",
+      "canonical": "Courier",
+      "note": "刊登莉迪亚结婚启事的报纸《信使报》（the ‘Courier,’），如 s487"
     }
   ],
   "annotation_started_at": "2026-10-30T06:53:50Z",
@@ -5875,7 +5881,8 @@
         "out_of_roster"
       ],
       "chapter_index": 53,
-      "gold_id": "not_entity",
+      "gold_id": "x027",
+      "human_review": "confirmed_by_user_2026-11-01",
       "note": "班纳特太太对宾利谈起莉迪亚结婚的消息登在了《泰晤士报》和《信使报》（the ‘Courier,’）上，此处为报纸名称而非人物或地点实体。"
     },
     {
