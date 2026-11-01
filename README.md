@@ -75,11 +75,13 @@ python -X utf8 -m entitytrace run "D:\小说\样本.txt" --identity-algorithm gr
 - `--max-requests N`、`--max-seconds S`：单次运行的新网络请求上限与运行秒数上限，默认不限；另内置连续 9 次传输层网络失败自动熔断停止。
 - `--encoding`、`--task-chars`、`--discovery-concurrency`、`--decision-concurrency`：输入编码、发现任务长度预算与各服务单进程并发上限。
 - `--stop-after chapters|discovery|identity`：在指定阶段完成后停止。
+- `--json`：将进度日志全部写往 stderr，stdout 仅在结束时输出一行 `entitytrace.v1` JSON 回执（不加 `--json` 时 `run` 的 stdout 文本保持原样）。
 - `--identity-rounds`（1—24，默认 12）、`--group-candidates`（1—3，默认 3）：**仅对 `--identity-algorithm groups-v2` 生效**。
 
-退出码约定：
-- `0`：`chapters`、`discovery`、`identity` 三个阶段全部完成并导出（`result.json` 的 `status` 为 `completed` 或含待审项的 `completed_with_review`）。
-- `2`：运行未完成或执行出错（包括达到 `--max-requests`／`--max-seconds` 预算上限、连续网络失败停止、`--stop-after` 提前停止，以及输入／配置／服务错误）。已建运行的未完成断点会导出 `status=incomplete`，并在 `manifest.json` 的 `state.last_error` 中记录类别（如 `budget`、`network`）以便后续恢复。
+退出码约定（适用于 `run`、只读查询命令与 `correct`；与旧版“所有失败或未完成一律返回 `2`”的行为不同，现按数据状态区分 `1` 与 `2`，是否自动重试以 JSON 回执的 `error.retryable` 为准）：
+- `0`：计算或命令完成（含 `completed` 与带待审的 `completed_with_review`、查询成功、`correct` 成功）。
+- `2`：数据库中留有**可续跑的断点**（包括网络中断 `network`、预算耗尽 `budget`、模型输出连续格式错误 `model_output`、额度耗尽 `quota`，以及 `--stop-after` 阶段断点）。注意：`quota` 退出码虽为 `2`（保留已完成缓存与断点），但 `error.retryable=false`，宿主不得自动重跑。
+- `1`：**无可续跑的断点**，或命令被拒绝（包括输入文件缺失／解码失败 `input`、配置缺失或鉴权失败 `config`、未知 `run_id`、非法参数、`groups-v2` 运行不支持查询、结果版本过期 `conflict` 及本地校验异常 `local`，`retryable` 均为 `false`）。
 
 ## 输出与回溯
 
@@ -107,12 +109,20 @@ python -X utf8 -m entitytrace run "D:\小说\样本.txt" --identity-algorithm gr
 
 地址为 `text_version_id + offset_unit + [start,end)`，从 0 开始、包含起点不含终点，单位是 Unicode 码点。原文换行和空格保留；UTF-8 BOM 仅从定位文本中去除，原始文件另存。章内偏移从整个章节范围起点计算，章节包含标题；`ordinal` 是含篇首／卷等分段的顺序，不等于作品印刷章号。
 
-从数据库取回原文或重新导出，不调用模型（将 `运行编号` 替换为终端打印的完整值）：
+从数据库按需只读查询、取回原文或重新导出，不调用模型（将 `运行编号` 替换为完整值；只读查询默认输出单行 `entitytrace.v1` JSON，实时通过内存 `build_export_bundle` 构建并带最新 `result_revision`，仅支持 `entity-roster-v1` 运行）：
 
 ```powershell
+python -X utf8 -m entitytrace status 运行编号
+python -X utf8 -m entitytrace entities 运行编号 --kind person --min-mentions 5 --limit 50 --offset 0
+python -X utf8 -m entitytrace entities 运行编号 --surface "称呼"
+python -X utf8 -m entitytrace entity 运行编号 实体ID --limit 50 --offset 0 --context 80
+python -X utf8 -m entitytrace review 运行编号 --status pending --limit 50 --offset 0
+python -X utf8 -m entitytrace quote 运行编号 100 120 --json --context 80
 python -X utf8 -m entitytrace quote 运行编号 100 120
 python -X utf8 -m entitytrace export 运行编号
 ```
+
+分页查询（`entities`、`entity`、`review`）的 `--limit` 默认 `50`、上限 `200`（超限按 `input` 拒绝，退出码 `1`），响应含 `total` 与 `next_offset`（无下一页时为 `null`）；`entity` 的 `snippet` 上下文上限 `400` 码点且不跨章节边界；`quote` 不加 `--json` 时纯文本输出保持原样。
 
 对已完成的默认 `entity-roster-v1` 运行，可通过 `correct` 叠加确定性更正或撤回（零模型调用，`groups-v2` 与未完成运行不支持）：
 
@@ -125,10 +135,10 @@ python -X utf8 -m entitytrace correct 运行编号 revoke 更正ID --cascade --s
 ```
 
 `correct` 生效规则：
-- `--expect-revision` 必须与当前 `result.json` 的 `result_revision` 一致，否则拒绝写入；`--resolves` 须指向当前 `review.json` 中存在的待审项，生效后标为 `resolved` 并记录 `resolved_by`。
+- `--expect-revision` 必须与当前 `result.json` 的 `result_revision` 一致，否则以 `conflict` 错误（退出码 `1`）拒绝写入；`--resolves` 须指向当前 `review.json` 中存在的待审项，生效后标为 `resolved` 并记录 `resolved_by`。
 - **只有 `--source user` 且未撤回的更正参与重放并改变 `result.json`**；`--source agent` 仅作为建议写入 `review.json` 的 `agent_suggestions`，不改变 `result.json` 与 `result_revision`。`user` 可撤回任意更正，`agent` 仅可撤回 `agent` 建议；有后续更正依赖目标更正时须显式加 `--cascade` 一并撤回。
 - 同一生效操作重复提交幂等返回 `status="duplicate"`；`split-surface` 后原实体剩余的 `c3_model` 提及会生成 `correction-c3-affected` 待审项提示复核而不自动搬移；零生效用户更正或全部撤回后，`result.json`、`review.json`（无未撤回建议时）与 `manifest.json` 逐字节复原。
-- 成功时 stdout 仅输出一行 JSON：`{"correction_id","status":"applied|suggested|duplicate|revoked","result_revision_before","result_revision","affected_entity_ids","output_dir"}`。
+- 成功时 stdout 输出单行 `entitytrace.v1` JSON：`{"protocol":"entitytrace.v1","command":"correct","run_id","error":null,"correction_id","status":"applied|suggested|duplicate|revoked","result_revision_before","result_revision","affected_entity_ids","output_dir"}`；失败时 stdout 输出单行 JSON 错误（含 `error.category` / `message` / `retryable`）并以退出码 `1` 退出，数据库零写入。
 
 ## 验证与当前限制
 

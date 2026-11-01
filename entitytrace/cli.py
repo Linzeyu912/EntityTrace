@@ -6,9 +6,49 @@ import sys
 from pathlib import Path
 
 from .corrections import apply_correction
-from .pipeline import export_run, run_pipeline
+from .pipeline import (
+    EXIT_CODE_BY_CATEGORY,
+    PROTOCOL,
+    classify_exception,
+    export_run,
+    run_pipeline,
+)
+from .query import (
+    DEFAULT_CONTEXT,
+    DEFAULT_LIMIT,
+    query_entities,
+    query_entity,
+    query_quote_json,
+    query_review,
+    query_status,
+)
 from .storage import Store
 from .text import address, validate_span
+
+KNOWN_COMMANDS = frozenset({"run", "status", "entities", "entity", "review", "quote", "export", "correct"})
+DEFAULT_JSON_COMMANDS = frozenset({"status", "entities", "entity", "review", "correct"})
+
+
+class _CliHelpExit(Exception):
+    """捕获 --help 正常退出，便于进程内调用返回 0。"""
+
+
+class _CliUsageError(ValueError):
+    """命令行参数错误，映射为 input 类别与退出码 1。"""
+
+    et_category = "input"
+
+
+class _CliParser(argparse.ArgumentParser):
+    def error(self, message: str) -> None:
+        raise _CliUsageError(f"命令行参数错误：{message}")
+
+    def exit(self, status: int = 0, message: str | None = None) -> None:
+        if message:
+            print(message, end="", file=sys.stderr)
+        if status == 0:
+            raise _CliHelpExit()
+        raise _CliUsageError((message or "命令行参数错误").strip())
 
 
 def _add_correct_common_args(parser: argparse.ArgumentParser) -> None:
@@ -20,14 +60,55 @@ def _add_correct_common_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--note", default=argparse.SUPPRESS, help="更正说明或依据备注")
     parser.add_argument("--db", type=Path, default=argparse.SUPPRESS, help="数据库路径，默认 data/entitytrace.sqlite3")
     parser.add_argument("--output", type=Path, default=argparse.SUPPRESS, help="输出根目录，默认 outputs")
+    parser.add_argument("--json", action="store_true", default=argparse.SUPPRESS, help="输出单行 JSON 回执（默认已启用）")
 
 
-def main(argv=None) -> int:
-    if hasattr(sys.stdout, "reconfigure"):
-        sys.stdout.reconfigure(encoding="utf-8")
-        sys.stderr.reconfigure(encoding="utf-8")
-    parser = argparse.ArgumentParser(description="EntityTrace：发现实体提及、按证据判断身份并导出 JSON")
-    subs = parser.add_subparsers(dest="command", required=True)
+def _detect_invocation_context(raw_argv: list[str]) -> tuple[str | None, str | None, bool]:
+    cmd: str | None = None
+    cmd_idx = -1
+    for idx, tok in enumerate(raw_argv):
+        if not tok.startswith("-"):
+            if tok in KNOWN_COMMANDS:
+                cmd = tok
+                cmd_idx = idx
+            break
+    run_id: str | None = None
+    if cmd and cmd != "run" and cmd_idx >= 0:
+        for tok in raw_argv[cmd_idx + 1:]:
+            if not tok.startswith("-"):
+                run_id = tok
+                break
+    json_mode = ("--json" in raw_argv) or (cmd in DEFAULT_JSON_COMMANDS)
+    return cmd, run_id, json_mode
+
+
+def _emit_json_line(payload: dict) -> None:
+    print(json.dumps(payload, ensure_ascii=False), flush=True)
+
+
+def _build_failed_run_receipt(err: dict) -> dict:
+    return {
+        "protocol": PROTOCOL,
+        "command": "run",
+        "run_id": None,
+        "result_revision": None,
+        "status": "failed",
+        "stages": {
+            name: {"complete": False, "seconds": 0.0, "resumed": False}
+            for name in ("chapters", "discovery", "identity")
+        },
+        "output_dir": None,
+        "files": None,
+        "counts": None,
+        "review_top": [],
+        "error": err,
+    }
+
+
+def _build_parser() -> _CliParser:
+    parser = _CliParser(description="EntityTrace：发现实体提及、按证据判断身份并导出 JSON")
+    subs = parser.add_subparsers(dest="command", required=True, parser_class=_CliParser)
+
     run = subs.add_parser("run", help="处理全文；相同输入及配置自动复用断点")
     run.add_argument("input", type=Path)
     run.add_argument("--db", type=Path, default=Path("data/entitytrace.sqlite3"))
@@ -44,24 +125,65 @@ def main(argv=None) -> int:
                      help="实体组消歧最大轮次，默认 12（仅对 --identity-algorithm groups-v2 生效）")
     run.add_argument("--group-candidates", type=int, default=3,
                      help="每次最多比较的候选组数，默认 3（仅对 --identity-algorithm groups-v2 生效）")
-    run.add_argument("--max-requests", type=int, default=None, help="本次调用最大新网络请求预算，默认不限；超限保留断点并以退出码 2 停止")
-    run.add_argument("--max-seconds", type=float, default=None, help="本次调用最大运行秒数预算，默认不限；超限保留断点并以退出码 2 停止")
+    run.add_argument("--max-requests", type=int, default=None,
+                     help="本次调用最大新网络请求预算，默认不限；超限保留断点并以退出码 2 停止")
+    run.add_argument("--max-seconds", type=float, default=None,
+                     help="本次调用最大运行秒数预算，默认不限；超限保留断点并以退出码 2 停止")
+    run.add_argument("--json", action="store_true", help="将进度写往 stderr，并在 stdout 输出单行机器可读 JSON 回执")
+
+    status = subs.add_parser("status", help="只读查询运行阶段状态、错误、计数与产物路径（默认 JSON，不调用模型）")
+    status.add_argument("run_id")
+    status.add_argument("--db", type=Path, default=Path("data/entitytrace.sqlite3"))
+    status.add_argument("--output", type=Path, default=Path("outputs"))
+    status.add_argument("--json", action="store_true", help="输出单行 JSON（默认已启用）")
+
+    entities = subs.add_parser("entities", help="只读分页查询实体名册，支持按粗类、最少提及数或精确称呼筛选（默认 JSON）")
+    entities.add_argument("run_id")
+    entities.add_argument("--kind", default=None, help="按实体粗类筛选")
+    entities.add_argument("--min-mentions", type=int, default=None, help="最少提及次数下限")
+    entities.add_argument("--surface", default=None, help="仅返回含该精确称呼提及的实体，并附 surface_count")
+    entities.add_argument("--limit", type=int, default=DEFAULT_LIMIT, help="单页条数上限（1—200，默认 50）")
+    entities.add_argument("--offset", type=int, default=0, help="分页起始偏移（默认 0）")
+    entities.add_argument("--db", type=Path, default=Path("data/entitytrace.sqlite3"))
+    entities.add_argument("--json", action="store_true", help="输出单行 JSON（默认已启用）")
+
+    entity = subs.add_parser("entity", help="只读查询单个实体的别名、链接方法分布、相关待审与提及分页片段（默认 JSON）")
+    entity.add_argument("run_id")
+    entity.add_argument("entity_id")
+    entity.add_argument("--limit", type=int, default=DEFAULT_LIMIT, help="提及单页条数上限（1—200，默认 50）")
+    entity.add_argument("--offset", type=int, default=0, help="提及分页起始偏移（默认 0）")
+    entity.add_argument("--context", type=int, default=DEFAULT_CONTEXT, help="前后各取多少码点片段（0—400，默认 80，不跨章节边界）")
+    entity.add_argument("--db", type=Path, default=Path("data/entitytrace.sqlite3"))
+    entity.add_argument("--json", action="store_true", help="输出单行 JSON（默认已启用）")
+
+    review = subs.add_parser("review", help="只读分页查询按 impact 排序的待审项（默认 pending、JSON）")
+    review.add_argument("run_id")
+    review.add_argument("--status", default="pending", help="筛选状态：pending（默认）、resolved 或 all")
+    review.add_argument("--stage", default=None, help="按产生阶段筛选（如 roster-c3-link、discovery 等）")
+    review.add_argument("--limit", type=int, default=DEFAULT_LIMIT, help="单页条数上限（1—200，默认 50）")
+    review.add_argument("--offset", type=int, default=0, help="分页起始偏移（默认 0）")
+    review.add_argument("--db", type=Path, default=Path("data/entitytrace.sqlite3"))
+    review.add_argument("--json", action="store_true", help="输出单行 JSON（默认已启用）")
+
     export = subs.add_parser("export", help="从已保存数据重新导出，不调用模型")
     export.add_argument("run_id")
     export.add_argument("--db", type=Path, default=Path("data/entitytrace.sqlite3"))
     export.add_argument("--output", type=Path, default=Path("outputs"))
+
     quote = subs.add_parser("quote", help="按全文码点地址取回原文，不调用模型")
     quote.add_argument("run_id")
     quote.add_argument("start", type=int)
     quote.add_argument("end", type=int)
+    quote.add_argument("--context", type=int, default=DEFAULT_CONTEXT, help="开启 --json 时前后各附带多少码点上下文（默认 80）")
+    quote.add_argument("--json", action="store_true", help="输出带前后上下文、chapter_id 与 result_revision 的单行 JSON")
     quote.add_argument("--db", type=Path, default=Path("data/entitytrace.sqlite3"))
 
     correct = subs.add_parser("correct", help="对已完成的名册运行叠加确定性更正或撤回，不调用模型")
     correct.add_argument("run_id")
     _add_correct_common_args(correct)
-    op_common = argparse.ArgumentParser(add_help=False)
+    op_common = _CliParser(add_help=False)
     _add_correct_common_args(op_common)
-    correct_ops = correct.add_subparsers(dest="op", required=True)
+    correct_ops = correct.add_subparsers(dest="op", required=True, parser_class=_CliParser)
 
     c_merge = correct_ops.add_parser("merge", parents=[op_common], help="将被并实体的全部提及并入目标实体（保留目标实体 ID）")
     c_merge.add_argument("target_entity_id")
@@ -82,20 +204,94 @@ def main(argv=None) -> int:
     c_revoke.add_argument("correction_id")
     c_revoke.add_argument("--cascade", action="store_true", help="一并撤回依赖该更正的后续更正")
 
-    args = parser.parse_args(argv)
+    return parser
+
+
+def main(argv=None) -> int:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+        sys.stderr.reconfigure(encoding="utf-8")
+    raw_argv = list(sys.argv[1:] if argv is None else argv)
+    cmd_name, known_run_id, json_mode = _detect_invocation_context(raw_argv)
+    parser = _build_parser()
     try:
+        args = parser.parse_args(raw_argv)
+        cmd_name = args.command
+        known_run_id = getattr(args, "run_id", None)
+        json_mode = bool(getattr(args, "json", False)) or (cmd_name in DEFAULT_JSON_COMMANDS)
+
         if args.command == "run":
-            _, _, complete = run_pipeline(args.input, args.db, args.output, args.config, args.discovery_concurrency,
-                                         args.decision_concurrency, args.task_chars, args.encoding, args.stop_after,
-                                         log=lambda message: print(message, flush=True),
-                                         identity_rounds=args.identity_rounds, group_candidates=args.group_candidates,
-                                         max_requests=args.max_requests, max_seconds=args.max_seconds,
-                                         identity_algorithm=args.identity_algorithm)
-            return 0 if complete else 2
+            log_stream = sys.stderr if args.json else sys.stdout
+            receipt: dict = {}
+            _, _, complete = run_pipeline(
+                args.input,
+                args.db,
+                args.output,
+                args.config,
+                args.discovery_concurrency,
+                args.decision_concurrency,
+                args.task_chars,
+                args.encoding,
+                args.stop_after,
+                log=lambda message: print(message, file=log_stream, flush=True),
+                identity_rounds=args.identity_rounds,
+                group_candidates=args.group_candidates,
+                max_requests=args.max_requests,
+                max_seconds=args.max_seconds,
+                identity_algorithm=args.identity_algorithm,
+                receipt_out=receipt,
+            )
+            if args.json:
+                _emit_json_line(receipt)
+            if complete:
+                return 0
+            err_obj = receipt.get("error")
+            if isinstance(err_obj, dict):
+                return EXIT_CODE_BY_CATEGORY.get(err_obj.get("category", "model_output"), 2)
+            return 2
+
         db_path = getattr(args, "db", Path("data/entitytrace.sqlite3"))
+        if not db_path.exists() or not db_path.is_file():
+            raise FileNotFoundError(f"数据库文件不存在：{db_path}")
         store = Store(db_path)
         try:
-            if args.command == "export":
+            if args.command == "status":
+                _emit_json_line(query_status(store, args.run_id, args.output))
+            elif args.command == "entities":
+                _emit_json_line(
+                    query_entities(
+                        store,
+                        args.run_id,
+                        kind=args.kind,
+                        min_mentions=args.min_mentions,
+                        surface=args.surface,
+                        limit=args.limit,
+                        offset=args.offset,
+                    )
+                )
+            elif args.command == "entity":
+                _emit_json_line(
+                    query_entity(
+                        store,
+                        args.run_id,
+                        args.entity_id,
+                        limit=args.limit,
+                        offset=args.offset,
+                        context=args.context,
+                    )
+                )
+            elif args.command == "review":
+                _emit_json_line(
+                    query_review(
+                        store,
+                        args.run_id,
+                        status=args.status,
+                        stage=args.stage,
+                        limit=args.limit,
+                        offset=args.offset,
+                    )
+                )
+            elif args.command == "export":
                 print(export_run(store, args.run_id, args.output).resolve())
             elif args.command == "correct":
                 if args.op == "merge":
@@ -120,13 +316,41 @@ def main(argv=None) -> int:
                     note=getattr(args, "note", None),
                     cascade=getattr(args, "cascade", False),
                 )
-                print(json.dumps(receipt, ensure_ascii=False))
+                envelope = {
+                    "protocol": PROTOCOL,
+                    "command": "correct",
+                    "run_id": args.run_id,
+                    "error": None,
+                    **receipt,
+                }
+                _emit_json_line(envelope)
             else:
-                source = store.source(store.run(args.run_id)["source_id"])
-                print(validate_span(source["text"], address(source["id"], args.start, args.end), source["id"]))
+                if args.json:
+                    _emit_json_line(query_quote_json(store, args.run_id, args.start, args.end, context=args.context))
+                else:
+                    source = store.source(store.run(args.run_id)["source_id"])
+                    print(validate_span(source["text"], address(source["id"], args.start, args.end), source["id"]))
         finally:
             store.close()
         return 0
+    except _CliHelpExit:
+        return 0
     except Exception as exc:
-        print("执行失败：" + (str(exc) if isinstance(exc, (ValueError, RuntimeError)) else type(exc).__name__), file=sys.stderr)
-        return 2
+        err = classify_exception(exc)
+        et_run_id = getattr(exc, "et_run_id", None) or known_run_id
+        if cmd_name == "run" and getattr(exc, "et_run_id", None) is None:
+            exit_code = 1
+        else:
+            exit_code = EXIT_CODE_BY_CATEGORY.get(err["category"], 1)
+        if json_mode:
+            if cmd_name == "run" and getattr(exc, "et_run_id", None) is None:
+                _emit_json_line(_build_failed_run_receipt(err))
+            else:
+                _emit_json_line({
+                    "protocol": PROTOCOL,
+                    "command": cmd_name or "unknown",
+                    "run_id": et_run_id if cmd_name != "run" else getattr(exc, "et_run_id", None),
+                    "error": err,
+                })
+        print("执行失败：" + err["message"], file=sys.stderr)
+        return exit_code

@@ -8,7 +8,7 @@ from pathlib import Path
 
 from .chapters import detect_chapters
 from .config import load_services
-from .corrections import partition_active_corrections, replay_user_corrections
+from .corrections import CorrectionConflictError, partition_active_corrections, replay_user_corrections
 from .discovery import discover
 from .identity import group_entities
 from .resolution import VERSION as RESOLUTION_VERSION, annotate_groups, resolve_groups
@@ -18,10 +18,126 @@ from .roster import (
     build_incomplete_roster_output,
     resolve_roster,
 )
-from .models import BudgetError, Models, RequestBudget
+from .models import BudgetError, ModelError, Models, RequestBudget
 from .storage import Store
 from .text import import_text, validate_span
 from .util import digest, dumps, implementation_hash, utc_now, write_bytes, write_json
+
+PROTOCOL = "entitytrace.v1"
+ALLOWED_ERROR_CATEGORIES = frozenset({
+    "input", "config", "quota", "network", "model_output", "budget", "conflict", "local",
+})
+RETRYABLE_CATEGORIES = frozenset({"network", "budget", "model_output"})
+EXIT_CODE_BY_CATEGORY = {
+    "network": 2,
+    "budget": 2,
+    "model_output": 2,
+    "quota": 2,
+    "input": 1,
+    "config": 1,
+    "conflict": 1,
+    "local": 1,
+}
+_CONFIG_VALUE_HINTS = (
+    "模型密钥",
+    "TypeSafe/Jev 凭证",
+    "服务地址不是已核对的官方地址",
+    "Decision 模型需要明确版本",
+)
+_LOCAL_INVARIANT_HINTS = (
+    "保存的原文指纹不匹配",
+    "原文版本不存在",
+    "提及地址不属于对应章节",
+    "实体分组未恰好覆盖所有提及",
+    "身份判断引用不存在的提及",
+    "章题原文核验失败",
+    "同一位置出现冲突章题",
+    "章题范围相互重叠",
+    "章节范围无法完整还原全文",
+)
+
+
+def make_error_dict(category: str, message: str) -> dict:
+    cat = category if category in ALLOWED_ERROR_CATEGORIES else "local"
+    return {
+        "category": cat,
+        "message": message,
+        "retryable": cat in RETRYABLE_CATEGORIES,
+    }
+
+
+def classify_exception(exc: BaseException) -> dict:
+    if isinstance(exc, CorrectionConflictError):
+        return make_error_dict("conflict", str(exc))
+    tagged = getattr(exc, "et_category", None)
+    if tagged in ALLOWED_ERROR_CATEGORIES:
+        msg = str(exc) if str(exc) else f"{tagged} 错误：{type(exc).__name__}"
+        return make_error_dict(tagged, msg)
+    if isinstance(exc, BudgetError):
+        cat = "network" if (exc.category == "network" or exc.stop_reason == "network_outage") else "budget"
+        return make_error_dict(cat, str(exc))
+    if isinstance(exc, ModelError):
+        status = getattr(exc, "status", None)
+        code = getattr(exc, "code", None)
+        msg = str(exc)
+        if code == "network_error" or status in {500, 502, 503, 504, 529}:
+            return make_error_dict("network", msg)
+        if (
+            status in {402, 429}
+            or "余额或硬额度不足" in msg
+            or code in {"billing_error", "quota_exceeded", "insufficient_quota", "rate_limit_exceeded"}
+        ):
+            return make_error_dict("quota", msg)
+        if status in {401, 403}:
+            return make_error_dict("config", msg)
+        return make_error_dict("model_output", msg)
+    if isinstance(exc, RuntimeError) and getattr(exc, "code", None) == "network_error":
+        return make_error_dict("network", str(exc))
+    if isinstance(exc, (UnicodeDecodeError, LookupError)):
+        return make_error_dict("input", f"输入文本解码失败：{exc}")
+    if isinstance(exc, (FileNotFoundError, IsADirectoryError, PermissionError)):
+        return make_error_dict("input", f"输入路径不可访问：{exc}")
+    if isinstance(exc, ValueError):
+        msg = str(exc)
+        if any(h in msg for h in _CONFIG_VALUE_HINTS):
+            return make_error_dict("config", msg)
+        if any(h in msg for h in _LOCAL_INVARIANT_HINTS):
+            return make_error_dict("local", msg)
+        return make_error_dict("input", msg)
+    msg = str(exc) if isinstance(exc, RuntimeError) and str(exc) else f"本地运行错误：{type(exc).__name__}"
+    return make_error_dict("local", msg)
+
+
+def infer_incomplete_stage_error(state: dict, stop_after: str = "identity") -> dict | None:
+    for name in ("chapters", "discovery", "identity"):
+        st = state.get(name)
+        if st is None:
+            continue
+        if not st.get("complete", False):
+            failures = st.get("failures") or []
+            if failures:
+                msgs = [str(f.get("error", "")) for f in failures]
+                if any("余额或硬额度不足" in m or "HTTP 402" in m or "HTTP 429" in m for m in msgs):
+                    return make_error_dict("quota", f"阶段 {name} 未完成（{len(failures)} 个任务失败）：{msgs[0]}")
+                if any("HTTP 401" in m or "HTTP 403" in m for m in msgs):
+                    return make_error_dict("config", f"阶段 {name} 未完成（{len(failures)} 个任务失败）：{msgs[0]}")
+                if any(
+                    "网络失败或超时" in m
+                    or any(f"HTTP {code}" in m for code in (500, 502, 503, 504, 529))
+                    for m in msgs
+                ):
+                    return make_error_dict("network", f"阶段 {name} 未完成（{len(failures)} 个任务失败）：{msgs[0]}")
+                return make_error_dict(
+                    "model_output",
+                    f"阶段 {name} 未完成：{len(failures)} 个任务因模型输出或格式错误失败，保留断点可续跑",
+                )
+            issues = int(st.get("issues", 0) or 0)
+            if issues > 0:
+                return make_error_dict("model_output", f"阶段 {name} 未完成：{issues} 处章号连续性待审阻断")
+            return make_error_dict("model_output", f"阶段 {name} 未完成，保留断点可续跑")
+        if name == stop_after:
+            return None
+    return None
 
 IDENTITY_ALGORITHMS = {
     "roster": ROSTER_VERSION,
@@ -279,7 +395,8 @@ def run_pipeline(input_path: Path, db_path: Path, output_root: Path, config_path
                  identity_rounds: int = 12, group_candidates: int = 3,
                  max_requests: int | None = None, max_seconds: float | None = None,
                  max_network_failures: int = 9,
-                 identity_algorithm: str = "roster") -> tuple[str, Path, bool]:
+                 identity_algorithm: str = "roster",
+                 receipt_out: dict | None = None) -> tuple[str, Path, bool]:
     wall_begin = time.monotonic()
     if identity_algorithm not in IDENTITY_ALGORITHMS:
         raise ValueError(f"不支持的身份归组算法：{identity_algorithm}")
@@ -289,14 +406,24 @@ def run_pipeline(input_path: Path, db_path: Path, output_root: Path, config_path
     if algo_version == RESOLUTION_VERSION and (not 1 <= identity_rounds <= 24 or not 1 <= group_candidates <= 3):
         raise ValueError("身份轮次须为 1—24，候选组上限须为 1—3")
     budget = RequestBudget(max_requests, max_seconds, max_network_failures=max_network_failures)
+    if not input_path.exists() or not input_path.is_file():
+        raise FileNotFoundError(f"输入文件不存在：{input_path}")
     store = Store(db_path)
     begin, invocation = time.monotonic(), uuid.uuid4().hex
     started, stages = utc_now(), {}
     run_id = None
     caught_exc: Exception | None = None
     try:
-        source = import_text(store, input_path, encoding)
-        services = load_services(config_path, require_decision=(algo_version == RESOLUTION_VERSION))
+        try:
+            source = import_text(store, input_path, encoding)
+        except Exception as exc:
+            exc.et_category = "input"  # type: ignore[attr-defined]
+            raise
+        try:
+            services = load_services(config_path, require_decision=(algo_version == RESOLUTION_VERSION))
+        except Exception as exc:
+            exc.et_category = "config"  # type: ignore[attr-defined]
+            raise
         # 预算参数（max_requests / max_seconds / max_network_failures）不写入 config 摘要，保证扩大预算可续跑同一 run_id
         config = {"implementation": implementation_hash(), "models": {k: v.public() for k, v in services.items()},
                   "discovery_concurrency": discovery_concurrency, "decision_concurrency": decision_concurrency,
@@ -341,7 +468,7 @@ def run_pipeline(input_path: Path, db_path: Path, output_root: Path, config_path
         store.close()
         raise ValueError("尚未建立运行")
     if budget.stop_reason == "network_outage" or (isinstance(caught_exc, BudgetError) and caught_exc.category == "network"):
-        error: dict | str | None = {
+        error: dict | None = {
             "category": "network",
             "stop_reason": "network_outage",
             "message": f"连续网络失败停止（network_outage）：连续 {budget.consecutive_network_failures} 次传输失败；保留未完成断点以便恢复",
@@ -363,7 +490,7 @@ def run_pipeline(input_path: Path, db_path: Path, output_root: Path, config_path
             "retryable": True,
         }
     elif caught_exc is not None:
-        error = str(caught_exc) if isinstance(caught_exc, (ValueError, RuntimeError)) else "本地运行错误：" + type(caught_exc).__name__
+        error = classify_exception(caught_exc)
     else:
         error = None
     invocation_record = {"id": invocation, "started": started, "ended": utc_now(), "seconds": round(time.monotonic() - begin, 4),
@@ -374,7 +501,8 @@ def run_pipeline(input_path: Path, db_path: Path, output_root: Path, config_path
     store.state(run_id, last_invocation=invocation, last_error=error)
     try:
         export_begin = time.monotonic()
-        output = export_run(store, run_id, output_root)
+        bundle = build_export_bundle(store, run_id)
+        output = write_export_bundle(store, run_id, bundle, output_root)
         invocation_record.update(export_seconds=round(time.monotonic() - export_begin, 4),
                                  wall_seconds=round(time.monotonic() - wall_begin, 4),
                                  timing_scope="从管线函数入口、数据库初始化至主输出导出完成；不含最终计时回执写入与进程启动退出",
@@ -385,10 +513,72 @@ def run_pipeline(input_path: Path, db_path: Path, output_root: Path, config_path
         write_json(output / "manifest.json", manifest)
         state = store.run(run_id)["state"]
         complete = budget.stop_reason is None and all(state.get(name, {}).get("complete", False) for name in ("chapters", "discovery", "identity"))
+        if receipt_out is not None:
+            resolved_out = output.resolve()
+            stages_receipt = {
+                name: {
+                    "complete": bool(state.get(name, {}).get("complete", False)),
+                    "seconds": float(stages.get(name, {}).get("seconds", 0.0)),
+                    "resumed": bool(stages.get(name, {}).get("resumed", False)),
+                }
+                for name in ("chapters", "discovery", "identity")
+            }
+            if isinstance(error, dict):
+                receipt_error: dict | None = make_error_dict(error["category"], error["message"])
+            elif not complete:
+                halted = getattr(models, "halted", None) if 'models' in locals() else None
+                if halted:
+                    halt_msg, _, _ = next(iter(halted.values()))
+                    receipt_error = make_error_dict("quota", halt_msg)
+                else:
+                    receipt_error = infer_incomplete_stage_error(state, stop_after=stop_after)
+            else:
+                receipt_error = None
+            pending_reviews = [
+                r for r in bundle["review"]["items"]
+                if r.get("status", "pending") == "pending"
+            ]
+            pending_reviews.sort(
+                key=lambda r: (-(r["impact"] if isinstance(r.get("impact"), int) else 1), r["id"])
+            )
+            review_top = [
+                {
+                    "id": r["id"],
+                    "stage": r.get("stage", ""),
+                    "reason": r.get("reason", ""),
+                    "impact": r["impact"] if isinstance(r.get("impact"), int) else 1,
+                }
+                for r in pending_reviews[:10]
+            ]
+            receipt_out.clear()
+            receipt_out.update({
+                "protocol": PROTOCOL,
+                "command": "run",
+                "run_id": run_id,
+                "result_revision": bundle["result"]["result_revision"],
+                "status": bundle["result"]["status"],
+                "stages": stages_receipt,
+                "output_dir": str(resolved_out),
+                "files": {
+                    "result": str(resolved_out / "result.json"),
+                    "review": str(resolved_out / "review.json"),
+                    "manifest": str(resolved_out / "manifest.json"),
+                },
+                "counts": {
+                    "mentions": manifest["counts"]["mentions"],
+                    "entities": manifest["counts"]["entities"],
+                    "review_items": manifest["counts"]["review_items"],
+                },
+                "review_top": review_top,
+                "error": receipt_error,
+            })
         log(f"输出目录：{output.resolve()}\n本次主输出完成用时：{invocation_record['wall_seconds']:.2f} 秒；状态：{'流程完成，查看待审清单' if complete else '未完成，可恢复'}")
         if error:
             msg = f"[{error['category']}] {error['message']}" if isinstance(error, dict) else str(error)
             log("错误：" + msg)
         return run_id, output, complete
+    except Exception as exc:
+        exc.et_run_id = run_id  # type: ignore[attr-defined]
+        raise
     finally:
         store.close()

@@ -405,6 +405,10 @@ class RosterCorrectionsTests(unittest.TestCase):
         ])
         self.assertEqual(rc1, 0, err1)
         rec1 = json.loads(out1)
+        self.assertEqual(rec1["protocol"], "entitytrace.v1")
+        self.assertEqual(rec1["command"], "correct")
+        self.assertEqual(rec1["run_id"], self.run_id)
+        self.assertIsNone(rec1["error"])
         self.assertEqual(rec1["status"], "applied")
         self.assertEqual(sorted(rec1["affected_entity_ids"]), sorted([gu_id, zhou_id]))
         self.assertEqual(self._calls_count(), initial_calls)
@@ -427,16 +431,18 @@ class RosterCorrectionsTests(unittest.TestCase):
         # 2) split-surface：从沈墨拆出“阿墨”，保留沈墨 ID，生成新实体 digest(["correction-split", cid])，
         #    并为仍留在沈墨中的 c3_model 提及“那位剑客”生成 correction-c3-affected 待审项
         #    同时测试无效 split-surface 被拒绝且不写记录
-        bad_rc_missing, _, _ = self._run_correct_cli([
+        bad_rc_missing, bad_out_missing, _ = self._run_correct_cli([
             self.run_id, "split-surface", shen_id, "不存在称呼",
             "--source", "user", "--expect-revision", res1["result_revision"],
         ])
-        self.assertEqual(bad_rc_missing, 2)
-        bad_rc_all, _, _ = self._run_correct_cli([
+        self.assertEqual(bad_rc_missing, 1)
+        self.assertEqual(json.loads(bad_out_missing)["error"]["category"], "input")
+        bad_rc_all, bad_out_all, _ = self._run_correct_cli([
             self.run_id, "split-surface", by_name["青石渡"]["id"], "青石渡",
             "--source", "user", "--expect-revision", res1["result_revision"],
         ])
-        self.assertEqual(bad_rc_all, 2)
+        self.assertEqual(bad_rc_all, 1)
+        self.assertEqual(json.loads(bad_out_all)["error"]["category"], "input")
 
         rc2, out2, err2 = self._run_correct_cli([
             self.run_id, "split-surface", shen_id, "阿墨",
@@ -466,12 +472,13 @@ class RosterCorrectionsTests(unittest.TestCase):
         self.assertEqual(dumps(e_map2[by_name["青石渡"]["id"]]), qingshi_before_dump)
 
         # 3) assign（至 new 并带 --resolves 解决初始待审项；另测试未知待审项被拒绝）
-        bad_rev_rc, _, _ = self._run_correct_cli([
+        bad_rev_rc, bad_rev_out, _ = self._run_correct_cli([
             self.run_id, "assign", guest_mention["id"], "new",
             "--source", "user", "--expect-revision", res2["result_revision"],
             "--resolves", "nonexistent_review_id",
         ])
-        self.assertEqual(bad_rev_rc, 2)
+        self.assertEqual(bad_rev_rc, 1)
+        self.assertEqual(json.loads(bad_rev_out)["error"]["category"], "input")
 
         rc3, out3, err3 = self._run_correct_cli([
             self.run_id, "assign", guest_mention["id"], "new",
@@ -549,11 +556,17 @@ class RosterCorrectionsTests(unittest.TestCase):
         gu_id, zhou_id = by_name["顾云"]["id"], by_name["周掌柜"]["id"]
 
         # 1) 版本过期拒绝且不写任何记录
-        rc_stale, _, err_stale = self._run_correct_cli([
+        rc_stale, out_stale, err_stale = self._run_correct_cli([
             self.run_id, "merge", gu_id, zhou_id,
             "--source", "user", "--expect-revision", "stale_wrong_revision",
         ])
-        self.assertEqual(rc_stale, 2)
+        self.assertEqual(rc_stale, 1)
+        stale_env = json.loads(out_stale)
+        self.assertEqual(stale_env["protocol"], "entitytrace.v1")
+        self.assertEqual(stale_env["command"], "correct")
+        self.assertEqual(stale_env["run_id"], self.run_id)
+        self.assertEqual(stale_env["error"]["category"], "conflict")
+        self.assertFalse(stale_env["error"]["retryable"])
         self.assertIn("结果版本已变化，请重新读取", err_stale)
         store = Store(self.db_path)
         try:
@@ -608,11 +621,12 @@ class RosterCorrectionsTests(unittest.TestCase):
         self.assertEqual(usr_dup_receipt["result_revision"], rev1_hash)
 
         # 5) 权限校验：agent 撤回 user 更正被拒绝；agent 撤回自身建议成功；user 撤回 user 更正成功；重复撤回幂等
-        rc_forbid, _, err_forbid = self._run_correct_cli([
+        rc_forbid, out_forbid, err_forbid = self._run_correct_cli([
             self.run_id, "revoke", usr_receipt["correction_id"],
             "--source", "agent", "--expect-revision", rev1_hash,
         ])
-        self.assertEqual(rc_forbid, 2)
+        self.assertEqual(rc_forbid, 1)
+        self.assertEqual(json.loads(out_forbid)["error"]["category"], "input")
         self.assertIn("agent 只能撤回 agent 建议", err_forbid)
 
         rc_rev_ag, out_rev_ag, _ = self._run_correct_cli([
@@ -685,11 +699,12 @@ class RosterCorrectionsTests(unittest.TestCase):
             count_before = len(store.corrections(self.run_id))
         finally:
             store.close()
-        rc_fail, _, err_fail = self._run_correct_cli([
+        rc_fail, out_fail, err_fail = self._run_correct_cli([
             self.run_id, "revoke", cid1,
             "--source", "user", "--expect-revision", r3["result_revision"],
         ])
-        self.assertEqual(rc_fail, 2)
+        self.assertEqual(rc_fail, 1)
+        self.assertEqual(json.loads(out_fail)["error"]["category"], "input")
         self.assertIn(cid2, err_fail)
         self.assertIn(cid3, err_fail)
         store = Store(self.db_path)
@@ -730,11 +745,12 @@ class RosterCorrectionsTests(unittest.TestCase):
         self.assertTrue(v2_ok)
         v2_rev = json.loads((v2_dir / "result.json").read_text(encoding="utf-8"))["result_revision"]
         v2_ents = json.loads((v2_dir / "result.json").read_text(encoding="utf-8"))["entities"]
-        rc_v2, _, err_v2 = self._run_correct_cli(
+        rc_v2, out_v2, err_v2 = self._run_correct_cli(
             [v2_run_id, "not-entity", v2_ents[0]["mention_ids"][0], "--source", "user", "--expect-revision", v2_rev],
             db_path=v2_db, out_root=v2_out,
         )
-        self.assertEqual(rc_v2, 2)
+        self.assertEqual(rc_v2, 1)
+        self.assertEqual(json.loads(out_v2)["error"]["category"], "input")
         self.assertIn("entity-roster-v1", err_v2)
 
         # 2) roster 未完成运行（stop_after="discovery"） -> 拒绝
@@ -746,11 +762,12 @@ class RosterCorrectionsTests(unittest.TestCase):
             )
         self.assertFalse(inc_ok)
         inc_res = json.loads((inc_dir / "result.json").read_text(encoding="utf-8"))
-        rc_inc, _, err_inc = self._run_correct_cli(
+        rc_inc, out_inc, err_inc = self._run_correct_cli(
             [inc_run_id, "not-entity", inc_res["mentions"][0]["id"], "--source", "user", "--expect-revision", inc_res["result_revision"]],
             db_path=inc_db, out_root=inc_out,
         )
-        self.assertEqual(rc_inc, 2)
+        self.assertEqual(rc_inc, 1)
+        self.assertEqual(json.loads(out_inc)["error"]["category"], "input")
         self.assertIn("尚未完成", err_inc)
 
     def test_corrections_module_isolation_no_models_no_gold_no_book_names(self):

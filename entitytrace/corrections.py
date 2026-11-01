@@ -14,6 +14,12 @@ VALID_OPS = {"merge", "split-surface", "assign", "not-entity", "revoke"}
 VALID_SOURCES = {"user", "agent"}
 
 
+class CorrectionConflictError(ValueError):
+    """期望的 result_revision 与当前实际版本不一致（错误类别 conflict）。"""
+
+    et_category = "conflict"
+
+
 def _choose_display_name(surfaces: collections.Counter[str]) -> str:
     if not surfaces:
         return ""
@@ -434,7 +440,7 @@ def apply_correction(
     before_bundle = build_export_bundle(store, run_id)
     before_rev = before_bundle["result"]["result_revision"]
     if expect_revision != before_rev:
-        raise ValueError("结果版本已变化，请重新读取")
+        raise CorrectionConflictError("结果版本已变化，请重新读取")
 
     before_reviews = before_bundle["review"]["items"]
     if resolves is not None:
