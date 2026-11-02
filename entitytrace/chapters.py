@@ -211,6 +211,11 @@ def _has_non_heading_body(text: str, start: int, end: int, dropped_spans: list[t
     return cursor < end and bool(text[cursor:end].strip())
 
 
+def _is_volume_style_title(title: str) -> bool:
+    s = _style({"title": title, "kind": "chapter"})
+    return s in {"chapter:第卷", "chapter:第部"}
+
+
 def filter_headings_with_body(text: str, labeled: list[dict]) -> tuple[list[dict], list[dict]]:
     ordered = sorted(labeled, key=lambda h: h["start"])
     kept_reversed: list[dict] = []
@@ -235,6 +240,17 @@ def filter_headings_with_body(text: str, labeled: list[dict]) -> tuple[list[dict
                 kept_reversed.append(h)
                 next_kept = h
                 continue
+        if (
+            not has_body
+            and h["kind"] == "chapter"
+            and next_kept is not None
+            and next_kept["kind"] in {"chapter", "extra"}
+            and _is_volume_style_title(h["title"])
+        ):
+            rekinded = {**h, "kind": "volume", "decision_result": "adopted_as_volume"}
+            kept_reversed.append(rekinded)
+            next_kept = rekinded
+            continue
         if h["kind"] in {"chapter", "extra"}:
             keep = has_body
         else:
@@ -248,6 +264,64 @@ def filter_headings_with_body(text: str, labeled: list[dict]) -> tuple[list[dict
     kept_reversed.reverse()
     dropped_reversed.reverse()
     return kept_reversed, dropped_reversed
+
+
+def _fill_chapter_gaps(
+    adopted: list[dict],
+    candidates: list[dict],
+    labeled_ids: set[str],
+) -> list[dict]:
+    numbered_cands: list[dict] = []
+    for c in candidates:
+        if c["id"] in labeled_ids:
+            continue
+        num = parse_chapter_number(c["title"])
+        if num is None:
+            continue
+        numbered_cands.append({
+            **c,
+            "_num": num,
+            "_style": _style({"title": c["title"], "kind": "chapter"}),
+        })
+    if not numbered_cands:
+        return []
+    last_by_style: dict[str, tuple[int, dict]] = {}
+    fills: list[dict] = []
+    for idx, head in enumerate(adopted):
+        if head["kind"] != "chapter":
+            continue
+        num = parse_chapter_number(head["title"])
+        if num is None:
+            continue
+        style = _style(head)
+        prev_is_volume = idx > 0 and adopted[idx - 1]["kind"] == "volume"
+        if style in last_by_style:
+            prev_num, prev_head = last_by_style[style]
+            volume_restart_ok = prev_is_volume and num == 1
+            if num > prev_num + 1 and not volume_restart_ok:
+                missing = list(range(prev_num + 1, num))
+                found: dict[int, list[dict]] = {}
+                for c in numbered_cands:
+                    if c["start"] < prev_head["end"] or c["start"] >= head["start"]:
+                        continue
+                    if c["_style"] == style and prev_num < c["_num"] < num:
+                        found.setdefault(c["_num"], []).append(c)
+                if all(len(found.get(k, [])) == 1 for k in missing):
+                    seq = [found[k][0] for k in missing]
+                    if all(seq[i]["start"] < seq[i + 1]["start"] for i in range(len(seq) - 1)):
+                        for c in seq:
+                            fills.append({
+                                "id": c["id"],
+                                "start": c["start"],
+                                "end": c["end"],
+                                "unit_end": c["unit_end"],
+                                "title": c["title"],
+                                "kind": "chapter",
+                                "request_id": None,
+                                "gap_filled": True,
+                            })
+        last_by_style[style] = (num, head)
+    return fills
 
 
 def _find_missing_number_spans(
@@ -415,19 +489,31 @@ def detect_chapters(store, models, source: dict, run_id: str, log) -> dict:
         batch_results[idx] = labeled_batch
         log(f"章节候选标注 {len(batch_results)}/{len(batches)}，本批标出 {len(labeled_batch)} 条")
     labeled = [item for i in sorted(batch_results) for item in batch_results[i]]
+    labeled_ids = {item["id"] for item in labeled}
     adopted_raw, dropped_raw = filter_headings_with_body(text, labeled)
-    adopted_ids = {h["id"] for h in adopted_raw}
+    gap_fills = _fill_chapter_gaps(adopted_raw, candidates, labeled_ids)
+    if gap_fills:
+        adopted_raw, dropped_raw = filter_headings_with_body(text, labeled + gap_fills)
+    adopted_by_id = {h["id"]: h for h in adopted_raw}
     dropped_reasons = {h["id"]: h.get("drop_reason", "dropped_no_body") for h in dropped_raw}
-    for item in sorted(labeled, key=lambda h: h["start"]):
+    for item in sorted(labeled + gap_fills, key=lambda h: h["start"]):
+        item_id = item["id"]
+        if item_id in adopted_by_id:
+            if item.get("gap_filled"):
+                decision_result = "gap_filled"
+            else:
+                decision_result = adopted_by_id[item_id].get("decision_result", "adopted")
+        else:
+            decision_result = dropped_reasons.get(item_id, "dropped_no_body")
         store.put(run_id, "decision", {
-            "id": digest([item["request_id"], item["id"]]),
+            "id": digest([item["request_id"], item_id]),
             "stage": "chapter-label",
             "request_id": item["request_id"],
-            "question_id": item["id"],
+            "question_id": item_id,
             "start": item["start"],
             "evidence": [address(source_id, item["start"], item["unit_end"])],
             "kind": item["kind"],
-            "result": "adopted" if item["id"] in adopted_ids else dropped_reasons.get(item["id"], "dropped_no_body"),
+            "result": decision_result,
         })
     issues, unnumbered = check_chapter_numbering(source_id, adopted_raw, text)
     for idx, issue in enumerate(issues):

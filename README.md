@@ -38,7 +38,7 @@ EntityTrace 是面向 agent 的插件，提供小说实体发现、身份判断�
 | 步骤 | 执行者 | 实际行为 |
 | --- | --- | --- |
 | 导入 TXT | 本地程序 | 保存原始字节、冻结文本及指纹，建立 Unicode 码点地址 |
-| 章节识别 | 本地程序候选筛选 + DeepSeek 按 ID 标注 + 本地结构核验 | 提取整行短候选并发标注（`temperature=0`），经“标题后须有正文”与“章号连续”两条确定性结构核验确认 |
+| 章节识别 | 本地程序候选筛选 + DeepSeek 按 ID 标注 + 本地结构核验 | 提取整行短候选并发标注（`temperature=0`），经“标题后须有正文（含无正文卷／部标题改判）”与“章号连续（含按原文唯一未标注章题补齐缺口）”两条确定性结构核验确认 |
 | 地址核验 | 本地程序 | 检查章节范围完整覆盖原文，再建立发现任务 |
 | 提及发现 | DeepSeek + 本地并发任务池 | 各章独立发现称呼与引用，长章拆任务；逐字核对提及地址 |
 | 章内归并（C1） | DeepSeek + 本地结构与边界校验 | 按发现片段整段上下文将称呼归入章内对象，区分专名／称谓／描述词，支持逐提及例外指派与非实体建议 |
@@ -81,7 +81,7 @@ python -X utf8 -m entitytrace run "D:\小说\样本.txt" --identity-algorithm gr
 退出码约定（适用于 `run`、只读查询命令与 `correct`；与旧版“所有失败或未完成一律返回 `2`”的行为不同，现按数据状态区分 `1` 与 `2`，是否自动重试以 JSON 回执的 `error.retryable` 为准）：
 - `0`：计算或命令完成（含 `completed` 与带待审的 `completed_with_review`、查询成功、`correct` 成功）。
 - `2`：数据库中留有**可续跑的断点**（包括网络中断 `network`、预算耗尽 `budget`、模型输出连续格式错误 `model_output`、额度耗尽 `quota`，以及 `--stop-after` 阶段断点）。注意：`quota` 退出码虽为 `2`（保留已完成缓存与断点），但 `error.retryable=false`，宿主不得自动重跑。
-- `1`：**无可续跑的断点**，或命令被拒绝（包括输入文件缺失／解码失败或章节结构阻断 `input`、配置缺失或鉴权失败 `config`、未知 `run_id`、非法参数、`groups-v2` 运行不支持查询、结果版本过期 `conflict` 及本地校验异常 `local`，`retryable` 均为 `false`）。章节阶段按原文证据分级处理章号异常：原文跳号（区间内找不到缺失章号）或回退后按新章题连续递增记为非阻断提示（`blocking=false`，`chapters` 仍标为 `complete=true`）；区间内存在缺失章号的疑似标题或重复章节记为阻断待审（`blocking=true`），回执报 `error.category="input"`、`retryable=false`（退出码 `1`，重跑命中缓存结果相同，不可自动重试，可通过 `review --stage chapters` 核查）。
+- `1`：**无可续跑的断点**，或命令被拒绝（包括输入文件缺失／解码失败或章节结构阻断 `input`、配置缺失或鉴权失败 `config`、未知 `run_id`、非法参数、`groups-v2` 运行不支持查询、结果版本过期 `conflict` 及本地校验异常 `local`，`retryable` 均为 `false`）。章节阶段先对跳号缺口按原文唯一未标注章题候选确定性补齐（`result="gap_filled"`，并对后接章／附章的无正文卷／部标题改判为 `volume`、`result="adopted_as_volume"`），再按原文证据分级处理章号异常：原文跳号（区间内找不到缺失章号）或回退后按新章题连续递增记为非阻断提示（`blocking=false`，`chapters` 仍标为 `complete=true`）；无法唯一补齐且区间内存在缺失章号的疑似标题或重复章节记为阻断待审（`blocking=true`），回执报 `error.category="input"`、`retryable=false`（退出码 `1`，重跑命中缓存结果相同，不可自动重试，可通过 `review --stage chapters` 核查）。
 
 ## 输出与回溯
 
@@ -91,7 +91,7 @@ python -X utf8 -m entitytrace run "D:\小说\样本.txt" --identity-algorithm gr
 | --- | --- |
 | `result.json` | 来源、章节、提及、原始发现记录、实体名册分组及汇总信息；不含描述提取 |
 | `review.json` | 身份证据不足、分歧未决与定位失败等待审问题，含稳定编号、影响范围（`impact`）及证据引用 |
-| `decisions.jsonl` | 章节候选标注追溯记录（`chapter-label`，含采纳或无正文丢弃结果），以及 `groups-v2` 模式下 Decision 每次判断的问题、证据、概率与置信度 |
+| `decisions.jsonl` | 章节候选标注追溯记录（`chapter-label`，含采纳、缺口补齐、卷题改判或无正文丢弃结果），以及 `groups-v2` 模式下 Decision 每次判断的问题、证据、概率与置信度 |
 | `requests.jsonl` | 本运行使用的成功模型请求和响应，不含 Authorization 或模型内部推理字段 |
 | `manifest.json` | 输入和源码版本、配置、阶段状态、每次调用预算与请求／缓存／失败统计、耗时和数量 |
 | `source.txt`、`source.original` | 用于地址定位的冻结文本、原始输入字节 |

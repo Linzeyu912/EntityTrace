@@ -122,7 +122,7 @@ python -X utf8 -m entitytrace correct <run_id> revoke <更正ID> [--cascade] --s
 | `2` | `null` | — | 显式指定 `--stop-after chapters` 或 `--stop-after discovery` 到达阶段断点 | 按编排计划决定是否继续推进后续阶段 |
 | `1` | `conflict` | `false` | `correct --expect-revision` 与当前实际 `result_revision` 不一致（结果版本已过期） | **不得直接用旧参数强推**；必须重新调用 `status` / `entities` / `entity` / `review` 读取最新状态与实体 ID，核对后再提交 |
 | `1` | `config` | `false` | 缺少 `DEEPSEEK_API_KEY`、配置文件路径错误、服务地址非法或 `401/403` 鉴权失败 | **禁止自动重试**；提示用户检查本地配置文件或环境变量凭证配置 |
-| `1` | `input` | `false` | 输入文件不存在／编码错误、章节结构阻断（区间内存在缺失章号的疑似标题或重复章节，`blocking=true`）、未知 `run_id`／`entity_id`、`--limit > 200`、`groups-v2` 运行调用只读查询、未完成运行调用 `correct` | **禁止自动重跑**（章节阻断重跑命中缓存结果相同，可通过 `review <run_id> --stage chapters` 核查；原文章号跳号或回退后按新章题连续递增记为 `blocking=false` 提示，不阻断运行）；检查参数或询问用户 |
+| `1` | `input` | `false` | 输入文件不存在／编码错误、章节结构阻断（经唯一未标注章题补齐后区间内仍存在歧义／非整行缺失章号疑似标题或重复章节，`blocking=true`）、未知 `run_id`／`entity_id`、`--limit > 200`、`groups-v2` 运行调用只读查询、未完成运行调用 `correct` | **禁止自动重跑**（章节阻断重跑命中缓存结果相同，可通过 `review <run_id> --stage chapters` 核查；唯一未标注章题缺口与后接章的无正文卷／部标题由程序确定性补齐或改判，原文章号跳号或回退后按新章题连续递增记为 `blocking=false` 提示，不阻断运行）；检查参数或询问用户 |
 | `1` | `local` | `false` | 保存的原文 SHA-256 指纹不匹配或本地覆盖不变量校验异常 | **立即停止**并向用户报告数据库／产物完整性异常，不得覆盖原库 |
 
 ---

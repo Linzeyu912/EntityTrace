@@ -1039,6 +1039,230 @@ class ChapterCandidateAndStructureTests(unittest.TestCase):
                 },
             )
 
+    def test_chapter_gap_fill_and_volume_rekind_rules(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+
+            def run_custom_chapters(tag: str, text_str: str, label_fn):
+                store = Store(root / f"{tag}.sqlite3")
+                try:
+                    p = root / f"{tag}.txt"
+                    p.write_bytes(text_str.encode("utf-8"))
+                    src = import_text(store, p)
+                    store.execute("INSERT INTO runs VALUES(?,?,?,?,?,?)", (tag, src["id"], "{}", "{}", "now", "now"))
+
+                    class CustomModels:
+                        def choices(s, *args, **kwargs):
+                            raise AssertionError("章节阶段禁止调用 choices")
+
+                        def generate(s, system, state, stage, validate, *args, **kwargs):
+                            val = {"headings": label_fn(state["candidates"])}
+                            validate(val)
+                            return val, f"req-{tag}"
+
+                    out = detect_chapters(store, CustomModels(), src, tag, lambda _: None)
+                    decs = store.records(tag, "decision")
+                    revs = store.records(tag, "review")
+                    return out, decs, revs
+                finally:
+                    store.close()
+
+            # 1) 章题标签错落在上一章末句 -> 补齐第二章，末句因无正文丢弃回到上一章正文，unnumbered == 0，complete == True
+            text_misplaced = (
+                "第一章 晨钟\n"
+                "山门开启。\n"
+                "众人拾级而上。\n"
+                "第二章 暮鼓\n"
+                "夜色渐深。\n"
+                "第三章 远钟\n"
+                "晨光微露。\n"
+            )
+            out1, decs1, revs1 = run_custom_chapters(
+                "misplaced",
+                text_misplaced,
+                lambda cands: [
+                    {"id": c["id"], "kind": "chapter"}
+                    for c in cands
+                    if c["text"] in {"第一章 晨钟", "众人拾级而上。", "第三章 远钟"}
+                ],
+            )
+            self.assertTrue(out1["complete"])
+            self.assertEqual(out1["issues"], 0)
+            self.assertEqual(out1["path_counts"]["unnumbered"], 0)
+            self.assertEqual(out1["path_counts"]["labeled"], 3)
+            self.assertEqual(out1["path_counts"]["adopted"], 3)
+            self.assertEqual(out1["path_counts"]["dropped_no_body"], 1)
+            self.assertEqual([c["title"] for c in out1["chapters"]], ["第一章 晨钟", "第二章 暮鼓", "第三章 远钟"])
+            res_map1 = {d["question_id"]: (d["result"], d["request_id"]) for d in decs1}
+            cands1 = {c["title"]: c["id"] for c in collect_candidates(text_misplaced)}
+            self.assertEqual(res_map1[cands1["第二章 暮鼓"]], ("gap_filled", None))
+            self.assertEqual(res_map1[cands1["众人拾级而上。"]], ("dropped_no_body", "req-misplaced"))
+            self.assertEqual(revs1, [])
+
+            # 2) 单纯漏标与连续两章漏标 -> 全部补齐
+            text_multi_gap = (
+                "第一章 起步\n正文一。\n"
+                "第二章 涉水\n正文二。\n"
+                "第三章 登山\n正文三。\n"
+                "第四章 穿林\n正文四。\n"
+                "第五章 抵城\n正文五。\n"
+            )
+            out2, decs2, revs2 = run_custom_chapters(
+                "multigap",
+                text_multi_gap,
+                lambda cands: [
+                    {"id": c["id"], "kind": "chapter"}
+                    for c in cands
+                    if c["text"] in {"第一章 起步", "第五章 抵城"}
+                ],
+            )
+            self.assertTrue(out2["complete"])
+            self.assertEqual(out2["issues"], 0)
+            self.assertEqual([c["title"] for c in out2["chapters"]], [
+                "第一章 起步", "第二章 涉水", "第三章 登山", "第四章 穿林", "第五章 抵城"
+            ])
+            gap_filled_decs2 = [d for d in decs2 if d["result"] == "gap_filled"]
+            self.assertEqual(len(gap_filled_decs2), 3)
+            self.assertTrue(all(d["request_id"] is None for d in gap_filled_decs2))
+            self.assertEqual(revs2, [])
+
+            # 3a) 缺失章号对应两行候选 -> 不补且阻断
+            text_dup_cand = (
+                "第一章 起步\n正文一。\n"
+                "第二章 歧路甲\n正文甲。\n"
+                "第二章 歧路乙\n正文乙。\n"
+                "第三章 终途\n正文三。\n"
+            )
+            out3a, decs3a, revs3a = run_custom_chapters(
+                "dupcand",
+                text_dup_cand,
+                lambda cands: [
+                    {"id": c["id"], "kind": "chapter"}
+                    for c in cands
+                    if c["text"] in {"第一章 起步", "第三章 终途"}
+                ],
+            )
+            self.assertFalse(out3a["complete"])
+            self.assertEqual(out3a["issues"], 1)
+            self.assertFalse(any(d["result"] == "gap_filled" for d in decs3a))
+            self.assertTrue(revs3a[0]["blocking"])
+
+            # 3b) 缺失章号只在句中出现、不是候选整行 -> 不补且阻断
+            text_inline = "第一章 起步\n他在第二章的批注里写下结论。\n第三章 终途\n正文三。\n"
+            out3b, decs3b, revs3b = run_custom_chapters(
+                "inline",
+                text_inline,
+                lambda cands: [
+                    {"id": c["id"], "kind": "chapter"}
+                    for c in cands
+                    if c["text"].startswith("第")
+                ],
+            )
+            self.assertFalse(out3b["complete"])
+            self.assertEqual(out3b["issues"], 1)
+            self.assertFalse(any(d["result"] == "gap_filled" for d in decs3b))
+            self.assertTrue(revs3b[0]["blocking"])
+
+            # 3c) 缺失章号行已被模型标注后丢弃 -> 不补且阻断
+            text_labeled_dropped = (
+                "第一章 起步\n正文一。\n"
+                "第二章 空目\n"
+                "第三章 终途\n正文三。\n"
+            )
+            out3c, decs3c, revs3c = run_custom_chapters(
+                "labeled_dropped",
+                text_labeled_dropped,
+                lambda cands: [
+                    {"id": c["id"], "kind": "chapter"}
+                    for c in cands
+                    if c["text"].startswith("第")
+                ],
+            )
+            self.assertFalse(out3c["complete"])
+            self.assertEqual(out3c["issues"], 1)
+            self.assertFalse(any(d["result"] == "gap_filled" for d in decs3c))
+            self.assertTrue(any(d["result"] == "dropped_no_body" for d in decs3c))
+            self.assertTrue(revs3c[0]["blocking"])
+
+            # 4a) 作者跳号（原文无缺失章号）-> 仍为非阻断提示
+            text_author_skip = "第一章 起步\n正文平稳无缺章。\n第三章 终途\n正文三。\n"
+            out4a, decs4a, revs4a = run_custom_chapters(
+                "author_skip",
+                text_author_skip,
+                lambda cands: [
+                    {"id": c["id"], "kind": "chapter"}
+                    for c in cands
+                    if c["text"].startswith("第")
+                ],
+            )
+            self.assertTrue(out4a["complete"])
+            self.assertEqual(out4a["issues"], 0)
+            self.assertFalse(any(d["result"] == "gap_filled" for d in decs4a))
+            self.assertEqual(len(revs4a), 1)
+            self.assertFalse(revs4a[0]["blocking"])
+
+            # 4b) 英文 CHAPTER N 风格缺口补齐
+            text_en_gap = (
+                "CHAPTER 1. Loomings\nCall me Ishmael.\n"
+                "CHAPTER 2. The Carpet-Bag\nI stuffed a shirt.\n"
+                "CHAPTER 3. The Spouter-Inn\nEntering that gable-ended Spouter-Inn.\n"
+            )
+            out4b, decs4b, revs4b = run_custom_chapters(
+                "en_gap",
+                text_en_gap,
+                lambda cands: [
+                    {"id": c["id"], "kind": "chapter"}
+                    for c in cands
+                    if c["text"].startswith("CHAPTER 1.") or c["text"].startswith("CHAPTER 3.")
+                ],
+            )
+            self.assertTrue(out4b["complete"])
+            self.assertEqual(out4b["issues"], 0)
+            self.assertEqual(len(out4b["chapters"]), 3)
+            self.assertEqual(sum(1 for d in decs4b if d["result"] == "gap_filled"), 1)
+            self.assertEqual(revs4b, [])
+
+            # 5) 无正文的“第二卷”标为 chapter 且后接章 -> 保留为 volume、result=adopted_as_volume；后接卷题或位于文末 -> 照旧丢弃
+            text_vol = (
+                "第一卷 潜龙\n"
+                "第一章 初入\n正文一。\n"
+                "第二卷 乘风\n"
+                "第二章 远航\n正文二。\n"
+                "第三卷 虚卷\n"
+                "第四卷 实卷\n"
+                "第三章 登顶\n正文三。\n"
+                "第五卷 尾空卷\n"
+            )
+            out5, decs5, revs5 = run_custom_chapters(
+                "vol_rekind",
+                text_vol,
+                lambda cands: [
+                    {"id": c["id"], "kind": "volume" if "第四卷" in c["text"] else "chapter"}
+                    for c in cands
+                    if c["text"].startswith("第")
+                ],
+            )
+            self.assertTrue(out5["complete"])
+            self.assertEqual(out5["issues"], 0)
+            kept_kinds5 = [(c["title"], c["kind"]) for c in out5["chapters"]]
+            self.assertEqual(kept_kinds5, [
+                ("第一卷 潜龙", "volume"),
+                ("第一章 初入", "chapter"),
+                ("第二卷 乘风", "volume"),
+                ("第二章 远航", "chapter"),
+                ("第四卷 实卷", "volume"),
+                ("第三章 登顶", "chapter"),
+            ])
+            cands5 = {c["title"]: c["id"] for c in collect_candidates(text_vol)}
+            dec_by_qid5 = {d["question_id"]: d for d in decs5}
+            self.assertEqual(dec_by_qid5[cands5["第一卷 潜龙"]]["kind"], "chapter")
+            self.assertEqual(dec_by_qid5[cands5["第一卷 潜龙"]]["result"], "adopted_as_volume")
+            self.assertEqual(dec_by_qid5[cands5["第二卷 乘风"]]["kind"], "chapter")
+            self.assertEqual(dec_by_qid5[cands5["第二卷 乘风"]]["result"], "adopted_as_volume")
+            self.assertEqual(dec_by_qid5[cands5["第三卷 虚卷"]]["result"], "dropped_no_body")
+            self.assertEqual(dec_by_qid5[cands5["第五卷 尾空卷"]]["result"], "dropped_no_body")
+            self.assertEqual(revs5, [])
+
 
 class CredentialDecouplingAndTemperatureTests(unittest.TestCase):
     def test_generate_without_temperature_preserves_exact_payload_and_cache_key(self):
