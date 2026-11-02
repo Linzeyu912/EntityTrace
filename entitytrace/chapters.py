@@ -39,6 +39,9 @@ _CN_UNITS = {"十": 10, "百": 100, "千": 1000}
 _CN_HEAD_RE = re.compile(r"^第([〇零一二两三四五六七八九十百千]+|\d+)[章回节]")
 _EN_HEAD_RE = re.compile(r"^(?:chapter|part)\s+([ivxlcdm]+|\d+)(?![a-z0-9])", re.IGNORECASE)
 _DOT_HEAD_RE = re.compile(r"^([ivxlcdm]+|\d+)\.(?!\d)", re.IGNORECASE)
+_CN_SPAN_RE = re.compile(r"第([〇零一二两三四五六七八九十百千]+|\d+)[章回节]")
+_EN_SPAN_RE = re.compile(r"(?<![a-z0-9])(?:chapter|part)\s+([ivxlcdm]+|\d+)(?![a-z0-9])", re.IGNORECASE)
+_DOT_SPAN_RE = re.compile(r"(?:^|(?<=[\r\n]))[ \t]*([ivxlcdm]+|\d+)\.(?!\d)", re.IGNORECASE)
 
 
 def _parse_roman(raw: str) -> int | None:
@@ -247,10 +250,51 @@ def filter_headings_with_body(text: str, labeled: list[dict]) -> tuple[list[dict
     return kept_reversed, dropped_reversed
 
 
-def check_chapter_numbering(source_id: str, adopted: list[dict]) -> tuple[list[dict], int]:
+def _find_missing_number_spans(
+    text: str, start: int, end: int, prev_num: int, curr_num: int
+) -> list[tuple[int, int]]:
+    if not text or start >= end or curr_num <= prev_num + 1:
+        return []
+    base = max(0, start)
+    segment = text[base:min(len(text), end)]
+    spans: list[tuple[int, int]] = []
+    for m in _CN_SPAN_RE.finditer(segment):
+        token = m.group(1)
+        val = int(token) if token.isdigit() else _parse_chinese_number(token)
+        if val is not None and prev_num < val < curr_num:
+            spans.append((base + m.start(), base + m.end()))
+    for m in _EN_SPAN_RE.finditer(segment):
+        token = m.group(1)
+        val = int(token) if token.isdigit() else _parse_roman(token)
+        if val is not None and prev_num < val < curr_num:
+            spans.append((base + m.start(), base + m.end()))
+    for m in _DOT_SPAN_RE.finditer(segment):
+        token = m.group(1)
+        val = int(token) if token.isdigit() else _parse_roman(token)
+        if val is not None and prev_num < val < curr_num:
+            spans.append((base + m.start(1), base + m.end()))
+    spans.sort()
+    return spans
+
+
+def check_chapter_numbering(source_id: str, adopted: list[dict], text: str = "") -> tuple[list[dict], int]:
     issues: list[dict] = []
     unnumbered = 0
     last_by_style: dict[str, tuple[int, dict]] = {}
+    seen_titles_by_style_num: dict[tuple[str, int], set[str]] = {}
+    next_num_by_idx: dict[int, int | None] = {}
+    next_seen_by_style: dict[str, int] = {}
+    for idx in range(len(adopted) - 1, -1, -1):
+        head = adopted[idx]
+        if head["kind"] != "chapter":
+            continue
+        num = parse_chapter_number(head["title"])
+        if num is None:
+            continue
+        style = _style(head)
+        next_num_by_idx[idx] = next_seen_by_style.get(style)
+        next_seen_by_style[style] = num
+
     for idx, head in enumerate(adopted):
         if head["kind"] != "chapter":
             continue
@@ -259,23 +303,65 @@ def check_chapter_numbering(source_id: str, adopted: list[dict]) -> tuple[list[d
             unnumbered += 1
             continue
         style = _style(head)
+        cur_title = head["title"].strip()
         prev_is_volume = idx > 0 and adopted[idx - 1]["kind"] == "volume"
         if style in last_by_style:
             prev_num, prev_head = last_by_style[style]
             expected = prev_num + 1
             volume_restart_ok = prev_is_volume and num == 1
             if num != expected and not volume_restart_ok:
-                issues.append({
-                    "reason": "章号序列不连续",
-                    "style": style,
-                    "previous_number": prev_num,
-                    "current_number": num,
-                    "range": address(source_id, head["start"], head["end"]),
-                    "evidence": [
-                        address(source_id, prev_head["start"], prev_head["end"]),
-                        address(source_id, head["start"], head["end"]),
-                    ],
-                })
+                base_evidence = [
+                    address(source_id, prev_head["start"], prev_head["end"]),
+                    address(source_id, head["start"], head["end"]),
+                ]
+                if num > prev_num + 1:
+                    found_spans = _find_missing_number_spans(text, prev_head["end"], head["start"], prev_num, num)
+                    if found_spans:
+                        issues.append({
+                            "reason": "章号序列不连续：区间内存在缺失章号的疑似标题",
+                            "style": style,
+                            "previous_number": prev_num,
+                            "current_number": num,
+                            "range": address(source_id, head["start"], head["end"]),
+                            "evidence": base_evidence + [address(source_id, s, e) for s, e in found_spans],
+                            "blocking": True,
+                        })
+                    else:
+                        issues.append({
+                            "reason": "原文章号跳号：区间内未找到缺失章号",
+                            "style": style,
+                            "previous_number": prev_num,
+                            "current_number": num,
+                            "missing_count": num - prev_num - 1,
+                            "range": address(source_id, head["start"], head["end"]),
+                            "evidence": base_evidence,
+                            "blocking": False,
+                        })
+                else:
+                    next_num = next_num_by_idx.get(idx)
+                    seen_titles_for_n = seen_titles_by_style_num.get((style, num), set())
+                    if next_num == num + 1 and cur_title not in seen_titles_for_n:
+                        issues.append({
+                            "reason": "原文章号回退后连续：疑似作者重复编号",
+                            "style": style,
+                            "previous_number": prev_num,
+                            "current_number": num,
+                            "range": address(source_id, head["start"], head["end"]),
+                            "evidence": base_evidence,
+                            "blocking": False,
+                        })
+                    else:
+                        reason = "疑似重复章节" if cur_title in seen_titles_for_n else "章号序列不连续"
+                        issues.append({
+                            "reason": reason,
+                            "style": style,
+                            "previous_number": prev_num,
+                            "current_number": num,
+                            "range": address(source_id, head["start"], head["end"]),
+                            "evidence": base_evidence,
+                            "blocking": True,
+                        })
+        seen_titles_by_style_num.setdefault((style, num), set()).add(cur_title)
         last_by_style[style] = (num, head)
     return issues, unnumbered
 
@@ -343,15 +429,16 @@ def detect_chapters(store, models, source: dict, run_id: str, log) -> dict:
             "kind": item["kind"],
             "result": "adopted" if item["id"] in adopted_ids else dropped_reasons.get(item["id"], "dropped_no_body"),
         })
-    issues, unnumbered = check_chapter_numbering(source_id, adopted_raw)
+    issues, unnumbered = check_chapter_numbering(source_id, adopted_raw, text)
     for idx, issue in enumerate(issues):
         store.put(run_id, "review", {
             "id": digest(["chapters", idx, issue]),
             "stage": "chapters",
             **issue,
             "status": "pending",
-            "blocking": True,
+            "blocking": bool(issue.get("blocking", True)),
         })
+    blocking_issues = [x for x in issues if x.get("blocking", True)]
     headings = [
         {
             "start": h["start"],
@@ -371,15 +458,15 @@ def detect_chapters(store, models, source: dict, run_id: str, log) -> dict:
         "adopted": len(headings),
         "dropped_no_body": len(dropped_raw),
         "unnumbered": unnumbered,
-        "numbering_issues": len(issues),
+        "numbering_issues": len(blocking_issues),
         "label_requests": len(batches),
     }
     return {
         "chapter_set_version": version,
         "chapters": chapters,
         "scan_windows": len(batches),
-        "complete": not issues,
-        "issues": len(issues),
+        "complete": not blocking_issues,
+        "issues": len(blocking_issues),
         "scanned_code_points": len(text),
         "path_counts": path_counts,
     }

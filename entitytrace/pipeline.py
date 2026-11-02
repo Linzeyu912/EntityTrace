@@ -133,7 +133,7 @@ def infer_incomplete_stage_error(state: dict, stop_after: str = "identity") -> d
                 )
             issues = int(st.get("issues", 0) or 0)
             if issues > 0:
-                return make_error_dict("model_output", f"阶段 {name} 未完成：{issues} 处章号连续性待审阻断")
+                return make_error_dict("input", "章节结构无法自动确认，重跑结果相同，见 `review --stage chapters`")
             return make_error_dict("model_output", f"阶段 {name} 未完成，保留断点可续跑")
         if name == stop_after:
             return None

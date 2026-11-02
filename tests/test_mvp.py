@@ -348,7 +348,10 @@ class FakeModels:
         if stage == "chapter-label":
             value = {
                 "headings": [
-                    {"id": c["id"], "kind": "chapter"}
+                    {
+                        "id": c["id"],
+                        "kind": "volume" if "卷" in c["text"].lstrip().split()[0] else "chapter",
+                    }
                     for c in state["candidates"]
                     if c["text"].lstrip().startswith("第")
                 ]
@@ -646,8 +649,8 @@ class PipelineTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)
             text = root / "input.txt"
-            # 章号从第一章直接跳至第三章，触发章号连续性阻断（chapters.complete == False）
-            text.write_text("第一章 初见\n林舟来了。\n第三章 跳章\n林舟走了。\n", encoding="utf-8")
+            # 章号从第一章跳至第三章且区间内含未独立成题的“第二章”，触发章号连续性阻断（chapters.complete == False）
+            text.write_text("第一章 初见\n林舟在第二章前停步。\n第三章 跳章\n林舟走了。\n", encoding="utf-8")
             config = root / ".env"
             config.write_text("DEEPSEEK_API_KEY=test\n", encoding="utf-8")
             src_db = root / "src.sqlite3"
@@ -837,24 +840,33 @@ class ChapterCandidateAndStructureTests(unittest.TestCase):
                 self.assertEqual(parse_chapter_number(title), expected)
 
     def test_chapter_numbering_gap_or_duplicate_blocks_run(self):
-        # 缺号（中文与罗马数字点号形式）及重复号均产生阻断待审
+        # 区间内无缺失章号：非阻断提示（blocking=False）；区间内含缺失章号：阻断待审（blocking=True）
         gap_adopted = [
             {"start": 0, "end": 3, "title": "第一章", "kind": "chapter"},
             {"start": 10, "end": 13, "title": "第三章", "kind": "chapter"},
         ]
-        issues_gap, unnum_gap = check_chapter_numbering("src-1", gap_adopted)
+        issues_gap_clean, unnum_gap = check_chapter_numbering("src-1", gap_adopted, "第一章\n正文平稳。\n第三章\n")
         self.assertEqual(unnum_gap, 0)
-        self.assertEqual(len(issues_gap), 1)
-        self.assertEqual(issues_gap[0]["reason"], "章号序列不连续")
-        self.assertEqual(len(issues_gap[0]["evidence"]), 2)
+        self.assertEqual(len(issues_gap_clean), 1)
+        self.assertFalse(issues_gap_clean[0]["blocking"])
+        self.assertEqual(issues_gap_clean[0]["reason"], "原文章号跳号：区间内未找到缺失章号")
+        self.assertEqual(issues_gap_clean[0]["missing_count"], 1)
+        self.assertEqual(len(issues_gap_clean[0]["evidence"]), 2)
+
+        issues_gap_block, _ = check_chapter_numbering("src-1b", gap_adopted, "第一章\n正文第二章\n第三章\n")
+        self.assertEqual(len(issues_gap_block), 1)
+        self.assertTrue(issues_gap_block[0]["blocking"])
+        self.assertEqual(issues_gap_block[0]["reason"], "章号序列不连续：区间内存在缺失章号的疑似标题")
+        self.assertEqual(len(issues_gap_block[0]["evidence"]), 3)
 
         roman_dot_gap = [
             {"start": 0, "end": 7, "title": "I. East", "kind": "chapter"},
             {"start": 20, "end": 29, "title": "III. West", "kind": "chapter"},
         ]
-        issues_roman, _ = check_chapter_numbering("src-2", roman_dot_gap)
+        issues_roman, _ = check_chapter_numbering("src-2", roman_dot_gap, "I. East\nII. Mid\n    III. West")
         self.assertEqual(len(issues_roman), 1)
-        self.assertEqual(issues_roman[0]["reason"], "章号序列不连续")
+        self.assertTrue(issues_roman[0]["blocking"])
+        self.assertEqual(issues_roman[0]["reason"], "章号序列不连续：区间内存在缺失章号的疑似标题")
 
         dup_adopted = [
             {"start": 0, "end": 9, "title": "Chapter 2", "kind": "chapter"},
@@ -862,7 +874,8 @@ class ChapterCandidateAndStructureTests(unittest.TestCase):
         ]
         issues_dup, _ = check_chapter_numbering("src-3", dup_adopted)
         self.assertEqual(len(issues_dup), 1)
-        self.assertEqual(issues_dup[0]["reason"], "章号序列不连续")
+        self.assertTrue(issues_dup[0]["blocking"])
+        self.assertEqual(issues_dup[0]["reason"], "疑似重复章节")
 
         # 无编号章题不阻断但计数 unnumbered
         unnum_adopted = [
@@ -873,6 +886,96 @@ class ChapterCandidateAndStructureTests(unittest.TestCase):
         issues_ok, unnum_cnt = check_chapter_numbering("src-4", unnum_adopted)
         self.assertEqual(issues_ok, [])
         self.assertEqual(unnum_cnt, 1)
+
+    def test_chapter_numbering_evidence_classification_and_cli_input_error(self):
+        import contextlib
+
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            cfg = root / ".env"
+            cfg.write_text("DEEPSEEK_API_KEY=test\n", encoding="utf-8")
+
+            # 1) 区间内无“第二章”：complete == True，issues == 0，产出 1 条 blocking == False 的 review
+            t1 = root / "t1.txt"
+            t1.write_text("第一章 甲\n正文。\n第三章 丙\n正文。\n", encoding="utf-8")
+            with patch("entitytrace.pipeline.Models", FakeModels):
+                _, out1, _ = run_pipeline(
+                    t1, root / "db1.sqlite3", root / "out1", cfg, stop_after="chapters", log=lambda _: None
+                )
+            man1 = json.loads((out1 / "manifest.json").read_text(encoding="utf-8"))
+            rev1 = json.loads((out1 / "review.json").read_text(encoding="utf-8"))
+            self.assertTrue(man1["state"]["chapters"]["complete"])
+            self.assertEqual(man1["state"]["chapters"]["issues"], 0)
+            self.assertEqual(man1["counts"]["chapter_path_counts"]["numbering_issues"], 0)
+            ch_revs1 = [r for r in rev1["items"] if r["stage"] == "chapters"]
+            self.assertEqual(len(ch_revs1), 1)
+            self.assertFalse(ch_revs1[0]["blocking"])
+            self.assertEqual(ch_revs1[0]["reason"], "原文章号跳号：区间内未找到缺失章号")
+            self.assertEqual(ch_revs1[0]["missing_count"], 1)
+
+            # 2) 区间内含“第二章”：complete == False，issues == 1，blocking == True，CLI 错误类别为 input（retryable == False，退出码 1）
+            t2 = root / "t2.txt"
+            t2.write_text("第一章 甲\n正文第二章 乙未换行。\n第三章 丙\n正文。\n", encoding="utf-8")
+            out_buf, err_buf = io.StringIO(), io.StringIO()
+            with patch("entitytrace.pipeline.Models", FakeModels), \
+                 contextlib.redirect_stdout(out_buf), \
+                 contextlib.redirect_stderr(err_buf):
+                rc2 = cli_main([
+                    "run", str(t2),
+                    "--db", str(root / "db2.sqlite3"),
+                    "--output", str(root / "out2"),
+                    "--config", str(cfg),
+                    "--stop-after", "chapters",
+                    "--json",
+                ])
+            self.assertEqual(rc2, 1)
+            receipt2 = json.loads(out_buf.getvalue().strip())
+            self.assertFalse(receipt2["stages"]["chapters"]["complete"])
+            self.assertEqual(receipt2["error"]["category"], "input")
+            self.assertFalse(receipt2["error"]["retryable"])
+            self.assertIn("review --stage chapters", receipt2["error"]["message"])
+            rev2 = json.loads(Path(receipt2["files"]["review"]).read_text(encoding="utf-8"))
+            ch_revs2 = [r for r in rev2["items"] if r["stage"] == "chapters"]
+            self.assertEqual(len(ch_revs2), 1)
+            self.assertTrue(ch_revs2[0]["blocking"])
+            self.assertEqual(ch_revs2[0]["reason"], "章号序列不连续：区间内存在缺失章号的疑似标题")
+            self.assertEqual(len(ch_revs2[0]["evidence"]), 3)
+
+            # 3) 含卷标题后章号从 10 回退到 8 且后接 9、章题不同：complete == True，issues == 0，产出 1 条 blocking == False 的 review
+            t3 = root / "t3.txt"
+            t3.write_text(
+                "第八章 晨雾\n正文一。\n第九章 山雨\n正文二。\n第十章 归帆\n正文三。\n"
+                "第二卷 远行\n第八章 新途\n正文四。\n第九章 渡口\n正文五。\n",
+                encoding="utf-8",
+            )
+            with patch("entitytrace.pipeline.Models", FakeModels):
+                _, out3, _ = run_pipeline(
+                    t3, root / "db3.sqlite3", root / "out3", cfg, stop_after="chapters", log=lambda _: None
+                )
+            man3 = json.loads((out3 / "manifest.json").read_text(encoding="utf-8"))
+            rev3 = json.loads((out3 / "review.json").read_text(encoding="utf-8"))
+            self.assertTrue(man3["state"]["chapters"]["complete"])
+            self.assertEqual(man3["state"]["chapters"]["issues"], 0)
+            ch_revs3 = [r for r in rev3["items"] if r["stage"] == "chapters"]
+            self.assertEqual(len(ch_revs3), 1)
+            self.assertFalse(ch_revs3[0]["blocking"])
+            self.assertEqual(ch_revs3[0]["reason"], "原文章号回退后连续：疑似作者重复编号")
+
+            # 4) 重复章题 第二章 乙 ... 第二章 乙：complete == False，issues == 1，blocking == True
+            t4 = root / "t4.txt"
+            t4.write_text("第一章 甲\n正文一。\n第二章 乙\n正文二。\n第二章 乙\n正文二重复。\n", encoding="utf-8")
+            with patch("entitytrace.pipeline.Models", FakeModels):
+                _, out4, _ = run_pipeline(
+                    t4, root / "db4.sqlite3", root / "out4", cfg, stop_after="chapters", log=lambda _: None
+                )
+            man4 = json.loads((out4 / "manifest.json").read_text(encoding="utf-8"))
+            rev4 = json.loads((out4 / "review.json").read_text(encoding="utf-8"))
+            self.assertFalse(man4["state"]["chapters"]["complete"])
+            self.assertEqual(man4["state"]["chapters"]["issues"], 1)
+            ch_revs4 = [r for r in rev4["items"] if r["stage"] == "chapters"]
+            self.assertEqual(len(ch_revs4), 1)
+            self.assertTrue(ch_revs4[0]["blocking"])
+            self.assertEqual(ch_revs4[0]["reason"], "疑似重复章节")
 
     def test_chapter_numbering_restarts_from_one_after_volume_without_blocking(self):
         adopted = [
