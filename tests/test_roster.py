@@ -9,6 +9,7 @@ from entitytrace.chapters import build_chapters
 from entitytrace.discovery import ground_result, plan_tasks
 from entitytrace.models import ModelError
 from entitytrace.roster import (
+    C1_MAX_TOKENS,
     VERSION,
     apply_c1_task_result,
     normalize_surface,
@@ -973,6 +974,247 @@ class RosterAlgorithmTests(unittest.TestCase):
         self.assertEqual(qing_ent["mention_count"], 2)
         # 验证“那位县尊”被拆分后保持 person 粗类，仅召回 person 候选
         self.assertEqual(c3_seen_candidates.get("那位县尊"), ["person"])
+
+    def test_c1_max_tokens_16000_and_other_stages_unchanged(self):
+        import io
+        import json
+        from entitytrace.chapters import detect_chapters
+        from entitytrace.config import Service
+        from entitytrace.discovery import discover
+        from entitytrace.models import Models
+
+        self.assertEqual(C1_MAX_TOKENS, 16000)
+        text = "第一章 启程\n沈墨在渡口遇见那位旅人。\n第二章 夜宿\n沈墨即沈墨子，与墨先生在客栈饮茶。\n"
+        path = self.root / "max_tok.txt"
+        path.write_bytes(text.encode("utf-8"))
+        source = import_text(self.store, path)
+        run_id = "run_max_tokens_check"
+        self.store.execute("INSERT INTO runs VALUES(?,?,?,?,?,?)", (run_id, source["id"], "{}", "{}", "now", "now"))
+
+        stage_max_tokens: dict[str, list[int]] = {}
+
+        def opener(request, timeout=None):
+            payload = json.loads(request.data.decode("utf-8"))
+            sys_prompt = payload["messages"][0]["content"]
+            user_state = json.loads(payload["messages"][1]["content"])
+            mt = payload["max_tokens"]
+            if "items" in user_state and "candidates" in user_state:
+                stage_max_tokens.setdefault("roster-c3-link", []).append(mt)
+                content = {
+                    "links": [
+                        {"mention_id": it["mention_id"], "selected_entity_id": "uncertain", "reason": "待审"}
+                        for it in user_state["items"]
+                    ]
+                }
+            elif "candidates" in user_state:
+                stage_max_tokens.setdefault("chapter-label", []).append(mt)
+                content = {
+                    "headings": [
+                        {"id": c["id"], "kind": "chapter"}
+                        for c in user_state["candidates"]
+                        if c["text"].startswith("第")
+                    ]
+                }
+            elif "surfaces" in user_state:
+                stage_max_tokens.setdefault("roster-c1", []).append(mt)
+                surfs = {r["surface"]: r for r in user_state["surfaces"]}
+                ents = []
+                assigns = []
+                if "沈墨" in surfs:
+                    s_items = [{"surface": "沈墨", "surface_type": "proper_name"}]
+                    if "沈墨子" in surfs:
+                        s_items.append({"surface": "沈墨子", "surface_type": "proper_name"})
+                    ents.append({
+                        "local_id": "e1",
+                        "name": "沈墨子" if "沈墨子" in surfs else "沈墨",
+                        "kind": "person",
+                        "surfaces": s_items,
+                        "evidence_ref": surfs["沈墨"]["refs"][0],
+                    })
+                if "墨先生" in surfs:
+                    ents.append({
+                        "local_id": "e2",
+                        "name": "墨先生",
+                        "kind": "person",
+                        "surfaces": [{"surface": "墨先生", "surface_type": "proper_name"}],
+                        "evidence_ref": surfs["墨先生"]["refs"][0],
+                    })
+                if "那位旅人" in surfs:
+                    m_id = surfs["那位旅人"]["mentions"][0]["mention_id"]
+                    assigns.append({
+                        "mention_id": m_id,
+                        "surface": "那位旅人",
+                        "ref": surfs["那位旅人"]["refs"][0],
+                        "local_id": "null",
+                        "reason": "身份未明",
+                    })
+                content = {"entities": ents, "assignments": assigns, "not_entity": []}
+            elif "rows" in user_state:
+                stage_max_tokens.setdefault("roster-c2-review", []).append(mt)
+                content = {
+                    "groups": [{
+                        "group_id": "g1",
+                        "name": user_state["rows"][0]["name"],
+                        "kind": "person",
+                        "row_ids": [r["row_id"] for r in user_state["rows"]],
+                        "member_ids": [],
+                        "reason": "同指",
+                    }],
+                    "unresolved_row_ids": [],
+                    "unresolved_member_ids": [],
+                }
+            elif "entries" in user_state:
+                stage_max_tokens.setdefault("roster-c2-propose", []).append(mt)
+                ents = user_state["entries"]
+                props = (
+                    [{"left": ents[0]["entry_id"], "right": ents[1]["entry_id"], "reason": "同指候选"}]
+                    if len(ents) >= 2
+                    else []
+                )
+                content = {"proposals": props}
+            elif "left" in user_state and "right" in user_state:
+                stage_max_tokens.setdefault("roster-c2-verify", []).append(mt)
+                content = {"verdict": "same", "reason": "同为沈墨"}
+            elif "items" in user_state and "candidates" in user_state:
+                stage_max_tokens.setdefault("roster-c3-link", []).append(mt)
+                content = {
+                    "links": [
+                        {"mention_id": it["mention_id"], "selected_entity_id": "uncertain", "reason": "待审"}
+                        for it in user_state["items"]
+                    ]
+                }
+            else:
+                stage_max_tokens.setdefault("discovery", []).append(mt)
+                ms = []
+                for u in user_state["units"]:
+                    for s in ("沈墨子", "沈墨", "那位旅人", "墨先生"):
+                        if s in u["text"]:
+                            ms.append({"text": s, "kind": "person", "refs": [u["id"]]})
+                content = {"mentions": ms, "links": []}
+            body = {"choices": [{"finish_reason": "stop", "message": {"content": dumps(content)}}]}
+            return io.BytesIO(dumps(body).encode("utf-8"))
+
+        svc = Service("discovery", "https://api.deepseek.com", "deepseek-flash", "TEST_SECRET")
+        models = Models(self.store, run_id, "inv1", {"discovery": svc}, discovery_concurrency=1, opener=opener)
+        ch_out = detect_chapters(self.store, models, source, run_id, lambda _: None)
+        self.assertTrue(ch_out["complete"])
+        disc_out = discover(
+            self.store, models, source, run_id, self.store.records(run_id, "chapter"), 9000, 1, lambda _: None
+        )
+        self.assertTrue(disc_out["complete"])
+        ros_out = resolve_roster(self.store, models, source, run_id, concurrency=1, log=lambda _: None)
+        self.assertTrue(ros_out["complete"])
+
+        self.assertEqual(set(stage_max_tokens["roster-c1"]), {16000})
+        self.assertEqual(set(stage_max_tokens["chapter-label"]), {4000})
+        self.assertEqual(set(stage_max_tokens["discovery"]), {8000})
+        self.assertEqual(set(stage_max_tokens["roster-c2-review"]), {8000})
+        self.assertEqual(set(stage_max_tokens["roster-c2-propose"]), {8000})
+        self.assertEqual(set(stage_max_tokens["roster-c2-verify"]), {8000})
+        self.assertEqual(set(stage_max_tokens["roster-c3-link"]), {8000})
+
+    def test_c1_assignment_string_null_tolerance_and_defined_null_and_invalid_local_id(self):
+        text = "第一章\n林掌柜向知县禀报，差役在堂下候命。\n"
+        path = self.root / "null_tol.txt"
+        path.write_bytes(text.encode("utf-8"))
+        source = import_text(self.store, path)
+        _, chapters = build_chapters(source, [{"start": 0, "end": 3, "title": "第一章", "kind": "chapter"}])
+        task = plan_tasks(source, chapters, 9000)[0]
+        uid = task["units"][0]["id"]
+        grounded = ground_result(
+            source,
+            task,
+            {
+                "mentions": [
+                    {"text": "林掌柜", "kind": "person", "refs": [uid]},
+                    {"text": "知县", "kind": "person", "refs": [uid]},
+                    {"text": "差役", "kind": "person", "refs": [uid]},
+                ],
+                "links": [],
+            },
+            "req_null",
+        )
+        mentions = grounded["mentions"]
+        m_zhixian = next(m for m in mentions if m["text"] == "知县")
+        m_chaiyi = next(m for m in mentions if m["text"] == "差役")
+        allowed_surfs = {"林掌柜", "知县", "差役"}
+        allowed_refs = {uid}
+        allowed_mids = {m["id"] for m in mentions} | {"m1", "m2", "m3"}
+
+        raw_json_null = {
+            "entities": [
+                {
+                    "local_id": "e1",
+                    "name": "林掌柜",
+                    "kind": "person",
+                    "surfaces": [{"surface": "林掌柜", "surface_type": "proper_name"}],
+                    "evidence_ref": uid,
+                }
+            ],
+            "assignments": [
+                {"mention_id": m_zhixian["id"], "surface": "知县", "ref": uid, "local_id": None, "reason": "未决"},
+                {"mention_id": m_chaiyi["id"], "surface": "差役", "ref": uid, "local_id": "not_entity", "reason": "泛称"},
+            ],
+            "not_entity": [],
+        }
+        raw_str_null = {
+            "entities": raw_json_null["entities"],
+            "assignments": [
+                {"mention_id": m_zhixian["id"], "surface": "知县", "ref": uid, "local_id": "null", "reason": "未决"},
+                {"mention_id": m_chaiyi["id"], "surface": "差役", "ref": uid, "local_id": "not_entity", "reason": "泛称"},
+            ],
+            "not_entity": [],
+        }
+
+        validate_c1_structure(raw_str_null, allowed_surfs, allowed_refs, Strict=True, allowed_mention_ids=allowed_mids)
+        out_json_null = apply_c1_task_result(source, task, mentions, raw_json_null, "req_1", strict=True)
+        out_str_null = apply_c1_task_result(source, task, mentions, raw_str_null, "req_1", strict=True)
+        self.assertEqual(out_str_null, out_json_null)
+        zhixian_outcome = next(o for o in out_str_null["mention_outcomes"] if o["mention_id"] == m_zhixian["id"])
+        self.assertEqual(zhixian_outcome["status"], "unresolved")
+        self.assertIsNone(zhixian_outcome["local_id"])
+
+        # 当 "null" 恰为本次返回中已定义的 local_id 时，按已定义对象处理
+        raw_defined_null = {
+            "entities": [
+                {
+                    "local_id": "e1",
+                    "name": "林掌柜",
+                    "kind": "person",
+                    "surfaces": [{"surface": "林掌柜", "surface_type": "proper_name"}],
+                    "evidence_ref": uid,
+                },
+                {
+                    "local_id": "null",
+                    "name": "知县",
+                    "kind": "person",
+                    "surfaces": [],
+                    "evidence_ref": uid,
+                },
+            ],
+            "assignments": [
+                {"mention_id": m_zhixian["id"], "surface": "知县", "ref": uid, "local_id": "null", "reason": "指向已定义对象 null"},
+                {"mention_id": m_chaiyi["id"], "surface": "差役", "ref": uid, "local_id": "not_entity", "reason": "泛称"},
+            ],
+            "not_entity": [],
+        }
+        validate_c1_structure(raw_defined_null, allowed_surfs, allowed_refs, Strict=True, allowed_mention_ids=allowed_mids)
+        out_defined_null = apply_c1_task_result(source, task, mentions, raw_defined_null, "req_2", strict=True)
+        zhixian_defined = next(o for o in out_defined_null["mention_outcomes"] if o["mention_id"] == m_zhixian["id"])
+        self.assertEqual(zhixian_defined["status"], "assigned")
+        self.assertEqual(zhixian_defined["local_id"], "null")
+
+        # 其他未定义字符串 local_id 照旧报错
+        for bad_lid in ("e999", "none", "unknown", "NULL"):
+            raw_bad = {
+                "entities": raw_json_null["entities"],
+                "assignments": [
+                    {"mention_id": m_zhixian["id"], "surface": "知县", "ref": uid, "local_id": bad_lid, "reason": "非法"},
+                ],
+                "not_entity": [],
+            }
+            with self.assertRaises(ModelError):
+                validate_c1_structure(raw_bad, allowed_surfs, allowed_refs, Strict=True, allowed_mention_ids=allowed_mids)
 
     def test_roster_module_does_not_import_gold(self):
         source = (ROOT / "entitytrace/roster.py").read_text(encoding="utf-8")
