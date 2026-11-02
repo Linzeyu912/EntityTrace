@@ -42,6 +42,8 @@
 python -X utf8 -m entitytrace run "<输入TXT路径>" --db "<数据库路径>" --output "<输出根目录>" --config "<凭证配置文件>" --max-requests 1000 --max-seconds 2400 --json
 ```
 
+> **预算估算参考**：CLI 默认不限制 `--max-requests` 与 `--max-seconds`；宿主按需设置单次运行预算时，可参考实测规模约 **每万字 10—17 次请求、14—18 秒** 估算。
+
 读取 `stdout` 单行回执中的核心字段：
 - `run_id`、`result_revision`、`status`（`completed` | `completed_with_review` | `incomplete` | `failed`）
 - `stages`：`chapters`、`discovery`、`identity` 各自的 `{"complete","seconds","resumed"}`
@@ -115,12 +117,12 @@ python -X utf8 -m entitytrace correct <run_id> revoke <更正ID> [--cascade] --s
 | `0` | `null` | — | `run` 完成（含 `completed` 与 `completed_with_review`）、查询成功、`correct` 成功 | 正常读取 JSON 结果；若 `status="completed_with_review"`，按 `review_top` 或 `review` 查看高影响待审项 |
 | `2` | `network` | `true` | 网络连接中断、超时、服务端 `5xx` 或连续断网熔断，数据库已保存断点 | 可退避等待后使用**同一 `--db` 与输入参数**自动重跑 `run --json` 断点续跑 |
 | `2` | `budget` | `true` | 触达 `--max-requests` 或 `--max-seconds` 预算上限停止，已完成任务保存在库 | 在宿主被授予的总预算范围内可扩大预算参数同库续跑；超出用户授权预算时询问用户 |
-| `2` | `model_output` | `true` | 个别任务模型输出连续格式错误或章号连续性阻断，阶段未完成但留有断点 | 允许同库自动续跑 **1 次**（已完成任务全部复用不重发）；若仍失败则停止并向用户报告 |
+| `2` | `model_output` | `true` | 个别任务模型输出连续格式错误，阶段未完成但留有断点 | 允许同库自动续跑 **1 次**（已完成任务全部复用不重发）；若仍失败则停止并向用户报告 |
 | `2` | `quota` | **`false`** | API 余额不足、硬额度耗尽（`hard_quota`）或 `402/429` 配额限制，库内保留断点 | **严禁自动重跑**；必须立即向用户报告额度耗尽，待用户充值或更换凭证后再同库恢复 |
 | `2` | `null` | — | 显式指定 `--stop-after chapters` 或 `--stop-after discovery` 到达阶段断点 | 按编排计划决定是否继续推进后续阶段 |
 | `1` | `conflict` | `false` | `correct --expect-revision` 与当前实际 `result_revision` 不一致（结果版本已过期） | **不得直接用旧参数强推**；必须重新调用 `status` / `entities` / `entity` / `review` 读取最新状态与实体 ID，核对后再提交 |
 | `1` | `config` | `false` | 缺少 `DEEPSEEK_API_KEY`、配置文件路径错误、服务地址非法或 `401/403` 鉴权失败 | **禁止自动重试**；提示用户检查本地配置文件或环境变量凭证配置 |
-| `1` | `input` | `false` | 输入文件不存在／编码错误、未知 `run_id`／`entity_id`、`--limit > 200`、`groups-v2` 运行调用只读查询、未完成运行调用 `correct` | 检查并修正命令参数；若是输入路径或文本编码问题则询问用户 |
+| `1` | `input` | `false` | 输入文件不存在／编码错误、章节结构阻断（区间内存在缺失章号的疑似标题或重复章节，`blocking=true`）、未知 `run_id`／`entity_id`、`--limit > 200`、`groups-v2` 运行调用只读查询、未完成运行调用 `correct` | **禁止自动重跑**（章节阻断重跑命中缓存结果相同，可通过 `review <run_id> --stage chapters` 核查；原文章号跳号或回退后按新章题连续递增记为 `blocking=false` 提示，不阻断运行）；检查参数或询问用户 |
 | `1` | `local` | `false` | 保存的原文 SHA-256 指纹不匹配或本地覆盖不变量校验异常 | **立即停止**并向用户报告数据库／产物完整性异常，不得覆盖原库 |
 
 ---

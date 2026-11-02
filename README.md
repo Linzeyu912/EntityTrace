@@ -72,7 +72,7 @@ python -X utf8 -m entitytrace run "D:\小说\样本.txt" --identity-algorithm gr
 
 `run` 主要参数（详见 `python -X utf8 -m entitytrace run --help`）：
 - `--identity-algorithm roster|groups-v2`：身份归组算法，默认 `roster`（`entity-roster-v1`）；`groups-v2` 为旧版实体组消歧。
-- `--max-requests N`、`--max-seconds S`：单次运行的新网络请求上限与运行秒数上限，默认不限；另内置连续 9 次传输层网络失败自动熔断停止。
+- `--max-requests N`、`--max-seconds S`：单次运行的新网络请求上限与运行秒数上限，默认不限（宿主需要设置单次预算时，可按实测约每万字 10—17 次请求、14—18 秒估算）；另内置连续 9 次传输层网络失败自动熔断停止。
 - `--encoding`、`--task-chars`、`--discovery-concurrency`、`--decision-concurrency`：输入编码、发现任务长度预算与各服务单进程并发上限。
 - `--stop-after chapters|discovery|identity`：在指定阶段完成后停止。
 - `--json`：将进度日志全部写往 stderr，stdout 仅在结束时输出一行 `entitytrace.v1` JSON 回执（不加 `--json` 时 `run` 的 stdout 文本保持原样）。
@@ -81,7 +81,7 @@ python -X utf8 -m entitytrace run "D:\小说\样本.txt" --identity-algorithm gr
 退出码约定（适用于 `run`、只读查询命令与 `correct`；与旧版“所有失败或未完成一律返回 `2`”的行为不同，现按数据状态区分 `1` 与 `2`，是否自动重试以 JSON 回执的 `error.retryable` 为准）：
 - `0`：计算或命令完成（含 `completed` 与带待审的 `completed_with_review`、查询成功、`correct` 成功）。
 - `2`：数据库中留有**可续跑的断点**（包括网络中断 `network`、预算耗尽 `budget`、模型输出连续格式错误 `model_output`、额度耗尽 `quota`，以及 `--stop-after` 阶段断点）。注意：`quota` 退出码虽为 `2`（保留已完成缓存与断点），但 `error.retryable=false`，宿主不得自动重跑。
-- `1`：**无可续跑的断点**，或命令被拒绝（包括输入文件缺失／解码失败 `input`、配置缺失或鉴权失败 `config`、未知 `run_id`、非法参数、`groups-v2` 运行不支持查询、结果版本过期 `conflict` 及本地校验异常 `local`，`retryable` 均为 `false`）。
+- `1`：**无可续跑的断点**，或命令被拒绝（包括输入文件缺失／解码失败或章节结构阻断 `input`、配置缺失或鉴权失败 `config`、未知 `run_id`、非法参数、`groups-v2` 运行不支持查询、结果版本过期 `conflict` 及本地校验异常 `local`，`retryable` 均为 `false`）。章节阶段按原文证据分级处理章号异常：原文跳号（区间内找不到缺失章号）或回退后按新章题连续递增记为非阻断提示（`blocking=false`，`chapters` 仍标为 `complete=true`）；区间内存在缺失章号的疑似标题或重复章节记为阻断待审（`blocking=true`），回执报 `error.category="input"`、`retryable=false`（退出码 `1`，重跑命中缓存结果相同，不可自动重试，可通过 `review --stage chapters` 核查）。
 
 ## 输出与回溯
 
