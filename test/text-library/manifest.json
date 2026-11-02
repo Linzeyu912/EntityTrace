@@ -4,7 +4,7 @@
   "migrated_date": "2026-10-28",
   "source_repository": "https://github.com/Linzeyu912/YingHe-entity",
   "source_commit": "1512f7b32ee2c40aa7bb5a833af266f84be1e07d",
-  "model_input_rule": "仅 books[].filename 指向的六份 TXT 是模型输入；不把清单、reference 或 provenance 目录交给模型。",
+  "model_input_rule": "仅 books[] 指向的纯文本 TXT 是模型输入（公版书位于 texts/，受版权保护的《凡人修仙传》仅存放在仓库外侧 .local/books/，严禁入 Git）；不把清单、reference 或 provenance 目录交给模型。",
   "encoding": "UTF-8",
   "newline": "LF",
   "books": [
@@ -140,6 +140,61 @@
         "保留原书 Etymology 与 Extracts 两篇前置文字，Etymology 保留原书分行，删除 Extracts 内重复的分节标题",
         "统一章题格式，合并固定宽度换行，保留所有正文段落",
         "完整原始下载保存在 sources/moby_dick.txt"
+      ]
+    },
+    {
+      "id": "fengshen-100",
+      "filename": "texts/07_中文长篇_封神演义_100回.txt",
+      "git_tracked": true,
+      "copyright_status": "public_domain",
+      "title": "封神演义",
+      "author": "许仲琳 / 陆西星",
+      "language": "zh-Hans",
+      "source_url": "https://www.gutenberg.org/ebooks/23910",
+      "retrieved_date": "2026-11-02",
+      "encoding": "UTF-8",
+      "newline": "CRLF",
+      "sha256": "7375fd1ec43cb7e6a532eca4dff870c332af350a8c1eb43837684db80701de07",
+      "bytes": 1799507,
+      "body_counts": {
+        "code_points_with_newlines": 606601,
+        "code_points_lf_equivalent": 601577,
+        "code_points_without_newlines": 596553,
+        "han_characters": 485248,
+        "english_words": 0,
+        "non_whitespace_characters": 587003
+      },
+      "transformations": [
+        "明代百回足本现代简体精校清洗版（对照 GitHub xp44mm/hanchuancaolu 与 Project Gutenberg #23910）",
+        "第一回至第一百回完整无缺，规范异体字并统一洞府与法宝名称，详见 provenance/2026-11-02/小说实体识别测试集_来源与难例说明.md"
+      ]
+    },
+    {
+      "id": "fanren-2451",
+      "filename": null,
+      "local_path": ".local/books/凡人修仙传_精校清洗版.txt",
+      "git_tracked": false,
+      "copyright_status": "copyrighted_local_only（受版权保护，仅存放在本机 .local/books/ 供超长篇规模测试，严禁将原文、数据库或导出入 Git）",
+      "title": "凡人修仙传",
+      "author": "忘语",
+      "language": "zh-Hans",
+      "source_url": "https://book.qidian.com/",
+      "retrieved_date": "2026-11-02",
+      "encoding": "UTF-8",
+      "newline": "CRLF",
+      "sha256": "d66e48efab576599df460ee606808b8694dc740c6d3e2cfe0c809e92439058ea",
+      "bytes": 22656781,
+      "body_counts": {
+        "code_points_with_newlines": 7746775,
+        "code_points_lf_equivalent": 7602124,
+        "code_points_without_newlines": 7457473,
+        "han_characters": 6449387,
+        "english_words": 0,
+        "non_whitespace_characters": 7180480
+      },
+      "transformations": [
+        "第 1 卷至第 12 卷共 2,451 章完结全本精校清洗版（去广告水印、修复同音错别字与防屏蔽干扰符）",
+        "保留原著连载时的 4 处历史章号编号异常（1754 后回退至 1747~1754，及 1761/1834/1876 三处跳号），详见 provenance/2026-11-02/小说实体识别测试集_来源与难例说明.md"
       ]
     }
   ],
