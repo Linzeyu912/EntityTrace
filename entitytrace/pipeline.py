@@ -165,12 +165,13 @@ def metrics(store: Store, run_id: str, invocation: str | None = None) -> dict:
         result["request_seconds_sum"] += row["seconds"]
         stage["attempts"] += 1
         stage["seconds_sum"] += row["seconds"]
+        usage = json.loads(row["detail"]).get("usage", {})
+        if isinstance(usage, dict) and usage:
+            result["input_tokens_reported"] += usage.get("prompt_tokens", usage.get("input_tokens", 0)) or 0
+            result["output_tokens_reported"] += usage.get("completion_tokens", usage.get("output_tokens", 0)) or 0
         if row["status"] == "success":
             result["successful_requests"] += 1
             stage["success"] += 1
-            usage = json.loads(row["detail"]).get("usage", {})
-            result["input_tokens_reported"] += usage.get("prompt_tokens", usage.get("input_tokens", 0)) or 0
-            result["output_tokens_reported"] += usage.get("completion_tokens", usage.get("output_tokens", 0)) or 0
         else:
             result["failed_attempts"] += 1
             stage["failed"] += 1

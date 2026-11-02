@@ -229,6 +229,8 @@ class Models:
                 except (ValueError, KeyError, TypeError, ModelError) as exc:
                     error = f"{service_name} 返回格式不符合约定"
                     detail = {"validation_error": str(exc)[:160] if isinstance(exc, ModelError) else type(exc).__name__}
+                    if isinstance(raw, dict) and isinstance(raw.get("usage"), dict) and raw["usage"]:
+                        detail["usage"] = raw["usage"]
                     raw = None
                 finally:
                     with self.lock:

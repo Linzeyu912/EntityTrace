@@ -1023,5 +1023,64 @@ class CredentialDecouplingAndTemperatureTests(unittest.TestCase):
                 self.assertIn("TypeSafe/Jev", str(pipe_ctx.exception))
 
 
+    def test_failed_validation_request_usage_counted_in_metrics(self):
+        from entitytrace.pipeline import metrics
+
+        with tempfile.TemporaryDirectory() as d:
+            store = Store(Path(d) / "db.sqlite3")
+            try:
+                calls = []
+
+                def opener_fail_then_succeed(request, **kwargs):
+                    calls.append(1)
+                    if len(calls) == 1:
+                        body = {
+                            "choices": [{"finish_reason": "length", "message": {"content": "{\"entities\":"}}],
+                            "usage": {"prompt_tokens": 1000, "completion_tokens": 8000},
+                        }
+                    else:
+                        body = {
+                            "choices": [{"finish_reason": "stop", "message": {"content": "{\"ok\": true}"}}],
+                            "usage": {"prompt_tokens": 1000, "completion_tokens": 500},
+                        }
+                    return io.BytesIO(json.dumps(body).encode("utf-8"))
+
+                svc = Service("discovery", "https://api.deepseek.com", "deepseek-flash", "TEST_SECRET")
+                with patch("entitytrace.models.time.sleep", lambda _: None):
+                    model = Models(store, "run-fail-ok", "inv-1", {"discovery": svc}, attempts=3, opener=opener_fail_then_succeed)
+                    out, _ = model.generate("sys", {"x": 1}, "roster-c1-chapter", lambda v: None)
+                self.assertEqual(out, {"ok": True})
+                m = metrics(store, "run-fail-ok")
+                self.assertEqual(m["input_tokens_reported"], 2000)
+                self.assertEqual(m["output_tokens_reported"], 8500)
+                self.assertEqual(m["network_attempts"], 2)
+                self.assertEqual(m["successful_requests"], 1)
+                self.assertEqual(m["failed_attempts"], 1)
+                failed_rows = store.rows("SELECT detail FROM calls WHERE run_id=? AND status='failed'", ("run-fail-ok",))
+                self.assertEqual(len(failed_rows), 1)
+                failed_detail = json.loads(failed_rows[0]["detail"])
+                self.assertEqual(failed_detail["usage"], {"prompt_tokens": 1000, "completion_tokens": 8000})
+                self.assertIn("validation_error", failed_detail)
+
+                # 0 次失败时与历史结果完全一致
+                def opener_always_succeed(request, **kwargs):
+                    body = {
+                        "choices": [{"finish_reason": "stop", "message": {"content": "{\"ok\": 2}"}}],
+                        "usage": {"prompt_tokens": 600, "completion_tokens": 300},
+                    }
+                    return io.BytesIO(json.dumps(body).encode("utf-8"))
+
+                model_ok = Models(store, "run-zero-fail", "inv-2", {"discovery": svc}, attempts=3, opener=opener_always_succeed)
+                model_ok.generate("sys", {"x": 2}, "roster-c1-chapter", lambda v: None)
+                m_ok = metrics(store, "run-zero-fail")
+                self.assertEqual(m_ok["input_tokens_reported"], 600)
+                self.assertEqual(m_ok["output_tokens_reported"], 300)
+                self.assertEqual(m_ok["network_attempts"], 1)
+                self.assertEqual(m_ok["successful_requests"], 1)
+                self.assertEqual(m_ok["failed_attempts"], 0)
+            finally:
+                store.close()
+
+
 if __name__ == "__main__":
     unittest.main()
