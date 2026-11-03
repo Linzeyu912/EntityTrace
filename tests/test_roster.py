@@ -10,6 +10,7 @@ from entitytrace.discovery import ground_result, plan_tasks
 from entitytrace.models import ModelError
 from entitytrace.roster import (
     C1_MAX_TOKENS,
+    C2_ROW_MEMBER_CAP,
     VERSION,
     apply_c1_task_result,
     normalize_surface,
@@ -1236,6 +1237,297 @@ class RosterAlgorithmTests(unittest.TestCase):
             old_forb = {kb for (ka, kb) in cannot_merge_objs if ka == k} | {ka for (ka, kb) in cannot_merge_objs if kb == k}
             new_forb = cannot_merge_by_obj.get(k, set())
             self.assertEqual(new_forb, old_forb)
+
+    def test_c2_cross_batch_continuation_and_row_member_cap(self):
+        self.assertEqual(C2_ROW_MEMBER_CAP, 100)
+        # 构造 130 个不同折叠行的同一候选簇（分 3 批：60 + 60 + 10）
+        lines = []
+        for idx in range(1, 131):
+            alias = f"云山叟{idx:03d}"
+            lines.append(f"第{idx}章\n沈青云（号{alias}）在此处驻足。\n")
+        text = "".join(lines)
+        path = self.root / "c2_batches.txt"
+        path.write_bytes(text.encode("utf-8"))
+        source = import_text(self.store, path)
+        headings = []
+        pos = 0
+        for idx in range(1, 131):
+            title = f"第{idx}章"
+            start = text.index(title, pos)
+            headings.append({"start": start, "end": start + len(title), "title": title, "kind": "chapter"})
+            pos = start + len(title)
+        _, chapters = build_chapters(source, headings)
+        tasks = plan_tasks(source, chapters, 9000)
+
+        def _setup_run(run_id: str) -> None:
+            self.store.execute("INSERT INTO runs VALUES(?,?,?,?,?,?)", (run_id, source["id"], "{}", "{}", "now", "now"))
+            for ch in chapters:
+                self.store.put(run_id, "chapter", ch)
+            for idx, t in enumerate(tasks, start=1):
+                alias = f"云山叟{idx:03d}"
+                u = t["units"][0]
+                disc = {
+                    "mentions": [
+                        {"text": "沈青云", "kind": "person", "refs": [u["id"]]},
+                        {"text": alias, "kind": "person", "refs": [u["id"]]},
+                    ],
+                    "links": [],
+                }
+                grounded = ground_result(source, t, disc, f"req_disc_{run_id}_{idx}")
+                records = [
+                    (kind, rec)
+                    for kind, key in [("mention", "mentions"), ("observation", "observations"), ("review", "reviews"), ("link", "links")]
+                    for rec in grounded[key]
+                ]
+                self.store.finish_task(run_id, t, {"request_id": f"req_disc_{run_id}_{idx}"}, records)
+
+        def handle_c1_130(state, n):
+            u = state["units"][0]
+            alias = next(r["surface"] for r in state["surfaces"] if r["surface"] != "沈青云")
+            return {
+                "entities": [{
+                    "local_id": "e1",
+                    "name": alias,
+                    "kind": "person",
+                    "surfaces": [
+                        {"surface": "沈青云", "surface_type": "proper_name"},
+                        {"surface": alias, "surface_type": "proper_name"},
+                    ],
+                    "evidence_ref": u["id"],
+                }],
+                "assignments": [],
+                "not_entity": [],
+            }, f"c1_{n}"
+
+        # 1) 3 批同名续接成 1 组，且跨批无约束
+        _setup_run("run_3batch_merge")
+        c2_rev_calls_1 = []
+
+        def handle_c2_rev_same_name(state, n):
+            c2_rev_calls_1.append(state)
+            return {
+                "groups": [{
+                    "group_id": "g1",
+                    "name": "沈青云",
+                    "kind": "person",
+                    "row_ids": [r["row_id"] for r in state["rows"]],
+                    "member_ids": [],
+                    "reason": "同指沈青云",
+                }],
+                "unresolved_row_ids": [],
+                "unresolved_member_ids": [],
+            }, f"c2_rev_{n}"
+
+        models_1 = ScriptedRosterModels({
+            "roster-c1": handle_c1_130,
+            "roster-c2-review": handle_c2_rev_same_name,
+            "roster-c2-propose": lambda state, n: ({"proposals": []}, f"prop_{n}"),
+        })
+        out1 = resolve_roster(self.store, models_1, source, "run_3batch_merge", concurrency=1, log=lambda _: None)
+        self.assertTrue(out1["complete"])
+        self.assertEqual(len(c2_rev_calls_1), 3)
+        roster_out_1 = self.store.records("run_3batch_merge", "roster_output")[0]
+        self.assertEqual(len(roster_out_1["entities"]), 1)
+        self.assertEqual(roster_out_1["entities"][0]["mention_count"], 260)
+
+        # 2) 先前同名组 >=2 个时不续接；本批同名组 >=2 个时不续接；粗类不兼容（person 对 place）时不续接；
+        #    同批拆开的两组之间有约束（C2 补合并被拦截），跨批且未同批出现的组之间无约束（可经 C2 补合并合拢）
+        _setup_run("run_guard_and_constraints")
+        rev_batch_seq = {"idx": 0}
+
+        def handle_c2_rev_complex(state, n):
+            b = rev_batch_seq["idx"]
+            rev_batch_seq["idx"] += 1
+            rids = [r["row_id"] for r in state["rows"]]
+            if b == 0:
+                # 第 1 批：输出两个同名组 "同名甲"（使得先前同名组 >= 2），以及 1 个 "沈青云" (person) 和 1 个被同批拆开的 "沈青河" (person)
+                return {
+                    "groups": [
+                        {"group_id": "g1", "name": "同名甲", "kind": "person", "row_ids": [rids[0]], "member_ids": [], "reason": "甲1"},
+                        {"group_id": "g2", "name": "同名甲", "kind": "person", "row_ids": [rids[1]], "member_ids": [], "reason": "甲2"},
+                        {"group_id": "g3", "name": "沈青云", "kind": "person", "row_ids": rids[2:30], "member_ids": [], "reason": "青云"},
+                        {"group_id": "g4", "name": "沈青河", "kind": "person", "row_ids": rids[30:], "member_ids": [], "reason": "同批拆开"},
+                    ],
+                    "unresolved_row_ids": [],
+                    "unresolved_member_ids": [],
+                }, f"c2_rev_c_{n}"
+            if b == 1:
+                # 第 2 批：
+                # - "同名甲" 因先前同名组有 2 个，不续接；
+                # - "本批双名" 在本批出现 2 次，不续接；
+                # - "沈青云" 但 kind="place"（与先前 person 不兼容），不续接；
+                # - "跨批别称"（与第 1 批从未同批出现，无跨批约束，后续可由 C2 补合并合入 "沈青云"）
+                return {
+                    "groups": [
+                        {"group_id": "g1", "name": "同名甲", "kind": "person", "row_ids": [rids[0]], "member_ids": [], "reason": "先前有2个同名"},
+                        {"group_id": "g2", "name": "本批双名", "kind": "person", "row_ids": [rids[1]], "member_ids": [], "reason": "本批重复1"},
+                        {"group_id": "g3", "name": "本批双名", "kind": "person", "row_ids": [rids[2]], "member_ids": [], "reason": "本批重复2"},
+                        {"group_id": "g4", "name": "沈青云", "kind": "place", "row_ids": [rids[3]], "member_ids": [], "reason": "粗类不兼容"},
+                        {"group_id": "g5", "name": "跨批别称", "kind": "person", "row_ids": rids[4:], "member_ids": [], "reason": "跨批独立组"},
+                    ],
+                    "unresolved_row_ids": [],
+                    "unresolved_member_ids": [],
+                }, f"c2_rev_c_{n}"
+            # 第 3 批：输出唯一的 "沈青云" (person)，由于此时先前名为 "沈青云" 的组有 2 个（b0 的 person 与 b1 的 place），len(prior_matches)==2 不续接
+            return {
+                "groups": [
+                    {"group_id": "g1", "name": "沈青云", "kind": "person", "row_ids": rids, "member_ids": [], "reason": "第三批"},
+                ],
+                "unresolved_row_ids": [],
+                "unresolved_member_ids": [],
+            }, f"c2_rev_c_{n}"
+
+        propose_seen = []
+
+        def handle_c2_propose_check_constraints(state, n):
+            if state["kind"] != "person":
+                return {"proposals": []}, f"prop_c_{n}"
+            entries = state["entries"]
+            propose_seen.extend(entries)
+            # 找出第 1 批的 "沈青云"（28行=56提及）、第 1 批同批拆开的 "沈青河"（30行=60提及）、第 2 批跨批的 "跨批别称"（56行=112提及）
+            e_qingyun = next(e["entry_id"] for e in entries if e["mention_count"] == 56)
+            e_qinghe = next(e["entry_id"] for e in entries if e["mention_count"] == 60)
+            e_cross = next(e["entry_id"] for e in entries if e["mention_count"] == 112)
+            # 同时提议合并 (e_qingyun, e_qinghe) [同批拆开，应被不可合并约束拦截] 与 (e_qingyun, e_cross) [跨批未同批出现，无约束应放行]
+            return {
+                "proposals": [
+                    {"left": e_qingyun, "right": e_qinghe, "reason": "同批拆开测试拦截"},
+                    {"left": e_qingyun, "right": e_cross, "reason": "跨批无约束测试放行"},
+                ]
+            }, f"prop_c_{n}"
+
+        verify_calls = []
+
+        def handle_c2_verify_check(state, n):
+            verify_calls.append(state)
+            return {"verdict": "same", "reason": "确认为同一人"}, f"ver_c_{n}"
+
+        models_2 = ScriptedRosterModels({
+            "roster-c1": handle_c1_130,
+            "roster-c2-review": handle_c2_rev_complex,
+            "roster-c2-propose": handle_c2_propose_check_constraints,
+            "roster-c2-verify": handle_c2_verify_check,
+        })
+        out2 = resolve_roster(self.store, models_2, source, "run_guard_and_constraints", concurrency=1, log=lambda _: None)
+        self.assertTrue(out2["complete"])
+        # 同批拆开的 (e_qingyun, e_qinghe) 在生成 verify 任务前已被 cannot_merge_objs 过滤，只有跨批的 (e_qingyun, e_cross) 进入 verify 并合并為 56+112=168 提及
+        self.assertEqual(len(verify_calls), 1)
+        roster_out_2 = self.store.records("run_guard_and_constraints", "roster_output")[0]
+        counts_2 = sorted(e["mention_count"] for e in roster_out_2["entities"])
+        # 10个组的提及数：b0甲1(2), b0甲2(2), b1甲(2), b1双1(2), b1双2(2), b1place(2), b2青云(20), b0青河(60), 以及合并后的 b0青云+b1跨批(56+112=168)
+        self.assertEqual(counts_2, [2, 2, 2, 2, 2, 2, 20, 60, 168])
+
+        # 3) 150 个成员的行只展示 100 个，取样确定且含首尾，带 members_total；未展示的成员随整行归属；已展示的成员仍可经 member_ids 单独拆出
+        lines_cap = []
+        for idx in range(1, 152):
+            if idx == 151:
+                lines_cap.append(f"第{idx}章\n陆云川与云川君在此练剑。\n")
+            else:
+                lines_cap.append(f"第{idx}章\n陆云川在此练剑。\n")
+        text_cap = "".join(lines_cap)
+        path_cap = self.root / "cap150.txt"
+        path_cap.write_bytes(text_cap.encode("utf-8"))
+        source_cap = import_text(self.store, path_cap)
+        headings_cap = []
+        pos = 0
+        for idx in range(1, 152):
+            title = f"第{idx}章"
+            start = text_cap.index(title, pos)
+            headings_cap.append({"start": start, "end": start + len(title), "title": title, "kind": "chapter"})
+            pos = start + len(title)
+        _, chs_cap = build_chapters(source_cap, headings_cap)
+        run_cap = "run_cap_150"
+        self.store.execute("INSERT INTO runs VALUES(?,?,?,?,?,?)", (run_cap, source_cap["id"], "{}", "{}", "now", "now"))
+        for ch in chs_cap:
+            self.store.put(run_cap, "chapter", ch)
+        tasks_cap = plan_tasks(source_cap, chs_cap, 9000)
+        for idx, t in enumerate(tasks_cap, start=1):
+            u = t["units"][0]
+            ms = [{"text": "陆云川", "kind": "person", "refs": [u["id"]]}]
+            if idx == 151:
+                ms.append({"text": "云川君", "kind": "person", "refs": [u["id"]]})
+            disc = {"mentions": ms, "links": []}
+            grounded = ground_result(source_cap, t, disc, "req_" + t["id"])
+            recs = [
+                (kind, rec)
+                for kind, key in [("mention", "mentions"), ("observation", "observations"), ("review", "reviews"), ("link", "links")]
+                for rec in grounded[key]
+            ]
+            self.store.finish_task(run_cap, t, {"request_id": "req_" + t["id"]}, recs)
+
+        def handle_c1_cap(state, n):
+            uid = state["units"][0]["id"]
+            if state["chapter_title"] == "第151章":
+                # 第 1..150 章各产生 1 个只含“陆云川”的对象（折叠为 r1 的 150 个成员），第 151 章产生 1 个含“陆云川”与“云川君”的对象（r2，1 个成员）
+                return {
+                    "entities": [{
+                        "local_id": "e1",
+                        "name": "云川君",
+                        "kind": "person",
+                        "surfaces": [
+                            {"surface": "陆云川", "surface_type": "proper_name"},
+                            {"surface": "云川君", "surface_type": "proper_name"},
+                        ],
+                        "evidence_ref": uid,
+                    }],
+                    "assignments": [],
+                    "not_entity": [],
+                }, f"c1_cap_{n}"
+            return {
+                "entities": [{
+                    "local_id": "e1",
+                    "name": "陆云川",
+                    "kind": "person",
+                    "surfaces": [{"surface": "陆云川", "surface_type": "proper_name"}],
+                    "evidence_ref": uid,
+                }],
+                "assignments": [],
+                "not_entity": [],
+            }, f"c1_cap_{n}"
+
+        seen_c2_rows = []
+
+        def handle_c2_rev_cap(state, n):
+            rows = state["rows"]
+            seen_c2_rows.extend(rows)
+            r1 = next(r for r in rows if r.get("members_total") == 150)
+            r2 = next(r for r in rows if r["row_id"] != r1["row_id"])
+            # 把 r1 中最后 1 个展示的成员经 member_ids 单独拆到 g2，其余未展示与已展示成员随 r1 归入 g1
+            last_mid = r1["members"][-1]["member_id"]
+            return {
+                "groups": [
+                    {"group_id": "g1", "name": "陆云川", "kind": "person", "row_ids": [r1["row_id"]], "member_ids": [], "reason": "主群"},
+                    {"group_id": "g2", "name": "云川君", "kind": "person", "row_ids": [r2["row_id"]], "member_ids": [last_mid], "reason": "拆出1个展示成员"},
+                ],
+                "unresolved_row_ids": [],
+                "unresolved_member_ids": [],
+            }, f"c2_rev_cap_{n}"
+
+        models_cap = ScriptedRosterModels({
+            "roster-c1": handle_c1_cap,
+            "roster-c2-review": handle_c2_rev_cap,
+            "roster-c2-propose": lambda state, n: ({"proposals": []}, f"prop_cap_{n}"),
+        })
+        out_cap = resolve_roster(self.store, models_cap, source_cap, run_cap, concurrency=1, log=lambda _: None)
+        self.assertTrue(out_cap["complete"])
+        r1_row = next(r for r in seen_c2_rows if r.get("members_total") == 150)
+        r2_row = next(r for r in seen_c2_rows if r["row_id"] != r1_row["row_id"])
+        self.assertEqual(r1_row["members_total"], 150)
+        self.assertNotIn("members_total", r2_row)
+        self.assertEqual(len(r1_row["members"]), 100)
+        rid_prefix = r1_row["row_id"]
+        # 验证首尾成员均被包含且顺序与原 member_id 编号递增一致
+        mids_num = [int(m["member_id"].split("_m")[1]) for m in r1_row["members"]]
+        self.assertEqual(mids_num, sorted(mids_num))
+        self.assertEqual(len(set(mids_num)), 100)
+        ch_id_to_ord = {c["id"]: c["ordinal"] for c in chs_cap}
+        member_ch_ords = [ch_id_to_ord[m["chapter_id"]] for m in r1_row["members"]]
+        self.assertIn(1, member_ch_ords)
+        self.assertIn(150, member_ch_ords)
+        roster_cap = self.store.records(run_cap, "roster_output")[0]
+        cap_counts = sorted(e["mention_count"] for e in roster_cap["entities"])
+        # 150 个 r1 成员中 1 个被拆入 g2（连同 r2 的 2 处提及共 3 处提及），其余 149 个（含 50 个未展示成员）全部随整行归属 g1
+        self.assertEqual(cap_counts, [3, 149])
 
     def test_roster_module_does_not_import_gold(self):
         source = (ROOT / "entitytrace/roster.py").read_text(encoding="utf-8")
