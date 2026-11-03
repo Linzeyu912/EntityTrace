@@ -1,0 +1,4348 @@
+{
+  "book": "07_中文长篇_封神演义_100回",
+  "source_path": "test/text-library/texts/07_中文长篇_封神演义_100回.txt",
+  "source_sha256": "7375fd1ec43cb7e6a532eca4dff870c332af350a8c1eb43837684db80701de07",
+  "chapters_version": "47275f17275e4d7818b4db4f7a0a9f5729429d47ac019faabceb23f0e80aadd1",
+  "guideline": "0.14a-T1-T5",
+  "created_at": "2026-11-03T12:00:00+08:00",
+  "labeler": "agent:claude-opus-4-6",
+  "human_review": "pending",
+  "entities": [
+    {
+      "gold_id": "G_PER_001",
+      "canonical_name": "姜子牙",
+      "entity_type": "person",
+      "sub_type": "deity_immortal",
+      "aliases": [
+        "姜子牙",
+        "姜尚",
+        "子牙",
+        "姜丞相",
+        "飞熊",
+        "尚父",
+        "吕望"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 24,
+          "start": 138469,
+          "end": 138471,
+          "text": "姜尚"
+        }
+      ],
+      "note": "第24回渭水垂钓受文王聘请，名尚字子牙，道号飞熊，周室丞相",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_002",
+      "canonical_name": "纣王",
+      "entity_type": "person",
+      "sub_type": "monarch_noble",
+      "aliases": [
+        "纣王",
+        "寿王",
+        "殷受",
+        "商王",
+        "天子"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 1,
+          "start": 1247,
+          "end": 1249,
+          "text": "纣王"
+        }
+      ],
+      "note": "第1回帝乙第三子寿王继位为天子，名曰纣王，都朝歌",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_003",
+      "canonical_name": "姬昌",
+      "entity_type": "person",
+      "sub_type": "monarch_noble",
+      "aliases": [
+        "姬昌",
+        "西伯侯",
+        "文王",
+        "周文王",
+        "姬伯"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 24,
+          "start": 131366,
+          "end": 131368,
+          "text": "文王"
+        }
+      ],
+      "note": "第24回西伯侯姬昌访贤聘请姜子牙，尊称文王",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_004",
+      "canonical_name": "姬发",
+      "entity_type": "person",
+      "sub_type": "monarch_noble",
+      "aliases": [
+        "姬发",
+        "武王",
+        "周武王"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 219501,
+          "end": 219503,
+          "text": "武王"
+        }
+      ],
+      "note": "第40回姬发袭父位称武王，拜子牙为相父",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_005",
+      "canonical_name": "哪吒",
+      "entity_type": "person",
+      "sub_type": "deity_immortal",
+      "aliases": [
+        "哪吒",
+        "灵珠子",
+        "三公子",
+        "三太子"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 12,
+          "start": 66979,
+          "end": 66981,
+          "text": "哪吒"
+        }
+      ],
+      "note": "第12回灵珠子投胎陈塘关李靖家，太乙真人赐名哪吒",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_006",
+      "canonical_name": "杨戬",
+      "entity_type": "person",
+      "sub_type": "deity_immortal",
+      "aliases": [
+        "杨戬",
+        "二郎"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 225118,
+          "end": 225120,
+          "text": "杨戬"
+        }
+      ],
+      "note": "第40回玉泉山金霞洞玉鼎真人门下杨戬下山助子牙破魔家四将",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_007",
+      "canonical_name": "雷震子",
+      "entity_type": "person",
+      "sub_type": "deity_immortal",
+      "aliases": [
+        "雷震子"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 10,
+          "start": 56615,
+          "end": 56618,
+          "text": "雷震子"
+        }
+      ],
+      "note": "第10回文王百子，终南山云中子收为徒弟赐名雷震子",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_008",
+      "canonical_name": "黄飞虎",
+      "entity_type": "person",
+      "sub_type": "official_general",
+      "aliases": [
+        "黄飞虎",
+        "武成王",
+        "镇国武成王"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 8,
+          "start": 41100,
+          "end": 41103,
+          "text": "黄飞虎"
+        }
+      ],
+      "note": "第8回商朝镇国武成王黄飞虎，后反商归周",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_009",
+      "canonical_name": "黄天化",
+      "entity_type": "person",
+      "sub_type": "deity_immortal",
+      "aliases": [
+        "黄天化",
+        "丙灵公"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 31,
+          "start": 175525,
+          "end": 175528,
+          "text": "黄天化"
+        }
+      ],
+      "note": "第31回青峰山紫阳洞清虚道德真君徒弟、黄飞虎长子黄天化下山",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_010",
+      "canonical_name": "土行孙",
+      "entity_type": "person",
+      "sub_type": "deity_immortal",
+      "aliases": [
+        "土行孙"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 56,
+          "start": 315783,
+          "end": 315786,
+          "text": "土行孙"
+        }
+      ],
+      "note": "第56回夹龙山飞龙洞惧留孙弟子土行孙归周娶邓婵玉",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_011",
+      "canonical_name": "邓婵玉",
+      "entity_type": "person",
+      "sub_type": "official_general",
+      "aliases": [
+        "邓婵玉"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 56,
+          "start": 318463,
+          "end": 318466,
+          "text": "邓婵玉"
+        }
+      ],
+      "note": "第56回三山关总兵邓九公之女邓婵玉，善发五光石，嫁土行孙",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_012",
+      "canonical_name": "邓九公",
+      "entity_type": "person",
+      "sub_type": "official_general",
+      "aliases": [
+        "邓九公"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 56,
+          "start": 315170,
+          "end": 315173,
+          "text": "邓九公"
+        }
+      ],
+      "note": "第56回三山关总兵邓九公受子牙设计招降归周",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_013",
+      "canonical_name": "闻仲",
+      "entity_type": "person",
+      "sub_type": "official_general",
+      "aliases": [
+        "闻仲",
+        "闻太师",
+        "太师"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 1,
+          "start": 1371,
+          "end": 1373,
+          "text": "闻仲"
+        }
+      ],
+      "note": "第1回帝乙托孤太师闻仲，金灵圣母门下，佐商征讨",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_014",
+      "canonical_name": "申公豹",
+      "entity_type": "person",
+      "sub_type": "deity_immortal",
+      "aliases": [
+        "申公豹"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 37,
+          "start": 203354,
+          "end": 203357,
+          "text": "申公豹"
+        }
+      ],
+      "note": "第37回子牙同门师弟申公豹逆天保纣，游说群仙阻周",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_015",
+      "canonical_name": "妲己",
+      "entity_type": "person",
+      "sub_type": "monarch_noble",
+      "aliases": [
+        "妲己",
+        "苏妲己",
+        "苏氏"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 8,
+          "start": 39611,
+          "end": 39613,
+          "text": "妲己"
+        }
+      ],
+      "note": "第8回冀州侯苏护之女妲己（九尾狐狸精附体），居寿仙宫惑乱纣王",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_016",
+      "canonical_name": "殷郊",
+      "entity_type": "person",
+      "sub_type": "monarch_noble",
+      "aliases": [
+        "殷郊",
+        "东宫太子",
+        "太子"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 8,
+          "start": 39278,
+          "end": 39280,
+          "text": "殷郊"
+        }
+      ],
+      "note": "第8回纣王长子东宫太子殷郊，救母诛姜环，后拜广成子为师",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_017",
+      "canonical_name": "殷洪",
+      "entity_type": "person",
+      "sub_type": "monarch_noble",
+      "aliases": [
+        "殷洪",
+        "二殿下"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 8,
+          "start": 39284,
+          "end": 39286,
+          "text": "殷洪"
+        }
+      ],
+      "note": "第8回纣王次子殷洪，与兄殷郊避难出逃，后拜赤精子为师",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_018",
+      "canonical_name": "姜皇后",
+      "entity_type": "person",
+      "sub_type": "monarch_noble",
+      "aliases": [
+        "姜皇后",
+        "姜后",
+        "姜氏",
+        "国母"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 8,
+          "start": 39135,
+          "end": 39137,
+          "text": "姜后"
+        }
+      ],
+      "note": "第8回纣王中宫元配姜皇后，遭妲己与费仲设计陷害屈死西宫",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_019",
+      "canonical_name": "黄贵妃",
+      "entity_type": "person",
+      "sub_type": "monarch_noble",
+      "aliases": [
+        "黄贵妃",
+        "黄妃"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 8,
+          "start": 39118,
+          "end": 39120,
+          "text": "黄妃"
+        }
+      ],
+      "note": "第8回黄飞虎之妹西宫黄贵妃，护佑殷郊殷洪",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_020",
+      "canonical_name": "杨贵妃",
+      "entity_type": "person",
+      "sub_type": "monarch_noble",
+      "aliases": [
+        "杨贵妃",
+        "杨妃"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 8,
+          "start": 40437,
+          "end": 40440,
+          "text": "杨贵妃"
+        }
+      ],
+      "note": "第8回馨庆宫杨贵妃，感念姜后恩德藏匿二位殿下",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_021",
+      "canonical_name": "商容",
+      "entity_type": "person",
+      "sub_type": "official_general",
+      "aliases": [
+        "商容",
+        "老丞相"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 8,
+          "start": 47162,
+          "end": 47164,
+          "text": "商容"
+        }
+      ],
+      "note": "第8回商朝致仕老丞相商容，在九间殿死谏纣王",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_022",
+      "canonical_name": "比干",
+      "entity_type": "person",
+      "sub_type": "official_general",
+      "aliases": [
+        "比干",
+        "亚相"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 2,
+          "start": 5266,
+          "end": 5268,
+          "text": "比干"
+        }
+      ],
+      "note": "第2回商朝亚相比干，忠心辅政",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_023",
+      "canonical_name": "费仲",
+      "entity_type": "person",
+      "sub_type": "official_general",
+      "aliases": [
+        "费仲"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 1,
+          "start": 3763,
+          "end": 3765,
+          "text": "费仲"
+        }
+      ],
+      "note": "第1回商朝佞臣中谏大夫费仲",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_024",
+      "canonical_name": "尤浑",
+      "entity_type": "person",
+      "sub_type": "official_general",
+      "aliases": [
+        "尤浑"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 1,
+          "start": 3804,
+          "end": 3806,
+          "text": "尤浑"
+        }
+      ],
+      "note": "第1回商朝佞臣尤浑，与费仲同党",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_025",
+      "canonical_name": "方弼",
+      "entity_type": "person",
+      "sub_type": "official_general",
+      "aliases": [
+        "方弼"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 8,
+          "start": 42262,
+          "end": 42264,
+          "text": "方弼"
+        }
+      ],
+      "note": "第8回镇殿大将军方弼，背负殷郊殷洪冲出朝歌反商",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_026",
+      "canonical_name": "方相",
+      "entity_type": "person",
+      "sub_type": "official_general",
+      "aliases": [
+        "方相"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 8,
+          "start": 42265,
+          "end": 42267,
+          "text": "方相"
+        }
+      ],
+      "note": "第8回镇殿将军方相，与兄方弼保二殿下出朝歌",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_027",
+      "canonical_name": "李靖",
+      "entity_type": "person",
+      "sub_type": "official_general",
+      "aliases": [
+        "李靖"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 12,
+          "start": 65940,
+          "end": 65942,
+          "text": "李靖"
+        }
+      ],
+      "note": "第12回陈塘关总兵李靖，度厄真人弟子，金吒木吒哪吒之父",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_028",
+      "canonical_name": "金吒",
+      "entity_type": "person",
+      "sub_type": "deity_immortal",
+      "aliases": [
+        "金吒"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 12,
+          "start": 65908,
+          "end": 65910,
+          "text": "金吒"
+        }
+      ],
+      "note": "第12回李靖长子金吒，五龙山云霄洞文殊广法天尊弟子",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_029",
+      "canonical_name": "木吒",
+      "entity_type": "person",
+      "sub_type": "deity_immortal",
+      "aliases": [
+        "木吒"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 12,
+          "start": 65913,
+          "end": 65915,
+          "text": "木吒"
+        }
+      ],
+      "note": "第12回李靖次子木吒，九宫山白鹤洞普贤真人弟子",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_030",
+      "canonical_name": "元始天尊",
+      "entity_type": "person",
+      "sub_type": "deity_immortal",
+      "aliases": [
+        "元始天尊",
+        "元始",
+        "掌教天尊"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 9,
+          "start": 50673,
+          "end": 50677,
+          "text": "元始天尊"
+        }
+      ],
+      "note": "第9回昆仑山玉虚宫阐教掌教圣人元始天尊",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_031",
+      "canonical_name": "老子",
+      "entity_type": "person",
+      "sub_type": "deity_immortal",
+      "aliases": [
+        "老子",
+        "太上老君",
+        "玄都"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 50,
+          "start": 288147,
+          "end": 288149,
+          "text": "老子"
+        }
+      ],
+      "note": "第50回玄都八景宫太上老君（老子），元始天尊道兄，骑青牛破黄河阵与诛仙阵",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_032",
+      "canonical_name": "通天教主",
+      "entity_type": "person",
+      "sub_type": "deity_immortal",
+      "aliases": [
+        "通天教主"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 72,
+          "start": 421075,
+          "end": 421079,
+          "text": "通天教主"
+        }
+      ],
+      "note": "第72回碧游宫截教掌教圣人通天教主",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_033",
+      "canonical_name": "接引道人",
+      "entity_type": "person",
+      "sub_type": "deity_immortal",
+      "aliases": [
+        "接引道人",
+        "西方教主"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 65,
+          "start": 377057,
+          "end": 377061,
+          "text": "接引道人"
+        }
+      ],
+      "note": "第65回西方教主接引道人，借青莲宝色旗并共破诛仙阵与万仙阵",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_034",
+      "canonical_name": "准提道人",
+      "entity_type": "person",
+      "sub_type": "deity_immortal",
+      "aliases": [
+        "准提道人"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 61,
+          "start": 352405,
+          "end": 352409,
+          "text": "准提道人"
+        }
+      ],
+      "note": "第61回西方教二教主准提道人，手执七宝妙树收西方有缘",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_035",
+      "canonical_name": "女娲娘娘",
+      "entity_type": "person",
+      "sub_type": "deity_immortal",
+      "aliases": [
+        "女娲娘娘",
+        "女娲"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 1,
+          "start": 1782,
+          "end": 1786,
+          "text": "女娲娘娘"
+        }
+      ],
+      "note": "第1回上古正神女娲娘娘，后以山河社稷图助杨戬收袁洪",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_036",
+      "canonical_name": "燃灯道人",
+      "entity_type": "person",
+      "sub_type": "deity_immortal",
+      "aliases": [
+        "燃灯道人",
+        "燃灯"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 14,
+          "start": 83852,
+          "end": 83856,
+          "text": "燃灯道人"
+        }
+      ],
+      "note": "第14回灵鹫山元觉洞燃灯道人，阐教副教主级仙人，后得定海珠",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_037",
+      "canonical_name": "陆压",
+      "entity_type": "person",
+      "sub_type": "deity_immortal",
+      "aliases": [
+        "陆压",
+        "陆压道人"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 48,
+          "start": 270925,
+          "end": 270927,
+          "text": "陆压"
+        }
+      ],
+      "note": "第48回西昆仑散仙陆压道人，以钉头七箭书助子牙射死赵公明，授斩仙飞刀",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_038",
+      "canonical_name": "云中子",
+      "entity_type": "person",
+      "sub_type": "deity_immortal",
+      "aliases": [
+        "云中子"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 5,
+          "start": 22416,
+          "end": 22419,
+          "text": "云中子"
+        }
+      ],
+      "note": "第5回终南山玉柱洞炼气士云中子，进木剑除妖、收雷震子",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_039",
+      "canonical_name": "南极仙翁",
+      "entity_type": "person",
+      "sub_type": "deity_immortal",
+      "aliases": [
+        "南极仙翁"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 15,
+          "start": 84686,
+          "end": 84690,
+          "text": "南极仙翁"
+        }
+      ],
+      "note": "第15回昆仑山玉虚宫仙人南极仙翁",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_040",
+      "canonical_name": "广成子",
+      "entity_type": "person",
+      "sub_type": "deity_immortal",
+      "aliases": [
+        "广成子"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 72,
+          "start": 418635,
+          "end": 418638,
+          "text": "广成子"
+        }
+      ],
+      "note": "第72回九仙山桃源洞广成子，玉虚十二仙之首，三谒碧游宫",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_041",
+      "canonical_name": "赤精子",
+      "entity_type": "person",
+      "sub_type": "deity_immortal",
+      "aliases": [
+        "赤精子"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 9,
+          "start": 50629,
+          "end": 50632,
+          "text": "赤精子"
+        }
+      ],
+      "note": "第9回太华山云霄洞赤精子，救殷洪授阴阳镜",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_042",
+      "canonical_name": "太乙真人",
+      "entity_type": "person",
+      "sub_type": "deity_immortal",
+      "aliases": [
+        "太乙真人"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 11,
+          "start": 65527,
+          "end": 65531,
+          "text": "太乙真人"
+        }
+      ],
+      "note": "第11回乾元山金光洞太乙真人，哪吒之师",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_043",
+      "canonical_name": "玉鼎真人",
+      "entity_type": "person",
+      "sub_type": "deity_immortal",
+      "aliases": [
+        "玉鼎真人"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 225085,
+          "end": 225089,
+          "text": "玉鼎真人"
+        }
+      ],
+      "note": "第40回玉泉山金霞洞玉鼎真人，杨戬之师",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_044",
+      "canonical_name": "惧留孙",
+      "entity_type": "person",
+      "sub_type": "deity_immortal",
+      "aliases": [
+        "惧留孙"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 44,
+          "start": 251597,
+          "end": 251600,
+          "text": "惧留孙"
+        }
+      ],
+      "note": "第44回夹龙山飞龙洞惧留孙，土行孙之师，执掌捆仙绳",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_045",
+      "canonical_name": "文殊广法天尊",
+      "entity_type": "person",
+      "sub_type": "deity_immortal",
+      "aliases": [
+        "文殊广法天尊"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 12,
+          "start": 66911,
+          "end": 66917,
+          "text": "文殊广法天尊"
+        }
+      ],
+      "note": "第12回五龙山云霄洞文殊广法天尊，金吒之师，执掌遁龙桩",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_046",
+      "canonical_name": "普贤真人",
+      "entity_type": "person",
+      "sub_type": "deity_immortal",
+      "aliases": [
+        "普贤真人"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 12,
+          "start": 66932,
+          "end": 66936,
+          "text": "普贤真人"
+        }
+      ],
+      "note": "第12回九宫山白鹤洞普贤真人，木吒之师，执掌吴钩剑",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_047",
+      "canonical_name": "慈航道人",
+      "entity_type": "person",
+      "sub_type": "deity_immortal",
+      "aliases": [
+        "慈航道人"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 44,
+          "start": 251697,
+          "end": 251701,
+          "text": "慈航道人"
+        }
+      ],
+      "note": "第44回普陀山落伽洞慈航道人，执掌清净琉璃瓶",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_048",
+      "canonical_name": "黄龙真人",
+      "entity_type": "person",
+      "sub_type": "deity_immortal",
+      "aliases": [
+        "黄龙真人"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 44,
+          "start": 251220,
+          "end": 251224,
+          "text": "黄龙真人"
+        }
+      ],
+      "note": "第44回二仙山麻姑洞黄龙真人",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_049",
+      "canonical_name": "道行天尊",
+      "entity_type": "person",
+      "sub_type": "deity_immortal",
+      "aliases": [
+        "道行天尊"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 224596,
+          "end": 224600,
+          "text": "道行天尊"
+        }
+      ],
+      "note": "第40回金庭山玉屋洞道行天尊，韩毒龙薛恶虎韦护之师",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_050",
+      "canonical_name": "清虚道德真君",
+      "entity_type": "person",
+      "sub_type": "deity_immortal",
+      "aliases": [
+        "清虚道德真君",
+        "道德真君"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 18,
+          "start": 100723,
+          "end": 100729,
+          "text": "清虚道德真君"
+        }
+      ],
+      "note": "第18回青峰山紫阳洞清虚道德真君，杨任与黄天化之师",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_051",
+      "canonical_name": "赵公明",
+      "entity_type": "person",
+      "sub_type": "deity_immortal",
+      "aliases": [
+        "赵公明",
+        "公明"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 46,
+          "start": 263256,
+          "end": 263259,
+          "text": "赵公明"
+        }
+      ],
+      "note": "第46回峨嵋山罗浮洞赵公明，跨黑虎执定海珠助闻仲伐西岐",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_052",
+      "canonical_name": "云霄",
+      "entity_type": "person",
+      "sub_type": "deity_immortal",
+      "aliases": [
+        "云霄",
+        "云霄娘娘"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 47,
+          "start": 269115,
+          "end": 269117,
+          "text": "云霄"
+        }
+      ],
+      "note": "第47回三仙岛云霄娘娘，赵公明之妹，执掌混元金斗与金蛟剪",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_053",
+      "canonical_name": "琼霄",
+      "entity_type": "person",
+      "sub_type": "deity_immortal",
+      "aliases": [
+        "琼霄",
+        "琼霄娘娘"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 49,
+          "start": 280077,
+          "end": 280079,
+          "text": "琼霄"
+        }
+      ],
+      "note": "第49回三仙岛琼霄娘娘，与姊云霄、妹碧霄共摆九曲黄河阵",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_054",
+      "canonical_name": "碧霄",
+      "entity_type": "person",
+      "sub_type": "deity_immortal",
+      "aliases": [
+        "碧霄",
+        "碧霄娘娘"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 47,
+          "start": 269720,
+          "end": 269722,
+          "text": "碧霄"
+        }
+      ],
+      "note": "第47回三仙岛碧霄娘娘，力劝云霄借金蛟剪与兄赵公明",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_055",
+      "canonical_name": "多宝道人",
+      "entity_type": "person",
+      "sub_type": "deity_immortal",
+      "aliases": [
+        "多宝道人"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 72,
+          "start": 421589,
+          "end": 421593,
+          "text": "多宝道人"
+        }
+      ],
+      "note": "第72回截教通天教主大弟子多宝道人，火灵圣母之师",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_056",
+      "canonical_name": "金灵圣母",
+      "entity_type": "person",
+      "sub_type": "deity_immortal",
+      "aliases": [
+        "金灵圣母"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 35,
+          "start": 191467,
+          "end": 191471,
+          "text": "金灵圣母"
+        }
+      ],
+      "note": "第35回碧游宫截教女仙金灵圣母，闻仲之师",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_057",
+      "canonical_name": "火灵圣母",
+      "entity_type": "person",
+      "sub_type": "deity_immortal",
+      "aliases": [
+        "火灵圣母"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 72,
+          "start": 416930,
+          "end": 416934,
+          "text": "火灵圣母"
+        }
+      ],
+      "note": "第72回多宝道人门下火灵圣母，戴金霞冠使火龙兵，死于广成子番天印",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_058",
+      "canonical_name": "魔礼青",
+      "entity_type": "person",
+      "sub_type": "official_general",
+      "aliases": [
+        "魔礼青"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 220605,
+          "end": 220608,
+          "text": "魔礼青"
+        }
+      ],
+      "note": "第40回佳梦关魔家四将之首魔礼青，使青云剑与虎头枪",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_059",
+      "canonical_name": "魔礼红",
+      "entity_type": "person",
+      "sub_type": "official_general",
+      "aliases": [
+        "魔礼红"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 220893,
+          "end": 220896,
+          "text": "魔礼红"
+        }
+      ],
+      "note": "第40回佳梦关魔家四将之二魔礼红，执掌混元珍珠伞",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_060",
+      "canonical_name": "魔礼海",
+      "entity_type": "person",
+      "sub_type": "official_general",
+      "aliases": [
+        "魔礼海"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 221007,
+          "end": 221010,
+          "text": "魔礼海"
+        }
+      ],
+      "note": "第40回佳梦关魔家四将之三魔礼海，执掌地水火风琵琶",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_061",
+      "canonical_name": "魔礼寿",
+      "entity_type": "person",
+      "sub_type": "official_general",
+      "aliases": [
+        "魔礼寿"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 221060,
+          "end": 221063,
+          "text": "魔礼寿"
+        }
+      ],
+      "note": "第40回佳梦关魔家四将之四魔礼寿，使两根鞭并囊藏花狐貂",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_062",
+      "canonical_name": "孔宣",
+      "entity_type": "person",
+      "sub_type": "official_general",
+      "aliases": [
+        "孔宣"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 53,
+          "start": 299933,
+          "end": 299935,
+          "text": "孔宣"
+        }
+      ],
+      "note": "第53回三山关新任总兵孔宣，善五色神光，后被准提道人收伏",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_063",
+      "canonical_name": "张奎",
+      "entity_type": "person",
+      "sub_type": "official_general",
+      "aliases": [
+        "张奎"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 31,
+          "start": 171269,
+          "end": 171271,
+          "text": "张奎"
+        }
+      ],
+      "note": "第31回渑池县镇守主将张奎，骑独角乌烟兽善地行术",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_064",
+      "canonical_name": "袁洪",
+      "entity_type": "person",
+      "sub_type": "official_general",
+      "aliases": [
+        "袁洪"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 87,
+          "start": 523662,
+          "end": 523664,
+          "text": "袁洪"
+        }
+      ],
+      "note": "第87回梅山七圣之首白猿精袁洪，封商朝守孟津大元帅",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_065",
+      "canonical_name": "苏护",
+      "entity_type": "person",
+      "sub_type": "monarch_noble",
+      "aliases": [
+        "苏护",
+        "冀州侯"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 2,
+          "start": 4899,
+          "end": 4901,
+          "text": "苏护"
+        }
+      ],
+      "note": "第2回冀州侯苏护，妲己之父，后归周",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PER_066",
+      "canonical_name": "崇侯虎",
+      "entity_type": "person",
+      "sub_type": "monarch_noble",
+      "aliases": [
+        "崇侯虎",
+        "北伯侯"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 1,
+          "start": 1543,
+          "end": 1546,
+          "text": "崇侯虎"
+        }
+      ],
+      "note": "第1回北伯侯崇侯虎，助纣督造鹿台，后被周讨灭",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_001",
+      "canonical_name": "朝歌",
+      "entity_type": "place",
+      "sub_type": "city",
+      "aliases": [
+        "朝歌",
+        "朝歌城"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 8,
+          "start": 42229,
+          "end": 42231,
+          "text": "朝歌"
+        }
+      ],
+      "note": "第8回商朝国都朝歌",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_002",
+      "canonical_name": "西岐",
+      "entity_type": "place",
+      "sub_type": "city",
+      "aliases": [
+        "西岐",
+        "西岐城",
+        "西岐州",
+        "西土"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 24,
+          "start": 132341,
+          "end": 132343,
+          "text": "西岐"
+        }
+      ],
+      "note": "第24回西伯侯姬昌治所与周室都城西岐",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_003",
+      "canonical_name": "岐山",
+      "entity_type": "place",
+      "sub_type": "mountain",
+      "aliases": [
+        "岐山",
+        "西岐山"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 219459,
+          "end": 219461,
+          "text": "岐山"
+        }
+      ],
+      "note": "第40回西岐近郊名山岐山，封神台所在地",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_004",
+      "canonical_name": "西宫",
+      "entity_type": "place",
+      "sub_type": "palace",
+      "aliases": [
+        "西宫"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 8,
+          "start": 39113,
+          "end": 39115,
+          "text": "西宫"
+        }
+      ],
+      "note": "第8回朝歌王宫内黄贵妃居所西宫",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_005",
+      "canonical_name": "中宫",
+      "entity_type": "place",
+      "sub_type": "palace",
+      "aliases": [
+        "中宫"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 8,
+          "start": 39552,
+          "end": 39554,
+          "text": "中宫"
+        }
+      ],
+      "note": "第8回朝歌王宫内姜皇后居所中宫",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_006",
+      "canonical_name": "东宫",
+      "entity_type": "place",
+      "sub_type": "palace",
+      "aliases": [
+        "东宫"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 8,
+          "start": 39290,
+          "end": 39292,
+          "text": "东宫"
+        }
+      ],
+      "note": "第8回朝歌王宫内太子殷郊居所东宫（取第2处独立方位提及）",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_007",
+      "canonical_name": "寿仙宫",
+      "entity_type": "place",
+      "sub_type": "palace",
+      "aliases": [
+        "寿仙宫"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 8,
+          "start": 39826,
+          "end": 39829,
+          "text": "寿仙宫"
+        }
+      ],
+      "note": "第8回朝歌内廷妲己与纣王居所寿仙宫",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_008",
+      "canonical_name": "馨庆宫",
+      "entity_type": "place",
+      "sub_type": "palace",
+      "aliases": [
+        "馨庆宫"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 8,
+          "start": 40434,
+          "end": 40437,
+          "text": "馨庆宫"
+        }
+      ],
+      "note": "第8回朝歌内廷杨贵妃居所馨庆宫",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_009",
+      "canonical_name": "九间殿",
+      "entity_type": "place",
+      "sub_type": "palace",
+      "aliases": [
+        "九间殿",
+        "九间大殿",
+        "长朝殿"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 8,
+          "start": 41063,
+          "end": 41066,
+          "text": "九间殿"
+        }
+      ],
+      "note": "第8回朝歌王宫正殿九间殿（亦称长朝殿）",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_010",
+      "canonical_name": "白虎殿",
+      "entity_type": "place",
+      "sub_type": "palace",
+      "aliases": [
+        "白虎殿"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 8,
+          "start": 41363,
+          "end": 41366,
+          "text": "白虎殿"
+        }
+      ],
+      "note": "第8回朝歌王宫白虎殿",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_011",
+      "canonical_name": "午门",
+      "entity_type": "place",
+      "sub_type": "building",
+      "aliases": [
+        "午门"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 8,
+          "start": 43496,
+          "end": 43498,
+          "text": "午门"
+        }
+      ],
+      "note": "第8回朝歌皇城正门午门",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_012",
+      "canonical_name": "摘星楼",
+      "entity_type": "place",
+      "sub_type": "building",
+      "aliases": [
+        "摘星楼"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 56,
+          "start": 323402,
+          "end": 323405,
+          "text": "摘星楼"
+        }
+      ],
+      "note": "第56回提及纣王于朝歌所建高楼摘星楼",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_013",
+      "canonical_name": "鹿台",
+      "entity_type": "place",
+      "sub_type": "building",
+      "aliases": [
+        "鹿台"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 24,
+          "start": 134144,
+          "end": 134146,
+          "text": "鹿台"
+        }
+      ],
+      "note": "第24回纣王聚敛民财所造高台鹿台",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_014",
+      "canonical_name": "灵台",
+      "entity_type": "place",
+      "sub_type": "building",
+      "aliases": [
+        "灵台"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 24,
+          "start": 132806,
+          "end": 132808,
+          "text": "灵台"
+        }
+      ],
+      "note": "第24回西岐文王所建观象占验高台灵台",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_015",
+      "canonical_name": "封神台",
+      "entity_type": "place",
+      "sub_type": "building",
+      "aliases": [
+        "封神台"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 219822,
+          "end": 219825,
+          "text": "封神台"
+        }
+      ],
+      "note": "第40回岐山所建收纳三教应劫神魂之封神台",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_016",
+      "canonical_name": "三济仓",
+      "entity_type": "place",
+      "sub_type": "building",
+      "aliases": [
+        "三济仓"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 224280,
+          "end": 224283,
+          "text": "三济仓"
+        }
+      ],
+      "note": "第40回西岐城内储粮官仓三济仓",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_017",
+      "canonical_name": "银安殿",
+      "entity_type": "place",
+      "sub_type": "building",
+      "aliases": [
+        "银安殿"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 56,
+          "start": 320069,
+          "end": 320072,
+          "text": "银安殿"
+        }
+      ],
+      "note": "第56回西岐相府正殿银安殿",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_018",
+      "canonical_name": "太师府",
+      "entity_type": "place",
+      "sub_type": "building",
+      "aliases": [
+        "太师府"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 8,
+          "start": 46828,
+          "end": 46831,
+          "text": "太师府"
+        }
+      ],
+      "note": "第8回朝歌城内闻太师府第太师府",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_019",
+      "canonical_name": "相府",
+      "entity_type": "place",
+      "sub_type": "building",
+      "aliases": [
+        "相府",
+        "丞相府"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 24,
+          "start": 138443,
+          "end": 138445,
+          "text": "相府"
+        }
+      ],
+      "note": "第24回西岐城内姜子牙丞相府（相府）",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_020",
+      "canonical_name": "王府",
+      "entity_type": "place",
+      "sub_type": "building",
+      "aliases": [
+        "王府",
+        "镇国武成王府",
+        "武成王府"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 227340,
+          "end": 227342,
+          "text": "王府"
+        }
+      ],
+      "note": "第40回西岐城内武王府第王府",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_021",
+      "canonical_name": "轩辕庙",
+      "entity_type": "place",
+      "sub_type": "building",
+      "aliases": [
+        "轩辕庙"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 8,
+          "start": 46640,
+          "end": 46643,
+          "text": "轩辕庙"
+        }
+      ],
+      "note": "第8回太师府贴邻古庙轩辕庙",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_022",
+      "canonical_name": "玉虚宫",
+      "entity_type": "place",
+      "sub_type": "palace",
+      "aliases": [
+        "玉虚宫",
+        "玉虚"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 223848,
+          "end": 223851,
+          "text": "玉虚宫"
+        }
+      ],
+      "note": "第40回昆仑山元始天尊道场玉虚宫",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_023",
+      "canonical_name": "碧游宫",
+      "entity_type": "place",
+      "sub_type": "palace",
+      "aliases": [
+        "碧游宫"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 72,
+          "start": 419132,
+          "end": 419135,
+          "text": "碧游宫"
+        }
+      ],
+      "note": "第72回东海金鳌岛通天教主道场碧游宫",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_024",
+      "canonical_name": "昆仑山",
+      "entity_type": "place",
+      "sub_type": "mountain",
+      "aliases": [
+        "昆仑山",
+        "昆仑"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 223492,
+          "end": 223494,
+          "text": "昆仑"
+        }
+      ],
+      "note": "第40回阐教圣山昆仑山（昆仑）",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_025",
+      "canonical_name": "终南山",
+      "entity_type": "place",
+      "sub_type": "mountain",
+      "aliases": [
+        "终南山"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 8,
+          "start": 42458,
+          "end": 42461,
+          "text": "终南山"
+        }
+      ],
+      "note": "第8回云中子修行名山终南山",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_026",
+      "canonical_name": "九龙岛",
+      "entity_type": "place",
+      "sub_type": "mountain",
+      "aliases": [
+        "九龙岛"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 220150,
+          "end": 220153,
+          "text": "九龙岛"
+        }
+      ],
+      "note": "第40回海外仙岛九龙岛",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_027",
+      "canonical_name": "桃花岭",
+      "entity_type": "place",
+      "sub_type": "mountain",
+      "aliases": [
+        "桃花岭"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 220576,
+          "end": 220579,
+          "text": "桃花岭"
+        }
+      ],
+      "note": "第40回龙须虎生长之地北海眼桃花岭",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_028",
+      "canonical_name": "金庭山",
+      "entity_type": "place",
+      "sub_type": "mountain",
+      "aliases": [
+        "金庭山"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 224590,
+          "end": 224593,
+          "text": "金庭山"
+        }
+      ],
+      "note": "第40回道行天尊修行名山金庭山",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_029",
+      "canonical_name": "玉屋洞",
+      "entity_type": "place",
+      "sub_type": "palace",
+      "aliases": [
+        "玉屋洞"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 224593,
+          "end": 224596,
+          "text": "玉屋洞"
+        }
+      ],
+      "note": "第40回金庭山道行天尊洞府玉屋洞",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_030",
+      "canonical_name": "玉泉山",
+      "entity_type": "place",
+      "sub_type": "mountain",
+      "aliases": [
+        "玉泉山"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 225079,
+          "end": 225082,
+          "text": "玉泉山"
+        }
+      ],
+      "note": "第40回玉鼎真人与杨戬修行名山玉泉山",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_031",
+      "canonical_name": "金霞洞",
+      "entity_type": "place",
+      "sub_type": "palace",
+      "aliases": [
+        "金霞洞"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 225082,
+          "end": 225085,
+          "text": "金霞洞"
+        }
+      ],
+      "note": "第40回玉泉山玉鼎真人洞府金霞洞",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_032",
+      "canonical_name": "青峰山",
+      "entity_type": "place",
+      "sub_type": "mountain",
+      "aliases": [
+        "青峰山"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 226951,
+          "end": 226954,
+          "text": "青峰山"
+        }
+      ],
+      "note": "第40回清虚道德真君修行名山青峰山",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_033",
+      "canonical_name": "紫阳洞",
+      "entity_type": "place",
+      "sub_type": "palace",
+      "aliases": [
+        "紫阳洞"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 224874,
+          "end": 224877,
+          "text": "紫阳洞"
+        }
+      ],
+      "note": "第40回青峰山清虚道德真君洞府紫阳洞",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_034",
+      "canonical_name": "夹龙山",
+      "entity_type": "place",
+      "sub_type": "mountain",
+      "aliases": [
+        "夹龙山"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 56,
+          "start": 315932,
+          "end": 315935,
+          "text": "夹龙山"
+        }
+      ],
+      "note": "第56回惧留孙与土行孙修行名山夹龙山",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_035",
+      "canonical_name": "飞龙洞",
+      "entity_type": "place",
+      "sub_type": "palace",
+      "aliases": [
+        "飞龙洞"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 56,
+          "start": 315935,
+          "end": 315938,
+          "text": "飞龙洞"
+        }
+      ],
+      "note": "第56回夹龙山惧留孙洞府飞龙洞",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_036",
+      "canonical_name": "麒麟崖",
+      "entity_type": "place",
+      "sub_type": "mountain",
+      "aliases": [
+        "麒麟崖"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 72,
+          "start": 420016,
+          "end": 420019,
+          "text": "麒麟崖"
+        }
+      ],
+      "note": "第72回昆仑山玉虚宫外仙崖麒麟崖",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_037",
+      "canonical_name": "梅山",
+      "entity_type": "place",
+      "sub_type": "mountain",
+      "aliases": [
+        "梅山"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 88,
+          "start": 530013,
+          "end": 530015,
+          "text": "梅山"
+        }
+      ],
+      "note": "第88回袁洪等梅山七圣聚居之地梅山",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_038",
+      "canonical_name": "猛兽崖",
+      "entity_type": "place",
+      "sub_type": "mountain",
+      "aliases": [
+        "猛兽崖"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 88,
+          "start": 525030,
+          "end": 525033,
+          "text": "猛兽崖"
+        }
+      ],
+      "note": "第88回渑池县外险崖猛兽崖",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_039",
+      "canonical_name": "磻溪",
+      "entity_type": "place",
+      "sub_type": "river",
+      "aliases": [
+        "磻溪"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 24,
+          "start": 132058,
+          "end": 132060,
+          "text": "磻溪"
+        }
+      ],
+      "note": "第24回渭水支流姜子牙隐居垂钓之地磻溪",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_040",
+      "canonical_name": "渭水",
+      "entity_type": "place",
+      "sub_type": "river",
+      "aliases": [
+        "渭水"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 24,
+          "start": 138254,
+          "end": 138256,
+          "text": "渭水"
+        }
+      ],
+      "note": "第24回西岐名川渭水",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_041",
+      "canonical_name": "黄河",
+      "entity_type": "place",
+      "sub_type": "river",
+      "aliases": [
+        "黄河"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 88,
+          "start": 525201,
+          "end": 525203,
+          "text": "黄河"
+        }
+      ],
+      "note": "第88回武王东征渡河要津黄河",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_042",
+      "canonical_name": "孟津",
+      "entity_type": "place",
+      "sub_type": "city",
+      "aliases": [
+        "孟津",
+        "孟津河"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 88,
+          "start": 524605,
+          "end": 524607,
+          "text": "孟津"
+        }
+      ],
+      "note": "第88回八百诸侯会师要地孟津",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_043",
+      "canonical_name": "渑池县",
+      "entity_type": "place",
+      "sub_type": "city",
+      "aliases": [
+        "渑池县",
+        "渑池"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 88,
+          "start": 524622,
+          "end": 524625,
+          "text": "渑池县"
+        }
+      ],
+      "note": "第88回张奎镇守重镇渑池县",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_044",
+      "canonical_name": "佳梦关",
+      "entity_type": "place",
+      "sub_type": "pass",
+      "aliases": [
+        "佳梦关"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 220171,
+          "end": 220174,
+          "text": "佳梦关"
+        }
+      ],
+      "note": "第40回魔家四将镇守关隘佳梦关",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_045",
+      "canonical_name": "三山关",
+      "entity_type": "place",
+      "sub_type": "pass",
+      "aliases": [
+        "三山关"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 24,
+          "start": 132328,
+          "end": 132331,
+          "text": "三山关"
+        }
+      ],
+      "note": "第24回邓九公、孔宣先后镇守关隘三山关",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_046",
+      "canonical_name": "游魂关",
+      "entity_type": "place",
+      "sub_type": "pass",
+      "aliases": [
+        "游魂关"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 24,
+          "start": 132307,
+          "end": 132310,
+          "text": "游魂关"
+        }
+      ],
+      "note": "第24回窦荣镇守关隘游魂关",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_047",
+      "canonical_name": "汜水关",
+      "entity_type": "place",
+      "sub_type": "pass",
+      "aliases": [
+        "汜水关"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 24,
+          "start": 138455,
+          "end": 138458,
+          "text": "汜水关"
+        }
+      ],
+      "note": "第24回韩荣镇守五关要隘汜水关",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_048",
+      "canonical_name": "陈塘关",
+      "entity_type": "place",
+      "sub_type": "pass",
+      "aliases": [
+        "陈塘关"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 12,
+          "start": 65828,
+          "end": 65831,
+          "text": "陈塘关"
+        }
+      ],
+      "note": "第12回李靖镇守东海口关隘陈塘关",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_049",
+      "canonical_name": "东鲁",
+      "entity_type": "place",
+      "sub_type": "city",
+      "aliases": [
+        "东鲁"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 8,
+          "start": 42669,
+          "end": 42671,
+          "text": "东鲁"
+        }
+      ],
+      "note": "第8回东伯侯姜桓楚封地东鲁",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_050",
+      "canonical_name": "南都",
+      "entity_type": "place",
+      "sub_type": "city",
+      "aliases": [
+        "南都"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 8,
+          "start": 45874,
+          "end": 45876,
+          "text": "南都"
+        }
+      ],
+      "note": "第8回南伯侯鄂崇禹封地南都",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_051",
+      "canonical_name": "冀州",
+      "entity_type": "place",
+      "sub_type": "city",
+      "aliases": [
+        "冀州"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 56,
+          "start": 323971,
+          "end": 323973,
+          "text": "冀州"
+        }
+      ],
+      "note": "第56回苏护原封地冀州",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_052",
+      "canonical_name": "许州",
+      "entity_type": "place",
+      "sub_type": "city",
+      "aliases": [
+        "许州"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 24,
+          "start": 136023,
+          "end": 136025,
+          "text": "许州"
+        }
+      ],
+      "note": "第24回地名许州",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_053",
+      "canonical_name": "楚州",
+      "entity_type": "place",
+      "sub_type": "city",
+      "aliases": [
+        "楚州"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 225506,
+          "end": 225508,
+          "text": "楚州"
+        }
+      ],
+      "note": "第40回黄天化经过地名楚州",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_PLC_054",
+      "canonical_name": "北海",
+      "entity_type": "place",
+      "sub_type": "river",
+      "aliases": [
+        "北海",
+        "北海眼",
+        "东海"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 24,
+          "start": 136021,
+          "end": 136023,
+          "text": "东海"
+        }
+      ],
+      "note": "第24回四海专名海域东海（含北海、北海眼）",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ORG_001",
+      "canonical_name": "成汤",
+      "entity_type": "org",
+      "sub_type": "dynasty",
+      "aliases": [
+        "成汤",
+        "殷汤",
+        "大商",
+        "商朝"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 8,
+          "start": 42016,
+          "end": 42018,
+          "text": "成汤"
+        }
+      ],
+      "note": "第8回商汤所建王朝政权成汤（亦称殷汤）",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ORG_002",
+      "canonical_name": "周室",
+      "entity_type": "org",
+      "sub_type": "dynasty",
+      "aliases": [
+        "周室",
+        "周家",
+        "周朝",
+        "西周",
+        "岐周"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 24,
+          "start": 137422,
+          "end": 137424,
+          "text": "周室"
+        }
+      ],
+      "note": "第24回文王武王所领周室政权",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ORG_003",
+      "canonical_name": "阐教",
+      "entity_type": "org",
+      "sub_type": "sect",
+      "aliases": [
+        "阐教"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 13,
+          "start": 76058,
+          "end": 76060,
+          "text": "阐教"
+        }
+      ],
+      "note": "第13回元始天尊执掌之玉虚宫道门教派阐教",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ORG_004",
+      "canonical_name": "截教",
+      "entity_type": "org",
+      "sub_type": "sect",
+      "aliases": [
+        "截教"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 72,
+          "start": 420768,
+          "end": 420770,
+          "text": "截教"
+        }
+      ],
+      "note": "第72回通天教主执掌之碧游宫教派截教",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ORG_005",
+      "canonical_name": "西方教",
+      "entity_type": "org",
+      "sub_type": "sect",
+      "aliases": [
+        "西方教",
+        "释门"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 222456,
+          "end": 222458,
+          "text": "释门"
+        }
+      ],
+      "note": "第40回接引道人与准提道人所创西方教（释门）",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ORG_006",
+      "canonical_name": "道门",
+      "entity_type": "org",
+      "sub_type": "sect",
+      "aliases": [
+        "道门"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 226207,
+          "end": 226209,
+          "text": "道门"
+        }
+      ],
+      "note": "第40回玄门修仙教门总称道门",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ORG_007",
+      "canonical_name": "三教",
+      "entity_type": "org",
+      "sub_type": "sect",
+      "aliases": [
+        "三教"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 72,
+          "start": 421333,
+          "end": 421335,
+          "text": "三教"
+        }
+      ],
+      "note": "第72回共议封神榜之阐教、截教、人道/西方三教",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ORG_008",
+      "canonical_name": "魔家四将",
+      "entity_type": "org",
+      "sub_type": "troop_group",
+      "aliases": [
+        "魔家四将"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 219166,
+          "end": 219170,
+          "text": "魔家四将"
+        }
+      ],
+      "note": "第40回佳梦关魔礼青、魔礼红、魔礼海、魔礼寿四兄弟组合魔家四将",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ORG_009",
+      "canonical_name": "梅山七圣",
+      "entity_type": "org",
+      "sub_type": "troop_group",
+      "aliases": [
+        "梅山七圣",
+        "梅山七怪"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 87,
+          "start": 523678,
+          "end": 523682,
+          "text": "梅山七圣"
+        }
+      ],
+      "note": "第87回梅山袁洪、常昊、吴龙等七位精灵组合梅山七圣",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ORG_010",
+      "canonical_name": "九龙岛四圣",
+      "entity_type": "org",
+      "sub_type": "troop_group",
+      "aliases": [
+        "九龙岛四圣",
+        "四圣"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 38,
+          "start": 207745,
+          "end": 207747,
+          "text": "四圣"
+        }
+      ],
+      "note": "第38回九龙岛王魔、杨森、高友乾、李兴霸四位炼气士组合四圣",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ORG_011",
+      "canonical_name": "哼哈二将",
+      "entity_type": "org",
+      "sub_type": "troop_group",
+      "aliases": [
+        "哼哈二将"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 99,
+          "start": 600089,
+          "end": 600093,
+          "text": "哼哈二将"
+        }
+      ],
+      "note": "第99回姜子牙敕封郑伦与陈奇二将合称哼哈二将",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ORG_012",
+      "canonical_name": "轩辕坟三妖",
+      "entity_type": "org",
+      "sub_type": "troop_group",
+      "aliases": [
+        "轩辕坟三妖",
+        "轩辕坟中三妖"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 1,
+          "start": 3388,
+          "end": 3394,
+          "text": "轩辕坟中三妖"
+        }
+      ],
+      "note": "第1回轩辕坟九尾狐狸精、九头雉鸡精、玉石琵琶精三妖组合",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ORG_013",
+      "canonical_name": "十天君",
+      "entity_type": "org",
+      "sub_type": "troop_group",
+      "aliases": [
+        "十天君"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 43,
+          "start": 243131,
+          "end": 243134,
+          "text": "十天君"
+        }
+      ],
+      "note": "第43回金鳌岛摆十绝阵之秦完等十位天君组合",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ORG_014",
+      "canonical_name": "八百诸侯",
+      "entity_type": "org",
+      "sub_type": "troop_group",
+      "aliases": [
+        "八百诸侯",
+        "八百镇诸侯"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 1,
+          "start": 1491,
+          "end": 1496,
+          "text": "八百镇诸侯"
+        }
+      ],
+      "note": "第1回天下四大伯侯统领之八百镇诸侯联盟",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ORG_015",
+      "canonical_name": "乌鸦兵",
+      "entity_type": "org",
+      "sub_type": "troop_group",
+      "aliases": [
+        "乌鸦兵"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 3,
+          "start": 15609,
+          "end": 15612,
+          "text": "乌鸦兵"
+        }
+      ],
+      "note": "第3回崇黑虎麾下特种军团三千乌鸦兵",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ORG_016",
+      "canonical_name": "飞熊军",
+      "entity_type": "org",
+      "sub_type": "troop_group",
+      "aliases": [
+        "飞熊军",
+        "黄巾力士"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 51,
+          "start": 289038,
+          "end": 289042,
+          "text": "黄巾力士"
+        }
+      ],
+      "note": "第51回玉虚宫及老子麾下护法神将群体黄巾力士",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_001",
+      "canonical_name": "龙凤剑",
+      "entity_type": "item",
+      "sub_type": "weapon",
+      "aliases": [
+        "龙凤剑"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 8,
+          "start": 40116,
+          "end": 40119,
+          "text": "龙凤剑"
+        }
+      ],
+      "note": "第8回商王室传国尚方御剑龙凤剑",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_002",
+      "canonical_name": "五色神牛",
+      "entity_type": "item",
+      "sub_type": "mount",
+      "aliases": [
+        "五色神牛",
+        "神牛"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 8,
+          "start": 43536,
+          "end": 43540,
+          "text": "五色神牛"
+        }
+      ],
+      "note": "第8回黄飞虎专属坐骑五色神牛",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_003",
+      "canonical_name": "炮烙",
+      "entity_type": "item",
+      "sub_type": "artifact",
+      "aliases": [
+        "炮烙"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 8,
+          "start": 42129,
+          "end": 42131,
+          "text": "炮烙"
+        }
+      ],
+      "note": "第8回费仲献策建造之铜柱酷刑器械炮烙（取第3处名词‘建造炮烙’）",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_004",
+      "canonical_name": "黄庭",
+      "entity_type": "item",
+      "sub_type": "artifact",
+      "aliases": [
+        "黄庭",
+        "黄庭经"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 24,
+          "start": 131315,
+          "end": 131317,
+          "text": "黄庭"
+        }
+      ],
+      "note": "第24回道家经典《黄庭经》",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_005",
+      "canonical_name": "六韬",
+      "entity_type": "item",
+      "sub_type": "artifact",
+      "aliases": [
+        "六韬"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 24,
+          "start": 132460,
+          "end": 132462,
+          "text": "六韬"
+        }
+      ],
+      "note": "第24回姜子牙所著兵书《六韬》",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_006",
+      "canonical_name": "逍遥马",
+      "entity_type": "item",
+      "sub_type": "mount",
+      "aliases": [
+        "逍遥马"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 24,
+          "start": 138167,
+          "end": 138170,
+          "text": "逍遥马"
+        }
+      ],
+      "note": "第24回文王、武王专属御乘逍遥马",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_007",
+      "canonical_name": "青云剑",
+      "entity_type": "item",
+      "sub_type": "weapon",
+      "aliases": [
+        "青云剑"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 219176,
+          "end": 219179,
+          "text": "青云剑"
+        }
+      ],
+      "note": "第40回魔礼青专名秘授法宝青云剑",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_008",
+      "canonical_name": "混元珍珠伞",
+      "entity_type": "item",
+      "sub_type": "talisman",
+      "aliases": [
+        "混元珍珠伞",
+        "混元伞",
+        "珍珠伞",
+        "珠伞"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 220906,
+          "end": 220909,
+          "text": "混元伞"
+        }
+      ],
+      "note": "第40回魔礼红专名法宝混元珍珠伞（简称混元伞、珍珠伞、珠伞）",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_009",
+      "canonical_name": "地水火风琵琶",
+      "entity_type": "item",
+      "sub_type": "talisman",
+      "aliases": [
+        "地水火风琵琶",
+        "琵琶"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 219188,
+          "end": 219190,
+          "text": "琵琶"
+        }
+      ],
+      "note": "第40回魔礼海专名法宝四弦琵琶（具地水火风之威）",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_010",
+      "canonical_name": "花狐貂",
+      "entity_type": "item",
+      "sub_type": "talisman",
+      "aliases": [
+        "花狐貂",
+        "花狐"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 221083,
+          "end": 221086,
+          "text": "花狐貂"
+        }
+      ],
+      "note": "第40回魔礼寿豹皮囊内豢养之专名异兽法宝花狐貂",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_011",
+      "canonical_name": "夜明珠",
+      "entity_type": "item",
+      "sub_type": "artifact",
+      "aliases": [
+        "夜明珠"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 220927,
+          "end": 220930,
+          "text": "夜明珠"
+        }
+      ],
+      "note": "第40回混元珍珠伞上缀嵌专名宝珠夜明珠",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_012",
+      "canonical_name": "定风珠",
+      "entity_type": "item",
+      "sub_type": "talisman",
+      "aliases": [
+        "定风珠"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 220955,
+          "end": 220958,
+          "text": "定风珠"
+        }
+      ],
+      "note": "第40回混元珍珠伞宝珠及度厄真人镇风法宝定风珠",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_013",
+      "canonical_name": "杏黄旗",
+      "entity_type": "item",
+      "sub_type": "talisman",
+      "aliases": [
+        "杏黄旗",
+        "杏黄幡"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 221492,
+          "end": 221495,
+          "text": "杏黄幡"
+        }
+      ],
+      "note": "第40回元始天尊赐姜子牙护身法宝杏黄旗（第40回亦作杏黄幡）",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_014",
+      "canonical_name": "四不相",
+      "entity_type": "item",
+      "sub_type": "mount",
+      "aliases": [
+        "四不相"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 221609,
+          "end": 221612,
+          "text": "四不相"
+        }
+      ],
+      "note": "第40回元始天尊赐姜子牙专属坐骑四不相",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_015",
+      "canonical_name": "风火轮",
+      "entity_type": "item",
+      "sub_type": "mount",
+      "aliases": [
+        "风火轮"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 222030,
+          "end": 222033,
+          "text": "风火轮"
+        }
+      ],
+      "note": "第40回太乙真人赐哪吒专属飞行法器风火轮",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_016",
+      "canonical_name": "火尖枪",
+      "entity_type": "item",
+      "sub_type": "weapon",
+      "aliases": [
+        "火尖枪"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 222035,
+          "end": 222038,
+          "text": "火尖枪"
+        }
+      ],
+      "note": "第40回哪吒专名兵器火尖枪",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_017",
+      "canonical_name": "乾坤圈",
+      "entity_type": "item",
+      "sub_type": "talisman",
+      "aliases": [
+        "乾坤圈"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 222351,
+          "end": 222354,
+          "text": "乾坤圈"
+        }
+      ],
+      "note": "第40回哪吒专名镇洞法宝乾坤圈",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_018",
+      "canonical_name": "混天绫",
+      "entity_type": "item",
+      "sub_type": "talisman",
+      "aliases": [
+        "混天绫"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 12,
+          "start": 66396,
+          "end": 66399,
+          "text": "混天绫"
+        }
+      ],
+      "note": "第12回哪吒专名法宝七尺混天绫",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_019",
+      "canonical_name": "遁龙桩",
+      "entity_type": "item",
+      "sub_type": "talisman",
+      "aliases": [
+        "遁龙桩",
+        "七宝金莲"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 222412,
+          "end": 222415,
+          "text": "遁龙桩"
+        }
+      ],
+      "note": "第40回文殊广法天尊传金吒专名法宝遁龙桩",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_020",
+      "canonical_name": "打神鞭",
+      "entity_type": "item",
+      "sub_type": "talisman",
+      "aliases": [
+        "打神鞭"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 222426,
+          "end": 222429,
+          "text": "打神鞭"
+        }
+      ],
+      "note": "第40回元始天尊赐姜子牙专名法宝打神鞭",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_021",
+      "canonical_name": "斩将刀",
+      "entity_type": "item",
+      "sub_type": "weapon",
+      "aliases": [
+        "斩将刀",
+        "三尖两刃刀",
+        "三尖刀"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 222130,
+          "end": 222133,
+          "text": "斩将刀"
+        }
+      ],
+      "note": "第40回杨戬专名兵器三尖两刃刀（第40回亦称斩将刀）",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_022",
+      "canonical_name": "虎头枪",
+      "entity_type": "item",
+      "sub_type": "weapon",
+      "aliases": [
+        "虎头枪"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 222142,
+          "end": 222145,
+          "text": "虎头枪"
+        }
+      ],
+      "note": "第40回魔礼青所持专名长枪虎头枪",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_023",
+      "canonical_name": "琉璃瓶",
+      "entity_type": "item",
+      "sub_type": "talisman",
+      "aliases": [
+        "琉璃瓶",
+        "清净琉璃瓶"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 223862,
+          "end": 223865,
+          "text": "琉璃瓶"
+        }
+      ],
+      "note": "第40回玉虚宫/慈航道人法宝琉璃瓶",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_024",
+      "canonical_name": "赤兔马",
+      "entity_type": "item",
+      "sub_type": "mount",
+      "aliases": [
+        "赤兔马"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 225547,
+          "end": 225550,
+          "text": "赤兔马"
+        }
+      ],
+      "note": "第40回黄飞虎/战将所乘名马赤兔马",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_025",
+      "canonical_name": "碧游床",
+      "entity_type": "item",
+      "sub_type": "artifact",
+      "aliases": [
+        "碧游床"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 227001,
+          "end": 227004,
+          "text": "碧游床"
+        }
+      ],
+      "note": "第40回玉虚宫元始天尊座具碧游床",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_026",
+      "canonical_name": "玉麒麟",
+      "entity_type": "item",
+      "sub_type": "mount",
+      "aliases": [
+        "玉麒麟"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 227093,
+          "end": 227096,
+          "text": "玉麒麟"
+        }
+      ],
+      "note": "第40回黄天化专名坐骑玉麒麟",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_027",
+      "canonical_name": "火龙标",
+      "entity_type": "item",
+      "sub_type": "talisman",
+      "aliases": [
+        "火龙标"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 227102,
+          "end": 227105,
+          "text": "火龙标"
+        }
+      ],
+      "note": "第40回清虚道德真君赐黄天化（及陈桐）之专名暗器火龙标",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_028",
+      "canonical_name": "攒心钉",
+      "entity_type": "item",
+      "sub_type": "talisman",
+      "aliases": [
+        "攒心钉"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 41,
+          "start": 228975,
+          "end": 228978,
+          "text": "攒心钉"
+        }
+      ],
+      "note": "第41回清虚道德真君赐黄天化破魔家四将之专名法宝攒心钉",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_029",
+      "canonical_name": "捆仙绳",
+      "entity_type": "item",
+      "sub_type": "talisman",
+      "aliases": [
+        "捆仙绳"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 56,
+          "start": 319915,
+          "end": 319918,
+          "text": "捆仙绳"
+        }
+      ],
+      "note": "第56回惧留孙专名法宝捆仙绳，土行孙曾盗用下山",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_030",
+      "canonical_name": "黄旄",
+      "entity_type": "item",
+      "sub_type": "artifact",
+      "aliases": [
+        "黄旄"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 56,
+          "start": 324026,
+          "end": 324028,
+          "text": "黄旄"
+        }
+      ],
+      "note": "第56回天子象征礼器黄旄",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_031",
+      "canonical_name": "白钺",
+      "entity_type": "item",
+      "sub_type": "artifact",
+      "aliases": [
+        "白钺"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 56,
+          "start": 324029,
+          "end": 324031,
+          "text": "白钺"
+        }
+      ],
+      "note": "第56回天子征伐象征礼器白钺",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_032",
+      "canonical_name": "金眼驼",
+      "entity_type": "item",
+      "sub_type": "mount",
+      "aliases": [
+        "金眼驼"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 72,
+          "start": 417786,
+          "end": 417789,
+          "text": "金眼驼"
+        }
+      ],
+      "note": "第72回火灵圣母专名坐骑金眼驼",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_033",
+      "canonical_name": "降魔杵",
+      "entity_type": "item",
+      "sub_type": "weapon",
+      "aliases": [
+        "降魔杵"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 72,
+          "start": 418133,
+          "end": 418136,
+          "text": "降魔杵"
+        }
+      ],
+      "note": "第72回韦护专名镇洞法宝兵器降魔杵",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_034",
+      "canonical_name": "金霞冠",
+      "entity_type": "item",
+      "sub_type": "talisman",
+      "aliases": [
+        "金霞冠"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 72,
+          "start": 418208,
+          "end": 418211,
+          "text": "金霞冠"
+        }
+      ],
+      "note": "第72回火灵圣母专名法宝金霞冠，广成子缴还碧游宫",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_035",
+      "canonical_name": "混元锤",
+      "entity_type": "item",
+      "sub_type": "weapon",
+      "aliases": [
+        "混元锤"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 72,
+          "start": 418476,
+          "end": 418479,
+          "text": "混元锤"
+        }
+      ],
+      "note": "第72回火灵圣母专名兵器混元锤",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_036",
+      "canonical_name": "扫霞衣",
+      "entity_type": "item",
+      "sub_type": "talisman",
+      "aliases": [
+        "扫霞衣"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 72,
+          "start": 418768,
+          "end": 418771,
+          "text": "扫霞衣"
+        }
+      ],
+      "note": "第72回南极仙翁借予广成子专破金霞冠金光之法宝扫霞衣",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_037",
+      "canonical_name": "番天印",
+      "entity_type": "item",
+      "sub_type": "talisman",
+      "aliases": [
+        "番天印"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 72,
+          "start": 418851,
+          "end": 418854,
+          "text": "番天印"
+        }
+      ],
+      "note": "第72回广成子镇洞专名法宝番天印（曾传殷郊，后收回）",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_038",
+      "canonical_name": "开天珠",
+      "entity_type": "item",
+      "sub_type": "talisman",
+      "aliases": [
+        "开天珠"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 72,
+          "start": 419829,
+          "end": 419832,
+          "text": "开天珠"
+        }
+      ],
+      "note": "第72回多宝道人门下专名法宝开天珠",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_039",
+      "canonical_name": "封神榜",
+      "entity_type": "item",
+      "sub_type": "artifact",
+      "aliases": [
+        "封神榜"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 72,
+          "start": 420547,
+          "end": 420550,
+          "text": "封神榜"
+        }
+      ],
+      "note": "第72回三教圣人佥押之封神名册封神榜",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_040",
+      "canonical_name": "九龙沉香辇",
+      "entity_type": "item",
+      "sub_type": "mount",
+      "aliases": [
+        "九龙沉香辇"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 72,
+          "start": 421040,
+          "end": 421045,
+          "text": "九龙沉香辇"
+        }
+      ],
+      "note": "第72回元始天尊专属御驾九龙沉香辇",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_041",
+      "canonical_name": "黄金棍",
+      "entity_type": "item",
+      "sub_type": "weapon",
+      "aliases": [
+        "黄金棍"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 88,
+          "start": 525957,
+          "end": 525960,
+          "text": "黄金棍"
+        }
+      ],
+      "note": "第88回雷震子专名兵器黄金棍",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_042",
+      "canonical_name": "太阳神针",
+      "entity_type": "item",
+      "sub_type": "talisman",
+      "aliases": [
+        "太阳神针"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 88,
+          "start": 525994,
+          "end": 525998,
+          "text": "太阳神针"
+        }
+      ],
+      "note": "第88回高明高觉大战中破神光之专名法宝太阳神针",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_043",
+      "canonical_name": "九龙神火罩",
+      "entity_type": "item",
+      "sub_type": "talisman",
+      "aliases": [
+        "九龙神火罩"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 88,
+          "start": 526370,
+          "end": 526375,
+          "text": "九龙神火罩"
+        }
+      ],
+      "note": "第88回太乙真人传哪吒之专名法宝九龙神火罩",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_044",
+      "canonical_name": "云霞兽",
+      "entity_type": "item",
+      "sub_type": "mount",
+      "aliases": [
+        "云霞兽"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 88,
+          "start": 526672,
+          "end": 526675,
+          "text": "云霞兽"
+        }
+      ],
+      "note": "第88回杨任专属坐骑云霞兽",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_045",
+      "canonical_name": "宾铁棍",
+      "entity_type": "item",
+      "sub_type": "weapon",
+      "aliases": [
+        "宾铁棍"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 88,
+          "start": 530094,
+          "end": 530097,
+          "text": "宾铁棍"
+        }
+      ],
+      "note": "第88回袁洪所持专名兵器一字水火宾铁棍",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_046",
+      "canonical_name": "混元金斗",
+      "entity_type": "item",
+      "sub_type": "talisman",
+      "aliases": [
+        "混元金斗",
+        "金斗"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 50,
+          "start": 284626,
+          "end": 284630,
+          "text": "混元金斗"
+        }
+      ],
+      "note": "第50回三仙岛三霄娘娘镇洞专名法宝混元金斗（简称金斗）",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_047",
+      "canonical_name": "金蛟剪",
+      "entity_type": "item",
+      "sub_type": "talisman",
+      "aliases": [
+        "金蛟剪"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 47,
+          "start": 269285,
+          "end": 269288,
+          "text": "金蛟剪"
+        }
+      ],
+      "note": "第47回三仙岛三霄娘娘专名法宝金蛟剪，曾借予赵公明",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_048",
+      "canonical_name": "定海珠",
+      "entity_type": "item",
+      "sub_type": "talisman",
+      "aliases": [
+        "定海珠"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 47,
+          "start": 266492,
+          "end": 266495,
+          "text": "定海珠"
+        }
+      ],
+      "note": "第47回赵公明专名法宝二十四颗定海珠，后归燃灯道人",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_049",
+      "canonical_name": "落宝金钱",
+      "entity_type": "item",
+      "sub_type": "talisman",
+      "aliases": [
+        "落宝金钱"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 47,
+          "start": 268038,
+          "end": 268042,
+          "text": "落宝金钱"
+        }
+      ],
+      "note": "第47回武夷山散仙萧升专名法宝落宝金钱",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_050",
+      "canonical_name": "钉头七箭书",
+      "entity_type": "item",
+      "sub_type": "talisman",
+      "aliases": [
+        "钉头七箭书"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 48,
+          "start": 272115,
+          "end": 272120,
+          "text": "钉头七箭书"
+        }
+      ],
+      "note": "第48回陆压道人秘授姜子牙拜射赵公明之异宝钉头七箭书",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_051",
+      "canonical_name": "阴阳镜",
+      "entity_type": "item",
+      "sub_type": "talisman",
+      "aliases": [
+        "阴阳镜"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 60,
+          "start": 344546,
+          "end": 344549,
+          "text": "阴阳镜"
+        }
+      ],
+      "note": "第60回太华山赤精子传殷洪之镇洞法宝阴阳镜",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_052",
+      "canonical_name": "落魂钟",
+      "entity_type": "item",
+      "sub_type": "talisman",
+      "aliases": [
+        "落魂钟"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 63,
+          "start": 364373,
+          "end": 364376,
+          "text": "落魂钟"
+        }
+      ],
+      "note": "第63回广成子传殷郊之专名法宝落魂钟",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_053",
+      "canonical_name": "太极图",
+      "entity_type": "item",
+      "sub_type": "talisman",
+      "aliases": [
+        "太极图"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 77,
+          "start": 454652,
+          "end": 454655,
+          "text": "太极图"
+        }
+      ],
+      "note": "第77回老子（太上老君）镇教至宝太极图",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_054",
+      "canonical_name": "七宝妙树",
+      "entity_type": "item",
+      "sub_type": "talisman",
+      "aliases": [
+        "七宝妙树"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 78,
+          "start": 458730,
+          "end": 458734,
+          "text": "七宝妙树"
+        }
+      ],
+      "note": "第78回准提道人专名法宝七宝妙树",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_055",
+      "canonical_name": "山河社稷图",
+      "entity_type": "item",
+      "sub_type": "talisman",
+      "aliases": [
+        "山河社稷图"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 92,
+          "start": 554788,
+          "end": 554793,
+          "text": "山河社稷图"
+        }
+      ],
+      "note": "第92回女娲娘娘赐杨戬擒拿袁洪之至宝山河社稷图",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_056",
+      "canonical_name": "十绝阵",
+      "entity_type": "item",
+      "sub_type": "formation",
+      "aliases": [
+        "十绝阵",
+        "天绝阵",
+        "地烈阵",
+        "风吼阵",
+        "寒冰阵",
+        "金光阵",
+        "化血阵",
+        "烈焰阵",
+        "落魂阵",
+        "红水阵",
+        "红沙阵"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 44,
+          "start": 246384,
+          "end": 246387,
+          "text": "十绝阵"
+        }
+      ],
+      "note": "第44回金鳌岛十天君所摆总阵十绝阵",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_057",
+      "canonical_name": "九曲黄河阵",
+      "entity_type": "item",
+      "sub_type": "formation",
+      "aliases": [
+        "九曲黄河阵",
+        "黄河阵"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 50,
+          "start": 284339,
+          "end": 284344,
+          "text": "九曲黄河阵"
+        }
+      ],
+      "note": "第50回三霄娘娘所摆大阵九曲黄河阵（简称黄河阵）",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_058",
+      "canonical_name": "诛仙阵",
+      "entity_type": "item",
+      "sub_type": "formation",
+      "aliases": [
+        "诛仙阵"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 77,
+          "start": 451171,
+          "end": 451174,
+          "text": "诛仙阵"
+        }
+      ],
+      "note": "第77回通天教主所摆杀阵诛仙阵",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_059",
+      "canonical_name": "万仙阵",
+      "entity_type": "item",
+      "sub_type": "formation",
+      "aliases": [
+        "万仙阵"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 82,
+          "start": 483829,
+          "end": 483832,
+          "text": "万仙阵"
+        }
+      ],
+      "note": "第82回通天教主率截教万仙所摆万仙阵",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_060",
+      "canonical_name": "先天数",
+      "entity_type": "item",
+      "sub_type": "spell",
+      "aliases": [
+        "先天数",
+        "厌星"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 24,
+          "start": 132028,
+          "end": 132031,
+          "text": "先天数"
+        }
+      ],
+      "note": "第24回文王与姜子牙推演天机之专名术数先天数（含厌星，T2）",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_061",
+      "canonical_name": "土遁",
+      "entity_type": "item",
+      "sub_type": "spell",
+      "aliases": [
+        "土遁",
+        "地行之术",
+        "地行法",
+        "指地成钢"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 223090,
+          "end": 223092,
+          "text": "土遁"
+        }
+      ],
+      "note": "第40回炼气士五行遁地与克制专名道法土遁（含地行之术、指地成钢，T2）",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_062",
+      "canonical_name": "九转元功",
+      "entity_type": "item",
+      "sub_type": "spell",
+      "aliases": [
+        "九转元功",
+        "八九玄功",
+        "元功",
+        "七十二变化"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 40,
+          "start": 225991,
+          "end": 225995,
+          "text": "九转元功"
+        }
+      ],
+      "note": "第40回玉鼎真人传杨戬之护体变化神功九转元功（含七十二变化，T2）",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_063",
+      "canonical_name": "火龙兵",
+      "entity_type": "item",
+      "sub_type": "spell",
+      "aliases": [
+        "火龙兵",
+        "三昧火"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 72,
+          "start": 417268,
+          "end": 417271,
+          "text": "火龙兵"
+        }
+      ],
+      "note": "第72回火灵圣母所练专名火系道术火龙兵（含三昧火，T2）",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_064",
+      "canonical_name": "金光法",
+      "entity_type": "item",
+      "sub_type": "spell",
+      "aliases": [
+        "金光法",
+        "纵地金光法"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 72,
+          "start": 420141,
+          "end": 420144,
+          "text": "金光法"
+        }
+      ],
+      "note": "第72回玉虚门人飞行专名道法纵地金光法（T2）",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    },
+    {
+      "gold_id": "G_ITM_065",
+      "canonical_name": "三首八臂",
+      "entity_type": "item",
+      "sub_type": "spell",
+      "aliases": [
+        "三首八臂",
+        "神光照耀眼"
+      ],
+      "representative_mentions": [
+        {
+          "chapter_ordinal": 88,
+          "start": 525881,
+          "end": 525885,
+          "text": "三首八臂"
+        }
+      ],
+      "note": "第88回哪吒等显化之专名法相神通三首八臂（含神光照耀眼，T2）",
+      "guideline": "0.14a-T1-T5",
+      "labeler": "agent:claude-opus-4-6",
+      "human_review": "pending"
+    }
+  ]
+}
