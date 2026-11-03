@@ -1,4 +1,4 @@
-"""校验《封神演义》0.14a 多类型金标准三层文件（roster.json, mentions.json, hard_cases.json）。"""
+"""校验《封神演义》0.14a/0.14b 多类型金标准三层文件（roster.json, mentions.json, hard_cases.json）。"""
 from __future__ import annotations
 
 import argparse
@@ -22,8 +22,34 @@ from entitytrace.util import digest
 ROSTER_ENTITY_TYPES = {"person", "place", "org", "item"}
 MENTION_ENTITY_TYPES = {"person", "place", "org", "item", "generic", "not_entity"}
 NON_PERSON_MENTION_TYPES = {"place", "org", "item", "generic", "not_entity"}
+SKIP_ENTITY_TYPES = {"not_entity", "person"}
 PROPER_ENTITY_TYPES = {"person", "place", "org", "item"}
 NULL_GOLD_ID_TYPES = {"generic", "not_entity"}
+SEVEN_KINDS = {"person", "place", "object", "organization", "ability", "concept", "unknown"}
+VALID_POLICIES = {"T1", "T2"}
+VALID_HC_TYPES = {"same", "different", "generic_no_merge", "policy_pending", "form_of"}
+
+REQUIRED_FENGSHEN_HC_TAGS = {
+    "hc007_rebuilt",
+    "hc013_rebuilt",
+    "yiqihuasanqing",
+    "title_chengxiang",
+    "title_tianzun",
+    "title_zhenren",
+    "title_niangniang",
+    "title_shengmu",
+    "shijuezhen_vs_subarrays",
+    "hunyuan_umbrella_pearls",
+    "baojian_multi_chapter",
+    "zhuxian_four_swords",
+    "zhuxianjian_vs_zhuxianzhen",
+    "huaxuedao_alias",
+    "bajiuxuangong_vs_xuangong",
+    "sanmeizhenhuo_vs_sanmeihuo",
+    "sanjiandao_alias",
+    "nezha_sanshoubabi_form",
+    "jiangziya_shangfu",
+}
 
 
 def _build_deterministic_chapters(raw_bytes: bytes) -> tuple[str, str, dict[int, dict]]:
@@ -65,10 +91,42 @@ def _check_item_provenance(item: dict, tag: str, errors: list[str]) -> None:
     if item.get("guideline") != "0.14a-T1-T5":
         errors.append(f"{tag}: guideline 必须为 '0.14a-T1-T5'")
     labeler = item.get("labeler")
-    if not isinstance(labeler, str) or not labeler.startswith("agent:"):
-        errors.append(f"{tag}: labeler 必须为 'agent:<model>' 格式")
+    if not isinstance(labeler, str) or not labeler.startswith("agent:") or not labeler[len("agent:"):].strip():
+        errors.append(f"{tag}: labeler 必须为非空 'agent:<model>' 格式（实际 {labeler!r}）")
     if item.get("human_review") != "pending":
-        errors.append(f"{tag}: human_review 必须为 'pending'")
+        errors.append(f"{tag}: human_review 必须为 'pending'（实际 {item.get('human_review')!r}）")
+
+
+def _check_clue(item: dict, text: str, start: int, end: int, tag: str, errors: list[str]) -> None:
+    clue = item.get("clue")
+    if not isinstance(clue, str) or not clue:
+        errors.append(f"{tag}: 缺少非空 clue 字段")
+        return
+    if not (4 <= len(clue) <= 20):
+        errors.append(f"{tag}: clue 长度必须为 4—20 码点（实际 {len(clue)}: {clue!r}）")
+        return
+    w_start = max(0, start - 40)
+    w_end = min(len(text), end + 40)
+    window = text[w_start:w_end]
+    if clue not in window:
+        errors.append(f"{tag}: clue {clue!r} 不是原文 [start-40, end+40) 窗口的逐字子串")
+        return
+    has_valid_occ = False
+    search_pos = 0
+    while True:
+        idx = window.find(clue, search_pos)
+        if idx < 0:
+            break
+        c_s = w_start + idx
+        c_e = c_s + len(clue)
+        overlap = max(0, min(c_e, end) - max(c_s, start))
+        outside = (c_e - c_s) - overlap
+        if outside >= 2:
+            has_valid_occ = True
+            break
+        search_pos = idx + 1
+    if not has_valid_occ:
+        errors.append(f"{tag}: clue {clue!r} 在窗口内未包含至少 2 个位于区间 [{start}, {end}) 之外的码点")
 
 
 def _check_span_in_chapter(
@@ -124,6 +182,37 @@ def _check_no_duplicate_or_overlapping_intervals(
             )
 
 
+def _check_not_strict_substring_of_longer_registered_name(
+    text: str,
+    start: int,
+    end: int,
+    registered_names_Desc: list[str],
+    tag: str,
+    errors: list[str],
+) -> None:
+    m_len = end - start
+    for r_name in registered_names_Desc:
+        r_len = len(r_name)
+        if r_len <= m_len:
+            break
+        w_s = max(0, start - r_len)
+        w_e = min(len(text), end + r_len)
+        sub = text[w_s:w_e]
+        pos = 0
+        while True:
+            idx = sub.find(r_name, pos)
+            if idx < 0:
+                break
+            r_s = w_s + idx
+            r_e = r_s + r_len
+            if r_s <= start and end <= r_e and (r_e - r_s) > m_len:
+                errors.append(
+                    f"{tag}: 提及区间 [{start}, {end})({text[start:end]!r}) 严格落在更长已登记名称 {r_name!r} [{r_s}, {r_e}) 之内"
+                )
+                return
+            pos = idx + 1
+
+
 def _check_type_and_refs(
     item: dict,
     allowed_types: set[str],
@@ -137,6 +226,7 @@ def _check_type_and_refs(
         return
     gid = item.get("gold_id")
     ref_to = item.get("refers_to")
+    owner = item.get("owner")
     if etype in PROPER_ENTITY_TYPES:
         if not isinstance(gid, str) or not gid:
             errors.append(f"{tag}: 专名类型 {etype!r} 的 gold_id 不能为空")
@@ -150,9 +240,18 @@ def _check_type_and_refs(
             errors.append(f"{tag}: refers_to {ref_to!r} 在 roster.json 中不存在")
         if etype != "generic":
             errors.append(f"{tag}: 仅 generic 类型可设置非空 refers_to（当前类型为 {etype!r}）")
+    if owner is not None:
+        if not isinstance(owner, str) or owner not in roster_ids:
+            errors.append(f"{tag}: owner {owner!r} 在 roster.json 中不存在")
+        if etype != "not_entity":
+            errors.append(f"{tag}: 仅 not_entity（T5 形态）可设置非空 owner（当前类型为 {etype!r}）")
 
 
-def check_type_gold(gold_dir: Path, text_path: Path) -> dict:
+def check_type_gold(
+    gold_dir: Path,
+    text_path: Path,
+    require_fengshen_checklist: bool | None = None,
+) -> dict:
     errors: list[str] = []
     if not text_path.is_file():
         return {"ok": False, "error_count": 1, "errors": [f"原文文件不存在: {text_path}"], "summary": {}}
@@ -183,11 +282,15 @@ def check_type_gold(gold_dir: Path, text_path: Path) -> dict:
     _check_top_meta(mentions, "mentions.json", expected_sha256, errors)
     _check_top_meta(hard_cases, "hard_cases.json", expected_sha256, errors)
 
+    # Cross-layer interval registry: (start, end) -> list of (entity_type, gold_id, refers_to, tag)
+    cross_layer_spans: dict[tuple[int, int], list[tuple[object, object, object, str]]] = {}
+
     # --- 1. Check roster.json ---
     roster_entities = roster.get("entities")
     roster_ids: set[str] = set()
     roster_intervals: list[tuple[int, int, str]] = []
     roster_by_type: dict[str, int] = {}
+    registered_names_set: set[str] = set()
 
     if not isinstance(roster_entities, list) or not roster_entities:
         errors.append("roster.json: entities 必须为非空数组")
@@ -208,14 +311,53 @@ def check_type_gold(gold_dir: Path, text_path: Path) -> dict:
             else:
                 roster_by_type[etype] = roster_by_type.get(etype, 0) + 1
 
+            # Check #7: kind, alt_kinds, policy
+            kind = ent.get("kind")
+            if kind not in SEVEN_KINDS:
+                errors.append(f"{tag}: 非法或缺失 7 类 kind {kind!r}（允许值：{sorted(SEVEN_KINDS)}）")
+            alt_kinds = ent.get("alt_kinds")
+            if not isinstance(alt_kinds, list) or not all(isinstance(k, str) and k in SEVEN_KINDS for k in alt_kinds):
+                errors.append(f"{tag}: alt_kinds 必须为合法的 7 类列表（实际 {alt_kinds!r}）")
+            elif len(set(alt_kinds)) != len(alt_kinds) or (isinstance(kind, str) and kind in alt_kinds):
+                errors.append(f"{tag}: alt_kinds 存在重复或包含主类 kind ({alt_kinds!r})")
+            policy = ent.get("policy")
+            if policy not in VALID_POLICIES:
+                errors.append(f"{tag}: policy 必须为 'T1' 或 'T2'（实际 {policy!r}）")
+
+            # Check #1: canonical_name and aliases must appear verbatim in text
             cname = ent.get("canonical_name")
             if not isinstance(cname, str) or not cname.strip():
                 errors.append(f"{tag}: canonical_name 必须为非空字符串")
+            else:
+                registered_names_set.add(cname)
+                if cname not in text:
+                    errors.append(f"{tag}: canonical_name {cname!r} 在原文中未逐字出现 (0 次)")
+
             aliases = ent.get("aliases")
             if not isinstance(aliases, list) or not aliases or not all(isinstance(a, str) and a.strip() for a in aliases):
                 errors.append(f"{tag}: aliases 必须为非空字符串列表")
-            elif cname and cname not in aliases:
-                errors.append(f"{tag}: canonical_name {cname!r} 必须包含在 aliases 中")
+            else:
+                if cname and cname not in aliases:
+                    errors.append(f"{tag}: canonical_name {cname!r} 必须包含在 aliases 中")
+                for al in aliases:
+                    registered_names_set.add(al)
+                    if al not in text:
+                        errors.append(f"{tag}: 别名 {al!r} 在原文中未逐字出现 (0 次)")
+
+            alias_occs = ent.get("alias_occurrences")
+            if isinstance(alias_occs, dict):
+                for al_name, occ in alias_occs.items():
+                    if isinstance(occ, dict):
+                        _check_span_in_chapter(
+                            text,
+                            ch_by_ord,
+                            occ.get("chapter_ordinal"),
+                            occ.get("start"),
+                            occ.get("end"),
+                            occ.get("text", al_name),
+                            f"{tag}.alias_occurrences[{al_name!r}]",
+                            errors,
+                        )
 
             _check_item_provenance(ent, tag, errors)
 
@@ -230,8 +372,16 @@ def check_type_gold(gold_dir: Path, text_path: Path) -> dict:
                     )
                     if iv is not None:
                         roster_intervals.append((iv[0], iv[1], r_tag))
+                        _check_clue(rm, text, iv[0], iv[1], r_tag, errors)
+                        cross_layer_spans.setdefault(iv, []).append((etype, gid, None, r_tag))
 
         _check_no_duplicate_or_overlapping_intervals(roster_intervals, "roster.json", errors)
+
+    registered_names_desc = sorted(registered_names_set, key=len, reverse=True)
+
+    # Check #3 on roster representative_mentions as well
+    for iv_s, iv_e, r_tag in roster_intervals:
+        _check_not_strict_substring_of_longer_registered_name(text, iv_s, iv_e, registered_names_desc, r_tag, errors)
 
     # --- 2. Check mentions.json ---
     sampled_chs = mentions.get("sampled_chapters")
@@ -256,6 +406,7 @@ def check_type_gold(gold_dir: Path, text_path: Path) -> dict:
     mention_intervals: list[tuple[int, int, str]] = []
     mentions_by_type: dict[str, int] = {}
     seen_mention_ids: set[str] = set()
+    annotated_surfaces: set[str] = set()
 
     if not isinstance(m_list, list) or not m_list:
         errors.append("mentions.json: mentions 必须为非空数组")
@@ -280,6 +431,15 @@ def check_type_gold(gold_dir: Path, text_path: Path) -> dict:
             )
             if iv is not None:
                 mention_intervals.append((iv[0], iv[1], tag))
+                _check_clue(m, text, iv[0], iv[1], tag, errors)
+                _check_not_strict_substring_of_longer_registered_name(
+                    text, iv[0], iv[1], registered_names_desc, tag, errors
+                )
+                cross_layer_spans.setdefault(iv, []).append(
+                    (m.get("entity_type"), m.get("gold_id"), m.get("refers_to"), tag)
+                )
+            if isinstance(m.get("text"), str) and m.get("text"):
+                annotated_surfaces.add(m["text"])
 
             _check_type_and_refs(m, NON_PERSON_MENTION_TYPES, roster_ids, tag, errors)
             etype = m.get("entity_type")
@@ -301,16 +461,59 @@ def check_type_gold(gold_dir: Path, text_path: Path) -> dict:
             )
             if iv is not None:
                 mention_intervals.append((iv[0], iv[1], tag))
-            _check_type_and_refs(sk, {"not_entity"}, roster_ids, tag, errors)
+                _check_clue(sk, text, iv[0], iv[1], tag, errors)
+                if sk.get("entity_type") != "not_entity":
+                    _check_not_strict_substring_of_longer_registered_name(
+                        text, iv[0], iv[1], registered_names_desc, tag, errors
+                    )
+                cross_layer_spans.setdefault(iv, []).append(
+                    (sk.get("entity_type"), sk.get("gold_id"), sk.get("refers_to"), tag)
+                )
+            if isinstance(sk.get("text"), str) and sk.get("text"):
+                annotated_surfaces.add(sk["text"])
+            reason = sk.get("reason")
+            if not isinstance(reason, str) or not reason.strip():
+                errors.append(f"{tag}: skip 必须附非空 reason 字段")
+            _check_type_and_refs(sk, SKIP_ENTITY_TYPES, roster_ids, tag, errors)
             _check_item_provenance(sk, tag, errors)
 
     _check_no_duplicate_or_overlapping_intervals(mention_intervals, "mentions.json", errors)
+
+    # Surface full-coverage check in sampled chapters
+    by_ch_intervals: dict[int, list[tuple[int, int]]] = {ord_no: [] for ord_no in sampled_ords}
+    for iv_s, iv_e, _ in mention_intervals:
+        for ord_no in sampled_ords:
+            det_c = ch_by_ord[ord_no]
+            if det_c["body_start"] <= iv_s < iv_e <= det_c["end"]:
+                by_ch_intervals[ord_no].append((iv_s, iv_e))
+                break
+
+    for ord_no in sorted(sampled_ords):
+        det_c = ch_by_ord[ord_no]
+        bs, be = det_c["body_start"], det_c["end"]
+        ch_text = text[bs:be]
+        ch_ivs = by_ch_intervals.get(ord_no, [])
+        for surf in sorted(annotated_surfaces):
+            pos = 0
+            while True:
+                idx = ch_text.find(surf, pos)
+                if idx < 0:
+                    break
+                occ_s = bs + idx
+                occ_e = occ_s + len(surf)
+                covered = any(iv_s <= occ_s and occ_e <= iv_e for iv_s, iv_e in ch_ivs)
+                if not covered:
+                    errors.append(
+                        f"mentions.json: 称呼全覆盖未通过，第 {ord_no} 回 [{occ_s}, {occ_e}) 的称呼 {surf!r} 未标注也未 skip"
+                    )
+                pos = idx + 1
 
     # --- 3. Check hard_cases.json ---
     cases = hard_cases.get("cases")
     hc_intervals: list[tuple[int, int, str]] = []
     seen_case_ids: set[str] = set()
     hc_mention_count = 0
+    seen_hc_tags: set[str] = set()
 
     if not isinstance(cases, list) or not cases:
         errors.append("hard_cases.json: cases 必须为非空数组")
@@ -326,6 +529,17 @@ def check_type_gold(gold_dir: Path, text_path: Path) -> dict:
                 seen_case_ids.add(cid)
 
             _check_item_provenance(case, c_tag, errors)
+
+            # Check #5: hard case type & tags
+            hc_type = case.get("type")
+            if hc_type not in VALID_HC_TYPES:
+                errors.append(f"{c_tag}: 非法或缺失难例 type {hc_type!r}（允许值：{sorted(VALID_HC_TYPES)}）")
+            c_tags = case.get("tags")
+            if not isinstance(c_tags, list) or not c_tags or not all(isinstance(t, str) and t.strip() for t in c_tags):
+                errors.append(f"{c_tag}: tags 必须为非空字符串列表")
+            else:
+                seen_hc_tags.update(c_tags)
+
             target_gids = case.get("target_gold_ids")
             if not isinstance(target_gids, list):
                 errors.append(f"{c_tag}: target_gold_ids 必须为数组")
@@ -338,6 +552,13 @@ def check_type_gold(gold_dir: Path, text_path: Path) -> dict:
             if not isinstance(c_mentions, list) or len(c_mentions) < 2:
                 errors.append(f"{c_tag}: 每个难例必须包含至少 2 条 mentions")
             else:
+                eff_targets: set[str] = set()
+                distinct_diff_keys: set[str] = set()
+                has_not_entity = False
+                all_generic = True
+                form_owners: set[str] = set()
+                owner_person_gids: set[str] = set()
+
                 for m_idx, hm in enumerate(c_mentions):
                     hm_tag = f"{c_tag}.mentions[{m_idx}]({hm.get('mention_id')})"
                     iv = _check_span_in_chapter(
@@ -345,11 +566,104 @@ def check_type_gold(gold_dir: Path, text_path: Path) -> dict:
                     )
                     if iv is not None:
                         hc_intervals.append((iv[0], iv[1], hm_tag))
+                        _check_clue(hm, text, iv[0], iv[1], hm_tag, errors)
+                        _check_not_strict_substring_of_longer_registered_name(
+                            text, iv[0], iv[1], registered_names_desc, hm_tag, errors
+                        )
+                        cross_layer_spans.setdefault(iv, []).append(
+                            (hm.get("entity_type"), hm.get("gold_id"), hm.get("refers_to"), hm_tag)
+                        )
                     _check_type_and_refs(hm, MENTION_ENTITY_TYPES, roster_ids, hm_tag, errors)
                     _check_item_provenance(hm, hm_tag, errors)
                     hc_mention_count += 1
 
+                    m_etype = hm.get("entity_type")
+                    m_gid = hm.get("gold_id")
+                    m_ref = hm.get("refers_to")
+                    m_owner = hm.get("owner")
+                    eff = m_gid or m_ref
+                    if eff:
+                        eff_targets.add(eff)
+                        distinct_diff_keys.add(f"gid:{eff}")
+                    else:
+                        distinct_diff_keys.add(f"non_gid:{m_etype}:{m_idx}")
+                    if m_etype == "not_entity":
+                        has_not_entity = True
+                        if isinstance(m_owner, str) and m_owner:
+                            form_owners.add(m_owner)
+                    if m_etype != "generic":
+                        all_generic = False
+                    if isinstance(m_gid, str) and m_gid:
+                        owner_person_gids.add(m_gid)
+
+                # Validate Check #5 consistency between hc_type and mentions
+                if hc_type in {"same", "policy_pending"}:
+                    if has_not_entity or len(eff_targets) != 1 or any((hm.get("gold_id") or hm.get("refers_to")) is None for hm in c_mentions):
+                        errors.append(
+                            f"{c_tag}: type={hc_type!r} 要求所有提及指向恰好 1 个有效所指（实际所指集合={sorted(eff_targets)}, 含not_entity={has_not_entity}）"
+                        )
+                elif hc_type == "different":
+                    if len(distinct_diff_keys) < 2:
+                        errors.append(
+                            f"{c_tag}: type='different' 要求至少包含 2 个不同所指（实际={sorted(distinct_diff_keys)}）"
+                        )
+                elif hc_type == "generic_no_merge":
+                    if not all_generic:
+                        errors.append(f"{c_tag}: type='generic_no_merge' 要求所有提及均为 generic 类型")
+                elif hc_type == "form_of":
+                    if len(form_owners) != 1 or form_owners != owner_person_gids:
+                        errors.append(
+                            f"{c_tag}: type='form_of' 要求由带 owner 的形态提及与同一主人提及组成（form_owners={sorted(form_owners)}, person_gids={sorted(owner_person_gids)}）"
+                        )
+                    else:
+                        only_owner = next(iter(form_owners))
+                        for hm in c_mentions:
+                            if not (hm.get("gold_id") == only_owner or (hm.get("entity_type") == "not_entity" and hm.get("owner") == only_owner)):
+                                errors.append(f"{c_tag}: type='form_of' 含不属于主人 {only_owner!r} 的提及")
+
+                # Special tag-specific checks for Check #6
+                if isinstance(c_tags, list):
+                    if "baojian_multi_chapter" in c_tags:
+                        ch_set = {hm.get("chapter_ordinal") for hm in c_mentions if hm.get("text") == "宝剑"}
+                        bj_cnt = sum(1 for hm in c_mentions if hm.get("text") == "宝剑")
+                        if len(ch_set) < 5 or bj_cnt < 10:
+                            errors.append(
+                                f"{c_tag}: baojian_multi_chapter 要求‘宝剑’跨 >=5 回且 >=10 处（实际 {len(ch_set)} 回 {bj_cnt} 处）"
+                            )
+                    if "nezha_sanshoubabi_form" in c_tags:
+                        ch_set = {hm.get("chapter_ordinal") for hm in c_mentions}
+                        if hc_type != "form_of" or len(ch_set) < 2:
+                            errors.append(
+                                f"{c_tag}: nezha_sanshoubabi_form 要求 type='form_of' 且跨 >=2 回（实际 type={hc_type!r}, 回数={len(ch_set)}）"
+                            )
+                    if "yiqihuasanqing" in c_tags and hc_type != "same":
+                        errors.append(f"{c_tag}: yiqihuasanqing (HC021) 要求 type='same'（实际 {hc_type!r}）")
+                    if "shijuezhen_vs_subarrays" in c_tags and hc_type != "different":
+                        errors.append(f"{c_tag}: shijuezhen_vs_subarrays (HC041) 要求 type='different'（实际 {hc_type!r}）")
+
         _check_no_duplicate_or_overlapping_intervals(hc_intervals, "hard_cases.json", errors)
+
+    # Check #6: required Fengshen hard case checklist tags
+    should_check_fengshen_tags = (
+        require_fengshen_checklist
+        if require_fengshen_checklist is not None
+        else (hard_cases.get("book") == "封神演义")
+    )
+    if should_check_fengshen_tags:
+        missing_tags = sorted(REQUIRED_FENGSHEN_HC_TAGS - seen_hc_tags)
+        if missing_tags:
+            errors.append(f"hard_cases.json: 缺少 0.14b 规格一第 4 项要求的难例标签: {missing_tags}")
+
+    # Check #2: Cross-layer interval consistency
+    for iv, records in sorted(cross_layer_spans.items()):
+        if len(records) > 1:
+            base_sig = records[0][:3]
+            base_tag = records[0][3]
+            for rec in records[1:]:
+                if rec[:3] != base_sig:
+                    errors.append(
+                        f"跨层区间不一致 [{iv[0]}, {iv[1]}): {base_tag}={base_sig} vs {rec[3]}={rec[:3]}"
+                    )
 
     summary = {
         "source_sha256": expected_sha256,
@@ -373,7 +687,7 @@ def check_type_gold(gold_dir: Path, text_path: Path) -> dict:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="校验 0.14a 多类型金标准三层文件")
+    parser = argparse.ArgumentParser(description="校验 0.14a/0.14b 多类型金标准三层文件")
     parser.add_argument("--gold", required=True, type=Path, help="金标准目录（含 roster.json, mentions.json, hard_cases.json）")
     parser.add_argument("--text", required=True, type=Path, help="对应小说原文路径")
     args = parser.parse_args(argv)
