@@ -117,7 +117,7 @@ python -X utf8 -m entitytrace correct <run_id> revoke <更正ID> [--cascade] --s
 | `0` | `null` | — | `run` 完成（含 `completed` 与 `completed_with_review`）、查询成功、`correct` 成功 | 正常读取 JSON 结果；若 `status="completed_with_review"`，按 `review_top` 或 `review` 查看高影响待审项 |
 | `2` | `network` | `true` | 网络连接中断、超时、服务端 `5xx` 或连续断网熔断，数据库已保存断点 | 可退避等待后使用**同一 `--db` 与输入参数**自动重跑 `run --json` 断点续跑 |
 | `2` | `budget` | `true` | 触达 `--max-requests` 或 `--max-seconds` 预算上限停止，已完成任务保存在库 | 在宿主被授予的总预算范围内可扩大预算参数同库续跑；超出用户授权预算时询问用户 |
-| `2` | `model_output` | `true` | 个别任务模型输出连续格式错误，阶段未完成但留有断点 | 允许同库自动续跑 **1 次**（已完成任务全部复用不重发）；若仍失败则停止并向用户报告 |
+| `2` | `model_output` | `true` | 个别任务模型输出连续格式错误，阶段未完成但留有断点（注：C3 链接任务连续返回非法输出时自动将该任务待链项转待审并正常完成，不阻断全书） | 允许同库自动续跑 **1 次**（已完成任务全部复用不重发）；若仍失败则停止并向用户报告 |
 | `2` | `quota` | **`false`** | API 余额不足、硬额度耗尽（`hard_quota`）或 `402/429` 配额限制，库内保留断点 | **严禁自动重跑**；必须立即向用户报告额度耗尽，待用户充值或更换凭证后再同库恢复 |
 | `2` | `null` | — | 显式指定 `--stop-after chapters` 或 `--stop-after discovery` 到达阶段断点 | 按编排计划决定是否继续推进后续阶段 |
 | `1` | `conflict` | `false` | `correct --expect-revision` 与当前实际 `result_revision` 不一致（结果版本已过期） | **不得直接用旧参数强推**；必须重新调用 `status` / `entities` / `entity` / `review` 读取最新状态与实体 ID，核对后再提交 |

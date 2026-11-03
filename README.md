@@ -43,7 +43,7 @@ EntityTrace 是面向 agent 的插件，提供小说实体发现、身份判断�
 | 提及发现 | DeepSeek + 本地并发任务池 | 各章独立发现称呼与引用，长章拆任务；逐字核对提及地址 |
 | 章内归并（C1） | DeepSeek + 本地结构与边界校验 | 按发现片段整段上下文将称呼归入章内对象，区分专名／称谓／描述词，支持逐提及例外指派与非实体建议 |
 | 跨章名册与复核（C2） | 本地并查集 + DeepSeek 分区复核／补合并核验 | 仅 `proper_name` 参与跨章候选聚合；多名称、粗类冲突或弱专名送分区复核；按粗类与跨粗类提议补合并，经双侧 ≥600 码点原文核验确认，不可合并约束全程硬拦截 |
-| 未决与非专名链接（C3） | 本地唯一称呼直连 + DeepSeek 候选链接 | 章内对象确定性落入名册；只含非专名称呼的对象与章内未决提及在候选名册与原文证据下链接，受专名一致性硬约束保护 |
+| 未决与非专名链接（C3） | 本地唯一称呼直连 + DeepSeek 候选链接 | 章内对象确定性落入名册；只含非专名称呼的对象与章内未决提及在候选名册与原文证据下链接，受专名一致性硬约束保护；单任务若连续返回非法格式则自动将该任务待链项转入待审而不阻断全书完成 |
 | 待审排序与统一导出（C4） | 本地程序 | 汇总身份与定位待审并按受影响提及数（`impact`）降序排列，校验全部码点地址与覆盖完整性，导出 `schema_version=3` 产物 |
 
 默认模型配置仅使用 `deepseek-flash`（章节标注、提及发现与名册身份阶段），无需配置 `TYPESAFE_API_KEY`；仅在切换 `--identity-algorithm groups-v2` 时加载并使用固定版本 `jev-1.13.0` 执行配对身份消歧。`entity-roster-v1` 不使用未校准概率分数作主路由，而是显式记录每处提及的链接来源（`chapter_local`、`c3_model`、`surface_unique`、`unresolved`、`c3_rejected_name_mismatch`、`not_entity_suggested`）与关联请求 ID。
@@ -80,7 +80,7 @@ python -X utf8 -m entitytrace run "D:\小说\样本.txt" --identity-algorithm gr
 
 退出码约定（适用于 `run`、只读查询命令与 `correct`；与旧版“所有失败或未完成一律返回 `2`”的行为不同，现按数据状态区分 `1` 与 `2`，是否自动重试以 JSON 回执的 `error.retryable` 为准）：
 - `0`：计算或命令完成（含 `completed` 与带待审的 `completed_with_review`、查询成功、`correct` 成功）。
-- `2`：数据库中留有**可续跑的断点**（包括网络中断 `network`、预算耗尽 `budget`、模型输出连续格式错误 `model_output`、额度耗尽 `quota`，以及 `--stop-after` 阶段断点）。注意：`quota` 退出码虽为 `2`（保留已完成缓存与断点），但 `error.retryable=false`，宿主不得自动重跑。
+- `2`：数据库中留有**可续跑的断点**（包括网络中断 `network`、预算耗尽 `budget`、阶段内模型输出连续格式错误 `model_output`（注：C3 链接任务若连续返回非法输出则自动将该任务待链项转待审，不阻断阶段完成）、额度耗尽 `quota`，以及 `--stop-after` 阶段断点）。注意：`quota` 退出码虽为 `2`（保留已完成缓存与断点），但 `error.retryable=false`，宿主不得自动重跑。
 - `1`：**无可续跑的断点**，或命令被拒绝（包括输入文件缺失／解码失败或章节结构阻断 `input`、配置缺失或鉴权失败 `config`、未知 `run_id`、非法参数、`groups-v2` 运行不支持查询、结果版本过期 `conflict` 及本地校验异常 `local`，`retryable` 均为 `false`）。章节阶段先对跳号缺口按原文唯一未标注章题候选确定性补齐（`result="gap_filled"`，并对后接章／附章的无正文卷／部标题改判为 `volume`、`result="adopted_as_volume"`），再按原文证据分级处理章号异常：原文跳号（区间内找不到缺失章号）或回退后按新章题连续递增记为非阻断提示（`blocking=false`，`chapters` 仍标为 `complete=true`）；无法唯一补齐且区间内存在缺失章号的疑似标题或重复章节记为阻断待审（`blocking=true`），回执报 `error.category="input"`、`retryable=false`（退出码 `1`，重跑命中缓存结果相同，不可自动重试，可通过 `review --stage chapters` 核查）。
 
 ## 输出与回溯

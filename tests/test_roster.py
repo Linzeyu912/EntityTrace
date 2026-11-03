@@ -12,6 +12,7 @@ from entitytrace.roster import (
     C1_MAX_TOKENS,
     C2_ROW_MEMBER_CAP,
     VERSION,
+    _check_c3_links,
     apply_c1_task_result,
     normalize_surface,
     resolve_roster,
@@ -1528,6 +1529,209 @@ class RosterAlgorithmTests(unittest.TestCase):
         cap_counts = sorted(e["mention_count"] for e in roster_cap["entities"])
         # 150 个 r1 成员中 1 个被拆入 g2（连同 r2 的 2 处提及共 3 处提及），其余 149 个（含 50 个未展示成员）全部随整行归属 g1
         self.assertEqual(cap_counts, [3, 149])
+
+    def test_c3_invalid_output_turns_into_review_without_blocking_and_http_error_still_blocks(self):
+        from entitytrace.pipeline import infer_incomplete_stage_error
+
+        # 1) 验证 _check_c3_links 报错附上非法值前 80 字符
+        bad_mid_str = "obj:" + ("a" * 100) + ":e3"
+        with self.assertRaises(ModelError) as ctx_mid:
+            _check_c3_links({"links": [{"mention_id": bad_mid_str, "selected_entity_id": "none"}]}, {"m1"}, {"none", "uncertain"})
+        self.assertIn("C3 link mention_id 非法：", str(ctx_mid.exception))
+        self.assertIn("obj:aaaa", str(ctx_mid.exception))
+        self.assertLessEqual(len(str(ctx_mid.exception)), len("C3 link mention_id 非法：") + 80)
+
+        bad_sel_str = "cand_" + ("b" * 100)
+        with self.assertRaises(ModelError) as ctx_sel:
+            _check_c3_links({"links": [{"mention_id": "m1", "selected_entity_id": bad_sel_str}]}, {"m1"}, {"none", "uncertain"})
+        self.assertIn("C3 selected_entity_id 非法：", str(ctx_sel.exception))
+        self.assertIn("cand_bbbb", str(ctx_sel.exception))
+
+        # 2) 构造两章运行：第一章同时含一个非专名对象（林小姐）和一个未决单提及（那位公子）进入 C3
+        text = (
+            "第一章\n苏沛之在省城见到林小姐与那位公子。\n"
+            "第二章\n林小姐（闺名林婉）与苏沛之饮茶。\n"
+        )
+        path = self.root / "c3_invalid.txt"
+        path.write_bytes(text.encode("utf-8"))
+        source = import_text(self.store, path)
+        idx1, idx2 = text.index("第一章"), text.index("第二章")
+        _, chapters = build_chapters(
+            source,
+            [
+                {"start": idx1, "end": idx1 + 3, "title": "第一章", "kind": "chapter"},
+                {"start": idx2, "end": idx2 + 3, "title": "第二章", "kind": "chapter"},
+            ],
+        )
+        tasks = plan_tasks(source, chapters, 9000)
+        u1, u2 = tasks[0]["units"][0]["id"], tasks[1]["units"][0]["id"]
+
+        def _prep(run_id: str) -> None:
+            self.store.execute("INSERT INTO runs VALUES(?,?,?,?,?,?)", (run_id, source["id"], "{}", "{}", "now", "now"))
+            for ch in chapters:
+                self.store.put(run_id, "chapter", ch)
+            for t, disc in zip(
+                tasks,
+                [
+                    {
+                        "mentions": [
+                            {"text": "苏沛之", "kind": "person", "refs": [u1]},
+                            {"text": "林小姐", "kind": "person", "refs": [u1]},
+                            {"text": "那位公子", "kind": "person", "refs": [u1]},
+                        ],
+                        "links": [],
+                    },
+                    {
+                        "mentions": [
+                            {"text": "林小姐", "kind": "person", "refs": [u2]},
+                            {"text": "林婉", "kind": "person", "refs": [u2]},
+                            {"text": "苏沛之", "kind": "person", "refs": [u2]},
+                        ],
+                        "links": [],
+                    },
+                ],
+            ):
+                grounded = ground_result(source, t, disc, f"req_disc_{run_id}_{t['id']}")
+                recs = [
+                    (kind, rec)
+                    for kind, key in [("mention", "mentions"), ("observation", "observations"), ("review", "reviews"), ("link", "links")]
+                    for rec in grounded[key]
+                ]
+                self.store.finish_task(run_id, t, {"request_id": f"req_disc_{run_id}_{t['id']}"}, recs)
+
+        def handle_c1(state, n):
+            uid = state["units"][0]["id"]
+            if state["chapter_title"] == "第一章":
+                m_gongzi = next(r["mentions"][0]["mention_id"] for r in state["surfaces"] if r["surface"] == "那位公子")
+                return {
+                    "entities": [
+                        {
+                            "local_id": "e1",
+                            "name": "苏沛之",
+                            "kind": "person",
+                            "surfaces": [{"surface": "苏沛之", "surface_type": "proper_name"}],
+                            "evidence_ref": uid,
+                        },
+                        {
+                            "local_id": "e2",
+                            "name": "林小姐",
+                            "kind": "person",
+                            "surfaces": [{"surface": "林小姐", "surface_type": "title_or_kinship"}],
+                            "evidence_ref": uid,
+                        },
+                    ],
+                    "assignments": [
+                        {"mention_id": m_gongzi, "surface": "那位公子", "ref": uid, "local_id": None, "reason": "身份未决"},
+                    ],
+                    "not_entity": [],
+                }, f"c1_{n}"
+            return {
+                "entities": [
+                    {
+                        "local_id": "e1",
+                        "name": "林婉",
+                        "kind": "person",
+                        "surfaces": [
+                            {"surface": "林婉", "surface_type": "proper_name"},
+                            {"surface": "林小姐", "surface_type": "title_or_kinship"},
+                        ],
+                        "evidence_ref": uid,
+                    },
+                    {
+                        "local_id": "e2",
+                        "name": "苏沛之",
+                        "kind": "person",
+                        "surfaces": [{"surface": "苏沛之", "surface_type": "proper_name"}],
+                        "evidence_ref": uid,
+                    },
+                ],
+                "assignments": [],
+                "not_entity": [],
+            }, f"c1_{n}"
+
+        # 场景 A：伪模型对 C3 任务始终返回非法 mention_id（ModelError 且 status=None, code=None）
+        # -> 运行完成，该任务各项（林小姐对象与那位公子提及）进入待审且原因固定为“C3 链接请求连续返回非法输出，未能链接，转待审”
+        _prep("run_c3_bad_mid")
+        models_bad_mid = ScriptedRosterModels({
+            "roster-c1": handle_c1,
+            "roster-c2-propose": lambda state, n: ({"proposals": []}, f"prop_{n}"),
+            "roster-c3-link": lambda state, n: (
+                {"links": [{"mention_id": "obj:wrong_hash:e2", "selected_entity_id": "none", "reason": "抄错ID"}]},
+                f"c3_bad_{n}",
+            ),
+        })
+        out_bad = resolve_roster(self.store, models_bad_mid, source, "run_c3_bad_mid", concurrency=1, log=lambda _: None)
+        self.assertTrue(out_bad["complete"], out_bad)
+        roster_bad = self.store.records("run_c3_bad_mid", "roster_output")[0]
+        c3_revs = [r for r in roster_bad["reviews"] if r["stage"] == "roster-c3-link"]
+        self.assertEqual(len(c3_revs), 2)
+        for r in c3_revs:
+            self.assertEqual(r["reason"], "C3 链接请求连续返回非法输出，未能链接，转待审")
+
+        # 补充验证经 CLI run --json 调用时退出码为 0 且 status 为 completed_with_review
+        import contextlib
+        import io
+        import json
+        import os
+        from unittest.mock import patch
+        from entitytrace.cli import main as cli_main
+        from tests.test_cli_contract import CliContractStageFTests, ContractFakeModels
+
+        class BadC3ContractModels(ContractFakeModels):
+            def generate(self, system, state, stage, validate, *args, **kwargs):
+                if stage == "roster-c3-link":
+                    val = {"links": [{"mention_id": "obj:invalid_mid:e1", "selected_entity_id": "none", "reason": "bad"}]}
+                    validate(val)
+                return super().generate(system, state, stage, validate, *args, **kwargs)
+
+        cli_book = self.root / "cli_bad_c3_book.txt"
+        cli_book.write_text(CliContractStageFTests.NOVEL_TEXT, encoding="utf-8")
+        cli_db = self.root / "cli_bad_c3.sqlite3"
+        cli_out = self.root / "cli_bad_c3_out"
+        cli_cfg = self.root / "cli.env"
+        cli_cfg.write_text("DEEPSEEK_API_KEY=test_key\n", encoding="utf-8")
+        out_buf, err_buf = io.StringIO(), io.StringIO()
+        clean_env = {k: v for k, v in os.environ.items() if not k.startswith("DEEPSEEK_") and not k.startswith("TYPESAFE_")}
+        with patch.dict(os.environ, clean_env, clear=True), \
+             patch("entitytrace.pipeline.Models", BadC3ContractModels), \
+             contextlib.redirect_stdout(out_buf), \
+             contextlib.redirect_stderr(err_buf):
+            rc_cli = cli_main([
+                "run", str(cli_book),
+                "--db", str(cli_db),
+                "--output", str(cli_out),
+                "--config", str(cli_cfg),
+                "--json",
+            ])
+        self.assertEqual(rc_cli, 0, err_buf.getvalue())
+        receipt_cli = json.loads(out_buf.getvalue().strip())
+        self.assertEqual(receipt_cli["status"], "completed_with_review")
+        self.assertIsNone(receipt_cli["error"])
+        self.assertEqual(receipt_cli["review_top"][0]["reason"], "C3 链接请求连续返回非法输出，未能链接，转待审")
+
+        # 场景 B：伪网络失败（code="network_error"）或 HTTP 500（status=500） -> 仍未完成，retryable=True
+        for idx_err, sim_err in enumerate([
+            ModelError("连接超时：网络失败或超时", code="network_error"),
+            ModelError("服务端错误：HTTP 500", status=500),
+        ]):
+            rid_err = f"run_c3_net_{idx_err}"
+            _prep(rid_err)
+
+            def raise_err(state, n, exc=sim_err):
+                raise exc
+
+            models_err = ScriptedRosterModels({
+                "roster-c1": handle_c1,
+                "roster-c2-propose": lambda state, n: ({"proposals": []}, f"prop_{n}"),
+                "roster-c3-link": raise_err,
+            })
+            out_err = resolve_roster(self.store, models_err, source, rid_err, concurrency=1, log=lambda _: None)
+            self.assertFalse(out_err["complete"])
+            self.assertEqual(out_err["stage"], "roster-c3-link")
+            self.assertEqual(len(out_err["failures"]), 1)
+            inferred = infer_incomplete_stage_error({"identity": out_err})
+            self.assertIsNotNone(inferred)
+            self.assertTrue(inferred["retryable"])
 
     def test_roster_module_does_not_import_gold(self):
         source = (ROOT / "entitytrace/roster.py").read_text(encoding="utf-8")

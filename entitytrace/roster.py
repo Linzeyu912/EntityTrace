@@ -780,9 +780,11 @@ def _check_c3_links(value: dict, allowed_mids: set[str], allowed_choices: set[st
         raise ModelError("C3 链接返回格式错误")
     for item in value["links"]:
         if not isinstance(item, dict) or item.get("mention_id") not in allowed_mids:
-            raise ModelError("C3 link mention_id 非法")
+            bad_mid = repr(item.get("mention_id") if isinstance(item, dict) else item)[:80]
+            raise ModelError(f"C3 link mention_id 非法：{bad_mid}")
         if item.get("selected_entity_id") not in allowed_choices:
-            raise ModelError("C3 selected_entity_id 非法")
+            bad_sel = repr(item.get("selected_entity_id"))[:80]
+            raise ModelError(f"C3 selected_entity_id 非法：{bad_sel}")
 
 
 def _kind_compatible(k1: str, k2: str) -> bool:
@@ -2046,6 +2048,7 @@ def resolve_roster(
             c3_tasks.append({
                 "id": c3_tid,
                 "stage": "roster-c3-link",
+                "discovery_task_id": t_id,
                 "state": state,
                 "allowed_mids": {it["item_id"] for it in items},
                 "allowed_choices": set(roster_by_id) | set(all_cand_ids) | {"none", "uncertain"},
@@ -2061,11 +2064,16 @@ def resolve_roster(
         return {"links": val["links"], "request_id": req_id}
 
     c3_failures = []
+    c3_invalid_output_dtids: set[str] = set()
     for ct, res, err in bounded_map(c3_tasks, c3_worker, concurrency):
         if err:
             msg = str(err) if isinstance(err, ModelError) else "C3 提及链接错误：" + type(err).__name__
             store.fail_task(run_id, ct, msg)
-            c3_failures.append({"task_id": ct["id"], "error": msg})
+            if isinstance(err, ModelError) and getattr(err, "status", None) is None and getattr(err, "code", None) is None:
+                c3_invalid_output_dtids.add(ct["discovery_task_id"])
+                log(f"C3 任务输出连续非法，已转待审：{msg}")
+            else:
+                c3_failures.append({"task_id": ct["id"], "error": msg})
             continue
         store.finish_task(run_id, ct, res)
         for link_row in res["links"]:
@@ -2262,10 +2270,15 @@ def resolve_roster(
                 "link_refs": list(dict.fromkeys(refs)),
             }
         first_m = by_mid[obj["mention_ids"][0]]
+        obj_reason = (
+            "C3 链接请求连续返回非法输出，未能链接，转待审"
+            if obj["task_id"] in c3_invalid_output_dtids
+            else "只含非专名称呼的章内对象经 C3 候选链接仍无法确定归属"
+        )
         all_reviews.append({
             "id": digest(["c3-obj-unresolved", k]),
             "stage": "roster-c3-link",
-            "reason": "只含非专名称呼的章内对象经 C3 候选链接仍无法确定归属",
+            "reason": obj_reason,
             "surface": obj["name"],
             "impact": len(obj["mention_ids"]),
             "evidence": [first_m["address"]],
@@ -2301,10 +2314,15 @@ def resolve_roster(
             "link_refs": list(dict.fromkeys(refs)),
         }
         cand_opts = unresolved_cand_map.get(mid, [])
+        m_reason = (
+            "C3 链接请求连续返回非法输出，未能链接，转待审"
+            if (mid in unresolved_cand_map and m["task_id"] in c3_invalid_output_dtids)
+            else "C1 章内未决且 C3 未能确定所属名册条目"
+        )
         all_reviews.append({
             "id": digest(["c3-unresolved", mid]),
             "stage": "roster-c3-link",
-            "reason": "C1 章内未决且 C3 未能确定所属名册条目",
+            "reason": m_reason,
             "mention_id": mid,
             "surface": m["text"],
             "impact": 1,
