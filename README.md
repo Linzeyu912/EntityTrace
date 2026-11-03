@@ -44,9 +44,9 @@ EntityTrace 是面向 agent 的插件，提供小说实体发现、身份判断�
 | 章内归并（C1） | DeepSeek + 本地结构与边界校验 | 按发现片段整段上下文将称呼归入章内对象，区分专名／称谓／描述词，支持逐提及例外指派与非实体建议 |
 | 跨章名册与复核（C2） | 本地并查集 + DeepSeek 分区复核／补合并核验 | 仅 `proper_name` 参与跨章候选聚合；多名称、粗类冲突或弱专名送分区复核；按粗类与跨粗类提议补合并，经双侧 ≥600 码点原文核验确认，不可合并约束全程硬拦截 |
 | 未决与非专名链接（C3） | 本地唯一称呼直连 + DeepSeek 候选链接 | 章内对象确定性落入名册；只含非专名称呼的对象与章内未决提及在候选名册与原文证据下链接，受专名一致性硬约束保护；单任务若连续返回非法格式则自动将该任务待链项转入待审而不阻断全书完成 |
-| 待审排序与统一导出（C4） | 本地程序 | 汇总身份与定位待审并按受影响提及数（`impact`）降序排列，校验全部码点地址与覆盖完整性，导出 `schema_version=3` 产物 |
+| 待审排序与统一导出（C4） | 本地程序 | 同任务无歧义 C1 专名补全（`same_task_proper`）并自动消解已完整覆盖的同任务定位待审（`auto_same_task_covered`）；汇总身份与定位待审并按受影响提及数（`impact`）降序排列，校验全部码点地址与覆盖完整性，导出 `schema_version=3` 产物 |
 
-默认模型配置仅使用 `deepseek-flash`（章节标注、提及发现与名册身份阶段），无需配置 `TYPESAFE_API_KEY`；仅在切换 `--identity-algorithm groups-v2` 时加载并使用固定版本 `jev-1.13.0` 执行配对身份消歧。`entity-roster-v1` 不使用未校准概率分数作主路由，而是显式记录每处提及的链接来源（`chapter_local`、`c3_model`、`surface_unique`、`unresolved`、`c3_rejected_name_mismatch`、`not_entity_suggested`）与关联请求 ID。
+默认模型配置仅使用 `deepseek-flash`（章节标注、提及发现与名册身份阶段），无需配置 `TYPESAFE_API_KEY`；仅在切换 `--identity-algorithm groups-v2` 时加载并使用固定版本 `jev-1.13.0` 执行配对身份消歧。`entity-roster-v1` 不使用未校准概率分数作主路由，而是显式记录每处提及的链接来源（`chapter_local`、`c3_model`、`surface_unique`、`same_task_proper`、`unresolved`、`c3_rejected_name_mismatch`、`not_entity_suggested`）与关联请求 ID。
 
 ## 运行
 
@@ -102,7 +102,7 @@ python -X utf8 -m entitytrace run "D:\小说\样本.txt" --identity-algorithm gr
 - `entities[]`：包含 `id`、`name`、`names`、`aliases`（强称呼集合）、`mention_ids`、`mention_count`、`start`、`first_chapter_id`、`kind`、`identity_status`（`linked_by_roster`、`unresolved_singleton`、`not_entity_suggested`）和 `link_methods`（各链接方法计数）。**注意：名册条目 `id` 由成员首处地址与强称呼集合摘要生成，不是跨版本永久编号。**
 - `mentions[]`：在章节与原文地址、定位证据基础上，增加 `entity_id`、`link_method`、`link_refs`（以及非实体建议项的 `identity_status=not_entity_suggested`）。
 - 顶层附加 `roster_summary`（条目数、活跃条目数、单项数、各链接方法计数、`c3_rejected_name_mismatch`、身份待审数、歧义称呼数）与 `ambiguous_surfaces`（映射到多个名册条目的称呼及分布，仅作信息展示，不列为待审）。
-- `review.json`：合并身份待审与发现／定位待审，按 `impact` 降序排列，并在 `counts` 中分列 `identity_reviews` 与 `grounding_discovery_reviews`。
+- `review.json`：合并身份待审与发现／定位待审，按 `impact` 降序排列，并在 `counts` 中分列 `identity_reviews` 与 `grounding_discovery_reviews`（含自动消解或用户更正消解项时另附 `pending` 与 `resolved`）。
 - 使用 `--identity-algorithm groups-v2` 或重新导出历史旧运行时，`export` 仍按原 `schema_version=2`（或 `1`）导出，既有字段与结构保持不变。
 
 清单 `manifest.json` 记录每次调用的各阶段耗时、`wall_seconds`（从管线入口、数据库初始化至主输出导出完成，不含最终回执回写与进程启停）、`export_seconds`、`identity_seconds` 及 `budget` 执行摘要。严格比较时另测整个命令的外部墙钟时间，并注明冷／热缓存口径。

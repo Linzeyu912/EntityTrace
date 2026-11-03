@@ -2447,6 +2447,30 @@ def resolve_roster(
         "ambiguous_surface_count": len(ambiguous_surfaces),
     }
 
+    from .propagation import deduplicate_grounding_reviews, propagate_same_task_proper
+
+    final_entities, updated_mentions, ambiguous_surfaces, roster_summary, _ = propagate_same_task_proper(
+        source=source,
+        chapters=chapters,
+        discovery_tasks=discovery_tasks,
+        c1_results=c1_results,
+        entities=final_entities,
+        mentions=updated_mentions,
+        ambiguous_surfaces=ambiguous_surfaces,
+        roster_summary=roster_summary,
+        enable_book_proper=False,
+    )
+    _, resolved_grounding = deduplicate_grounding_reviews(
+        source=source,
+        discovery_tasks=discovery_tasks,
+        observations=store.records(run_id, "observation"),
+        mentions=updated_mentions,
+        reviews=store.records(run_id, "review"),
+    )
+    for r_item in resolved_grounding:
+        store.put(run_id, "review", r_item)
+    method_totals = collections.Counter(m["link_method"] for m in updated_mentions)
+
     store.put(run_id, "roster_output", {
         "id": "roster_output",
         "start": 0,

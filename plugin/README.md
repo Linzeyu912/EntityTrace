@@ -47,7 +47,7 @@ python -X utf8 -m entitytrace run "<输入TXT路径>" --db "<数据库路径>" -
 读取 `stdout` 单行回执中的核心字段：
 - `run_id`、`result_revision`、`status`（`completed` | `completed_with_review` | `incomplete` | `failed`）
 - `stages`：`chapters`、`discovery`、`identity` 各自的 `{"complete","seconds","resumed"}`
-- `counts`：`{"mentions","entities","review_items"}`
+- `counts`：`{"mentions","entities","review_items"}`（`review_items` 为当前未决 `pending` 待审数；同任务专名补全后已覆盖的冗余定位待审自动标为 `resolved`、`resolution="auto_same_task_covered"`）
 - `review_top`：按 `impact` 降序前 10 条未决待审摘要 `[{"id","stage","reason","impact"}]`
 - `output_dir`、`files`（`result`、`review`、`manifest` 路径）与 `error`
 
@@ -64,7 +64,7 @@ python -X utf8 -m entitytrace run "<输入TXT路径>" --db "<数据库路径>" -
    ```powershell
    python -X utf8 -m entitytrace review <run_id> --status pending --limit 50 --offset 0 --db "<数据库路径>"
    ```
-   可选：`--status pending|resolved|all`、`--stage <阶段名>`。返回：`counts`、`total`、`limit`、`offset`、`next_offset`、`items`。
+   可选：`--status pending|resolved|all`、`--stage <阶段名>`。返回：`counts`（含 `total`、`identity_reviews`、`grounding_discovery_reviews` 及存在已消解项时的 `pending`、`resolved`）、`total`、`limit`、`offset`、`next_offset`、`items`。
 3. **查实体名册列表或按精确称呼检索**：
    ```powershell
    python -X utf8 -m entitytrace entities <run_id> --kind person --min-mentions 5 --limit 50 --offset 0 --db "<数据库路径>"

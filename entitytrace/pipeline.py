@@ -227,11 +227,12 @@ def build_export_bundle(store: Store, run_id: str) -> dict:
             for span in mention["evidence"]:
                 validate_span(text, span, source["id"])
         ids = {m["id"] for m in mentions}
-        if ids != raw_ids or sorted(mid for e in entities for mid in e["mention_ids"]) != sorted(ids):
+        if not (raw_ids <= ids) or sorted(mid for e in entities for mid in e["mention_ids"]) != sorted(ids):
             raise ValueError("实体分组未恰好覆盖所有提及")
         pending_identity = [r for r in identity_reviews if r.get("status", "pending") == "pending"]
         pending_non_identity = [r for r in non_identity_reviews if r.get("status", "pending") == "pending"]
         pending_all = pending_identity + pending_non_identity
+        has_resolved = bool(active_user) or (len(pending_all) != len(all_reviews))
         status = "incomplete" if not complete else "completed_with_review" if pending_all else "completed"
         limitations = [
             "名册条目 ID 由成员首处地址与强称呼集合摘要生成，不是跨版本永久编号。",
@@ -264,7 +265,7 @@ def build_export_bundle(store: Store, run_id: str) -> dict:
             "identity_reviews": len(identity_reviews),
             "grounding_discovery_reviews": len(non_identity_reviews),
         }
-        if active_user:
+        if has_resolved:
             review_counts["pending"] = len(pending_all)
             review_counts["resolved"] = len(all_reviews) - len(pending_all)
         review_doc = {
@@ -307,9 +308,9 @@ def build_export_bundle(store: Store, run_id: str) -> dict:
                 "singletons": sum(1 for e in entities if len(e["mention_ids"]) == 1),
                 "unlocated_observations": sum(o["status"] == "unlocated" for o in observations),
                 "decisions": len(decisions),
-                "review_items": len(pending_all) if active_user else len(all_reviews),
-                "identity_review_items": len(pending_identity) if active_user else len(identity_reviews),
-                "grounding_discovery_review_items": len(pending_non_identity) if active_user else len(non_identity_reviews),
+                "review_items": len(pending_all) if has_resolved else len(all_reviews),
+                "identity_review_items": len(pending_identity) if has_resolved else len(identity_reviews),
+                "grounding_discovery_review_items": len(pending_non_identity) if has_resolved else len(non_identity_reviews),
             },
             "validation": {
                 "source_hashes": True,
