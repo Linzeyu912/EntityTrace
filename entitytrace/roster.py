@@ -1837,10 +1837,14 @@ def resolve_roster(
     c3_by_task: dict[str, list[dict]] = collections.defaultdict(list)
     non_proper_without_candidates: list[tuple[str, str]] = []
     non_proper_cand_map: dict[str, list[str]] = {}
+    cannot_merge_by_obj: dict[tuple[str, str], set[tuple[str, str]]] = collections.defaultdict(set)
+    for ka, kb in cannot_merge_objs:
+        cannot_merge_by_obj[ka].add(kb)
+        cannot_merge_by_obj[kb].add(ka)
 
     for k in non_proper_obj_keys:
         obj = local_objects[k]
-        forb = {kb for (ka, kb) in cannot_merge_objs if ka == k} | {ka for (ka, kb) in cannot_merge_objs if kb == k}
+        forb = cannot_merge_by_obj.get(k, set())
         req_pnorms: set[str] = {normalize_surface(s) for s in obj.get("proper_surfaces", []) if normalize_surface(s)}
         for s, st in obj.get("surface_types", {}).items():
             if st == "proper_name" and normalize_surface(s):

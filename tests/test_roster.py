@@ -1216,6 +1216,27 @@ class RosterAlgorithmTests(unittest.TestCase):
             with self.assertRaises(ModelError):
                 validate_c1_structure(raw_bad, allowed_surfs, allowed_refs, Strict=True, allowed_mention_ids=allowed_mids)
 
+    def test_cannot_merge_adjacency_index_matches_pairwise_scan(self):
+        import collections
+        import random
+
+        rng = random.Random(20261103)
+        obj_pool = [(f"t{i // 5}", f"e{i % 5}") for i in range(60)]
+        cannot_merge_objs: set[tuple[tuple[str, str], tuple[str, str]]] = set()
+        for _ in range(250):
+            a, b = rng.sample(obj_pool, 2)
+            cannot_merge_objs.add((min(a, b), max(a, b)))
+
+        cannot_merge_by_obj: dict[tuple[str, str], set[tuple[str, str]]] = collections.defaultdict(set)
+        for ka, kb in cannot_merge_objs:
+            cannot_merge_by_obj[ka].add(kb)
+            cannot_merge_by_obj[kb].add(ka)
+
+        for k in obj_pool:
+            old_forb = {kb for (ka, kb) in cannot_merge_objs if ka == k} | {ka for (ka, kb) in cannot_merge_objs if kb == k}
+            new_forb = cannot_merge_by_obj.get(k, set())
+            self.assertEqual(new_forb, old_forb)
+
     def test_roster_module_does_not_import_gold(self):
         source = (ROOT / "entitytrace/roster.py").read_text(encoding="utf-8")
         self.assertNotIn("entity-gold", source)
