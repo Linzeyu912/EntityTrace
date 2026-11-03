@@ -519,14 +519,16 @@ def _compute_b3_and_split_merge(
 
 
 def _classify_hard_case_type(case: dict) -> str:
-    """将难例映射为 0.14a 规格二第 6 项规定的四类：same | different | generic_no_merge | policy_pending。"""
-    if case.get("type") in {"same", "different", "generic_no_merge", "policy_pending"}:
+    """将难例映射为 0.14b 规格二规定的五类：same | different | generic_no_merge | form_of | policy_pending。"""
+    if case.get("type") in {"same", "different", "generic_no_merge", "policy_pending", "form_of"}:
         return case["type"]
     cid = case.get("case_id", "")
     title = case.get("title", "")
     if cid == "HC021" or "一气化三清" in title:
         return "policy_pending"
     c_mentions = case.get("mentions", [])
+    if any(m.get("owner") for m in c_mentions):
+        return "form_of"
     if any(m.get("entity_type") == "generic" for m in c_mentions):
         return "generic_no_merge"
     gids = {m.get("gold_id") for m in c_mentions if m.get("gold_id")}
@@ -540,12 +542,16 @@ def _evaluate_hard_cases(
     cases: list[dict],
     matched_map: dict[str, dict],
     pred_entities: dict[str, dict] | None = None,
+    owner_peids: dict[str, set[str]] | None = None,
+    dom_gid_map: dict[str, str | None] | None = None,
 ) -> dict:
     """逐条评估 hard_cases.json：
-    1) 保持原有 overall_pass_rate / by_category（严格检查召回+类型+归组）；
-    2) 同时按 0.14a 规格二第 6 项输出 by_spec2_type（same / different / generic_no_merge / policy_pending，其中 policy_pending 只列出不计分）。
+    1) 保持原有 overall_pass_rate / by_category（旧口径：未召回即失败）；
+    2) 按 0.14b 规格二第 1 项区分三种结果（passed / wrong / unscorable），输出可评通过率（分母为 passed+wrong）、可评覆盖率与旧口径通过率。
     """
     pred_entities = pred_entities or {}
+    owner_peids = owner_peids or {}
+    dom_gid_map = dom_gid_map or {}
     case_results = []
     by_cat_pass: dict[str, int] = collections.Counter()
     by_cat_total: dict[str, int] = collections.Counter()
@@ -553,7 +559,8 @@ def _evaluate_hard_cases(
     failed_ids: list[str] = []
 
     spec2_type_pass: dict[str, list[str]] = collections.defaultdict(list)
-    spec2_type_fail: dict[str, list[str]] = collections.defaultdict(list)
+    spec2_type_wrong: dict[str, list[str]] = collections.defaultdict(list)
+    spec2_type_unscorable: dict[str, list[str]] = collections.defaultdict(list)
     policy_pending_list: list[dict] = []
 
     for case in cases:
@@ -564,67 +571,95 @@ def _evaluate_hard_cases(
         c_mentions = case["mentions"]
 
         reasons: list[str] = []
-        spec2_reasons: list[str] = []
+        wrong_reasons: list[str] = []
+        unscorable_reasons: list[str] = []
         gid_to_peids: dict[str, set[str]] = collections.defaultdict(set)
         peid_to_gids: dict[str, set[str]] = collections.defaultdict(set)
         matched_peids_all: list[str] = []
+        local_owner_peids: dict[str, set[str]] = collections.defaultdict(set)
+
+        for hm in c_mentions:
+            ekey = f"hc:{cid}:{hm['mention_id']}"
+            gid = hm.get("gold_id") or hm.get("refers_to")
+            p = matched_map.get(ekey)
+            if gid and p is not None and p.get("entity_id"):
+                local_owner_peids[gid].add(p["entity_id"])
 
         for hm in c_mentions:
             ekey = f"hc:{cid}:{hm['mention_id']}"
             gt = hm["entity_type"]
             gid = hm.get("gold_id") or hm.get("refers_to")
+            owner_gid = hm.get("owner")
             p = matched_map.get(ekey)
 
             if gt in PROPER_TYPES:
-                if p is None:
-                    reasons.append(f"{hm['mention_id']}({hm['text']}) 未被召回")
-                    spec2_reasons.append(f"{hm['mention_id']}({hm['text']}) 未被召回")
+                if p is None or not p.get("entity_id"):
+                    msg = f"{hm['mention_id']}({hm['text']}) 未被召回"
+                    reasons.append(msg)
+                    unscorable_reasons.append(msg)
                 else:
                     if p["kind"] != gt:
                         reasons.append(f"{hm['mention_id']}({hm['text']}) 类型误判为 {p['kind']}（期望 {gt}）")
-                    peid = p.get("entity_id")
-                    if peid:
-                        matched_peids_all.append(peid)
-                        if gid:
-                            gid_to_peids[gid].add(peid)
-                            peid_to_gids[peid].add(gid)
+                    peid = p["entity_id"]
+                    matched_peids_all.append(peid)
+                    if gid:
+                        gid_to_peids[gid].add(peid)
+                        peid_to_gids[peid].add(gid)
             elif gt == "not_entity":
-                if p is not None:
-                    reasons.append(f"{hm['mention_id']}({hm['text']}) 非实体被误提取为 {p['kind']}")
-                    peid = p.get("entity_id")
-                    if peid:
-                        matched_peids_all.append(peid)
+                if p is not None and p.get("entity_id"):
+                    peid = p["entity_id"]
+                    matched_peids_all.append(peid)
+                    active_cnt = pred_entities.get(peid, {}).get("active_mention_count", 2)
+                    if owner_gid:
+                        valid_owner_eids = (
+                            set(owner_peids.get(owner_gid, set()))
+                            | local_owner_peids.get(owner_gid, set())
+                        )
+                        if dom_gid_map.get(peid) == owner_gid:
+                            valid_owner_eids.add(peid)
+                        if active_cnt >= 2 and peid not in valid_owner_eids:
+                            msg = f"{hm['mention_id']}({hm['text']}) 形态词落入不含主人({owner_gid})的多成员预测实体 {peid}"
+                            reasons.append(msg)
+                            wrong_reasons.append(msg)
+                    else:
+                        reasons.append(f"{hm['mention_id']}({hm['text']}) 非实体被误提取为 {p['kind']}")
                         peid_to_gids[peid].add(f"__NE_{hm['mention_id']}")
-                        if pred_entities.get(peid, {}).get("active_mention_count", 2) >= 2:
-                            spec2_reasons.append(f"{hm['mention_id']}({hm['text']}) 非实体被并入多成员实体 {peid}")
+                        if active_cnt >= 2:
+                            wrong_reasons.append(f"{hm['mention_id']}({hm['text']}) 非实体被并入多成员实体 {peid}")
             elif gt == "generic":
-                if p is not None:
+                if p is not None and p.get("entity_id"):
                     reasons.append(f"{hm['mention_id']}({hm['text']}) 泛指词被提取为专名实体({p['kind']})")
-                    peid = p.get("entity_id")
-                    if peid:
-                        matched_peids_all.append(peid)
-                        tag = gid if gid else f"__GEN_{hm['chapter_ordinal']}_{hm['mention_id']}"
-                        peid_to_gids[peid].add(tag)
-                        if hm.get("refers_to") is None:
-                            chs = pred_entities.get(peid, {}).get("active_chapters", [])
-                            if len(chs) >= 2:
-                                spec2_reasons.append(
-                                    f"{hm['mention_id']}({hm['text']}) 无指代泛称所在预测实体 {peid} 跨 {len(chs)} 回({chs})"
-                                )
+                    peid = p["entity_id"]
+                    matched_peids_all.append(peid)
+                    tag = gid if gid else f"__GEN_{hm['chapter_ordinal']}_{hm['mention_id']}"
+                    peid_to_gids[peid].add(tag)
+                    if hm.get("refers_to") is None:
+                        chs = pred_entities.get(peid, {}).get("active_chapters", [])
+                        if len(chs) >= 2:
+                            wrong_reasons.append(
+                                f"{hm['mention_id']}({hm['text']}) 无指代泛称所在预测实体 {peid} 跨 {len(chs)} 回({chs})"
+                            )
+                elif gid is not None and hc_type in {"same", "different", "policy_pending"}:
+                    unscorable_reasons.append(f"{hm['mention_id']}({hm['text']}) 带所指泛称未被召回")
 
         for gid, peids in gid_to_peids.items():
             if len(peids) > 1:
                 msg = f"同指实体 {gid} 被拆成 {len(peids)} 个预测实体"
                 reasons.append(msg)
                 if hc_type in {"same", "policy_pending"}:
-                    spec2_reasons.append(msg)
+                    wrong_reasons.append(msg)
+
+        if hc_type in {"same", "policy_pending"} and len(set(matched_peids_all)) > 1 and not wrong_reasons:
+            msg = f"同指提及被拆成 {len(set(matched_peids_all))} 个预测实体"
+            reasons.append(msg)
+            wrong_reasons.append(msg)
 
         for peid, gids in peid_to_gids.items():
             if len(gids) > 1:
                 msg = f"不同对象 {sorted(gids)} 被错并入同一预测实体 {peid}"
                 reasons.append(msg)
                 if hc_type in {"different", "generic_no_merge"}:
-                    spec2_reasons.append(msg)
+                    wrong_reasons.append(msg)
 
         # 对 generic_no_merge：检查不同回或不同所指的泛称是否落入同一预测实体
         if hc_type == "generic_no_merge":
@@ -639,11 +674,40 @@ def _evaluate_hard_cases(
             for peid, ref_keys in peid_to_ch_or_ref.items():
                 if len(ref_keys) > 1:
                     msg = f"不同回/不同所指的泛称 {sorted(ref_keys)} 落入同一预测实体 {peid}"
-                    if msg not in spec2_reasons:
-                        spec2_reasons.append(msg)
+                    if msg not in wrong_reasons:
+                        wrong_reasons.append(msg)
 
+        # 按 0.14b 规格二第 1 项判定三态结果：passed | wrong | unscorable
+        if hc_type in {"same", "policy_pending"}:
+            if wrong_reasons:
+                spec2_status = "wrong"
+            elif not unscorable_reasons:
+                spec2_status = "passed"
+            else:
+                spec2_status = "unscorable"
+        elif hc_type == "different":
+            if wrong_reasons:
+                spec2_status = "wrong"
+            elif not unscorable_reasons:
+                spec2_status = "passed"
+            else:
+                spec2_status = "unscorable"
+        elif hc_type == "generic_no_merge":
+            if wrong_reasons:
+                spec2_status = "wrong"
+            else:
+                spec2_status = "passed"
+        elif hc_type == "form_of":
+            if wrong_reasons:
+                spec2_status = "wrong"
+            else:
+                spec2_status = "passed"
+        else:
+            spec2_status = "wrong" if wrong_reasons else ("passed" if not unscorable_reasons else "unscorable")
+
+        spec2_reasons = wrong_reasons if spec2_status == "wrong" else (unscorable_reasons if spec2_status == "unscorable" else [])
         passed = len(reasons) == 0
-        spec2_passed = len(spec2_reasons) == 0
+        spec2_passed = spec2_status == "passed"
 
         if passed:
             by_cat_pass[cat] += 1
@@ -655,14 +719,17 @@ def _evaluate_hard_cases(
             policy_pending_list.append({
                 "case_id": cid,
                 "title": case["title"],
+                "status": spec2_status,
                 "grouped_as_same_in_run": spec2_passed,
                 "notes": spec2_reasons,
             })
         else:
-            if spec2_passed:
+            if spec2_status == "passed":
                 spec2_type_pass[hc_type].append(cid)
+            elif spec2_status == "wrong":
+                spec2_type_wrong[hc_type].append(cid)
             else:
-                spec2_type_fail[hc_type].append(cid)
+                spec2_type_unscorable[hc_type].append(cid)
 
         case_results.append({
             "case_id": cid,
@@ -670,6 +737,7 @@ def _evaluate_hard_cases(
             "spec2_type": hc_type,
             "title": case["title"],
             "passed": passed,
+            "spec2_status": spec2_status,
             "spec2_passed": spec2_passed,
             "failure_reasons": reasons,
             "spec2_failure_reasons": spec2_reasons,
@@ -685,32 +753,54 @@ def _evaluate_hard_cases(
         for cat, total in sorted(by_cat_total.items())
     }
 
+    def _summarize_3state(p_list: list[str], w_list: list[str], u_list: list[str]) -> dict:
+        scorable_cnt = len(p_list) + len(w_list)
+        total_cnt = scorable_cnt + len(u_list)
+        return {
+            **fraction(len(p_list), scorable_cnt),
+            "pass_rate_scorable": fraction(len(p_list), scorable_cnt),
+            "scorable_coverage": fraction(scorable_cnt, total_cnt),
+            "old_pass_rate": fraction(len(p_list), total_cnt),
+            "passed_count": len(p_list),
+            "wrong_count": len(w_list),
+            "unscorable_count": len(u_list),
+            "total_count": total_cnt,
+            "passed_case_ids": p_list,
+            "wrong_case_ids": w_list,
+            "unscorable_case_ids": u_list,
+            "failed_case_ids": w_list + u_list,
+        }
+
     by_spec2_type = {}
     scored_pass_all: list[str] = []
-    scored_fail_all: list[str] = []
-    for t in ("same", "different", "generic_no_merge"):
+    scored_wrong_all: list[str] = []
+    scored_unscorable_all: list[str] = []
+    scored_types = ["same", "different", "generic_no_merge", "form_of"]
+    for t in scored_types:
         p_list = spec2_type_pass.get(t, [])
-        f_list = spec2_type_fail.get(t, [])
+        w_list = spec2_type_wrong.get(t, [])
+        u_list = spec2_type_unscorable.get(t, [])
+        if t == "form_of" and not (p_list or w_list or u_list):
+            continue
         scored_pass_all.extend(p_list)
-        scored_fail_all.extend(f_list)
-        by_spec2_type[t] = {
-            **fraction(len(p_list), len(p_list) + len(f_list)),
-            "passed_case_ids": p_list,
-            "failed_case_ids": f_list,
-        }
+        scored_wrong_all.extend(w_list)
+        scored_unscorable_all.extend(u_list)
+        by_spec2_type[t] = _summarize_3state(p_list, w_list, u_list)
+
     by_spec2_type["policy_pending"] = {
         "status": "listed_only_not_scored",
         "count": len(policy_pending_list),
         "cases": policy_pending_list,
     }
-    by_spec2_type["scored_total"] = {
-        **fraction(len(scored_pass_all), len(scored_pass_all) + len(scored_fail_all)),
-        "passed_case_ids": scored_pass_all,
-        "failed_case_ids": scored_fail_all,
-    }
+    by_spec2_type["scored_total"] = _summarize_3state(
+        scored_pass_all, scored_wrong_all, scored_unscorable_all
+    )
 
     return {
         "overall_pass_rate": fraction(len(passed_ids), len(cases)),
+        "scorable_pass_rate": by_spec2_type["scored_total"]["pass_rate_scorable"],
+        "scorable_coverage": by_spec2_type["scored_total"]["scorable_coverage"],
+        "old_scored_pass_rate": by_spec2_type["scored_total"]["old_pass_rate"],
         "passed_case_ids": passed_ids,
         "failed_case_ids": failed_ids,
         "by_category": by_category,
@@ -813,15 +903,17 @@ def _compute_spec2_metrics(
     item1_all_layers = compute_item1_recall(combined_gold, m_all, include_person=True)
 
     # ------------------------------------------------------------------
-    # 预先基于全层与穷尽层构建每个预测实体的主导 gold_id
+    # 预先基于全层与穷尽层构建每个预测实体的主导 gold_id 与主人实体集合
     # ------------------------------------------------------------------
     by_pred_all_gids: dict[str, list[str]] = collections.defaultdict(list)
+    owner_peids_all: dict[str, set[str]] = collections.defaultdict(set)
     for g in combined_gold:
         eff_gid = g.get("gold_id") or g.get("refers_to")
         if eff_gid and g["_eval_key"] in m_all:
             peid = m_all[g["_eval_key"]].get("entity_id")
             if peid:
                 by_pred_all_gids[peid].append(eff_gid)
+                owner_peids_all[eff_gid].add(peid)
 
     by_pred_ex_gids: dict[str, list[str]] = collections.defaultdict(list)
     for g in exhaustive_gold:
@@ -839,11 +931,14 @@ def _compute_spec2_metrics(
             dom_gid_ex[peid] = infer_predicted_entity_gold_id(peid, by_pred_ex_gids, pent, alias_norm_to_unique_gid)
         else:
             dom_gid_ex[peid] = dom_gid_all[peid]
+        if dom_gid_all[peid]:
+            owner_peids_all[dom_gid_all[peid]].add(peid)
 
     # ------------------------------------------------------------------
     # 2. 分类链接精确率：已匹配、且被系统放进多成员实体的提及中，所属实体正确的比例。
     #    实体的金标准身份取其已匹配成员中占多数的 gold_id；
-    #    not_entity 进入多成员实体、refers_to=null 的泛称所在实体跨 >=2 回，都算错并计入分母。
+    #    not_entity 进入多成员实体（带 owner 的形态词仅在落入不含主人的多成员实体时计错）、
+    #    refers_to=null 的泛称所在实体跨 >=2 回，都算错并计入分母。
     # ------------------------------------------------------------------
     def compute_item2_link_precision(
         gold_list: list[dict],
@@ -851,6 +946,13 @@ def _compute_spec2_metrics(
         dom_gid_map: dict[str, str | None],
         include_person: bool = False,
     ) -> dict:
+        local_owner_peids: dict[str, set[str]] = collections.defaultdict(set)
+        for g in gold_list:
+            eff_gid = g.get("gold_id") or g.get("refers_to")
+            p = matched_map.get(g["_eval_key"])
+            if eff_gid and p is not None and p.get("entity_id"):
+                local_owner_peids[eff_gid].add(p["entity_id"])
+
         records = []
         for g in gold_list:
             p = matched_map.get(g["_eval_key"])
@@ -888,6 +990,16 @@ def _compute_spec2_metrics(
                     "error_type": None if is_ok else "wrong_entity_identity",
                 })
             elif gt == "not_entity":
+                owner_gid = g.get("owner")
+                if owner_gid:
+                    valid_owner_eids = (
+                        set(owner_peids_all.get(owner_gid, set()))
+                        | local_owner_peids.get(owner_gid, set())
+                    )
+                    if dom_gid_map.get(peid) == owner_gid:
+                        valid_owner_eids.add(peid)
+                    if peid in valid_owner_eids:
+                        continue
                 records.append({
                     "sample_id": sid,
                     "surface": g.get("text", ""),
@@ -1040,7 +1152,7 @@ def _compute_spec2_metrics(
     item3_all_layers = compute_item3_b3_matched_only(combined_gold, m_all, include_person=True)
 
     # ------------------------------------------------------------------
-    # 4. 泛称跨章误并：refers_to=null 的泛称中，所属预测实体跨 >=2 回的条数 / 已匹配条数
+    # 4. 泛称跨章误并：refers_to=null 的泛称中，所属预测实体跨 >=2 回的条数 / 已匹配条数，及跨章误并实体个数与名称
     # ------------------------------------------------------------------
     def compute_item4_generic_overmerge(gold_list: list[dict], matched_map: dict[str, dict]) -> dict:
         pure_generics = [
@@ -1101,6 +1213,9 @@ def _compute_spec2_metrics(
             "overmerge_rate_among_matched": fraction(len(overmerged_all_ch_ids), len(matched_gens)),
             "overmerge_rate_sampled_chapters_only": fraction(len(overmerged_gold_ch_ids), len(matched_gens)),
             "overmerge_rate_among_all_pure_generic": fraction(len(overmerged_all_ch_ids), len(pure_generics)),
+            "overmerged_entity_count": len(overmerged_entities_list),
+            "overmerged_entity_names": [e["name"] for e in overmerged_entities_list],
+            "overmerged_entity_ids": [e["entity_id"] for e in overmerged_entities_list],
             "total_pure_generic_count": len(pure_generics),
             "matched_pure_generic_count": len(matched_gens),
             "unmatched_pure_generic_count": len(unmatched_ids),
@@ -1184,9 +1299,13 @@ def _compute_spec2_metrics(
             ng_alt = [r[id_key] for r in recs if not r["ok_kind_or_alt"]]
             ok_s7 = [r[id_key] for r in recs if r["ok_strict_7"]]
             ok_c4 = [r[id_key] for r in recs if r["ok_4class"]]
+            base_alt = fraction(len(ok_alt), len(recs))
             return {
+                **base_alt,
+                "correct_ids": ok_alt,
+                "wrong_ids": ng_alt,
                 "kind_or_alt_kinds": {
-                    **fraction(len(ok_alt), len(recs)),
+                    **base_alt,
                     "correct_ids": ok_alt,
                     "wrong_ids": ng_alt,
                 },
@@ -1368,7 +1487,8 @@ def evaluate_single_result(
     for m in mentions_doc.get("mentions", []):
         exhaustive_gold.append({**m, "_eval_key": f"ex:{m['mention_id']}"})
     for sk in mentions_doc.get("skips", []):
-        exhaustive_gold.append({**sk, "_eval_key": f"ex:{sk['skip_id']}"})
+        if sk.get("entity_type") != "person":
+            exhaustive_gold.append({**sk, "_eval_key": f"ex:{sk['skip_id']}"})
 
     hc_gold: list[dict] = []
     for case in hard_cases_doc.get("cases", []):
@@ -1416,19 +1536,49 @@ def evaluate_single_result(
 
     run_meta = _extract_run_meta(result_path, result_doc, pred_mentions, pred_entities)
 
+    alias_owners: dict[str, set[str]] = collections.defaultdict(set)
+    for gid, gent in roster_map.items():
+        for al in [gent.get("canonical_name", "")] + list(gent.get("aliases", [])):
+            if al:
+                alias_owners[normalize_surface(al)].add(gid)
+    alias_norm_to_unique_gid = {
+        k: next(iter(v)) for k, v in alias_owners.items() if len(v) == 1
+    }
+
     def compute_under_mode(strict_only: bool) -> dict:
         m_ex = match_gold_to_pred(exhaustive_gold, pred_mentions, strict_only=strict_only)
-        m_hc = match_gold_to_pred(hc_gold, pred_mentions, strict_only=strict_only)
+        m_hc: dict[str, dict] = {}
+        for case in hard_cases_doc.get("cases", []):
+            cid = case["case_id"]
+            case_items = [{**hm, "_eval_key": f"hc:{cid}:{hm['mention_id']}"} for hm in case.get("mentions", [])]
+            m_hc.update(match_gold_to_pred(case_items, pred_mentions, strict_only=strict_only))
         m_ro = match_gold_to_pred(roster_rep_gold, pred_mentions, strict_only=strict_only)
         m_all = match_gold_to_pred(combined_gold, pred_mentions, strict_only=strict_only)
         m_rh = match_gold_to_pred(rh_positive_gold, pred_mentions, strict_only=strict_only)
+
+        by_pred_all_gids: dict[str, list[str]] = collections.defaultdict(list)
+        owner_peids: dict[str, set[str]] = collections.defaultdict(set)
+        for g in combined_gold:
+            eff_gid = g.get("gold_id") or g.get("refers_to")
+            if eff_gid and g["_eval_key"] in m_all:
+                peid = m_all[g["_eval_key"]].get("entity_id")
+                if peid:
+                    by_pred_all_gids[peid].append(eff_gid)
+                    owner_peids[eff_gid].add(peid)
+        dom_gid_all: dict[str, str | None] = {}
+        for peid, pent in pred_entities.items():
+            dom_gid_all[peid] = infer_predicted_entity_gold_id(peid, by_pred_all_gids, pent, alias_norm_to_unique_gid)
+            if dom_gid_all[peid]:
+                owner_peids[dom_gid_all[peid]].add(peid)
 
         per_chapter_cm = {}
         for ch_ord in sorted(sampled_ords):
             ch_sub = [g for g in exhaustive_gold if g.get("chapter_ordinal") == ch_ord]
             per_chapter_cm[str(ch_ord)] = _build_confusion_matrix(ch_sub, m_ex)
 
-        hc_eval = _evaluate_hard_cases(hard_cases_doc.get("cases", []), m_hc, pred_entities)
+        hc_eval = _evaluate_hard_cases(
+            hard_cases_doc.get("cases", []), m_hc, pred_entities, owner_peids, dom_gid_all
+        )
         spec2 = _compute_spec2_metrics(
             exhaustive_gold,
             combined_gold,
@@ -1604,7 +1754,8 @@ def compare_multiple_runs(
     for m in mentions_doc.get("mentions", []):
         exhaustive_gold.append({**m, "_eval_key": f"ex:{m['mention_id']}"})
     for sk in mentions_doc.get("skips", []):
-        exhaustive_gold.append({**sk, "_eval_key": f"ex:{sk['skip_id']}"})
+        if sk.get("entity_type") != "person":
+            exhaustive_gold.append({**sk, "_eval_key": f"ex:{sk['skip_id']}"})
 
     hc_gold: list[dict] = []
     for case in hard_cases_doc.get("cases", []):
@@ -1733,6 +1884,10 @@ def compare_multiple_runs(
             s1["item4_generic_cross_chapter_overmerge"]["exhaustive_layer"]["overmerge_rate_among_matched"]["value"],
             s2["item4_generic_cross_chapter_overmerge"]["exhaustive_layer"]["overmerge_rate_among_matched"]["value"],
         ),
+        "item4_generic_cross_chapter_overmerge_entity_count_exhaustive": _diff_stat(
+            s1["item4_generic_cross_chapter_overmerge"]["exhaustive_layer"]["overmerged_entity_count"],
+            s2["item4_generic_cross_chapter_overmerge"]["exhaustive_layer"]["overmerged_entity_count"],
+        ),
         "item5_coarse_type_accuracy_entity_level": _diff_stat(
             s1["item5_coarse_type_accuracy"]["all_layers"]["entity_level"]["total"]["kind_or_alt_kinds"]["value"],
             s2["item5_coarse_type_accuracy"]["all_layers"]["entity_level"]["total"]["kind_or_alt_kinds"]["value"],
@@ -1746,7 +1901,8 @@ def compare_multiple_runs(
                 s1["item6_hard_cases_by_type"][t]["value"],
                 s2["item6_hard_cases_by_type"][t]["value"],
             )
-            for t in ("same", "different", "generic_no_merge", "scored_total")
+            for t in ("same", "different", "generic_no_merge", "form_of", "scored_total")
+            if t in s1["item6_hard_cases_by_type"] and t in s2["item6_hard_cases_by_type"]
         },
         "item7_unmatched_pred_non_person_in_sampled_chapters": _diff_stat(
             s1["item7_unmatched_pred_non_person_in_sampled_chapters"]["unmatched_against_exhaustive_count"],

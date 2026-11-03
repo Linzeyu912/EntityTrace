@@ -557,6 +557,231 @@ class TestTypeGoldEval(unittest.TestCase):
             self.assertEqual(co_b3["co_matched_count"], 1)
             self.assertAlmostEqual(co_b3["b3_f1_vs_run1"], 1.0)
 
+    def test_spec2_014b_3state_hard_cases_entity_overmerge_7class_and_form_owner(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            tmp_dir = Path(td)
+            gold_dir, r1_path, _ = _build_synthetic_gold_and_runs(tmp_dir)
+
+            # Augment gold with:
+            # 1) explicit 7-class kind & alt_kinds on G_ORG_1 (kind="organization", alt_kinds=["place"])
+            # 2) a 'same' hard case HC_UNSCORABLE_SAME where 1 mention is not recalled
+            # 3) a 'different' hard case HC_UNSCORABLE_DIFF where 1 target gold_id is not recalled and no wrong merge
+            # 4) two 'form_of' cases: HC_FORM_PASS (form in owner's multi-member entity) and HC_FORM_WRONG (form in non-owner multi-member entity)
+            # 5) two owner-bearing form mentions in mentions.json: M_FORM_OK (in owner's entity) and M_FORM_BAD (in non-owner multi-member entity)
+            roster = json.loads((gold_dir / "roster.json").read_text(encoding="utf-8"))
+            for e in roster["entities"]:
+                if e["gold_id"] == "G_ORG_1":
+                    e["kind"] = "organization"
+                    e["alt_kinds"] = ["place"]
+                    e["policy"] = "T1"
+            (gold_dir / "roster.json").write_text(json.dumps(roster, ensure_ascii=False), encoding="utf-8")
+
+            mentions = json.loads((gold_dir / "mentions.json").read_text(encoding="utf-8"))
+            mentions["mentions"].extend([
+                {
+                    "mention_id": "M_FORM_OK",
+                    "chapter_ordinal": 8,
+                    "start": 140,
+                    "end": 144,
+                    "text": "三首八臂",
+                    "entity_type": "not_entity",
+                    "gold_id": None,
+                    "refers_to": None,
+                    "owner": "G_PER_1",
+                    "note": "T5 形态归属 G_PER_1（落入含主人的 E_PER_A 不计错）",
+                },
+                {
+                    "mention_id": "M_FORM_BAD",
+                    "chapter_ordinal": 8,
+                    "start": 150,
+                    "end": 154,
+                    "text": "三头八臂",
+                    "entity_type": "not_entity",
+                    "gold_id": None,
+                    "refers_to": None,
+                    "owner": "G_PER_1",
+                    "note": "T5 形态归属 G_PER_1（落入不含主人的多成员实体 E_PLC_1 计错）",
+                },
+            ])
+            (gold_dir / "mentions.json").write_text(json.dumps(mentions, ensure_ascii=False), encoding="utf-8")
+
+            hard_cases = json.loads((gold_dir / "hard_cases.json").read_text(encoding="utf-8"))
+            hard_cases["cases"].extend([
+                {
+                    "case_id": "HC_UNSCORABLE_SAME",
+                    "category": "alias_fullname_abbrev",
+                    "type": "same",
+                    "title": "打神鞭未召回导致无法评",
+                    "mentions": [
+                        {
+                            "mention_id": "HUM1",
+                            "chapter_ordinal": 8,
+                            "start": 50,
+                            "end": 53,
+                            "text": "打神鞭",
+                            "entity_type": "item",
+                            "gold_id": "G_ITM_1",
+                            "refers_to": None,
+                        },
+                        {
+                            "mention_id": "HUM2",
+                            "chapter_ordinal": 8,
+                            "start": 160,
+                            "end": 163,
+                            "text": "打神鞭",
+                            "entity_type": "item",
+                            "gold_id": "G_ITM_1",
+                            "refers_to": None,
+                        },
+                    ],
+                },
+                {
+                    "case_id": "HC_UNSCORABLE_DIFF",
+                    "category": "composite_vs_sub_entity",
+                    "type": "different",
+                    "title": "朝歌已召回但打神鞭未召回导致无法评",
+                    "mentions": [
+                        {
+                            "mention_id": "HUM3",
+                            "chapter_ordinal": 8,
+                            "start": 30,
+                            "end": 32,
+                            "text": "朝歌",
+                            "entity_type": "place",
+                            "gold_id": "G_PLC_1",
+                            "refers_to": None,
+                        },
+                        {
+                            "mention_id": "HUM4",
+                            "chapter_ordinal": 8,
+                            "start": 50,
+                            "end": 53,
+                            "text": "打神鞭",
+                            "entity_type": "item",
+                            "gold_id": "G_ITM_1",
+                            "refers_to": None,
+                        },
+                    ],
+                },
+                {
+                    "case_id": "HC_FORM_PASS",
+                    "category": "generic_and_not_entity_trap",
+                    "type": "form_of",
+                    "title": "形态词落入含主人实体通过",
+                    "mentions": [
+                        {
+                            "mention_id": "HFM1",
+                            "chapter_ordinal": 8,
+                            "start": 10,
+                            "end": 13,
+                            "text": "姜子牙",
+                            "entity_type": "person",
+                            "gold_id": "G_PER_1",
+                            "refers_to": None,
+                        },
+                        {
+                            "mention_id": "HFM2",
+                            "chapter_ordinal": 8,
+                            "start": 140,
+                            "end": 144,
+                            "text": "三首八臂",
+                            "entity_type": "not_entity",
+                            "gold_id": None,
+                            "refers_to": None,
+                            "owner": "G_PER_1",
+                        },
+                    ],
+                },
+                {
+                    "case_id": "HC_FORM_WRONG",
+                    "category": "generic_and_not_entity_trap",
+                    "type": "form_of",
+                    "title": "形态词落入不含主人多成员实体判错",
+                    "mentions": [
+                        {
+                            "mention_id": "HFM3",
+                            "chapter_ordinal": 8,
+                            "start": 10,
+                            "end": 13,
+                            "text": "姜子牙",
+                            "entity_type": "person",
+                            "gold_id": "G_PER_1",
+                            "refers_to": None,
+                        },
+                        {
+                            "mention_id": "HFM4",
+                            "chapter_ordinal": 8,
+                            "start": 150,
+                            "end": 154,
+                            "text": "三头八臂",
+                            "entity_type": "not_entity",
+                            "gold_id": None,
+                            "refers_to": None,
+                            "owner": "G_PER_1",
+                        },
+                    ],
+                },
+            ])
+            (gold_dir / "hard_cases.json").write_text(json.dumps(hard_cases, ensure_ascii=False), encoding="utf-8")
+
+            run1_doc = json.loads(r1_path.read_text(encoding="utf-8"))
+            for ent in run1_doc["entities"]:
+                if ent["id"] == "E_PER_A":
+                    ent["mention_ids"].append("pm_form_ok")
+                    ent["mention_count"] = len(ent["mention_ids"])
+                elif ent["id"] == "E_PLC_1":
+                    ent["mention_ids"].append("pm_form_bad")
+                    ent["mention_count"] = len(ent["mention_ids"])
+            run1_doc["mentions"].extend([
+                {"id": "pm_form_ok", "start": 140, "end": 144, "text": "三首八臂", "entity_id": "E_PER_A", "chapter_id": "ch8"},
+                {"id": "pm_form_bad", "start": 150, "end": 154, "text": "三头八臂", "entity_id": "E_PLC_1", "chapter_id": "ch8"},
+            ])
+            r1_path.write_text(json.dumps(run1_doc, ensure_ascii=False), encoding="utf-8")
+
+            report = evaluate_type_gold([r1_path], gold_dir)
+            s1 = report["runs"][0]["strict"]["spec2_metrics"]
+
+            # 1) Hard cases 3-state evaluation: passed / wrong / unscorable
+            hc_by_type = s1["item6_hard_cases_by_type"]
+            self.assertEqual(hc_by_type["same"]["passed_case_ids"], ["HC_PASS"])
+            self.assertEqual(hc_by_type["same"]["wrong_case_ids"], ["HC_SPLIT"])
+            self.assertEqual(hc_by_type["same"]["unscorable_case_ids"], ["HC_UNSCORABLE_SAME"])
+            self.assertEqual(hc_by_type["same"]["pass_rate_scorable"]["numerator"], 1)
+            self.assertEqual(hc_by_type["same"]["pass_rate_scorable"]["denominator"], 2)
+            self.assertEqual(hc_by_type["same"]["scorable_coverage"]["numerator"], 2)
+            self.assertEqual(hc_by_type["same"]["scorable_coverage"]["denominator"], 3)
+            self.assertEqual(hc_by_type["same"]["old_pass_rate"]["numerator"], 1)
+            self.assertEqual(hc_by_type["same"]["old_pass_rate"]["denominator"], 3)
+
+            self.assertEqual(hc_by_type["different"]["wrong_case_ids"], ["HC_DIFF"])
+            self.assertEqual(hc_by_type["different"]["unscorable_case_ids"], ["HC_UNSCORABLE_DIFF"])
+            self.assertEqual(hc_by_type["different"]["pass_rate_scorable"]["denominator"], 1)
+
+            self.assertEqual(hc_by_type["form_of"]["passed_case_ids"], ["HC_FORM_PASS"])
+            self.assertEqual(hc_by_type["form_of"]["wrong_case_ids"], ["HC_FORM_WRONG"])
+            self.assertEqual(hc_by_type["form_of"]["pass_rate_scorable"]["numerator"], 1)
+            self.assertEqual(hc_by_type["form_of"]["pass_rate_scorable"]["denominator"], 2)
+
+            # 2) Generic cross-chapter overmerge entity count & names
+            gen_ov = s1["item4_generic_cross_chapter_overmerge"]["exhaustive_layer"]
+            self.assertEqual(gen_ov["overmerged_entity_count"], 1)
+            self.assertEqual(gen_ov["overmerged_entity_names"], ["宝剑"])
+
+            # 3) Coarse-type accuracy by 7-class kind / alt_kinds
+            # E_ORG_AS_PLC has kind="place", which is in G_ORG_1's alt_kinds=["place"]
+            ct_acc = s1["item5_coarse_type_accuracy"]["exhaustive_layer"]["entity_level"]["total"]
+            self.assertEqual(ct_acc["numerator"], 2)
+            self.assertEqual(ct_acc["denominator"], 2)
+            self.assertAlmostEqual(ct_acc["value"], 1.0)
+            self.assertEqual(ct_acc["strict_7class"]["numerator"], 1)
+
+            # 4) Owner-bearing T5 form mentions in link precision:
+            # M_FORM_OK (in E_PER_A with owner G_PER_1) is NOT counted wrong;
+            # M_FORM_BAD (in E_PLC_1 without owner G_PER_1) IS counted wrong!
+            lp_ex = s1["item2_link_precision"]["exhaustive_layer"]["total"]
+            self.assertNotIn("M_FORM_OK", lp_ex["wrong_not_entity_ids"])
+            self.assertIn("M_FORM_BAD", lp_ex["wrong_not_entity_ids"])
+
     def test_not_imported_by_production_code(self) -> None:
         pkg_dir = ROOT / "entitytrace"
         forbidden = ("evaluate_type_gold", "check_type_gold", "entity-gold/fengshen", "entity-gold\\fengshen")
