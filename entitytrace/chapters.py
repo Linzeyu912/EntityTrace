@@ -473,7 +473,7 @@ def build_chapters(source: dict, headings: list[dict]) -> tuple[str, list[dict]]
     return version, chapters
 
 
-def detect_chapters(store, models, source: dict, run_id: str, log) -> dict:
+def detect_chapters(store, models, source: dict, run_id: str, log, concurrency: int = LABEL_CONCURRENCY) -> dict:
     text, source_id = source["text"], source["id"]
     candidates = collect_candidates(text)
     batches = [
@@ -482,7 +482,7 @@ def detect_chapters(store, models, source: dict, run_id: str, log) -> dict:
     ]
     batch_results: dict[int, list[dict]] = {}
     indices = list(range(len(batches)))
-    for idx, result, error in bounded_map(indices, lambda i: scan_window(models, batches[i]), LABEL_CONCURRENCY):
+    for idx, result, error in bounded_map(indices, lambda i: scan_window(models, batches[i]), concurrency):
         if error:
             raise error
         labeled_batch, _ = result

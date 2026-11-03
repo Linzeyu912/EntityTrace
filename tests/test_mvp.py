@@ -1263,6 +1263,56 @@ class ChapterCandidateAndStructureTests(unittest.TestCase):
             self.assertEqual(dec_by_qid5[cands5["第五卷 尾空卷"]]["result"], "dropped_no_body")
             self.assertEqual(revs5, [])
 
+    def test_chapter_labeling_concurrency_byte_invariance(self):
+        from entitytrace.util import dumps
+
+        # 构造超過 240 条候选（产生 3 个批次），验证并发 1 与并发 8 下章节表版本与决策记录逐字节相同
+        lines = []
+        for idx in range(1, 130):
+            lines.append(f"第{idx}章 风起\n短行正文{idx}。\n")
+        text = "".join(lines)
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            path = root / "multi_batch.txt"
+            path.write_text(text, encoding="utf-8")
+
+            class DeterministicBatchModels:
+                def choices(s, *args, **kwargs):
+                    raise AssertionError("章节阶段禁止调用 choices")
+
+                def generate(s, system, state, stage, validate, *args, **kwargs):
+                    cands = state["candidates"]
+                    req_id = digest(["batch-req", [c["id"] for c in cands]])
+                    val = {
+                        "headings": [
+                            {"id": c["id"], "kind": "chapter"}
+                            for c in cands
+                            if c["text"].startswith("第")
+                        ]
+                    }
+                    validate(val)
+                    return val, req_id
+
+            results = {}
+            for conc in (1, 8):
+                store = Store(root / f"c_{conc}.sqlite3")
+                try:
+                    source = import_text(store, path)
+                    rid = f"run_c{conc}"
+                    store.execute("INSERT INTO runs VALUES(?,?,?,?,?,?)", (rid, source["id"], "{}", "{}", "now", "now"))
+                    out = detect_chapters(store, DeterministicBatchModels(), source, rid, lambda _: None, concurrency=conc)
+                    decs = store.records(rid, "decision")
+                    chs = store.records(rid, "chapter")
+                    results[conc] = (out["chapter_set_version"], dumps(decs), dumps(chs), out["path_counts"])
+                finally:
+                    store.close()
+
+            self.assertGreaterEqual(results[1][3]["label_requests"], 2)
+            self.assertEqual(results[1][0], results[8][0])
+            self.assertEqual(results[1][1], results[8][1])
+            self.assertEqual(results[1][2], results[8][2])
+            self.assertEqual(results[1][3], results[8][3])
+
 
 class CredentialDecouplingAndTemperatureTests(unittest.TestCase):
     def test_generate_without_temperature_preserves_exact_payload_and_cache_key(self):

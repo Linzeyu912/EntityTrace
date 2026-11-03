@@ -445,7 +445,7 @@ def run_pipeline(input_path: Path, db_path: Path, output_root: Path, config_path
                 log(f"复用已完成阶段：{name}")
                 outcome = state[name]
             elif name == "chapters":
-                outcome = detect_chapters(store, models, source, run_id, log)
+                outcome = detect_chapters(store, models, source, run_id, log, concurrency=discovery_concurrency)
                 outcome.pop("chapters", None)
             elif name == "discovery":
                 outcome = discover(store, models, source, run_id, store.records(run_id, "chapter"), task_chars, discovery_concurrency, log)
