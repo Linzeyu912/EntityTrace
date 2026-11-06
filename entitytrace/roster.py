@@ -2144,29 +2144,37 @@ def resolve_roster(
     c3_tasks = []
     c3_results: dict[str, dict] = {}
     for t_id, items in sorted(c3_by_task.items()):
-        payload_items = []
         all_cand_ids: set[str] = set()
         for it in items:
+            all_cand_ids.update(it["candidate_ids"])
+        sorted_cand_ids = sorted(all_cand_ids)
+        full_to_short_eid = {rid: f"e{idx}" for idx, rid in enumerate(sorted_cand_ids, start=1)}
+        short_to_full_eid = {f"e{idx}": rid for idx, rid in enumerate(sorted_cand_ids, start=1)}
+        short_to_full_mid: dict[str, str] = {}
+        payload_items = []
+        for idx, it in enumerate(items, start=1):
+            short_mid = f"m{idx}"
+            short_to_full_mid[short_mid] = it["item_id"]
             ex = _excerpt_around(text, it["start"], it["end"], min_chars=1200)
             payload_items.append({
-                "mention_id": it["item_id"],
+                "mention_id": short_mid,
                 "surface": it["surface"],
                 "context": ex["text"],
-                "candidate_entity_ids": it["candidate_ids"],
+                "candidate_entity_ids": [full_to_short_eid[cid] for cid in it["candidate_ids"]],
             })
-            all_cand_ids.update(it["candidate_ids"])
         candidates_info = [
             {
-                "entity_id": rid,
+                "entity_id": full_to_short_eid[rid],
                 "name": roster_by_id[rid]["name"],
                 "strong_surfaces": roster_by_id[rid]["strong_surfaces"][:8],
                 "kind": roster_by_id[rid]["kind"],
                 "evidence": roster_by_id[rid]["representative_evidence"],
             }
-            for rid in sorted(all_cand_ids)
+            for rid in sorted_cand_ids
         ]
         state = {"items": payload_items, "candidates": candidates_info}
-        c3_tid = digest([VERSION, "c3-link", t_id, state, C3_LINK_PROMPT])
+        id_map = {"items": short_to_full_mid, "candidates": short_to_full_eid}
+        c3_tid = digest([VERSION, "c3-link", t_id, state, id_map, C3_LINK_PROMPT])
         old = store.task(run_id, c3_tid)
         if old and old["status"] == "completed" and old["result"]:
             for link_row in old["result"]["links"]:
@@ -2177,8 +2185,10 @@ def resolve_roster(
                 "stage": "roster-c3-link",
                 "discovery_task_id": t_id,
                 "state": state,
-                "allowed_mids": {it["item_id"] for it in items},
-                "allowed_choices": set(roster_by_id) | set(all_cand_ids) | {"none", "uncertain"},
+                "short_to_full_mid": short_to_full_mid,
+                "short_to_full_eid": short_to_full_eid,
+                "allowed_mids": set(short_to_full_mid),
+                "allowed_choices": set(short_to_full_eid) | {"none", "uncertain"},
             })
 
     def c3_worker(ct: dict) -> dict:
@@ -2189,7 +2199,17 @@ def resolve_roster(
             lambda v: _check_c3_links(v, ct["allowed_mids"], ct["allowed_choices"]),
             temperature=0,
         )
-        return {"links": val["links"], "request_id": req_id}
+        mid_map = ct["short_to_full_mid"]
+        eid_map = ct["short_to_full_eid"]
+        mapped_links = [
+            {
+                **link_row,
+                "mention_id": mid_map[link_row["mention_id"]],
+                "selected_entity_id": eid_map.get(link_row["selected_entity_id"], link_row["selected_entity_id"]),
+            }
+            for link_row in val["links"]
+        ]
+        return {"links": mapped_links, "request_id": req_id}
 
     c3_failures = []
     c3_invalid_output_dtids: set[str] = set()

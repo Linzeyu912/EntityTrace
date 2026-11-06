@@ -2197,6 +2197,203 @@ class RosterAlgorithmTests(unittest.TestCase):
         out_00 = self.store.records("run_no_downgrade_00", "roster_output")[0]
         self.assertEqual(dumps(out_02), dumps(out_00))
 
+    def test_a2_c3_short_ids_mapping_validation_and_task_digest(self):
+        """0.15b 规格一（A2）：验证 C3 短编号确定性、存储完整 ID、未知短编号与完整长 ID 被拒、
+        跨项候选转 c3_rejected_name_mismatch、映射不同任务键不同、无 C3 项时导出逐字节不变、C3_LINK_PROMPT SHA-256 不变。"""
+        import hashlib
+        from entitytrace.roster import C3_LINK_PROMPT
+        from entitytrace.util import dumps
+
+        # (7) C3_LINK_PROMPT SHA-256 与 da392d5 逐字节不变
+        self.assertEqual(
+            hashlib.sha256(C3_LINK_PROMPT.encode("utf-8")).hexdigest(),
+            "04729a1f14afb9b3738418d4851d113fc40164faca8b8c0cdd4d91ea9f88b9b4",
+        )
+
+        # 构造两章合成文本（无任何测试书原文）：
+        # 第一章含人物专名“沈砚”、地点专名“玄铁堡”，以及非专名人物对象“那位剑客”和非专名地点对象“那座古堡”；
+        # 第二章含人物专名“沈砚”与“林婉”、地点专名“玄铁堡”。
+        text = (
+            "第一章\n沈砚与那位剑客来到玄铁堡，望见那座古堡。\n"
+            "第二章\n沈砚与林婉重返玄铁堡。\n"
+        )
+        path = self.root / "a2_short_ids.txt"
+        path.write_bytes(text.encode("utf-8"))
+        source = import_text(self.store, path)
+        idx1, idx2 = text.index("第一章"), text.index("第二章")
+        _, chapters = build_chapters(
+            source,
+            [
+                {"start": idx1, "end": idx1 + 3, "title": "第一章", "kind": "chapter"},
+                {"start": idx2, "end": idx2 + 3, "title": "第二章", "kind": "chapter"},
+            ],
+        )
+        tasks = plan_tasks(source, chapters, 9000)
+        u1, u2 = tasks[0]["units"][0]["id"], tasks[1]["units"][0]["id"]
+        source, run_id, tasks = self._prepare_two_chapter_run(
+            text,
+            {
+                "mentions": [
+                    {"text": "沈砚", "kind": "person", "refs": [u1]},
+                    {"text": "那位剑客", "kind": "person", "refs": [u1]},
+                    {"text": "玄铁堡", "kind": "place", "refs": [u1]},
+                    {"text": "那座古堡", "kind": "place", "refs": [u1]},
+                ],
+                "links": [],
+            },
+            {
+                "mentions": [
+                    {"text": "沈砚", "kind": "person", "refs": [u2]},
+                    {"text": "林婉", "kind": "person", "refs": [u2]},
+                    {"text": "玄铁堡", "kind": "place", "refs": [u2]},
+                ],
+                "links": [],
+            },
+        )
+
+        def handle_c1(state, n):
+            uid = state["units"][0]["id"]
+            if state["chapter_title"] == "第一章":
+                return {
+                    "entities": [
+                        {"local_id": "e1", "name": "沈砚", "kind": "person", "surfaces": [{"surface": "沈砚", "surface_type": "proper_name"}], "evidence_ref": uid},
+                        {"local_id": "e2", "name": "那位剑客", "kind": "person", "surfaces": [{"surface": "那位剑客", "surface_type": "description"}], "evidence_ref": uid},
+                        {"local_id": "e3", "name": "玄铁堡", "kind": "place", "surfaces": [{"surface": "玄铁堡", "surface_type": "proper_name"}], "evidence_ref": uid},
+                        {"local_id": "e4", "name": "那座古堡", "kind": "place", "surfaces": [{"surface": "那座古堡", "surface_type": "description"}], "evidence_ref": uid},
+                    ],
+                    "assignments": [],
+                    "not_entity": [],
+                }, f"c1_a2_{n}"
+            return {
+                "entities": [
+                    {"local_id": "e1", "name": "沈砚", "kind": "person", "surfaces": [{"surface": "沈砚", "surface_type": "proper_name"}], "evidence_ref": uid},
+                    {"local_id": "e2", "name": "林婉", "kind": "person", "surfaces": [{"surface": "林婉", "surface_type": "proper_name"}], "evidence_ref": uid},
+                    {"local_id": "e3", "name": "玄铁堡", "kind": "place", "surfaces": [{"surface": "玄铁堡", "surface_type": "proper_name"}], "evidence_ref": uid},
+                ],
+                "assignments": [],
+                "not_entity": [],
+            }, f"c1_a2_{n}"
+
+        seen_c3_states = []
+
+        def handle_c3_check_and_mismatch(state, n):
+            seen_c3_states.append(state)
+            # (1) 编号确定性：items 按顺序为 m1, m2；candidates 按 sorted(all_cand_ids) 编为 e1, e2
+            self.assertEqual([it["mention_id"] for it in state["items"]], ["m1", "m2"])
+            self.assertEqual([c["entity_id"] for c in state["candidates"]], ["e1", "e2"])
+            for it in state["items"]:
+                self.assertTrue(all(cid in {"e1", "e2"} for cid in it["candidate_entity_ids"]))
+
+            # 找出“那位剑客”(person) 与“那座古堡”(place) 各自的短编号与候选
+            swordsman_item = next(it for it in state["items"] if it["surface"] == "那位剑客")
+            castle_item = next(it for it in state["items"] if it["surface"] == "那座古堡")
+            shen_short = next(c["entity_id"] for c in state["candidates"] if c["name"] == "沈砚")
+            fort_short = next(c["entity_id"] for c in state["candidates"] if c["name"] == "玄铁堡")
+            self.assertEqual(swordsman_item["candidate_entity_ids"], [shen_short])
+            self.assertEqual(castle_item["candidate_entity_ids"], [fort_short])
+
+            # (4) 让“那位剑客”正常选 shen_short，让“那座古堡”故意选本请求内存在但不属于其候选的 shen_short
+            # -> 通过 _check_c3_links，但在回写后触发 sel not in set(it["candidate_ids"]) 转 c3_rejected_name_mismatch
+            return {
+                "links": [
+                    {"mention_id": swordsman_item["mention_id"], "selected_entity_id": shen_short, "reason": "同指沈砚"},
+                    {"mention_id": castle_item["mention_id"], "selected_entity_id": shen_short, "reason": "故意选非本项候选"},
+                ]
+            }, f"c3_a2_{n}"
+
+        models = ScriptedRosterModels({
+            "roster-c1": handle_c1,
+            "roster-c2-propose": lambda state, n: ({"proposals": []}, f"prop_a2_{n}"),
+            "roster-c3-link": handle_c3_check_and_mismatch,
+        })
+        outcome = resolve_roster(self.store, models, source, run_id, concurrency=1, log=lambda _: None)
+        self.assertTrue(outcome["complete"])
+        self.assertEqual(len(seen_c3_states), 1)
+
+        # (2) 存储结果为完整 ID（非 m1/m2、非 e1/e2）
+        c3_task_rows = self.store.rows("SELECT id FROM tasks WHERE run_id=? AND stage='roster-c3-link'", (run_id,))
+        self.assertEqual(len(c3_task_rows), 1)
+        c3_tid_1 = c3_task_rows[0]["id"]
+        stored_c3 = self.store.task(run_id, c3_tid_1)["result"]
+        for row in stored_c3["links"]:
+            self.assertNotIn(row["mention_id"], {"m1", "m2"})
+            self.assertTrue(row["mention_id"].startswith("obj:"))
+            self.assertNotIn(row["selected_entity_id"], {"e1", "e2"})
+
+        out = self.store.records(run_id, "roster_output")[0]
+        shen_ent = next(e for e in out["entities"] if "沈砚" in e["names"])
+        self.assertEqual(shen_ent["link_methods"].get("c3_model"), 1)
+        castle_ent = next(e for e in out["entities"] if e["name"] == "那座古堡")
+        self.assertEqual(castle_ent["link_methods"].get("c3_rejected_name_mismatch"), 1)
+
+        # (3) 未知短编号（m99 / e99）与完整长 ID 均被 _check_c3_links 拒绝
+        full_mid = stored_c3["links"][0]["mention_id"]
+        full_eid = stored_c3["links"][0]["selected_entity_id"]
+        for bad_payload in [
+            {"links": [{"mention_id": "m99", "selected_entity_id": "e1"}]},
+            {"links": [{"mention_id": full_mid, "selected_entity_id": "e1"}]},
+            {"links": [{"mention_id": "m1", "selected_entity_id": "e99"}]},
+            {"links": [{"mention_id": "m1", "selected_entity_id": full_eid}]},
+        ]:
+            with self.assertRaises(ModelError):
+                _check_c3_links(bad_payload, {"m1", "m2"}, {"e1", "e2", "none", "uncertain"})
+
+        # (5) 映射不同则任务键 c3_tid 不同：当 local_id 从 e2/e4 变为 e20/e40 时，state 内容相同但 short_to_full_mid 映射不同，c3_tid 必须不同
+        import copy
+        run_id_alt = "run_a2_alt_map"
+        self.store.execute("INSERT INTO runs VALUES(?,?,?,?,?,?)", (run_id_alt, source["id"], "{}", "{}", "now", "now"))
+        for ch in self.store.records(run_id, "chapter"):
+            self.store.put(run_id_alt, "chapter", ch)
+        for m in self.store.records(run_id, "mention"):
+            if m.get("link_method") != "same_task_proper":
+                self.store.put(run_id_alt, "mention", m)
+
+        def handle_c1_alt(state, n):
+            res, req = handle_c1(state, n)
+            res = copy.deepcopy(res)
+            if state["chapter_title"] == "第一章":
+                res["entities"][1]["local_id"] = "e20"
+                res["entities"][3]["local_id"] = "e40"
+            return res, req
+
+        models_alt = ScriptedRosterModels({
+            "roster-c1": handle_c1_alt,
+            "roster-c2-propose": lambda state, n: ({"proposals": []}, f"prop_alt_{n}"),
+            "roster-c3-link": handle_c3_check_and_mismatch,
+        })
+        out_alt = resolve_roster(self.store, models_alt, source, run_id_alt, concurrency=1, log=lambda _: None)
+        self.assertTrue(out_alt["complete"], out_alt)
+        c3_tid_2 = self.store.rows("SELECT id FROM tasks WHERE run_id=? AND stage='roster-c3-link'", (run_id_alt,))[0]["id"]
+        self.assertNotEqual(c3_tid_1, c3_tid_2)
+        # 且请求 state 逐字节相同（都用 m1/m2, e1/e2）
+        self.assertEqual(dumps(seen_c3_states[0]), dumps(seen_c3_states[1]))
+
+        # (6) 无 C3 项时导出逐字节不变
+        run_no_c3 = "run_a2_no_c3"
+        self.store.execute("INSERT INTO runs VALUES(?,?,?,?,?,?)", (run_no_c3, source["id"], "{}", "{}", "now", "now"))
+        for ch in self.store.records(run_id, "chapter"):
+            self.store.put(run_no_c3, "chapter", ch)
+        for m in self.store.records(run_id, "mention"):
+            if m["text"] in {"沈砚", "林婉", "玄铁堡"}:
+                self.store.put(run_no_c3, "mention", m)
+        models_no_c3 = ScriptedRosterModels({
+            "roster-c1": lambda state, n: (
+                {
+                    "entities": [
+                        {"local_id": "e1", "name": "沈砚", "kind": "person", "surfaces": [{"surface": "沈砚", "surface_type": "proper_name"}], "evidence_ref": state["units"][0]["id"]},
+                        {"local_id": "e3", "name": "玄铁堡", "kind": "place", "surfaces": [{"surface": "玄铁堡", "surface_type": "proper_name"}], "evidence_ref": state["units"][0]["id"]},
+                    ] + ([{"local_id": "e2", "name": "林婉", "kind": "person", "surfaces": [{"surface": "林婉", "surface_type": "proper_name"}], "evidence_ref": state["units"][0]["id"]}] if state["chapter_title"] == "第二章" else []),
+                    "assignments": [],
+                    "not_entity": [],
+                },
+                f"c1_noc3_{n}",
+            ),
+            "roster-c2-propose": lambda state, n: ({"proposals": []}, f"prop_noc3_{n}"),
+        })
+        out_noc3 = resolve_roster(self.store, models_no_c3, source, run_no_c3, concurrency=1, log=lambda _: None)
+        self.assertTrue(out_noc3["complete"])
+        self.assertEqual(len(self.store.rows("SELECT id FROM tasks WHERE run_id=? AND stage='roster-c3-link'", (run_no_c3,))), 0)
+
     def test_roster_module_does_not_import_gold(self):
         source = (ROOT / "entitytrace/roster.py").read_text(encoding="utf-8")
         self.assertNotIn("entity-gold", source)
