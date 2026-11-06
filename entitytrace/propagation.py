@@ -1,4 +1,4 @@
-"""规格三：同任务专名确定性补全（Rule T / Rule G）与冗余定位待审合并消解（零模型调用）。"""
+"""规格三：同任务专名确定性补全（Rule T）与冗余定位待审合并消解（零模型调用）。"""
 from __future__ import annotations
 
 import collections
@@ -18,9 +18,8 @@ def propagate_same_task_proper(
     mentions: list[dict],
     ambiguous_surfaces: list[dict],
     roster_summary: dict,
-    enable_book_proper: bool = False,
 ) -> tuple[list[dict], list[dict], list[dict], dict, list[dict]]:
-    """在身份归组（C1/C2/C3/C4）完成后，对同任务内无歧义 C1 专名（及可选全书非人物专名 G）做确定性字面补全。
+    """在身份归组（C1/C2/C3/C4）完成后，对同任务内无歧义 C1 专名做确定性字面补全。
 
     若无任何新增补全提及，原样返回输入对象引用，确保无可补时导出逐字节不变。
     """
@@ -30,64 +29,8 @@ def propagate_same_task_proper(
     ent_by_id = {e["id"]: e for e in entities}
 
     mentions_by_task: dict[str, list[dict]] = collections.defaultdict(list)
-    mentions_by_surf: dict[str, list[dict]] = collections.defaultdict(list)
     for m in mentions:
         mentions_by_task[m["task_id"]].append(m)
-        mentions_by_surf[m["text"]].append(m)
-
-    g_qualifying: dict[str, str] = {}
-    if enable_book_proper:
-        all_weak_norms: set[str] = set()
-        proper_chapters_by_norm: dict[str, set[str]] = collections.defaultdict(set)
-        proper_tasks_by_norm: dict[str, set[str]] = collections.defaultdict(set)
-        typed_tasks_by_norm: dict[str, set[str]] = collections.defaultdict(set)
-
-        for dtask in discovery_tasks:
-            tid = dtask["id"]
-            cid = dtask["chapter_id"]
-            c1 = c1_results.get(tid)
-            if not c1:
-                continue
-            all_weak_norms.update(c1.get("weak_norms", []))
-            pnorms = set(c1.get("declared_proper_norms", []))
-            t_surfs = {m["text"] for m in mentions_by_task.get(tid, [])}
-            t_norms = {normalize_surface(s) for s in t_surfs if normalize_surface(s)}
-            for ns in pnorms & t_norms:
-                proper_chapters_by_norm[ns].add(cid)
-                proper_tasks_by_norm[ns].add(tid)
-                typed_tasks_by_norm[ns].add(tid)
-            for ent in c1.get("entities", []):
-                stypes = ent.get("surface_types") or {s: "proper_name" for s in ent.get("surfaces", [])}
-                for s, st in stypes.items():
-                    ns = normalize_surface(s)
-                    if ns in t_norms and st in {"proper_name", "title_or_kinship", "description"}:
-                        typed_tasks_by_norm[ns].add(tid)
-
-        for s, ms in mentions_by_surf.items():
-            if len(s) < 2:
-                continue
-            ns = normalize_surface(s)
-            if not ns or ns in all_weak_norms:
-                continue
-            eids = {m["entity_id"] for m in ms}
-            if len(eids) != 1:
-                continue
-            eid = next(iter(eids))
-            ent = ent_by_id[eid]
-            if ent["kind"] == "person":
-                continue
-            if ent.get("identity_status") in {"unresolved_singleton", "not_entity_suggested"}:
-                continue
-            if any(
-                m.get("link_method") in {"unresolved", "not_entity_suggested", "c3_rejected_name_mismatch"}
-                for m in ms
-            ):
-                continue
-            n_ch = len(proper_chapters_by_norm[ns])
-            n_p = len(proper_tasks_by_norm[ns])
-            n_t = len(typed_tasks_by_norm[ns])
-            if n_ch >= 3 and n_t > 0 and (n_p / n_t) >= 0.9:
-                g_qualifying[s] = eid
 
     new_mentions: list[dict] = []
     for dtask in discovery_tasks:
@@ -123,11 +66,6 @@ def propagate_same_task_proper(
             qualifying_t[s] = eid
 
         all_q: dict[str, tuple[str, str]] = {s: (eid, "same_task_proper") for s, eid in qualifying_t.items()}
-        if enable_book_proper:
-            for s, eid in g_qualifying.items():
-                if s not in all_q:
-                    all_q[s] = (eid, "book_proper")
-
         if not all_q:
             continue
 
@@ -144,7 +82,7 @@ def propagate_same_task_proper(
         if not cands:
             continue
 
-        cands.sort(key=lambda x: (-(x[1] - x[0]), x[0], x[4] == "book_proper", x[2]))
+        cands.sort(key=lambda x: (-(x[1] - x[0]), x[0], x[2]))
         accepted_spans: list[tuple[int, int]] = []
         unit_by_id = {u["id"]: u for u in dtask["units"]}
         for a, b, s, eid, method in cands:

@@ -402,139 +402,6 @@ class SameTaskProperPropagationTests(unittest.TestCase):
         self.assertEqual(added[0]["text"], "Ann")
         self.assertEqual(added[0]["start"], text.rindex("Ann"))
 
-    def test_rule_g_book_proper_conditions(self):
-        text = (
-            "第一章\n玄铁令现世，沈墨持礼。\n"
-            "第二章\n玄铁令再现，沈墨远行。\n"
-            "第三章\n玄铁令传闻，沈墨归来。\n"
-            "第四章\n无人识得玄铁令，亦有人提沈墨。\n"
-        )
-        source_id = "src_g"
-        source = {"id": source_id, "text": text}
-        chs = []
-        for idx, title in enumerate(["第一章", "第二章", "第三章", "第四章"], 1):
-            st = text.index(title)
-            ed = text.index(["第一章", "第二章", "第三章", "第四章"][idx]) if idx < 4 else len(text)
-            chs.append(
-                {
-                    "id": f"ch{idx}",
-                    "ordinal": idx,
-                    "kind": "chapter",
-                    "title": title,
-                    "start": st,
-                    "body_start": st + 4,
-                    "end": ed,
-                    "chapter_set_version": "v1",
-                }
-            )
-        dtasks = plan_tasks(source, chs, task_chars=9000)
-        mentions = []
-        c1_results = {}
-        for i in range(3):
-            dt = dtasks[i]
-            u0 = dt["units"][0]
-            pos_x = text.index("玄铁令", dt["start"], dt["end"])
-            pos_s = text.index("沈墨", dt["start"], dt["end"])
-            mentions.append(
-                {
-                    "id": f"m_x_{i}",
-                    "text": "玄铁令",
-                    "start": pos_x,
-                    "end": pos_x + 3,
-                    "address": address(source_id, pos_x, pos_x + 3),
-                    "chapter_id": dt["chapter_id"],
-                    "task_id": dt["id"],
-                    "provisional_kinds": ["object"],
-                    "observation_ids": [],
-                    "evidence": [address(source_id, u0["start"], u0["end"])],
-                    "entity_id": "ent_x",
-                    "link_method": "chapter_local",
-                    "link_refs": [],
-                }
-            )
-            mentions.append(
-                {
-                    "id": f"m_s_{i}",
-                    "text": "沈墨",
-                    "start": pos_s,
-                    "end": pos_s + 2,
-                    "address": address(source_id, pos_s, pos_s + 2),
-                    "chapter_id": dt["chapter_id"],
-                    "task_id": dt["id"],
-                    "provisional_kinds": ["person"],
-                    "observation_ids": [],
-                    "evidence": [address(source_id, u0["start"], u0["end"])],
-                    "entity_id": "ent_s",
-                    "link_method": "chapter_local",
-                    "link_refs": [],
-                }
-            )
-            c1_results[dt["id"]] = {
-                "task_id": dt["id"],
-                "request_id": f"req_{i}",
-                "declared_proper_norms": [normalize_surface("玄铁令"), normalize_surface("沈墨")],
-                "weak_norms": [],
-                "entities": [
-                    {
-                        "surfaces": ["玄铁令"],
-                        "surface_types": {"玄铁令": "proper_name"},
-                    },
-                    {
-                        "surfaces": ["沈墨"],
-                        "surface_types": {"沈墨": "proper_name"},
-                    },
-                ],
-            }
-        c1_results[dtasks[3]["id"]] = {
-            "task_id": dtasks[3]["id"],
-            "request_id": "req_3",
-            "declared_proper_norms": [],
-            "weak_norms": [],
-            "entities": [],
-        }
-        entities = [
-            {
-                "id": "ent_x",
-                "name": "玄铁令",
-                "names": ["玄铁令"],
-                "aliases": ["玄铁令"],
-                "mention_ids": ["m_x_0", "m_x_1", "m_x_2"],
-                "mention_count": 3,
-                "start": mentions[0]["start"],
-                "first_chapter_id": "ch1",
-                "kind": "object",
-                "identity_status": "linked_by_roster",
-                "link_methods": {"chapter_local": 3},
-            },
-            {
-                "id": "ent_s",
-                "name": "沈墨",
-                "names": ["沈墨"],
-                "aliases": ["沈墨"],
-                "mention_ids": ["m_s_0", "m_s_1", "m_s_2"],
-                "mention_count": 3,
-                "start": mentions[1]["start"],
-                "first_chapter_id": "ch1",
-                "kind": "person",
-                "identity_status": "linked_by_roster",
-                "link_methods": {"chapter_local": 3},
-            },
-        ]
-        # Rule T 关闭 book_proper 时，第四章无已定位提及，不补全
-        _, _, _, _, added_t = propagate_same_task_proper(
-            source, chs, dtasks, c1_results, entities, mentions, [], {}, enable_book_proper=False
-        )
-        self.assertEqual(added_t, [])
-
-        # 开启 Rule G (enable_book_proper=True) 时，第四章只补非人物“玄铁令”（link_method="book_proper"），不跨任务补人物“沈墨”
-        _, _, _, _, added_g = propagate_same_task_proper(
-            source, chs, dtasks, c1_results, entities, mentions, [], {}, enable_book_proper=True
-        )
-        self.assertEqual(len(added_g), 1)
-        self.assertEqual(added_g[0]["text"], "玄铁令")
-        self.assertEqual(added_g[0]["link_method"], "book_proper")
-        self.assertEqual(added_g[0]["chapter_id"], "ch4")
-
     def test_grounding_review_deduplication_and_byte_identical_when_nothing_to_complete(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -673,6 +540,17 @@ class SameTaskProperPropagationTests(unittest.TestCase):
                 self.assertEqual(added2, [])
                 self.assertEqual(dumps(e2), dumps(roster_out["entities"]))
                 self.assertEqual(dumps(m2), dumps(roster_out["mentions"]))
+
+                # 验证 build_export_bundle 对多出提及 link_method!='same_task_proper' 抛 ValueError
+                tampered_out = dict(roster_out)
+                tampered_mentions = [dict(x) for x in roster_out["mentions"]]
+                for tm in tampered_mentions:
+                    if tm["id"] != "m_shen_1":
+                        tm["link_method"] = "book_proper"
+                tampered_out["mentions"] = tampered_mentions
+                store.put(run_id, "roster_output", tampered_out)
+                with self.assertRaises(ValueError):
+                    build_export_bundle(store, run_id)
             finally:
                 store.close()
 

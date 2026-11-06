@@ -2458,7 +2458,6 @@ def resolve_roster(
         mentions=updated_mentions,
         ambiguous_surfaces=ambiguous_surfaces,
         roster_summary=roster_summary,
-        enable_book_proper=False,
     )
     _, resolved_grounding = deduplicate_grounding_reviews(
         source=source,

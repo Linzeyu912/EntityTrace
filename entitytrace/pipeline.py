@@ -227,7 +227,11 @@ def build_export_bundle(store: Store, run_id: str) -> dict:
             for span in mention["evidence"]:
                 validate_span(text, span, source["id"])
         ids = {m["id"] for m in mentions}
-        if not (raw_ids <= ids) or sorted(mid for e in entities for mid in e["mention_ids"]) != sorted(ids):
+        if (
+            not (raw_ids <= ids)
+            or any(m.get("link_method") != "same_task_proper" for m in mentions if m["id"] not in raw_ids)
+            or sorted(mid for e in entities for mid in e["mention_ids"]) != sorted(ids)
+        ):
             raise ValueError("实体分组未恰好覆盖所有提及")
         pending_identity = [r for r in identity_reviews if r.get("status", "pending") == "pending"]
         pending_non_identity = [r for r in non_identity_reviews if r.get("status", "pending") == "pending"]
