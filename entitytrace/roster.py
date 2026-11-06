@@ -492,7 +492,7 @@ def apply_c1_task_result(
 
     # 检查同一任务内出现在两个对象下的称呼 -> 标记为弱称呼
     for surf, lids in surface_to_strong_lids.items():
-        if len(lids) > 1 or surf in not_entity_surfaces:
+        if len(lids) > 1:
             weak_norms_in_task.add(normalize_surface(surf))
 
     mention_outcomes: dict[str, dict] = {}

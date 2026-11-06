@@ -1863,6 +1863,156 @@ class RosterAlgorithmTests(unittest.TestCase):
         self.assertEqual(v_tid_without, v_tid_with)
         self.assertEqual(v_req_without, v_req_with)
 
+    def test_c1_not_entity_echo_does_not_mark_claimed_proper_as_weak_norm(self):
+        # 0.14e 规格一单测：
+        # ① 单一对象认领的专名同时出现在 not_entity 中，不进 weak_norms、提及仍归该对象、规则 T 可补全；
+        # ② 两个对象认领同一称呼，仍进 weak_norms；
+        # ③ 只出现在 not_entity、未被认领的称呼，提及仍为 not_entity；
+        # ④ 无回显时 apply_c1_task_result 输出与修改前逐字节相同。
+        text = "第一章\n沈砚手持青霜剑，侍卫甲与侍卫乙同称铁卫，路边有碎石。稍后沈砚又握紧青霜剑。\n"
+        path = self.root / "c1_not_entity_echo.txt"
+        path.write_bytes(text.encode("utf-8"))
+        source = import_text(self.store, path)
+        idx1 = text.index("第一章")
+        _, chapters = build_chapters(source, [{"start": idx1, "end": idx1 + 3, "title": "第一章", "kind": "chapter"}])
+        tasks = plan_tasks(source, chapters, 9000)
+        task = tasks[0]
+        uid = task["units"][0]["id"]
+
+        # 注意：发现阶段只报出第一处“青霜剑”，第二处“青霜剑”留给规则 T 补全
+        first_sword_start = text.index("青霜剑")
+        mentions = [
+            {
+                "id": "m_shen_1",
+                "text": "沈砚",
+                "start": text.index("沈砚"),
+                "end": text.index("沈砚") + 2,
+                "address": f"{source['id']}:{text.index('沈砚')}..{text.index('沈砚') + 2}",
+                "chapter_id": task["chapter_id"],
+                "task_id": task["id"],
+                "provisional_kinds": ["person"],
+                "observation_ids": [],
+                "evidence": [f"{source['id']}:{task['units'][0]['start']}..{task['units'][0]['end']}"],
+            },
+            {
+                "id": "m_sword_1",
+                "text": "青霜剑",
+                "start": first_sword_start,
+                "end": first_sword_start + 3,
+                "address": f"{source['id']}:{first_sword_start}..{first_sword_start + 3}",
+                "chapter_id": task["chapter_id"],
+                "task_id": task["id"],
+                "provisional_kinds": ["object"],
+                "observation_ids": [],
+                "evidence": [f"{source['id']}:{task['units'][0]['start']}..{task['units'][0]['end']}"],
+            },
+            {
+                "id": "m_tie_1",
+                "text": "铁卫",
+                "start": text.index("铁卫"),
+                "end": text.index("铁卫") + 2,
+                "address": f"{source['id']}:{text.index('铁卫')}..{text.index('铁卫') + 2}",
+                "chapter_id": task["chapter_id"],
+                "task_id": task["id"],
+                "provisional_kinds": ["person"],
+                "observation_ids": [],
+                "evidence": [f"{source['id']}:{task['units'][0]['start']}..{task['units'][0]['end']}"],
+            },
+            {
+                "id": "m_stone_1",
+                "text": "碎石",
+                "start": text.index("碎石"),
+                "end": text.index("碎石") + 2,
+                "address": f"{source['id']}:{text.index('碎石')}..{text.index('碎石') + 2}",
+                "chapter_id": task["chapter_id"],
+                "task_id": task["id"],
+                "provisional_kinds": ["object"],
+                "observation_ids": [],
+                "evidence": [f"{source['id']}:{task['units'][0]['start']}..{task['units'][0]['end']}"],
+            },
+        ]
+
+        raw_no_echo = {
+            "entities": [
+                {
+                    "local_id": "e1",
+                    "name": "沈砚",
+                    "kind": "person",
+                    "surfaces": [{"surface": "沈砚", "surface_type": "proper_name"}],
+                    "evidence_ref": uid,
+                },
+                {
+                    "local_id": "e2",
+                    "name": "青霜剑",
+                    "kind": "object",
+                    "surfaces": [{"surface": "青霜剑", "surface_type": "proper_name"}],
+                    "evidence_ref": uid,
+                },
+                {
+                    "local_id": "e3",
+                    "name": "侍卫甲",
+                    "kind": "person",
+                    "surfaces": [{"surface": "铁卫", "surface_type": "title_or_kinship"}],
+                    "evidence_ref": uid,
+                },
+                {
+                    "local_id": "e4",
+                    "name": "侍卫乙",
+                    "kind": "person",
+                    "surfaces": [{"surface": "铁卫", "surface_type": "title_or_kinship"}],
+                    "evidence_ref": uid,
+                },
+            ],
+            "assignments": [],
+            "not_entity": ["碎石"],
+        }
+        raw_with_echo = {
+            **raw_no_echo,
+            # 模型在 not_entity 中回显了已被单一对象认领的“沈砚”“青霜剑”
+            "not_entity": ["沈砚", "青霜剑", "铁卫", "碎石"],
+        }
+
+        res_no_echo = apply_c1_task_result(source, task, mentions, raw_no_echo, "req_c1_echo")
+        res_with_echo = apply_c1_task_result(source, task, mentions, raw_with_echo, "req_c1_echo")
+
+        # ④ 无回显与有回显（对已认领对象）输出逐字节相同；单一认领专名不进 weak_norms，多重认领仍进 weak_norms
+        self.assertEqual(dumps(res_no_echo), dumps(res_with_echo))
+        self.assertNotIn("沈砚", res_with_echo["weak_norms"])
+        self.assertNotIn("青霜剑", res_with_echo["weak_norms"])
+        self.assertIn("铁卫", res_with_echo["weak_norms"])  # ② 两个对象认领同一称呼，仍进 weak_norms
+
+        outcomes = {o["mention_id"]: o for o in res_with_echo["mention_outcomes"]}
+        self.assertEqual(outcomes["m_shen_1"]["status"], "assigned")
+        self.assertEqual(outcomes["m_shen_1"]["local_id"], "e1")
+        self.assertEqual(outcomes["m_sword_1"]["status"], "assigned")
+        self.assertEqual(outcomes["m_sword_1"]["local_id"], "e2")
+        self.assertEqual(outcomes["m_stone_1"]["status"], "not_entity")  # ③ 未被认领的 not_entity 提及仍为 not_entity
+
+        # ① 验证完整 resolve_roster 下，规则 T 能补全第二处“沈砚”与“青霜剑”
+        run_id = "run_c1_echo_prop"
+        self.store.execute("INSERT INTO runs VALUES(?,?,?,?,?,?)", (run_id, source["id"], "{}", "{}", "now", "now"))
+        for ch in chapters:
+            self.store.put(run_id, "chapter", ch)
+        self.store.finish_task(
+            run_id,
+            task,
+            {"request_id": "req_disc"},
+            [("mention", m) for m in mentions],
+        )
+        models = ScriptedRosterModels({
+            "roster-c1": lambda state, n: (raw_with_echo, "req_c1_echo"),
+            "roster-c2-propose": lambda state, n: ({"proposals": []}, "req_prop"),
+        })
+        out = resolve_roster(self.store, models, source, run_id, concurrency=1, log=lambda *_: None)
+        self.assertTrue(out["complete"])
+        roster_out = self.store.records(run_id, "roster_output")[0]
+        sword_ent = next(e for e in roster_out["entities"] if e["name"] == "青霜剑")
+        shen_ent = next(e for e in roster_out["entities"] if e["name"] == "沈砚")
+        self.assertEqual(sword_ent["mention_count"], 2)
+        self.assertEqual(sword_ent["link_methods"].get("same_task_proper"), 1)
+        self.assertEqual(shen_ent["mention_count"], 2)
+        self.assertEqual(shen_ent["link_methods"].get("same_task_proper"), 1)
+
     def test_roster_module_does_not_import_gold(self):
         source = (ROOT / "entitytrace/roster.py").read_text(encoding="utf-8")
         self.assertNotIn("entity-gold", source)
