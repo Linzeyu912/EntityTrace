@@ -14,6 +14,7 @@ from entitytrace.roster import (
     VERSION,
     _check_c3_links,
     apply_c1_task_result,
+    compute_prelim_entry_ids,
     normalize_surface,
     resolve_roster,
     resolve_surface_direct,
@@ -1732,6 +1733,135 @@ class RosterAlgorithmTests(unittest.TestCase):
             inferred = infer_incomplete_stage_error({"identity": out_err})
             self.assertIsNotNone(inferred)
             self.assertTrue(inferred["retryable"])
+
+    def test_c2_prelim_entry_id_content_digest_stability_and_collision_lengthening(self):
+        # 1. 人工构造 8 位前缀冲突与 12 位前缀冲突时自动加长，不产生重复 entry_id
+        clusters_collision = [
+            {"member_keys": [("t1", "e1")]},
+            {"member_keys": [("t2", "e2")]},
+            {"member_keys": [("t3", "e3")]},
+            {"member_keys": [("t4", "e4")]},
+        ]
+        fake_digests = {
+            (("t1", "e1"),): "abcd1234ef01aaaa" + "0" * 48,
+            (("t2", "e2"),): "abcd12349988bbbb" + "0" * 48,  # 与 t1 在 8 位冲突，12 位不同
+            (("t3", "e3"),): "777788889999cccc" + "0" * 48,
+            (("t4", "e4"),): "777788889999dddd" + "0" * 48,  # 与 t3 在 12 位仍冲突，16 位不同
+        }
+        eids = compute_prelim_entry_ids(clusters_collision, digest_fn=lambda mks: fake_digests[tuple(mks)])
+        self.assertEqual(len(set(eids)), 4)
+        self.assertEqual(eids[0], "pabcd1234ef01")
+        self.assertEqual(eids[1], "pabcd12349988")
+        self.assertEqual(eids[2], "p777788889999cccc")
+        self.assertEqual(eids[3], "p777788889999dddd")
+
+        # 无冲突条目保持 p + 8 位
+        clusters_mixed = [
+            {"member_keys": [("t0", "e0")]},
+            {"member_keys": [("t1", "e1")]},
+            {"member_keys": [("t2", "e2")]},
+        ]
+        fake_mixed = {
+            (("t0", "e0"),): "1111222233334444" + "0" * 48,
+            (("t1", "e1"),): "abcd1234ef01aaaa" + "0" * 48,
+            (("t2", "e2"),): "abcd12349988bbbb" + "0" * 48,
+        }
+        eids_mixed = compute_prelim_entry_ids(clusters_mixed, digest_fn=lambda mks: fake_mixed[tuple(mks)])
+        self.assertEqual(eids_mixed, ["p11112222", "pabcd1234ef01", "pabcd12349988"])
+
+        # 2. 在合成数据上，增删一个无关簇时，其余簇的 entry_id 不变，未受影响的 C2.4 核验对 request_id 与任务 id 保持不变
+        from entitytrace.util import digest as real_digest
+
+        text = "第一章\n路人甲经过。林舟与阿舟先后进城。\n第二章\n林舟再次出现。\n"
+        path = self.root / "c2_prelim_stability.txt"
+        path.write_bytes(text.encode("utf-8"))
+        source = import_text(self.store, path)
+        idx1, idx2 = text.index("第一章"), text.index("第二章")
+        _, chapters = build_chapters(
+            source,
+            [
+                {"start": idx1, "end": idx1 + 3, "title": "第一章", "kind": "chapter"},
+                {"start": idx2, "end": idx2 + 3, "title": "第二章", "kind": "chapter"},
+            ],
+        )
+        tasks = plan_tasks(source, chapters, 9000)
+        u1, u2 = tasks[0]["units"][0]["id"], tasks[1]["units"][0]["id"]
+
+        def run_variant(run_id: str, include_extra_cluster: bool):
+            self.store.execute("INSERT INTO runs VALUES(?,?,?,?,?,?)", (run_id, source["id"], "{}", "{}", "now", "now"))
+            for ch in chapters:
+                self.store.put(run_id, "chapter", ch)
+            ch1_mentions = [
+                {"text": "林舟", "kind": "person", "refs": [u1]},
+                {"text": "阿舟", "kind": "person", "refs": [u1]},
+            ]
+            if include_extra_cluster:
+                ch1_mentions.insert(0, {"text": "路人甲", "kind": "person", "refs": [u1]})
+            ch2_mentions = [{"text": "林舟", "kind": "person", "refs": [u2]}]
+            for task, disc in zip(tasks, [{"mentions": ch1_mentions, "links": []}, {"mentions": ch2_mentions, "links": []}]):
+                grounded = ground_result(source, task, disc, "req_" + task["id"])
+                records = [
+                    (kind, rec)
+                    for kind, key in [("mention", "mentions"), ("observation", "observations"), ("review", "reviews"), ("link", "links")]
+                    for rec in grounded[key]
+                ]
+                self.store.finish_task(run_id, task, {"request_id": "req_" + task["id"]}, records)
+
+            propose_entries_seen = []
+            verify_states_seen = []
+
+            def handle_c1(state, n):
+                uid = state["units"][0]["id"]
+                if state["chapter_title"] == "第一章":
+                    ents = [
+                        {"local_id": "e_lin", "name": "林舟", "kind": "person", "surfaces": [{"surface": "林舟", "surface_type": "proper_name"}], "evidence_ref": uid},
+                        {"local_id": "e_azhou", "name": "阿舟", "kind": "person", "surfaces": [{"surface": "阿舟", "surface_type": "proper_name"}], "evidence_ref": uid},
+                    ]
+                    if include_extra_cluster:
+                        ents.insert(0, {"local_id": "e_000_extra", "name": "路人甲", "kind": "person", "surfaces": [{"surface": "路人甲", "surface_type": "proper_name"}], "evidence_ref": uid})
+                    return {"entities": ents, "assignments": [], "not_entity": []}, f"req_c1_{n}"
+                return {
+                    "entities": [
+                        {"local_id": "e_lin", "name": "林舟", "kind": "person", "surfaces": [{"surface": "林舟", "surface_type": "proper_name"}], "evidence_ref": uid},
+                    ],
+                    "assignments": [],
+                    "not_entity": [],
+                }, f"req_c1_{n}"
+
+            def handle_propose(state, n):
+                by_name = {e["name"]: e["entry_id"] for e in state["entries"]}
+                propose_entries_seen.append(by_name)
+                return {
+                    "proposals": [
+                        {"left": by_name["林舟"], "right": by_name["阿舟"], "reason": "林舟与阿舟疑似同人"}
+                    ]
+                }, "req_propose_fixed"
+
+            def handle_verify(state, n):
+                req_id = real_digest(["verify_req", state])
+                verify_states_seen.append((state, req_id))
+                return {"verdict": "same", "reason": "确为同人"}, req_id
+
+            models = ScriptedRosterModels({
+                "roster-c1": handle_c1,
+                "roster-c2-propose": handle_propose,
+                "roster-c2-verify": handle_verify,
+            })
+            out = resolve_roster(self.store, models, source, run_id, concurrency=1, log=lambda *_: None)
+            self.assertTrue(out["complete"])
+            verify_task_rows = self.store.rows("SELECT id FROM tasks WHERE run_id=? AND stage='roster-c2-verify'", (run_id,))
+            self.assertEqual(len(verify_task_rows), 1)
+            return propose_entries_seen[0], verify_task_rows[0]["id"], verify_states_seen[0][1]
+
+        entries_without, v_tid_without, v_req_without = run_variant("run_without_extra", False)
+        entries_with, v_tid_with, v_req_with = run_variant("run_with_extra", True)
+
+        self.assertTrue(entries_without["林舟"].startswith("p"))
+        self.assertEqual(len(entries_without["林舟"]), 9)
+        self.assertEqual(entries_without["林舟"], entries_with["林舟"])
+        self.assertEqual(entries_without["阿舟"], entries_with["阿舟"])
+        self.assertEqual(v_tid_without, v_tid_with)
+        self.assertEqual(v_req_without, v_req_with)
 
     def test_roster_module_does_not_import_gold(self):
         source = (ROOT / "entitytrace/roster.py").read_text(encoding="utf-8")

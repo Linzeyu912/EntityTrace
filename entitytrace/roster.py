@@ -820,6 +820,32 @@ def _surface_tokens(surface: str) -> set[str]:
     return tokens
 
 
+def compute_prelim_entry_ids(clusters: list[dict], digest_fn: Callable = digest) -> list[str]:
+    """为 C2.4 初步名册条目计算内容摘要编号：默认 "p" + digest(sorted(m_keys))[:8]；
+    若发生 8 位前缀冲突，按完整 digest 升序为冲突条目自动加长到 12 位（仍冲突则 16 位）。"""
+    full_digests = [digest_fn(sorted(c["member_keys"])) for c in clusters]
+    lengths = [8] * len(clusters)
+    for next_len in (12, 16, 24, 32, 64):
+        by_prefix: dict[str, list[int]] = collections.defaultdict(list)
+        for i, d in enumerate(full_digests):
+            by_prefix[d[:lengths[i]]].append(i)
+        collided = [idxs for idxs in by_prefix.values() if len(idxs) > 1]
+        if not collided:
+            break
+        for idxs in collided:
+            for i in sorted(idxs, key=lambda idx: (full_digests[idx], idx)):
+                lengths[i] = min(next_len, len(full_digests[i]))
+    result = [f"p{full_digests[i][:lengths[i]]}" for i in range(len(clusters))]
+    by_eid: dict[str, list[int]] = collections.defaultdict(list)
+    for i, eid in enumerate(result):
+        by_eid[eid].append(i)
+    for eid, idxs in by_eid.items():
+        if len(idxs) > 1:
+            for rank, i in enumerate(sorted(idxs, key=lambda idx: (full_digests[idx], idx)), start=1):
+                result[i] = f"{eid}_{rank}"
+    return result
+
+
 def resolve_roster(
     store,
     models,
@@ -1450,8 +1476,10 @@ def resolve_roster(
     post_review_clusters.extend(reviewed_c2_clusters)
     post_review_clusters.sort(key=lambda c: c["member_keys"][0])
 
+    prelim_entry_ids = compute_prelim_entry_ids(post_review_clusters)
+
     # 构建初步名册条目列表（供 C2.4 补合并）
-    def build_entry_summary(idx: int, cluster: dict) -> dict:
+    def build_entry_summary(entry_id: str, cluster: dict) -> dict:
         m_keys = cluster["member_keys"]
         mids = sorted(
             {mid for k in m_keys for mid in local_objects[k]["mention_ids"]},
@@ -1468,7 +1496,7 @@ def resolve_roster(
             kind_counts[local_objects[k]["kind"]] += len(local_objects[k]["mention_ids"])
         first_ch = min((by_mid[mid]["chapter_id"] for mid in mids), key=lambda cid: chapter_order.get(cid, 999999))
         return {
-            "entry_id": f"n{idx:04d}",
+            "entry_id": entry_id,
             "member_keys": m_keys,
             "mention_ids": mids,
             "name": _choose_display_name(surf_counts),
@@ -1481,7 +1509,7 @@ def resolve_roster(
             "unresolved_c2": cluster.get("unresolved_c2", False),
         }
 
-    prelim_entries = [build_entry_summary(i + 1, c) for i, c in enumerate(post_review_clusters)]
+    prelim_entries = [build_entry_summary(eid, c) for eid, c in zip(prelim_entry_ids, post_review_clusters)]
     entry_by_id = {e["entry_id"]: e for e in prelim_entries}
 
     # ==================== C2.4：名册补合并（按粗类分批 + R7 跨粗类批次 -> 两侧 >=600 码点原文核验） ====================
