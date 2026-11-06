@@ -18,6 +18,7 @@ def propagate_same_task_proper(
     mentions: list[dict],
     ambiguous_surfaces: list[dict],
     roster_summary: dict,
+    downgraded_norms: set[str] | None = None,
 ) -> tuple[list[dict], list[dict], list[dict], dict, list[dict]]:
     """在身份归组（C1/C2/C3/C4）完成后，对同任务内无歧义 C1 专名做确定性字面补全。
 
@@ -32,11 +33,12 @@ def propagate_same_task_proper(
     for m in mentions:
         mentions_by_task[m["task_id"]].append(m)
 
+    downgraded = downgraded_norms or set()
     new_mentions: list[dict] = []
     for dtask in discovery_tasks:
         tid = dtask["id"]
         c1 = c1_results.get(tid)
-        prop_norms = set(c1.get("declared_proper_norms", [])) if c1 else set()
+        prop_norms = (set(c1.get("declared_proper_norms", [])) - downgraded) if c1 else set()
         weak_norms = set(c1.get("weak_norms", [])) if c1 else set()
         c1_req_id = c1.get("request_id") if c1 else None
         t_mentions = mentions_by_task.get(tid, [])

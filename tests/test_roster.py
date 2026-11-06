@@ -2013,6 +2013,190 @@ class RosterAlgorithmTests(unittest.TestCase):
         self.assertEqual(shen_ent["mention_count"], 2)
         self.assertEqual(shen_ent["link_methods"].get("same_task_proper"), 1)
 
+    def test_a4a_prime_unstable_proper_downgrade(self):
+        """0.14e 规格三（A4-a′）：验证比例计算、人物豁免、降级后不同名并查、C3 不用降级键、规则 T 跳过降级称呼、无降级时逐字节不变。"""
+        from unittest.mock import patch
+        from entitytrace.roster import compute_unstable_proper_norms
+        from entitytrace.util import dumps
+
+        # 构造 3 章合成文本（无任何四本测试书或封神/凡人原文）
+        ch1 = "第一章\n沈砚带黑木匣进玄铁堡，黑木匣紧锁。赵校尉守卫玄铁堡。\n"
+        ch2 = "第二章\n林婉在青石谷打开黑木匣，赵校尉亦至青石谷。\n"
+        ch3 = "第三章\n苏沛之在白鹤渡见黑木匣，赵校尉随后赶到白鹤渡。\n"
+        text = ch1 + ch2 + ch3
+        path = self.root / "a4a_prime.txt"
+        path.write_bytes(text.encode("utf-8"))
+        source = import_text(self.store, path)
+
+        c1_end = len(ch1)
+        c2_end = c1_end + len(ch2)
+        _, chapters = build_chapters(
+            source,
+            [
+                {"start": 0, "end": 3, "title": "第一章", "kind": "chapter"},
+                {"start": c1_end, "end": c1_end + 3, "title": "第二章", "kind": "chapter"},
+                {"start": c2_end, "end": c2_end + 3, "title": "第三章", "kind": "chapter"},
+            ],
+        )
+        tasks = plan_tasks(source, chapters, 9000)
+        self.assertEqual(len(tasks), 3)
+
+        def _make_mentions():
+            res = []
+            # 第一章：第一处“黑木匣”被发现，第二处“黑木匣”留给规则 T 检验是否跳过
+            for idx, (tid, cid, base, sub, s_list) in enumerate([
+                (tasks[0]["id"], chapters[0]["id"], 0, ch1, ["沈砚", "黑木匣", "玄铁堡", "赵校尉"]),
+                (tasks[1]["id"], chapters[1]["id"], c1_end, ch2, ["林婉", "黑木匣", "青石谷", "赵校尉"]),
+                (tasks[2]["id"], chapters[2]["id"], c2_end, ch3, ["苏沛之", "黑木匣", "白鹤渡", "赵校尉"]),
+            ]):
+                u_id = tasks[idx]["units"][0]["id"]
+                u_span = f"{source['id']}:{tasks[idx]['units'][0]['start']}..{tasks[idx]['units'][0]['end']}"
+                for surf in s_list:
+                    pos = base + sub.index(surf)
+                    kind = "object" if surf == "黑木匣" else ("place" if surf in {"玄铁堡", "青石谷", "白鹤渡"} else "person")
+                    res.append({
+                        "id": f"m_{cid}_{surf}",
+                        "text": surf,
+                        "start": pos,
+                        "end": pos + len(surf),
+                        "address": f"{source['id']}:{pos}..{pos + len(surf)}",
+                        "chapter_id": cid,
+                        "task_id": tid,
+                        "provisional_kinds": [kind],
+                        "observation_ids": [f"o_{cid}_{surf}"],
+                        "evidence": [u_span],
+                        "unit_id": u_id,
+                    })
+            return res
+
+        mentions = _make_mentions()
+
+        def handle_c1(state, n):
+            uid = state["units"][0]["id"]
+            title = state["chapter_title"]
+            if title == "第一章":
+                # 第一章：黑木匣被判为 proper_name（且与玄铁堡同任务出现）；赵校尉判为 proper_name (person)
+                return {
+                    "entities": [
+                        {"local_id": "e1", "name": "沈砚", "kind": "person", "surfaces": [{"surface": "沈砚", "surface_type": "proper_name"}], "evidence_ref": uid},
+                        {"local_id": "e2", "name": "玄铁堡", "kind": "place", "surfaces": [{"surface": "玄铁堡", "surface_type": "proper_name"}], "evidence_ref": uid},
+                        {"local_id": "e3", "name": "黑木匣", "kind": "object", "surfaces": [{"surface": "黑木匣", "surface_type": "proper_name"}], "evidence_ref": uid},
+                        {"local_id": "e4", "name": "赵校尉", "kind": "person", "surfaces": [{"surface": "赵校尉", "surface_type": "proper_name"}], "evidence_ref": uid},
+                    ],
+                    "assignments": [],
+                    "not_entity": [],
+                }, f"req_c1_{n}"
+            if title == "第二章":
+                # 第二章：黑木匣被判为 description（挂在专名器物“青玉匣”或单独对象上）；赵校尉判为 title_or_kinship (person)
+                return {
+                    "entities": [
+                        {"local_id": "e1", "name": "林婉", "kind": "person", "surfaces": [{"surface": "林婉", "surface_type": "proper_name"}], "evidence_ref": uid},
+                        {"local_id": "e2", "name": "青石谷", "kind": "place", "surfaces": [{"surface": "青石谷", "surface_type": "proper_name"}], "evidence_ref": uid},
+                        {"local_id": "e3", "name": "黑木匣", "kind": "object", "surfaces": [{"surface": "黑木匣", "surface_type": "description"}], "evidence_ref": uid},
+                        {"local_id": "e4", "name": "赵校尉", "kind": "person", "surfaces": [{"surface": "赵校尉", "surface_type": "title_or_kinship"}], "evidence_ref": uid},
+                    ],
+                    "assignments": [],
+                    "not_entity": [],
+                }, f"req_c1_{n}"
+            # 第三章：黑木匣被判为 description；赵校尉判为 title_or_kinship (person)
+            return {
+                "entities": [
+                    {"local_id": "e1", "name": "苏沛之", "kind": "person", "surfaces": [{"surface": "苏沛之", "surface_type": "proper_name"}], "evidence_ref": uid},
+                    {"local_id": "e2", "name": "白鹤渡", "kind": "place", "surfaces": [{"surface": "白鹤渡", "surface_type": "proper_name"}], "evidence_ref": uid},
+                    {"local_id": "e3", "name": "黑木匣", "kind": "object", "surfaces": [{"surface": "黑木匣", "surface_type": "description"}], "evidence_ref": uid},
+                    {"local_id": "e4", "name": "赵校尉", "kind": "person", "surfaces": [{"surface": "赵校尉", "surface_type": "title_or_kinship"}], "evidence_ref": uid},
+                ],
+                "assignments": [],
+                "not_entity": [],
+            }, f"req_c1_{n}"
+
+        def _prep_run(rid):
+            self.store.execute("INSERT INTO runs VALUES(?,?,?,?,?,?)", (rid, source["id"], "{}", "{}", "now", "now"))
+            for ch in chapters:
+                self.store.put(rid, "chapter", ch)
+            for t in tasks:
+                t_ms = [m for m in mentions if m["task_id"] == t["id"]]
+                self.store.finish_task(rid, t, {"request_id": f"disc_{rid}_{t['id']}"}, [("mention", m) for m in t_ms])
+
+        # 1) 验证开启 A4-a′ (theta=0.5)：
+        # - “黑木匣” P=1, D=2, r=1/3 < 0.5 且非人物 -> 降级
+        # - “赵校尉” P=1, D=2, r=1/3 < 0.5 但 kind=='person' -> 人物豁免，不降级
+        _prep_run("run_with_a4a")
+        c3_states_a4a = []
+
+        def handle_c3(state, n):
+            c3_states_a4a.append(state)
+            return {
+                "links": [
+                    {"mention_id": it["mention_id"], "selected_entity_id": it["candidate_entity_ids"][0], "reason": "默认选首候选"}
+                    for it in state["items"]
+                ]
+            }, f"req_c3_{n}"
+
+        models_a4a = ScriptedRosterModels({
+            "roster-c1": handle_c1,
+            "roster-c2-propose": lambda state, n: ({"proposals": []}, f"prop_{n}"),
+            "roster-c2-review": lambda state, n: (
+                {"groups": [{"group_id": "g1", "name": "赵校尉", "kind": "person", "row_ids": [r["row_id"] for r in state["rows"]], "member_ids": [], "reason": "同人"}], "unresolved_row_ids": [], "unresolved_member_ids": []},
+                f"rev_{n}",
+            ),
+            "roster-c3-link": handle_c3,
+        })
+        with patch("entitytrace.roster.UNSTABLE_PROPER_THETA", 0.5):
+            out_a4a = resolve_roster(self.store, models_a4a, source, "run_with_a4a", concurrency=1, log=lambda *_: None)
+        self.assertTrue(out_a4a["complete"])
+
+        # 直接检验 compute_unstable_proper_norms：黑木匣在降级集合中，赵校尉因人物豁免不在其中
+        c1_res_map = {t["id"]: self.store.task("run_with_a4a", self.store.rows("SELECT id FROM tasks WHERE run_id=? AND stage='roster-c1'", ("run_with_a4a",))[i]["id"])["result"] for i, t in enumerate(tasks)}
+        # 按 task_id 映射
+        c1_by_tid = {}
+        for row in self.store.rows("SELECT id FROM tasks WHERE run_id=? AND stage='roster-c1'", ("run_with_a4a",)):
+            tr = self.store.task("run_with_a4a", row["id"])["result"]
+            c1_by_tid[tr["task_id"]] = tr
+        downgraded = compute_unstable_proper_norms(tasks, c1_by_tid, mentions, theta=0.5)
+        self.assertEqual(downgraded, {"黑木匣"})
+
+        roster_a4a = self.store.records("run_with_a4a", "roster_output")[0]
+        box_ents = [e for e in roster_a4a["entities"] if e["name"] == "黑木匣"]
+        # 三章的“黑木匣”降级后均为只含非专名对象，且各章内无其他 object 候选，C3 不召回跨章同名“黑木匣” -> 保持 3 个独立章内对象，且第一章第二处“黑木匣”不被规则 T 补全
+        self.assertEqual(len(box_ents), 3)
+        for be in box_ents:
+            self.assertEqual(be["mention_count"], 1)
+            self.assertEqual(be["link_methods"].get("same_task_proper", 0), 0)
+        # C3 请求中不应出现任何“黑木匣”待链项（因无同章 object 候选且跨章精确/词干键已被禁用）
+        for st in c3_states_a4a:
+            for it in st["items"]:
+                self.assertNotEqual(it["surface"], "黑木匣")
+
+        # 2) 验证无降级时（所设阈值下無词满足降级，如 theta=0.2 vs theta=0.0），导出与请求负载逐字节不变
+        _prep_run("run_no_downgrade_02")
+        _prep_run("run_no_downgrade_00")
+        calls_02, calls_00 = [], []
+
+        def make_recording_models(log_list):
+            return ScriptedRosterModels({
+                "roster-c1": lambda state, n: (log_list.append(("c1", dumps(state))) or handle_c1(state, n)),
+                "roster-c2-propose": lambda state, n: (log_list.append(("prop", dumps(state))) or ({"proposals": []}, f"prop_{n}")),
+                "roster-c2-review": lambda state, n: (
+                    log_list.append(("rev", dumps(state)))
+                    or ({"groups": [{"group_id": "g1", "name": "赵校尉", "kind": "person", "row_ids": [r["row_id"] for r in state["rows"]], "member_ids": [], "reason": "同人"}], "unresolved_row_ids": [], "unresolved_member_ids": []}, f"rev_{n}")
+                ),
+                "roster-c3-link": lambda state, n: (
+                    log_list.append(("c3", dumps(state)))
+                    or ({"links": [{"mention_id": it["mention_id"], "selected_entity_id": "none", "reason": "无"} for it in state["items"]]}, f"c3_{n}")
+                ),
+            })
+
+        with patch("entitytrace.roster.UNSTABLE_PROPER_THETA", 0.2):
+            resolve_roster(self.store, make_recording_models(calls_02), source, "run_no_downgrade_02", concurrency=1, log=lambda *_: None)
+        with patch("entitytrace.roster.UNSTABLE_PROPER_THETA", 0.0):
+            resolve_roster(self.store, make_recording_models(calls_00), source, "run_no_downgrade_00", concurrency=1, log=lambda *_: None)
+
+        self.assertEqual(calls_02, calls_00)
+        out_02 = self.store.records("run_no_downgrade_02", "roster_output")[0]
+        out_00 = self.store.records("run_no_downgrade_00", "roster_output")[0]
+        self.assertEqual(dumps(out_02), dumps(out_00))
+
     def test_roster_module_does_not_import_gold(self):
         source = (ROOT / "entitytrace/roster.py").read_text(encoding="utf-8")
         self.assertNotIn("entity-gold", source)
