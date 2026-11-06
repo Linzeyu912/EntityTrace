@@ -24,6 +24,7 @@ C1_PROMPT = """你是小说章节内实体称呼归并器。输入小说原文�
    - proper_name：专名、全名、单名、字、号、绰号、专有地名/建筑名/书名/机构专名，以及带特定专有姓氏且在全书中固定指代某一个体的专有称呼（如 Mr. Bennet、Mrs. Bennet、Mrs. Gardiner、Lady Catherine、Sir William、黄知县、鲍师爷、刘太守、孔制台）。
    - title_or_kinship：可能对应同姓多人或不同人物的称谓、纯官职、纯亲属称呼、“X氏”及泛指小姐/少爷称呼（如 Miss Bennet、凌氏、郑氏、叶氏、陈氏、知县、太守、大人、制台、中丞、师爷、老爷、太太、老夫人、表叔、老表台、外甥、姑丈、叔父、侄老爹、Lady、Sir、Colonel）。
    - description：关系描述短语或身份泛称（如 my father、his father、his sister、her sister、her daughter、her mother、his aunt、his friend、令尊翁、先父、他妹子、the waiter、小厮、书童、更夫）。
+   - description 还包括：由类别名词构成、只说明“某一方或某人的某类场所、营寨、官邸、门阙、旗牌或器物”的称呼，即使前面带国名、阵营名、人名或官职（如 敌军营地、总督府邸、停战旗、the rebel camp、the governor's house）；只有当该称呼本身就是这个对象独有的名字（换一个主人或换一处就不能这样叫）时才是 proper_name。
 2. surfaces 只作为“该称呼在本片段内默认全部同指该对象”的简写；assignments 采用 mention_id（或 surface + ref）作为例外分配的最小单位：
    - 若某称呼在本片段内全部指向同一对象，放入该对象的 surfaces。
    - 若某称呼在本片段内大多数指向某对象，但个别出现位置（mention_id）是断词误切（如“我今天来”中的“天来”、“大有关系”中的“大有”）或指向另一同类型对象，可将该称呼保留在主对象的 surfaces 中，同时在 assignments 中针对该例外 mention_id 单独指定 local_id（另一对象的 local_id、"not_entity" 或 null）。
