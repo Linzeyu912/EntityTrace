@@ -2394,6 +2394,213 @@ class RosterAlgorithmTests(unittest.TestCase):
         self.assertTrue(out_noc3["complete"])
         self.assertEqual(len(self.store.rows("SELECT id FROM tasks WHERE run_id=? AND stage='roster-c3-link'", (run_no_c3,))), 0)
 
+    def _prepare_s3_propose_batch_order_fixture(self):
+        """构造同时产生 place 批次（下标 0）与 cross_kind 批次（下标 1）的合成双章输入。
+        两条目均有 place 与 organization 双 provisional_kinds，故既属于 place 批，又属于 cross_kind 批。"""
+        text = (
+            "第一章\n青云书院坐落于北麓，世人皆敬仰青云书院。\n"
+            "第二章\n青云院藏书万卷，学子齐聚青云院。\n"
+        )
+        path = self.root / "s3_propose_order.txt"
+        path.write_bytes(text.encode("utf-8"))
+        source = import_text(self.store, path)
+        idx1, idx2 = text.index("第一章"), text.index("第二章")
+        _, chapters = build_chapters(
+            source,
+            [
+                {"start": idx1, "end": idx1 + 3, "title": "第一章", "kind": "chapter"},
+                {"start": idx2, "end": idx2 + 3, "title": "第二章", "kind": "chapter"},
+            ],
+        )
+        tasks = plan_tasks(source, chapters, 9000)
+        u1, u2 = tasks[0]["units"][0]["id"], tasks[1]["units"][0]["id"]
+        source, base_run_id, tasks = self._prepare_two_chapter_run(
+            text,
+            {
+                "mentions": [
+                    {"text": "青云书院", "kind": "place", "refs": [u1]},
+                    {"text": "青云书院", "kind": "organization", "refs": [u1]},
+                ],
+                "links": [],
+            },
+            {
+                "mentions": [
+                    {"text": "青云院", "kind": "place", "refs": [u2]},
+                    {"text": "青云院", "kind": "organization", "refs": [u2]},
+                ],
+                "links": [],
+            },
+        )
+
+        def handle_c1(state, n):
+            uid = state["units"][0]["id"]
+            surf = "青云书院" if state["chapter_title"] == "第一章" else "青云院"
+            return {
+                "entities": [
+                    {
+                        "local_id": "e1",
+                        "name": surf,
+                        "kind": "place",
+                        "surfaces": [{"surface": surf, "surface_type": "proper_name"}],
+                        "evidence_ref": uid,
+                    }
+                ],
+                "assignments": [],
+                "not_entity": [],
+            }, f"c1_s3_{state['chapter_title']}"
+
+        return source, base_run_id, handle_c1
+
+    def test_s3_c2_propose_dedup_order_invariant_under_reverse_threads_and_partial_resume(self):
+        """0.15b.1 规格 S3 单测 ①：让补合并提议的工作线程完成顺序与批次顺序相反，
+        或一批来自已完成任务、一批来自新请求，所得 proposals（含 reason、propose_request_id）与按批次顺序完成时逐项相同。"""
+        import threading
+
+        source, base_run_id, handle_c1 = self._prepare_s3_propose_batch_order_fixture()
+
+        def clone_run(new_run_id: str) -> str:
+            self.store.execute("INSERT INTO runs VALUES(?,?,?,?,?,?)", (new_run_id, source["id"], "{}", "{}", "now", "now"))
+            for ch in self.store.records(base_run_id, "chapter"):
+                self.store.put(new_run_id, "chapter", ch)
+            for m in self.store.records(base_run_id, "mention"):
+                self.store.put(new_run_id, "mention", m)
+            return new_run_id
+
+        # 情形 A：按批次顺序串行完成（concurrency=1，place 批先完成，cross_kind 批后完成）
+        run_seq = clone_run("run_s3_seq")
+        seq_verify_states = []
+
+        def propose_seq(state, n):
+            ids = sorted(e["entry_id"] for e in state["entries"])
+            k = state["kind"]
+            return (
+                {"proposals": [{"left": ids[0], "right": ids[1], "reason": f"reason_from_{k}"}]},
+                f"req_propose_{k}",
+            )
+
+        def verify_capture_seq(state, n):
+            seq_verify_states.append(state)
+            return {"verdict": "same", "reason": "同指青云书院"}, "req_verify_s3"
+
+        models_seq = ScriptedRosterModels({
+            "roster-c1": handle_c1,
+            "roster-c2-propose": propose_seq,
+            "roster-c2-verify": verify_capture_seq,
+        })
+        out_seq = resolve_roster(self.store, models_seq, source, run_seq, concurrency=1, log=lambda _: None)
+        self.assertTrue(out_seq["complete"])
+        self.assertEqual(len(seq_verify_states), 1)
+        seq_roster_out = self.store.records(run_seq, "roster_output")[0]
+
+        # 情形 B：双线程并发（concurrency=2），强制下标 1 的 cross_kind 批先返回、下标 0 的 place 批等待事件后才返回
+        run_rev = clone_run("run_s3_rev_threads")
+        rev_verify_states = []
+        cross_kind_done = threading.Event()
+        completion_order = []
+
+        def propose_reverse_threads(state, n):
+            ids = sorted(e["entry_id"] for e in state["entries"])
+            k = state["kind"]
+            if k == "place":
+                # 等待 cross_kind 线程先完成返回
+                cross_kind_done.wait(timeout=5.0)
+                completion_order.append("place")
+            else:
+                completion_order.append("cross_kind")
+                cross_kind_done.set()
+            return (
+                {"proposals": [{"left": ids[0], "right": ids[1], "reason": f"reason_from_{k}"}]},
+                f"req_propose_{k}",
+            )
+
+        def verify_capture_rev(state, n):
+            rev_verify_states.append(state)
+            return {"verdict": "same", "reason": "同指青云书院"}, "req_verify_s3"
+
+        models_rev = ScriptedRosterModels({
+            "roster-c1": handle_c1,
+            "roster-c2-propose": propose_reverse_threads,
+            "roster-c2-verify": verify_capture_rev,
+        })
+        out_rev = resolve_roster(self.store, models_rev, source, run_rev, concurrency=2, log=lambda _: None)
+        self.assertTrue(out_rev["complete"])
+        self.assertEqual(completion_order, ["cross_kind", "place"])
+        self.assertEqual(len(rev_verify_states), 1)
+        rev_roster_out = self.store.records(run_rev, "roster_output")[0]
+
+        # 情形 C：下标 1 的 cross_kind 批来自 store.task 已完成任务，下标 0 的 place 批来自本次新请求
+        run_mixed = clone_run("run_s3_mixed_cache")
+        for r in self.store.rows("SELECT id, stage, result FROM tasks WHERE run_id=? AND stage='roster-c2-propose'", (run_seq,)):
+            import json
+            res_obj = json.loads(r["result"])
+            if res_obj["request_id"] == "req_propose_cross_kind":
+                self.store.finish_task(run_mixed, {"id": r["id"], "stage": "roster-c2-propose"}, res_obj)
+
+        mixed_verify_states = []
+        mixed_propose_called_kinds = []
+
+        def propose_mixed(state, n):
+            mixed_propose_called_kinds.append(state["kind"])
+            return propose_seq(state, n)
+
+        def verify_capture_mixed(state, n):
+            mixed_verify_states.append(state)
+            return {"verdict": "same", "reason": "同指青云书院"}, "req_verify_s3"
+
+        models_mixed = ScriptedRosterModels({
+            "roster-c1": handle_c1,
+            "roster-c2-propose": propose_mixed,
+            "roster-c2-verify": verify_capture_mixed,
+        })
+        out_mixed = resolve_roster(self.store, models_mixed, source, run_mixed, concurrency=2, log=lambda _: None)
+        self.assertTrue(out_mixed["complete"])
+        self.assertEqual(mixed_propose_called_kinds, ["place"])
+        self.assertEqual(len(mixed_verify_states), 1)
+        mixed_roster_out = self.store.records(run_mixed, "roster_output")[0]
+
+        # 断言情形 B、情形 C 与情形 A 的核验输入（含 proposal_reason）及最终导出（含 link_refs 中的 propose_request_id）逐项相同
+        self.assertEqual(dumps(rev_verify_states), dumps(seq_verify_states))
+        self.assertEqual(dumps(mixed_verify_states), dumps(seq_verify_states))
+        self.assertEqual(dumps(rev_roster_out), dumps(seq_roster_out))
+        self.assertEqual(dumps(mixed_roster_out), dumps(seq_roster_out))
+
+    def test_s3_c2_propose_duplicate_pair_keeps_smaller_batch_index_reason(self):
+        """0.15b.1 规格 S3 单测 ②：两批提议同一对、理由不同时，保留下标较小批次（place，pb_idx=0）的理由与 request_id。"""
+        source, base_run_id, handle_c1 = self._prepare_s3_propose_batch_order_fixture()
+        seen_propose_kinds = []
+        verify_states = []
+
+        def handle_propose(state, n):
+            k = state["kind"]
+            seen_propose_kinds.append(k)
+            ids = sorted(e["entry_id"] for e in state["entries"])
+            reason = "批0（place）全称简称理由" if k == "place" else "批1（cross_kind）跨粗类理由"
+            return (
+                {"proposals": [{"left": ids[0], "right": ids[1], "reason": reason}]},
+                f"req_prop_{k}",
+            )
+
+        def handle_verify(state, n):
+            verify_states.append(state)
+            return {"verdict": "same", "reason": "确系同一书院"}, f"req_ver_{n}"
+
+        models = ScriptedRosterModels({
+            "roster-c1": handle_c1,
+            "roster-c2-propose": handle_propose,
+            "roster-c2-verify": handle_verify,
+        })
+        out = resolve_roster(self.store, models, source, base_run_id, concurrency=1, log=lambda _: None)
+        self.assertTrue(out["complete"])
+        # 确认两批顺序为下标 0=place, 下标 1=cross_kind
+        self.assertEqual(seen_propose_kinds, ["place", "cross_kind"])
+        # 同一对只触发 1 次核验，且保留下标较小批次（place，pb_idx=0）的理由与 propose_request_id
+        self.assertEqual(len(verify_states), 1)
+        self.assertEqual(verify_states[0]["proposal_reason"], "批0（place）全称简称理由")
+        roster_out = self.store.records(base_run_id, "roster_output")[0]
+        merged_refs = {ref for m in roster_out["mentions"] for ref in m.get("link_refs", [])}
+        self.assertIn("req_prop_place", merged_refs)
+        self.assertNotIn("req_prop_cross_kind", merged_refs)
+
     def test_roster_module_does_not_import_gold(self):
         source = (ROOT / "entitytrace/roster.py").read_text(encoding="utf-8")
         self.assertNotIn("entity-gold", source)

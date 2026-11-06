@@ -1628,7 +1628,7 @@ def resolve_roster(
 
     propose_jobs = []
     propose_cached_outputs = []
-    for kind_name, b_idx, batch in propose_batches:
+    for pb_idx, (kind_name, b_idx, batch) in enumerate(propose_batches):
         compact_rows = [
             {
                 "entry_id": e["entry_id"],
@@ -1643,11 +1643,12 @@ def resolve_roster(
         task_id = digest([VERSION, "c2-propose", kind_name, b_idx, compact_rows, C2_PROPOSE_PROMPT])
         old = store.task(run_id, task_id)
         if old and old["status"] == "completed" and old["result"]:
-            propose_cached_outputs.append((batch, old["result"]["value"], old["result"]["request_id"]))
+            propose_cached_outputs.append((pb_idx, batch, old["result"]["value"], old["result"]["request_id"]))
         else:
             propose_jobs.append({
                 "id": task_id,
                 "stage": "roster-c2-propose",
+                "pb_idx": pb_idx,
                 "kind_name": kind_name,
                 "batch": batch,
                 "compact_rows": compact_rows,
@@ -1670,7 +1671,7 @@ def resolve_roster(
             c2_propose_failures.append({"task_id": pj["id"], "error": msg})
             continue
         store.finish_task(run_id, {"id": pj["id"], "stage": "roster-c2-propose"}, res)
-        propose_cached_outputs.append((pj["batch"], res["value"], res["request_id"]))
+        propose_cached_outputs.append((pj["pb_idx"], pj["batch"], res["value"], res["request_id"]))
 
     if c2_propose_failures:
         return {
@@ -1679,7 +1680,8 @@ def resolve_roster(
             "failures": c2_propose_failures,
         }
 
-    for batch, val, req_id in propose_cached_outputs:
+    propose_cached_outputs.sort(key=lambda item: item[0])
+    for _, batch, val, req_id in propose_cached_outputs:
         batch_ids = {e["entry_id"] for e in batch}
         for prop in val["proposals"]:
             l_id, r_id = prop["left"], prop["right"]
