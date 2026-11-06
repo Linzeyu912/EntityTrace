@@ -1458,6 +1458,235 @@ class CredentialDecouplingAndTemperatureTests(unittest.TestCase):
             finally:
                 store.close()
 
+    def test_all_stages_default_temperature_zero_and_fallback_on_output_error_only(self):
+        from entitytrace.discovery import discover
+        from entitytrace.roster import resolve_roster
+
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            store = Store(root / "db.sqlite3")
+            try:
+                svc = Service("discovery", "https://api.deepseek.com", "deepseek-flash", "TEST_SECRET")
+
+                # (2) 第一次尝试在 temperature=0 下返回截断或格式错误时，第二次尝试自动移除 temperature，
+                #     成功后以首次 request_id 落库并在 calls.detail 记录 temperature_sent
+                sent_payloads_out_err: list[dict] = []
+
+                def opener_output_err_then_ok(request, **kwargs):
+                    p = json.loads(request.data.decode("utf-8"))
+                    sent_payloads_out_err.append(p)
+                    if len(sent_payloads_out_err) == 1:
+                        body = {
+                            "choices": [{"finish_reason": "length", "message": {"content": "{\"ok\":"}}],
+                            "usage": {"prompt_tokens": 100, "completion_tokens": 8000},
+                        }
+                    else:
+                        body = {
+                            "choices": [{"finish_reason": "stop", "message": {"content": "{\"ok\": true}"}}],
+                            "usage": {"prompt_tokens": 100, "completion_tokens": 50},
+                        }
+                    return io.BytesIO(json.dumps(body).encode("utf-8"))
+
+                with patch("entitytrace.models.time.sleep", lambda _: None):
+                    m1 = Models(store, "run-t0-fallback", "inv-t1", {"discovery": svc}, attempts=3, opener=opener_output_err_then_ok)
+                    val1, req_id1 = m1.generate("sys", {"u": 1}, "roster-c1", lambda v: None, temperature=0)
+
+                self.assertEqual(val1, {"ok": True})
+                self.assertEqual(len(sent_payloads_out_err), 2)
+                self.assertEqual(sent_payloads_out_err[0].get("temperature"), 0)
+                self.assertNotIn("temperature", sent_payloads_out_err[1])
+                # 验证缓存键仍为首次含 temperature=0 的 request_id，再次调用命中缓存
+                self.assertIsNotNone(store.cache(req_id1))
+                val1_cached, req_id1_cached = m1.generate("sys", {"u": 1}, "roster-c1", lambda v: None, temperature=0)
+                self.assertEqual(val1_cached, {"ok": True})
+                self.assertEqual(req_id1_cached, req_id1)
+                self.assertEqual(len(sent_payloads_out_err), 2)
+
+                call_rows_1 = store.rows("SELECT attempt, status, detail FROM calls WHERE run_id=? ORDER BY id", ("run-t0-fallback",))
+                self.assertEqual(len(call_rows_1), 3)
+                d_att1 = json.loads(call_rows_1[0]["detail"])
+                d_att2 = json.loads(call_rows_1[1]["detail"])
+                self.assertEqual(call_rows_1[0]["status"], "failed")
+                self.assertEqual(d_att1["temperature_sent"], 0)
+                self.assertEqual(call_rows_1[1]["status"], "success")
+                self.assertIsNone(d_att2["temperature_sent"])
+
+                # (3) 第一次尝试遇 HTTP 503 或网络错误时，第二次尝试仍带 temperature=0
+                sent_payloads_http_err: list[dict] = []
+
+                def opener_http_503_then_ok(request, **kwargs):
+                    p = json.loads(request.data.decode("utf-8"))
+                    sent_payloads_http_err.append(p)
+                    if len(sent_payloads_http_err) == 1:
+                        raise urllib.error.HTTPError(
+                            request.full_url, 503, "Service Unavailable", {}, io.BytesIO(b"busy")
+                        )
+                    body = {
+                        "choices": [{"finish_reason": "stop", "message": {"content": "{\"ok\": 503}"}}],
+                        "usage": {"prompt_tokens": 80, "completion_tokens": 20},
+                    }
+                    return io.BytesIO(json.dumps(body).encode("utf-8"))
+
+                with patch("entitytrace.models.time.sleep", lambda _: None):
+                    m2 = Models(store, "run-t0-http503", "inv-t2", {"discovery": svc}, attempts=3, opener=opener_http_503_then_ok)
+                    val2, _ = m2.generate("sys", {"u": 2}, "discovery", lambda v: None, temperature=0)
+
+                self.assertEqual(val2, {"ok": 503})
+                self.assertEqual(len(sent_payloads_http_err), 2)
+                self.assertEqual(sent_payloads_http_err[0].get("temperature"), 0)
+                self.assertEqual(sent_payloads_http_err[1].get("temperature"), 0)
+                call_rows_2 = store.rows("SELECT attempt, status, detail FROM calls WHERE run_id=? ORDER BY id", ("run-t0-http503",))
+                self.assertEqual(json.loads(call_rows_2[0]["detail"])["temperature_sent"], 0)
+                self.assertEqual(json.loads(call_rows_2[1]["detail"])["temperature_sent"], 0)
+
+                # (1) 验证发现与 roster 五个阶段（roster-c1, roster-c2-review, roster-c2-propose, roster-c2-verify, roster-c3-link）
+                #     默认发起请求体全部包含 "temperature": 0
+                stage_payloads: dict[str, list[dict]] = {}
+                book_path = root / "book_t0.txt"
+                book_text = (
+                    "第一章\n沈墨在城门遇见沈公子与一位老者。\n"
+                    "第二章\n沈墨与沈公子、韩立重逢，韩立提起沈墨。\n"
+                )
+                book_path.write_bytes(book_text.encode("utf-8"))
+                source = import_text(store, book_path)
+                i1, i2 = book_text.index("第一章"), book_text.index("第二章")
+                _, chapters = build_chapters(
+                    source,
+                    [
+                        {"start": i1, "end": i1 + 3, "title": "第一章", "kind": "chapter"},
+                        {"start": i2, "end": i2 + 3, "title": "第二章", "kind": "chapter"},
+                    ],
+                )
+                run_s = "run-all-stages-t0"
+                store.execute("INSERT INTO runs VALUES(?,?,?,?,?,?)", (run_s, source["id"], "{}", "{}", "now", "now"))
+                for ch in chapters:
+                    store.put(run_s, "chapter", ch)
+
+                class StageInspectingModels(Models):
+                    def generate(self, system, state, stage, validate, max_tokens=8000, temperature=None):
+                        stage_payloads.setdefault(stage, []).append({"temperature": temperature, "max_tokens": max_tokens, "state": state})
+                        return super().generate(system, state, stage, validate, max_tokens=max_tokens, temperature=temperature)
+
+                sent_by_http: list[dict] = []
+
+                def opener_all_stages(request, **kwargs):
+                    p = json.loads(request.data.decode("utf-8"))
+                    sent_by_http.append(p)
+                    user_obj = json.loads(p["messages"][1]["content"])
+                    if "section_kind" in user_obj:
+                        uid = user_obj["units"][0]["id"]
+                        if user_obj["chapter_title"] == "第一章":
+                            content = {
+                                "mentions": [
+                                    {"text": "沈墨", "kind": "person", "refs": [uid]},
+                                    {"text": "沈公子", "kind": "person", "refs": [uid]},
+                                    {"text": "老者", "kind": "person", "refs": [uid]},
+                                ],
+                                "links": [],
+                            }
+                        else:
+                            content = {
+                                "mentions": [
+                                    {"text": "沈墨", "kind": "person", "refs": [uid]},
+                                    {"text": "沈公子", "kind": "person", "refs": [uid]},
+                                    {"text": "韩立", "kind": "person", "refs": [uid]},
+                                ],
+                                "links": [],
+                            }
+                    elif "surfaces" in user_obj:
+                        uid = user_obj["units"][0]["id"]
+                        if user_obj["chapter_title"] == "第一章":
+                            content = {
+                                "entities": [
+                                    {
+                                        "local_id": "e1",
+                                        "name": "沈墨",
+                                        "kind": "person",
+                                        "surfaces": [
+                                            {"surface": "沈墨", "surface_type": "proper_name"},
+                                            {"surface": "沈公子", "surface_type": "proper_name"},
+                                        ],
+                                        "evidence_ref": uid,
+                                    },
+                                    {
+                                        "local_id": "e2",
+                                        "name": "老者",
+                                        "kind": "person",
+                                        "surfaces": [{"surface": "老者", "surface_type": "description"}],
+                                        "evidence_ref": uid,
+                                    },
+                                ],
+                                "assignments": [],
+                                "not_entity": [],
+                            }
+                        else:
+                            content = {
+                                "entities": [
+                                    {
+                                        "local_id": "e1",
+                                        "name": "沈公子",
+                                        "kind": "person",
+                                        "surfaces": [
+                                            {"surface": "沈墨", "surface_type": "proper_name"},
+                                            {"surface": "沈公子", "surface_type": "proper_name"},
+                                        ],
+                                        "evidence_ref": uid,
+                                    },
+                                    {
+                                        "local_id": "e2",
+                                        "name": "韩立",
+                                        "kind": "person",
+                                        "surfaces": [{"surface": "韩立", "surface_type": "proper_name"}],
+                                        "evidence_ref": uid,
+                                    },
+                                ],
+                                "assignments": [],
+                                "not_entity": [],
+                            }
+                    elif "rows" in user_obj:
+                        rids = [r["row_id"] for r in user_obj["rows"]]
+                        content = {
+                            "groups": [{"group_id": "g1", "name": "沈墨", "kind": "person", "row_ids": rids, "member_ids": [], "reason": "同指"}],
+                            "unresolved_row_ids": [],
+                            "unresolved_member_ids": [],
+                        }
+                    elif "entries" in user_obj:
+                        eids = [e["entry_id"] for e in user_obj["entries"]]
+                        if len(eids) >= 2:
+                            content = {"proposals": [{"left": eids[0], "right": eids[1], "reason": "尝试提议"}]}
+                        else:
+                            content = {"proposals": []}
+                    elif "proposal_reason" in user_obj:
+                        content = {"verdict": "different", "reason": "不同人"}
+                    elif "items" in user_obj:
+                        content = {
+                            "links": [
+                                {"mention_id": it["mention_id"], "selected_entity_id": "none", "reason": "无同指"}
+                                for it in user_obj["items"]
+                            ]
+                        }
+                    else:
+                        content = {}
+                    body = {"choices": [{"finish_reason": "stop", "message": {"content": json.dumps(content, ensure_ascii=False)}}]}
+                    return io.BytesIO(json.dumps(body).encode("utf-8"))
+
+                m_all = StageInspectingModels(store, run_s, "inv-all", {"discovery": svc}, discovery_concurrency=1, opener=opener_all_stages)
+                d_out = discover(store, m_all, source, run_s, chapters, 9000, 1, lambda *_: None)
+                self.assertTrue(d_out["complete"])
+                r_out = resolve_roster(store, m_all, source, run_s, concurrency=1, log=lambda *_: None, task_chars=9000)
+                self.assertTrue(r_out["complete"])
+
+                expected_stages = {"discovery", "roster-c1", "roster-c2-review", "roster-c2-propose", "roster-c2-verify", "roster-c3-link"}
+                self.assertEqual(set(stage_payloads.keys()), expected_stages)
+                for st_name, recs in stage_payloads.items():
+                    self.assertTrue(len(recs) >= 1, st_name)
+                    for r in recs:
+                        self.assertEqual(r["temperature"], 0, f"{st_name} temperature != 0")
+                for hp in sent_by_http:
+                    self.assertEqual(hp.get("temperature"), 0)
+            finally:
+                store.close()
+
 
 if __name__ == "__main__":
     unittest.main()

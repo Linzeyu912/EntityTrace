@@ -164,6 +164,7 @@ class Models:
             self.store.call(self.run_id, self.invocation, stage, request_id, service_name, 0, "cached", 0, {})
             return cached, request_id
         error = "模型请求失败"
+        drop_temperature = False
         for attempt in range(1, self.attempts + 1):
             if self.budget is not None and self.budget.stop_reason == "network_outage":
                 raise BudgetError("连续网络失败，停止新请求并保留断点", category="network", stop_reason="network_outage")
@@ -176,7 +177,13 @@ class Models:
                 time.sleep(delay)
             retryable, retry_after = True, 0.0
             begin = time.monotonic()
-            detail: dict = {}
+            send_payload = (
+                {k: v for k, v in payload.items() if k != "temperature"}
+                if (drop_temperature and "temperature" in payload)
+                else payload
+            )
+            temperature_sent = send_payload.get("temperature")
+            detail: dict = {"temperature_sent": temperature_sent}
             raw = None
             with self.gates[service_name]:
                 with self.lock:
@@ -186,7 +193,7 @@ class Models:
                     self.peaks[service_name] = max(self.peaks[service_name], self.active[service_name])
                     active = self.active[service_name]
                 try:
-                    request = urllib.request.Request(service.url + path, data=dumps(payload).encode("utf-8"),
+                    request = urllib.request.Request(service.url + path, data=dumps(send_payload).encode("utf-8"),
                         headers={"Authorization": "Bearer " + service.key, "Content-Type": "application/json"}, method="POST")
                     with self.opener(request, timeout=self.timeout) as response:
                         raw = json.loads(response.read().decode("utf-8"))
@@ -194,7 +201,7 @@ class Models:
                     # Authorization 头从不写入日志；不保存模型内部推理字段。
                     for choice in raw.get("choices", []):
                         choice.get("message", {}).pop("reasoning_content", None)
-                    detail = {"usage": raw.get("usage", {}), "active_requests": active}
+                    detail = {"usage": raw.get("usage", {}), "active_requests": active, "temperature_sent": temperature_sent}
                 except urllib.error.HTTPError as exc:
                     error_status = exc.code
                     error = f"{service_name} 请求失败（HTTP {exc.code}）"
@@ -216,7 +223,7 @@ class Models:
                             retry_after = parsedate_to_datetime(header).timestamp() - time.time()
                         except (TypeError, ValueError, OverflowError):
                             retry_after = 0
-                    detail = {"http_status": exc.code, "hard_quota": hard_quota, "error_type": error_code}
+                    detail = {"http_status": exc.code, "hard_quota": hard_quota, "error_type": error_code, "temperature_sent": temperature_sent}
                     if hard_quota:
                         error += "，余额或硬额度不足，本次运行停止该服务的新请求；成功缓存仍可复用"
                         with self.lock:
@@ -225,10 +232,15 @@ class Models:
                 except (urllib.error.URLError, TimeoutError, socket.timeout, OSError):
                     error = f"{service_name} 网络失败或超时"
                     error_code = "network_error"
+                    detail = {"temperature_sent": temperature_sent}
                     raw = None
                 except (ValueError, KeyError, TypeError, ModelError) as exc:
+                    drop_temperature = True
                     error = f"{service_name} 返回格式不符合约定"
-                    detail = {"validation_error": str(exc)[:160] if isinstance(exc, ModelError) else type(exc).__name__}
+                    detail = {
+                        "validation_error": str(exc)[:160] if isinstance(exc, ModelError) else type(exc).__name__,
+                        "temperature_sent": temperature_sent,
+                    }
                     if isinstance(raw, dict) and isinstance(raw.get("usage"), dict) and raw["usage"]:
                         detail["usage"] = raw["usage"]
                     raw = None

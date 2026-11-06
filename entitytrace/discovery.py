@@ -127,7 +127,7 @@ def discover(store, models, source: dict, run_id: str, chapters: list[dict], tas
         state = {"chapter_title": task["chapter_title"], "section_kind": task["section_kind"], "units": task["units"],
                  "before_context_only": source["text"][max(0, task["start"] - 250):task["start"]],
                  "after_context_only": source["text"][task["end"]:task["end"] + 250]}
-        value, request_id = models.generate(PROMPT, state, "discovery", check_discovery)
+        value, request_id = models.generate(PROMPT, state, "discovery", check_discovery, temperature=0)
         return ground_result(source, task, value, request_id)
     failures = []
     for task, result, error in bounded_map(pending, worker, concurrency):

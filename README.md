@@ -46,7 +46,7 @@ EntityTrace 是面向 agent 的插件，提供小说实体发现、身份判断�
 | 未决与非专名链接（C3） | 本地唯一称呼直连 + DeepSeek 候选链接 | 章内对象确定性落入名册；只含非专名称呼的对象与章内未决提及在候选名册与原文证据下链接，受专名一致性硬约束保护；单任务若连续返回非法格式则自动将该任务待链项转入待审而不阻断全书完成 |
 | 待审排序与统一导出（C4） | 本地程序 | 同任务无歧义 C1 专名补全（`same_task_proper`）并自动消解已完整覆盖的同任务定位待审（`auto_same_task_covered`）；汇总身份与定位待审并按受影响提及数（`impact`）降序排列，校验全部码点地址与覆盖完整性，导出 `schema_version=3` 产物 |
 
-默认模型配置仅使用 `deepseek-flash`（章节标注、提及发现与名册身份阶段），无需配置 `TYPESAFE_API_KEY`；仅在切换 `--identity-algorithm groups-v2` 时加载并使用固定版本 `jev-1.13.0` 执行配对身份消歧。`entity-roster-v1` 不使用未校准概率分数作主路由，而是显式记录每处提及的链接来源（`chapter_local`、`c3_model`、`surface_unique`、`same_task_proper`、`unresolved`、`c3_rejected_name_mismatch`、`not_entity_suggested`）与关联请求 ID。
+默认模型配置仅使用 `deepseek-flash`（章节标注、提及发现与名册身份全部阶段默认固定 `temperature=0`，若单次尝试因模型输出截断或格式校验失败则下一次重试自动恢复服务端默认温度），无需配置 `TYPESAFE_API_KEY`；仅在切换 `--identity-algorithm groups-v2` 时加载并使用固定版本 `jev-1.13.0` 执行配对身份消歧。`entity-roster-v1` 不使用未校准概率分数作主路由，而是显式记录每处提及的链接来源（`chapter_local`、`c3_model`、`surface_unique`、`same_task_proper`、`unresolved`、`c3_rejected_name_mismatch`、`not_entity_suggested`）与关联请求 ID。
 
 ## 运行
 

@@ -921,6 +921,7 @@ def resolve_roster(
                 allowed_mention_ids=allowed_mids,
             ),
             max_tokens=C1_MAX_TOKENS,
+            temperature=0,
         )
         return apply_c1_task_result(source, dtask, t_mentions, raw_val, req_id, strict=strict_c1)
 
@@ -1290,6 +1291,7 @@ def resolve_roster(
                         state,
                         "roster-c2-review",
                         lambda v, ar=allowed_rids, am=allowed_mids: _check_c2_review(v, ar, am),
+                        temperature=0,
                     )
                     from_cache = False
                 batch_outputs.append({
@@ -1547,6 +1549,7 @@ def resolve_roster(
             {"kind": pj["kind_name"], "entries": pj["compact_rows"]},
             "roster-c2-propose",
             _check_c2_proposals,
+            temperature=0,
         )
         return {"value": val, "request_id": req_id}
 
@@ -1659,7 +1662,13 @@ def resolve_roster(
             verify_tasks.append({"id": tid, "stage": "roster-c2-verify", "prop": prop, "state": state})
 
     def verify_worker(vt: dict) -> dict:
-        val, req_id = models.generate(C2_VERIFY_PROMPT, vt["state"], "roster-c2-verify", _check_c2_verify)
+        val, req_id = models.generate(
+            C2_VERIFY_PROMPT,
+            vt["state"],
+            "roster-c2-verify",
+            _check_c2_verify,
+            temperature=0,
+        )
         return {"verdict": val["verdict"], "reason": str(val.get("reason", "")), "request_id": req_id}
 
     verify_failures = []
@@ -2060,6 +2069,7 @@ def resolve_roster(
             ct["state"],
             "roster-c3-link",
             lambda v: _check_c3_links(v, ct["allowed_mids"], ct["allowed_choices"]),
+            temperature=0,
         )
         return {"links": val["links"], "request_id": req_id}
 
