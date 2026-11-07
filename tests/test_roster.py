@@ -2855,6 +2855,219 @@ class RosterAlgorithmTests(unittest.TestCase):
         }
         self.assertEqual(c3_mismatch_surfaces, {"林昭", "沈甲师爷", "温七随从"})
 
+    def _setup_two_chapter_title_review_fixture(self, run_tag: str, include_ambiguous_proper: bool = False):
+        text = (
+            "第一章\n"
+            "韩立走进大厅，家主笑脸相迎，贵家主拱手道谢。沈昭在一旁饮茶。\n\n"
+            "第二章\n"
+            "韩立来到后院，家主端坐堂上。沈昭递上书信。\n"
+        )
+        path = self.root / f"{run_tag}.txt"
+        path.write_bytes(text.encode("utf-8"))
+        source = import_text(self.store, path)
+        idx1, idx2 = text.index("第一章"), text.index("第二章")
+        _, chapters = build_chapters(
+            source,
+            [
+                {"start": idx1, "end": idx1 + 3, "title": "第一章", "kind": "chapter"},
+                {"start": idx2, "end": idx2 + 3, "title": "第二章", "kind": "chapter"},
+            ],
+        )
+        tasks = plan_tasks(source, chapters, 9000)
+        u1, u2 = tasks[0]["units"][0]["id"], tasks[1]["units"][0]["id"]
+        run_id = f"run_{run_tag}"
+        self.store.execute("INSERT INTO runs VALUES(?,?,?,?,?,?)", (run_id, source["id"], "{}", "{}", "now", "now"))
+        for ch in chapters:
+            self.store.put(run_id, "chapter", ch)
+
+        m_ch1 = [
+            {"text": "韩立", "kind": "person", "refs": [u1]},
+            {"text": "家主", "kind": "person", "refs": [u1]},
+            {"text": "贵家主", "kind": "person", "refs": [u1]},
+        ]
+        m_ch2 = [
+            {"text": "韩立", "kind": "person", "refs": [u2]},
+            {"text": "家主", "kind": "person", "refs": [u2]},
+        ]
+        if include_ambiguous_proper:
+            m_ch1.append({"text": "沈昭", "kind": "person", "refs": [u1]})
+            m_ch2.append({"text": "沈昭", "kind": "person", "refs": [u2]})
+
+        for t, disc in zip(tasks, [{"mentions": m_ch1, "links": []}, {"mentions": m_ch2, "links": []}]):
+            grounded = ground_result(source, t, disc, f"req_disc_{t['id']}")
+            recs = [
+                (kind, rec)
+                for kind, key in [("mention", "mentions"), ("observation", "observations"), ("review", "reviews"), ("link", "links")]
+                for rec in grounded[key]
+            ]
+            self.store.finish_task(run_id, t, {"request_id": f"req_disc_{t['id']}"}, recs)
+
+        def handle_c1(state, n):
+            title = state["chapter_title"]
+            ch_idx = 0 if title == "第一章" else 1
+            uid = state["units"][0]["id"]
+            jia_surfaces = [{"surface": "家主", "surface_type": "title_or_kinship"}]
+            if ch_idx == 0:
+                jia_surfaces.append({"surface": "贵家主", "surface_type": "title_or_kinship"})
+            ents = [
+                {
+                    "local_id": "e1",
+                    "name": "韩立",
+                    "kind": "person",
+                    "surfaces": [{"surface": "韩立", "surface_type": "proper_name"}],
+                    "evidence_ref": uid,
+                },
+                {
+                    "local_id": "e2",
+                    "name": "家主",
+                    "kind": "person",
+                    "surfaces": jia_surfaces,
+                    "evidence_ref": uid,
+                },
+            ]
+            if include_ambiguous_proper:
+                # 制造跨章同名粗类冲突（person vs organization）触发主 c2-review
+                ents.append({
+                    "local_id": "e3",
+                    "name": "沈昭",
+                    "kind": "person" if ch_idx == 0 else "organization",
+                    "surfaces": [{"surface": "沈昭", "surface_type": "proper_name"}],
+                    "evidence_ref": uid,
+                })
+            return {"entities": ents, "assignments": [], "not_entity": []}, f"c1_tr_{n}"
+
+        def handle_c3(state, n):
+            return {
+                "links": [
+                    {"mention_id": it["mention_id"], "selected_entity_id": "none", "reason": "非专名候选"}
+                    for it in state["items"]
+                ]
+            }, f"c3_tr_{n}"
+
+        return source, run_id, chapters, tasks, handle_c1, handle_c3
+
+    def test_c3_title_review_invalid_output_keeps_chapter_local_and_creates_review(self):
+        """0.15c 规格一单测 1：c3-title-review 抛出无 status/code 的 ModelError 时保持章内独立并生成簇级待审。"""
+        source, run_id, chapters, _tasks, handle_c1, handle_c3 = self._setup_two_chapter_title_review_fixture("015c-tr-invalid")
+
+        def handle_c2_review(_state, _n):
+            raise ModelError("C2 重复分配 row_id：r1")
+
+        models = ScriptedRosterModels({
+            "roster-c1": handle_c1,
+            "roster-c2-propose": lambda state, n: ({"proposals": []}, f"prop_{n}"),
+            "roster-c2-review": handle_c2_review,
+            "roster-c3-link": handle_c3,
+        })
+        out = resolve_roster(self.store, models, source, run_id, concurrency=1, log=lambda _: None)
+        self.assertTrue(out["complete"], out)
+
+        failed_tasks = self.store.rows(
+            "SELECT id, stage, status, error FROM tasks WHERE run_id=? AND stage='roster-c2-review'",
+            (run_id,),
+        )
+        self.assertEqual(len(failed_tasks), 1)
+        self.assertEqual(failed_tasks[0]["status"], "failed")
+        self.assertIn("C2 重复分配 row_id：r1", failed_tasks[0]["error"])
+
+        roster_out = self.store.records(run_id, "roster_output")[0]
+        jia_mentions = [m for m in roster_out["mentions"] if m["text"] in {"家主", "贵家主"}]
+        self.assertEqual(len(jia_mentions), 4)
+        for m in jia_mentions:
+            self.assertEqual(m["link_method"], "chapter_local")
+        ch0_eids = {m["entity_id"] for m in jia_mentions if m["chapter_id"] == chapters[0]["id"]}
+        ch1_eids = {m["entity_id"] for m in jia_mentions if m["chapter_id"] == chapters[1]["id"]}
+        self.assertEqual(len(ch0_eids), 1)
+        self.assertEqual(len(ch1_eids), 1)
+        self.assertNotEqual(ch0_eids, ch1_eids)
+
+        tr_reviews = [
+            r for r in roster_out["reviews"]
+            if r["stage"] == "roster-c2-review"
+            and r["reason"] == "称谓簇跨章复核连续返回非法输出，各章对象保持独立，转待审"
+        ]
+        self.assertEqual(len(tr_reviews), 1)
+        rev = tr_reviews[0]
+        self.assertEqual(rev["status"], "pending")
+        self.assertEqual(rev["impact"], 4)
+        self.assertEqual(len(rev["options"]), 2)
+        self.assertEqual(set(rev["options"]), ch0_eids | ch1_eids)
+        self.assertEqual(len(rev["evidence"]), 2)
+
+    def test_c3_title_review_http_or_network_error_still_halts(self):
+        """0.15c 规格一单测 2：c3-title-review 抛出带 HTTP status 的 ModelError 或网络异常时仍返回 complete=False。"""
+        source, run_id, _chapters, _tasks, handle_c1, handle_c3 = self._setup_two_chapter_title_review_fixture("015c-tr-http502")
+
+        def handle_c2_review_http(_state, _n):
+            raise ModelError("HTTP 502", status=502)
+
+        models = ScriptedRosterModels({
+            "roster-c1": handle_c1,
+            "roster-c2-propose": lambda state, n: ({"proposals": []}, f"prop_{n}"),
+            "roster-c2-review": handle_c2_review_http,
+            "roster-c3-link": handle_c3,
+        })
+        out = resolve_roster(self.store, models, source, run_id, concurrency=1, log=lambda _: None)
+        self.assertFalse(out["complete"])
+        self.assertEqual(out["stage"], "roster-c2-review")
+        self.assertEqual(len(out["failures"]), 1)
+
+    def test_main_c2_review_invalid_output_still_halts(self):
+        """0.15c 规格一单测 3：主 c2-review 抛出重复分配 row_id 的 ModelError 时仍返回 complete=False。"""
+        source, run_id, _chapters, _tasks, handle_c1, handle_c3 = self._setup_two_chapter_title_review_fixture(
+            "015c-main-c2-halt", include_ambiguous_proper=True
+        )
+
+        def handle_c2_review_dup(_state, _n):
+            raise ModelError("C2 重复分配 row_id：r1")
+
+        models = ScriptedRosterModels({
+            "roster-c1": handle_c1,
+            "roster-c2-propose": lambda state, n: ({"proposals": []}, f"prop_{n}"),
+            "roster-c2-review": handle_c2_review_dup,
+            "roster-c3-link": handle_c3,
+        })
+        out = resolve_roster(self.store, models, source, run_id, concurrency=1, log=lambda _: None)
+        self.assertFalse(out["complete"])
+        self.assertEqual(out["stage"], "roster-c2-review")
+        self.assertEqual(len(out["failures"]), 1)
+
+    def test_c3_title_review_check_c2_review_rejects_duplicate_row_id_and_falls_back(self):
+        """0.15c 规格一单测 4：模型在 g1 与 g2 中重复引用 r1 时，_check_c2_review 抛出 ModelError，经 A′ 兜底后不发生错误跨章合并。"""
+        from entitytrace.roster import _check_c2_review
+
+        dup_payload = {
+            "groups": [
+                {"group_id": "g1", "name": "家主", "kind": "person", "row_ids": ["r1"], "member_ids": [], "reason": "r1独立"},
+                {"group_id": "g2", "name": "贵家主", "kind": "person", "row_ids": ["r1", "r2"], "member_ids": [], "reason": "误把r1再并入r2"},
+            ],
+            "unresolved_row_ids": [],
+            "unresolved_member_ids": [],
+        }
+        with self.assertRaises(ModelError) as ctx:
+            _check_c2_review(dup_payload, {"r1", "r2"}, set())
+        self.assertIn("C2 重复分配 row_id：r1", str(ctx.exception))
+
+        source, run_id, chapters, _tasks, handle_c1, handle_c3 = self._setup_two_chapter_title_review_fixture("015c-tr-dup-payload")
+
+        def handle_c2_review(state, n):
+            _check_c2_review(dup_payload, {r["row_id"] for r in state["rows"]}, set())
+            return dup_payload, f"rev_{n}"
+
+        models = ScriptedRosterModels({
+            "roster-c1": handle_c1,
+            "roster-c2-propose": lambda state, n: ({"proposals": []}, f"prop_{n}"),
+            "roster-c2-review": handle_c2_review,
+            "roster-c3-link": handle_c3,
+        })
+        out = resolve_roster(self.store, models, source, run_id, concurrency=1, log=lambda _: None)
+        self.assertTrue(out["complete"], out)
+        roster_out = self.store.records(run_id, "roster_output")[0]
+        jia_mentions = [m for m in roster_out["mentions"] if m["text"] in {"家主", "贵家主"}]
+        ch0_eid = next(m["entity_id"] for m in jia_mentions if m["chapter_id"] == chapters[0]["id"])
+        ch1_eid = next(m["entity_id"] for m in jia_mentions if m["chapter_id"] == chapters[1]["id"])
+        self.assertNotEqual(ch0_eid, ch1_eid)
+
     def test_roster_module_does_not_import_gold(self):
         source = (ROOT / "entitytrace/roster.py").read_text(encoding="utf-8")
         self.assertNotIn("entity-gold", source)

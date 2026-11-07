@@ -1420,7 +1420,16 @@ def resolve_roster(
                 msg = str(err) if isinstance(err, ModelError) else "C2 分歧复核错误：" + type(err).__name__
                 fail_tid = digest([VERSION, stage_tag, job["member_keys"], 0])
                 store.fail_task(run_id, {"id": fail_tid, "stage": "roster-c2-review"}, msg)
-                failures.append({"task_id": fail_tid, "error": msg})
+                failures.append({
+                    "task_id": fail_tid,
+                    "error": msg,
+                    "member_keys": job["member_keys"],
+                    "is_invalid_output": (
+                        isinstance(err, ModelError)
+                        and getattr(err, "status", None) is None
+                        and getattr(err, "code", None) is None
+                    ),
+                })
                 continue
 
             row_to_keys = job["row_to_keys"]
@@ -2410,12 +2419,40 @@ def resolve_roster(
 
     if title_review_inputs:
         title_reviewed_clusters, title_rev_failures = _run_c2_review_on_clusters(title_review_inputs, stage_tag="c3-title-review")
-        if title_rev_failures:
+        blocking_failures = [f for f in title_rev_failures if not f.get("is_invalid_output", False)]
+        if blocking_failures:
             return {
                 "complete": False,
                 "stage": "roster-c2-review",
-                "failures": title_rev_failures,
+                "failures": blocking_failures,
             }
+        for f in title_rev_failures:
+            f_keys = f["member_keys"]
+            cluster_eids: list[str] = []
+            cluster_evidence: list[dict] = []
+            cluster_impact = 0
+            for k in f_keys:
+                obj = local_objects[k]
+                e = _register_roster_cluster([k], [], default_method="chapter_local")
+                cluster_eids.append(e["id"])
+                cluster_evidence.append(by_mid[obj["mention_ids"][0]]["address"])
+                cluster_impact += len(obj["mention_ids"])
+                for mid in obj["mention_ids"]:
+                    mention_link[mid] = {
+                        "entity_id": e["id"],
+                        "link_method": "chapter_local",
+                        "link_refs": [obj["request_id"]],
+                    }
+            all_reviews.append({
+                "id": digest(["c3-title-review-invalid-output", f["task_id"], f_keys]),
+                "stage": "roster-c2-review",
+                "reason": "称谓簇跨章复核连续返回非法输出，各章对象保持独立，转待审",
+                "name": local_objects[f_keys[0]]["name"] if f_keys else "",
+                "impact": cluster_impact,
+                "evidence": cluster_evidence,
+                "options": cluster_eids,
+                "status": "pending",
+            })
         for tc in title_reviewed_clusters:
             m_keys = tc["member_keys"]
             method_name = "c3_model" if len(m_keys) > 1 else "chapter_local"
