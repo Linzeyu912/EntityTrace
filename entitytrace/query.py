@@ -1,6 +1,7 @@
-"""阶段 F：只读状态、名册、实体详情、待审与原文摘录查询（零模型调用，统一由 build_export_bundle 内存构建）。"""
+"""阶段 F：只读状态、名册、实体详情、待审与原文摘录查询（零模型调用，按需构建并复用只读查询快照）。"""
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 from .discovery import KINDS
@@ -40,21 +41,48 @@ def _paginate(items: list, limit: int, offset: int) -> tuple[list, int, int | No
     return page, total, next_offset
 
 
-def _require_roster_bundle(store: Store, run_id: str) -> tuple[dict, dict]:
+def _load_roster_snapshot(
+    store: Store,
+    run_id: str,
+    need_entities: bool = False,
+    need_reviews: bool = False,
+) -> tuple[dict, dict]:
     run = store.run(run_id)
     algo = run["config"].get("identity_algorithm")
     if algo != ROSTER_VERSION:
         raise ValueError(f"只读查询仅支持 entity-roster-v1 运行，不支持 {algo}")
-    bundle = build_export_bundle(store, run_id)
-    return run, bundle
+    fp = store.query_fingerprint(run_id)
+    cols = ["fingerprint", "meta_json"]
+    if need_entities:
+        cols.append("entities_json")
+    if need_reviews:
+        cols.append("reviews_json")
+    sql = f"SELECT {', '.join(cols)} FROM query_snapshots WHERE run_id=?"
+    rows = store.rows(sql, (run_id,))
+    if not rows or rows[0]["fingerprint"] != fp:
+        build_export_bundle(store, run_id)
+        rows = store.rows(sql, (run_id,))
+    row = rows[0]
+    snap: dict = {"meta": json.loads(row["meta_json"])}
+    if need_entities:
+        snap["entities"] = json.loads(row["entities_json"])
+    if need_reviews:
+        snap["reviews"] = json.loads(row["reviews_json"])
+    return run, snap
+
+
+def _load_source_text(store: Store, source_id: str) -> str:
+    rows = store.rows("SELECT text FROM sources WHERE id=?", (source_id,))
+    if not rows:
+        raise ValueError("原文版本不存在")
+    return rows[0]["text"]
 
 
 def query_status(store: Store, run_id: str, output_root: Path) -> dict:
-    _, bundle = _require_roster_bundle(store, run_id)
-    result = bundle["result"]
-    manifest = bundle["manifest"]
-    state = manifest["state"]
-    invocations = manifest.get("invocations") or []
+    run, snap = _load_roster_snapshot(store, run_id)
+    meta = snap["meta"]
+    state = run["state"]
+    invocations = store.records(run_id, "invocation")
     last_inv_id = state.get("last_invocation")
     latest_inv = next(
         (inv for inv in reversed(invocations) if inv.get("id") == last_inv_id),
@@ -74,7 +102,7 @@ def query_status(store: Store, run_id: str, output_root: Path) -> dict:
         last_error: dict | None = make_error_dict(raw_err["category"], str(raw_err.get("message", "")))
     elif isinstance(raw_err, str) and raw_err:
         last_error = make_error_dict("local", raw_err)
-    elif result["status"] == "incomplete":
+    elif meta["status"] == "incomplete":
         last_error = infer_incomplete_stage_error(state)
     else:
         last_error = None
@@ -83,12 +111,12 @@ def query_status(store: Store, run_id: str, output_root: Path) -> dict:
         "protocol": PROTOCOL,
         "command": "status",
         "run_id": run_id,
-        "result_revision": result["result_revision"],
+        "result_revision": meta["result_revision"],
         "error": None,
-        "status": result["status"],
+        "status": meta["status"],
         "stages": stages_info,
         "last_error": last_error,
-        "counts": manifest["counts"],
+        "counts": meta["counts"],
         "output_dir": str(resolved_out),
         "files": {
             "result": str(resolved_out / "result.json"),
@@ -114,18 +142,17 @@ def query_entities(
         raise ValueError("--min-mentions 不能为负数")
     if surface is not None and surface == "":
         raise ValueError("--surface 不能为空字符串")
-    _, bundle = _require_roster_bundle(store, run_id)
-    result = bundle["result"]
-    mentions_by_id = {m["id"]: m for m in result["mentions"]}
+    _, snap = _load_roster_snapshot(store, run_id, need_entities=True)
+    meta = snap["meta"]
     matched: list[dict] = []
-    for ent in result["entities"]:
+    for ent in snap["entities"]:
         if kind is not None and ent["kind"] != kind:
             continue
         if min_mentions is not None and ent["mention_count"] < min_mentions:
             continue
         surf_count = 0
         if surface is not None:
-            surf_count = sum(1 for mid in ent["mention_ids"] if mentions_by_id[mid]["text"] == surface)
+            surf_count = int((ent.get("surface_counts") or {}).get(surface, 0))
             if surf_count == 0:
                 continue
         item = {
@@ -145,7 +172,7 @@ def query_entities(
         "protocol": PROTOCOL,
         "command": "entities",
         "run_id": run_id,
-        "result_revision": result["result_revision"],
+        "result_revision": meta["result_revision"],
         "error": None,
         "total": total,
         "limit": limit,
@@ -185,21 +212,23 @@ def query_entity(
 ) -> dict:
     _validate_page(limit, offset)
     _validate_context(context, MAX_ENTITY_CONTEXT)
-    _, bundle = _require_roster_bundle(store, run_id)
-    result = bundle["result"]
-    ent = next((e for e in result["entities"] if e["id"] == entity_id), None)
-    if ent is None:
+    _, snap = _load_roster_snapshot(store, run_id, need_reviews=True)
+    meta = snap["meta"]
+    ent_rows = store.rows(
+        "SELECT entity_json, mentions_json FROM query_entity_mentions WHERE run_id=? AND entity_id=?",
+        (run_id, entity_id),
+    )
+    if not ent_rows:
         raise ValueError(f"实体不存在：{entity_id}")
-    text = bundle["text"]
-    chapters_by_id = {c["id"]: c for c in result["chapters"]}
-    mentions_by_id = {m["id"]: m for m in result["mentions"]}
-    ent_mentions = [mentions_by_id[mid] for mid in ent["mention_ids"]]
-    ent_mentions.sort(key=lambda m: (m["start"], m["end"], m["id"]))
+    ent = json.loads(ent_rows[0]["entity_json"])
+    ent_mentions = json.loads(ent_rows[0]["mentions_json"])
+    text = _load_source_text(store, meta["source_id"])
+    chapters_by_id = {c["id"]: c for c in meta["chapters"]}
     ent_mids = {m["id"] for m in ent_mentions}
     ent_spans = {(m["start"], m["end"]) for m in ent_mentions}
 
     related_reviews = [
-        r for r in bundle["review"]["items"]
+        r for r in snap["reviews"]
         if r.get("status", "pending") == "pending"
         and _is_review_related_to_entity(r, entity_id, ent_mids, ent_spans)
     ]
@@ -227,7 +256,7 @@ def query_entity(
         "protocol": PROTOCOL,
         "command": "entity",
         "run_id": run_id,
-        "result_revision": result["result_revision"],
+        "result_revision": meta["result_revision"],
         "error": None,
         "entity_id": ent["id"],
         "name": ent["name"],
@@ -258,11 +287,10 @@ def query_review(
     _validate_page(limit, offset)
     if status not in {"pending", "resolved", "all"}:
         raise ValueError("--status 仅支持 pending、resolved 或 all")
-    _, bundle = _require_roster_bundle(store, run_id)
-    result = bundle["result"]
-    review_doc = bundle["review"]
+    _, snap = _load_roster_snapshot(store, run_id, need_reviews=True)
+    meta = snap["meta"]
     matched: list[dict] = []
-    for raw_item in review_doc["items"]:
+    for raw_item in snap["reviews"]:
         item_status = raw_item.get("status", "pending")
         if status != "all" and item_status != status:
             continue
@@ -279,11 +307,11 @@ def query_review(
         "protocol": PROTOCOL,
         "command": "review",
         "run_id": run_id,
-        "result_revision": result["result_revision"],
+        "result_revision": meta["result_revision"],
         "error": None,
         "status_filter": status,
         "stage_filter": stage,
-        "counts": review_doc["counts"],
+        "counts": meta["review_counts"],
         "total": total,
         "limit": limit,
         "offset": offset,
@@ -300,12 +328,12 @@ def query_quote_json(
     context: int = DEFAULT_CONTEXT,
 ) -> dict:
     _validate_context(context, MAX_QUOTE_CONTEXT)
-    _, bundle = _require_roster_bundle(store, run_id)
-    result = bundle["result"]
-    full_text = bundle["text"]
-    source_id = result["source"]["id"]
+    _, snap = _load_roster_snapshot(store, run_id)
+    meta = snap["meta"]
+    source_id = meta["source_id"]
+    full_text = _load_source_text(store, source_id)
     span_text = validate_span(full_text, address(source_id, start, end), source_id)
-    chapters = result["chapters"]
+    chapters = meta["chapters"]
     chapter_id = None
     for ch in chapters:
         if ch["start"] <= start < end <= ch["end"]:
@@ -320,7 +348,7 @@ def query_quote_json(
         "protocol": PROTOCOL,
         "command": "quote",
         "run_id": run_id,
-        "result_revision": result["result_revision"],
+        "result_revision": meta["result_revision"],
         "error": None,
         "start": start,
         "end": end,

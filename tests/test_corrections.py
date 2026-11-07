@@ -770,6 +770,95 @@ class RosterCorrectionsTests(unittest.TestCase):
         self.assertEqual(json.loads(out_inc)["error"]["category"], "input")
         self.assertIn("尚未完成", err_inc)
 
+    def test_query_snapshot_immediately_reflects_correct_and_revoke(self):
+        from entitytrace.query import (
+            query_entities,
+            query_entity,
+            query_quote_json,
+            query_review,
+            query_status,
+        )
+
+        res0, rev0, _, _ = self._read_exported()
+        rev0_hash = res0["result_revision"]
+        init_review_id = rev0["items"][0]["id"]
+        by_name = {e["name"]: e for e in res0["entities"]}
+        gu_id = by_name["顾云"]["id"]
+        zhou_id = by_name["周掌柜"]["id"]
+        guest_mention = next(m for m in res0["mentions"] if m["text"] == "神秘来客")
+
+        store = Store(self.db_path)
+        try:
+            st0 = query_status(store, self.run_id, self.out_root)
+            ents0 = query_entities(store, self.run_id)
+            ent_gu0 = query_entity(store, self.run_id, gu_id)
+            revs0 = query_review(store, self.run_id)
+            qt0 = query_quote_json(store, self.run_id, 0, 4)
+        finally:
+            store.close()
+        self.assertEqual(st0["result_revision"], rev0_hash)
+        self.assertEqual(ents0["result_revision"], rev0_hash)
+        self.assertEqual(ent_gu0["result_revision"], rev0_hash)
+        self.assertEqual(ent_gu0["mention_count"], 1)
+        self.assertEqual(revs0["result_revision"], rev0_hash)
+        self.assertEqual(revs0["total"], 1)
+        self.assertEqual(qt0["result_revision"], rev0_hash)
+
+        rc1, out1, err1 = self._run_correct_cli([
+            self.run_id, "merge", gu_id, zhou_id,
+            "--source", "user", "--expect-revision", rev0_hash,
+            "--resolves", init_review_id,
+        ])
+        self.assertEqual(rc1, 0, err1)
+        rec1 = json.loads(out1)
+        rev1_hash = rec1["result_revision"]
+        self.assertNotEqual(rev1_hash, rev0_hash)
+
+        # 直接在未重新 export 的数据库上也可以验证查询快照立即反映最新更正
+        store = Store(self.db_path)
+        try:
+            st1 = query_status(store, self.run_id, self.out_root)
+            ents1 = query_entities(store, self.run_id)
+            ent_gu1 = query_entity(store, self.run_id, gu_id)
+            revs1 = query_review(store, self.run_id)
+            qt1 = query_quote_json(store, self.run_id, guest_mention["start"], guest_mention["end"])
+            with self.assertRaises(ValueError):
+                query_entity(store, self.run_id, zhou_id)
+        finally:
+            store.close()
+        self.assertEqual(st1["result_revision"], rev1_hash)
+        self.assertEqual(st1["status"], "completed")
+        self.assertEqual(st1["counts"]["entities"], st0["counts"]["entities"] - 1)
+        self.assertEqual(st1["counts"]["review_items"], 0)
+        self.assertEqual(ents1["result_revision"], rev1_hash)
+        self.assertEqual(ents1["total"], ents0["total"] - 1)
+        self.assertEqual(ent_gu1["result_revision"], rev1_hash)
+        self.assertEqual(ent_gu1["mention_count"], 2)
+        self.assertEqual(ent_gu1["aliases"], ["周掌柜", "顾云"])
+        self.assertEqual(revs1["result_revision"], rev1_hash)
+        self.assertEqual(revs1["total"], 0)
+        self.assertEqual(qt1["result_revision"], rev1_hash)
+
+        rc_rev, out_rev, err_rev = self._run_correct_cli([
+            self.run_id, "revoke", rec1["correction_id"],
+            "--source", "user", "--expect-revision", rev1_hash,
+        ])
+        self.assertEqual(rc_rev, 0, err_rev)
+        store = Store(self.db_path)
+        try:
+            st2 = query_status(store, self.run_id, self.out_root)
+            ents2 = query_entities(store, self.run_id)
+            ent_gu2 = query_entity(store, self.run_id, gu_id)
+            revs2 = query_review(store, self.run_id)
+            qt2 = query_quote_json(store, self.run_id, 0, 4)
+        finally:
+            store.close()
+        self.assertEqual(st2, st0)
+        self.assertEqual(ents2, ents0)
+        self.assertEqual(ent_gu2, ent_gu0)
+        self.assertEqual(revs2, revs0)
+        self.assertEqual(qt2, qt0)
+
     def test_corrections_module_isolation_no_models_no_gold_no_book_names(self):
         src = (ROOT / "entitytrace/corrections.py").read_text(encoding="utf-8")
         for forbidden in ["entity-gold", "evaluate_identity_gold", "Pride", "九命奇冤", "伤逝", "Second Stain", "Elizabeth", "Darcy"]:

@@ -178,6 +178,74 @@ def metrics(store: Store, run_id: str, invocation: str | None = None) -> dict:
     return result
 
 
+def _save_roster_query_snapshot(store: Store, run_id: str, result: dict, review_doc: dict, manifest: dict) -> None:
+    fingerprint = store.query_fingerprint(run_id)
+    meta_obj = {
+        "result_revision": result["result_revision"],
+        "status": result["status"],
+        "source_id": result["source"]["id"],
+        "chapters": result["chapters"],
+        "counts": manifest["counts"],
+        "review_counts": review_doc["counts"],
+    }
+    mentions_by_id = {m["id"]: m for m in result["mentions"]}
+    entities_obj: list[dict] = []
+    entity_mentions_rows: list[tuple[str, str, str]] = []
+    for ent in result["entities"]:
+        surface_counts: dict[str, int] = {}
+        ent_mentions: list[dict] = []
+        for mid in ent["mention_ids"]:
+            m = mentions_by_id[mid]
+            t = m["text"]
+            surface_counts[t] = surface_counts.get(t, 0) + 1
+            ent_mentions.append(m)
+        entities_obj.append({
+            "id": ent["id"],
+            "name": ent["name"],
+            "kind": ent["kind"],
+            "mention_count": ent["mention_count"],
+            "first_chapter_id": ent["first_chapter_id"],
+            "identity_status": ent["identity_status"],
+            "surface_counts": surface_counts,
+        })
+        ent_mentions.sort(key=lambda m: (m["start"], m["end"], m["id"]))
+        slim_mentions = [
+            {
+                "id": m["id"],
+                "chapter_id": m["chapter_id"],
+                "start": m["start"],
+                "end": m["end"],
+                "text": m["text"],
+                "link_method": m["link_method"],
+            }
+            for m in ent_mentions
+        ]
+        ent_header = {
+            "id": ent["id"],
+            "name": ent["name"],
+            "names": ent.get("names", []),
+            "aliases": ent.get("aliases", []),
+            "kind": ent["kind"],
+            "identity_status": ent["identity_status"],
+            "mention_count": ent["mention_count"],
+            "first_chapter_id": ent["first_chapter_id"],
+            "link_methods": ent.get("link_methods", {}),
+        }
+        entity_mentions_rows.append((
+            ent["id"],
+            json.dumps(ent_header, ensure_ascii=False, separators=(",", ":")),
+            json.dumps(slim_mentions, ensure_ascii=False, separators=(",", ":")),
+        ))
+    store.save_query_snapshot(
+        run_id,
+        fingerprint,
+        meta_obj,
+        entities_obj,
+        review_doc["items"],
+        entity_mentions_rows,
+    )
+
+
 def build_export_bundle(store: Store, run_id: str) -> dict:
     run = store.run(run_id)
     source = store.source(run["source_id"])
@@ -328,6 +396,7 @@ def build_export_bundle(store: Store, run_id: str) -> dict:
             manifest["source_run_id"] = run["config"]["source_run_id"]
         if run["config"].get("arm"):
             manifest["arm"] = run["config"]["arm"]
+        _save_roster_query_snapshot(store, run_id, result, review_doc, manifest)
         return {"result": result, "review": review_doc, "manifest": manifest, "decisions": decisions, "text": text, "raw": source["raw"]}
 
     identities = store.records(run_id, "identity")
