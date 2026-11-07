@@ -2601,6 +2601,260 @@ class RosterAlgorithmTests(unittest.TestCase):
         self.assertIn("req_prop_place", merged_refs)
         self.assertNotIn("req_prop_cross_kind", merged_refs)
 
+    def test_c3v_cross_item_candidate_verification(self):
+        """0.15b.2 规格 C3-V 单测：
+        1. 本项 candidate_ids 之外、同请求内的同粗类条目：通过 D1 与 cannot_merge_by_obj，按 c3_model 归入；
+        2. 本项 candidate_ids 之外、同请求内的条目违反 D1 req_pnorms <= sel_pnorms：转 c3_rejected_name_mismatch 并生成待审；
+        3. 本项 candidate_ids 之外、同请求内的条目违反 cannot_merge_by_obj（对象项）：转 c3_rejected_name_mismatch 并生成待审；
+        4. 本项 candidate_ids 之外、同请求内的跨粗类条目：person vs place 拒绝；person vs organization 按当前臂规则判定；
+        5. 同一合成输入下，修改前后的 C3 请求 state、id_map 与 c3_tid 逐字节相同。"""
+        from entitytrace.roster import C3_LINK_PROMPT, VERSION
+        from entitytrace.util import digest, dumps
+
+        text = (
+            "第一章\n"
+            "褚六与沈甲师爷同行。沈甲剑客、沈甲使者、那座玄铁堡、玄铁盟分舵、温七随从、林昭先后登场。\n"
+            "第二章\n"
+            "沈甲一、沈甲二、沈甲三、沈甲四、沈甲五与温七、林昭、褚六、沈甲师爷在玄铁堡会合玄铁盟。\n"
+            "第三章\n"
+            "另一位林昭独自远行。\n"
+        )
+        path = self.root / "c3v_synthetic.txt"
+        path.write_bytes(text.encode("utf-8"))
+        source = import_text(self.store, path)
+        idx1, idx2, idx3 = text.index("第一章"), text.index("第二章"), text.index("第三章")
+        _, chapters = build_chapters(
+            source,
+            [
+                {"start": idx1, "end": idx1 + 3, "title": "第一章", "kind": "chapter"},
+                {"start": idx2, "end": idx2 + 3, "title": "第二章", "kind": "chapter"},
+                {"start": idx3, "end": idx3 + 3, "title": "第三章", "kind": "chapter"},
+            ],
+        )
+        tasks = plan_tasks(source, chapters, 9000)
+        u1, u2, u3 = tasks[0]["units"][0]["id"], tasks[1]["units"][0]["id"], tasks[2]["units"][0]["id"]
+
+        run_id = "run_c3v_test"
+        self.store.execute("INSERT INTO runs VALUES(?,?,?,?,?,?)", (run_id, source["id"], "{}", "{}", "now", "now"))
+        for ch in chapters:
+            self.store.put(run_id, "chapter", ch)
+
+        disc_payloads = [
+            {
+                "mentions": [
+                    {"text": "褚六", "kind": "person", "refs": [u1]},
+                    {"text": "沈甲师爷", "kind": "person", "refs": [u1]},
+                    {"text": "沈甲剑客", "kind": "person", "refs": [u1]},
+                    {"text": "沈甲使者", "kind": "person", "refs": [u1]},
+                    {"text": "那座玄铁堡", "kind": "place", "refs": [u1]},
+                    {"text": "玄铁盟分舵", "kind": "organization", "refs": [u1]},
+                    {"text": "温七随从", "kind": "person", "refs": [u1]},
+                    {"text": "林昭", "kind": "person", "refs": [u1]},
+                ],
+                "links": [],
+            },
+            {
+                "mentions": [
+                    {"text": "沈甲一", "kind": "person", "refs": [u2]},
+                    {"text": "沈甲二", "kind": "person", "refs": [u2]},
+                    {"text": "沈甲三", "kind": "person", "refs": [u2]},
+                    {"text": "沈甲四", "kind": "person", "refs": [u2]},
+                    {"text": "沈甲五", "kind": "person", "refs": [u2]},
+                    {"text": "温七", "kind": "person", "refs": [u2]},
+                    {"text": "林昭", "kind": "person", "refs": [u2]},
+                    {"text": "褚六", "kind": "person", "refs": [u2]},
+                    {"text": "沈甲师爷", "kind": "person", "refs": [u2]},
+                    {"text": "玄铁堡", "kind": "place", "refs": [u2]},
+                    {"text": "玄铁盟", "kind": "organization", "refs": [u2]},
+                ],
+                "links": [],
+            },
+            {
+                "mentions": [
+                    {"text": "林昭", "kind": "person", "refs": [u3]},
+                ],
+                "links": [],
+            },
+        ]
+        for t, disc in zip(tasks, disc_payloads):
+            grounded = ground_result(source, t, disc, f"req_disc_{t['id']}")
+            recs = [
+                (kind, rec)
+                for kind, key in [("mention", "mentions"), ("observation", "observations"), ("review", "reviews"), ("link", "links")]
+                for rec in grounded[key]
+            ]
+            self.store.finish_task(run_id, t, {"request_id": f"req_disc_{t['id']}"}, recs)
+
+        def handle_c1(state, n):
+            uid = state["units"][0]["id"]
+            title = state["chapter_title"]
+            if title == "第一章":
+                m_wen_guest = next(r["mentions"][0]["mention_id"] for r in state["surfaces"] if r["surface"] == "温七随从")
+                m_lin_ch1 = next(r["mentions"][0]["mention_id"] for r in state["surfaces"] if r["surface"] == "林昭")
+                return {
+                    "entities": [
+                        {
+                            "local_id": "e1",
+                            "name": "褚六",
+                            "kind": "person",
+                            "surfaces": [
+                                {"surface": "褚六", "surface_type": "proper_name"},
+                                {"surface": "沈甲师爷", "surface_type": "title_or_kinship"},
+                            ],
+                            "evidence_ref": uid,
+                        },
+                        {"local_id": "e2", "name": "沈甲剑客", "kind": "person", "surfaces": [{"surface": "沈甲剑客", "surface_type": "description"}], "evidence_ref": uid},
+                        {"local_id": "e4", "name": "沈甲使者", "kind": "person", "surfaces": [{"surface": "沈甲使者", "surface_type": "description"}], "evidence_ref": uid},
+                        {"local_id": "e5", "name": "那座玄铁堡", "kind": "place", "surfaces": [{"surface": "那座玄铁堡", "surface_type": "description"}], "evidence_ref": uid},
+                        {"local_id": "e6", "name": "玄铁盟分舵", "kind": "organization", "surfaces": [{"surface": "玄铁盟分舵", "surface_type": "description"}], "evidence_ref": uid},
+                    ],
+                    "assignments": [
+                        {"mention_id": m_wen_guest, "surface": "温七随从", "ref": uid, "local_id": None, "reason": "未决"},
+                        {"mention_id": m_lin_ch1, "surface": "林昭", "ref": uid, "local_id": None, "reason": "同名待决"},
+                    ],
+                    "not_entity": [],
+                }, f"c1_c3v_{n}"
+            if title == "第二章":
+                return {
+                    "entities": [
+                        {"local_id": "e1", "name": "沈甲一", "kind": "person", "surfaces": [{"surface": "沈甲一", "surface_type": "proper_name"}], "evidence_ref": uid},
+                        {"local_id": "e2", "name": "沈甲二", "kind": "person", "surfaces": [{"surface": "沈甲二", "surface_type": "proper_name"}], "evidence_ref": uid},
+                        {"local_id": "e3", "name": "沈甲三", "kind": "person", "surfaces": [{"surface": "沈甲三", "surface_type": "proper_name"}], "evidence_ref": uid},
+                        {"local_id": "e4", "name": "沈甲四", "kind": "person", "surfaces": [{"surface": "沈甲四", "surface_type": "proper_name"}], "evidence_ref": uid},
+                        {"local_id": "e5", "name": "沈甲五", "kind": "person", "surfaces": [{"surface": "沈甲五", "surface_type": "proper_name"}], "evidence_ref": uid},
+                        {"local_id": "e6", "name": "温七", "kind": "person", "surfaces": [{"surface": "温七", "surface_type": "proper_name"}], "evidence_ref": uid},
+                        {"local_id": "e7", "name": "林昭", "kind": "person", "surfaces": [{"surface": "林昭", "surface_type": "proper_name"}], "evidence_ref": uid},
+                        {"local_id": "e8", "name": "玄铁堡", "kind": "place", "surfaces": [{"surface": "玄铁堡", "surface_type": "proper_name"}], "evidence_ref": uid},
+                        {"local_id": "e9", "name": "玄铁盟", "kind": "organization", "surfaces": [{"surface": "玄铁盟", "surface_type": "proper_name"}], "evidence_ref": uid},
+                        {"local_id": "e10", "name": "褚六", "kind": "person", "surfaces": [{"surface": "褚六", "surface_type": "proper_name"}], "evidence_ref": uid},
+                        {"local_id": "e11", "name": "沈甲师爷", "kind": "person", "surfaces": [{"surface": "沈甲师爷", "surface_type": "title_or_kinship"}], "evidence_ref": uid},
+                    ],
+                    "assignments": [],
+                    "not_entity": [],
+                }, f"c1_c3v_{n}"
+            return {
+                "entities": [
+                    {"local_id": "e1", "name": "林昭", "kind": "person", "surfaces": [{"surface": "林昭", "surface_type": "proper_name"}], "evidence_ref": uid},
+                ],
+                "assignments": [],
+                "not_entity": [],
+            }, f"c1_c3v_{n}"
+
+        captured_c3_state = []
+
+        def handle_c3(state, n):
+            cands_by_name = {c["name"]: c["entity_id"] for c in state["candidates"]}
+            items_by_surf = {it["surface"]: it for it in state["items"]}
+
+            if "沈甲剑客" not in items_by_surf:
+                # 第二章 C3（沈甲师爷）
+                return {
+                    "links": [
+                        {"mention_id": it["mention_id"], "selected_entity_id": "none", "reason": "无"}
+                        for it in state["items"]
+                    ]
+                }, f"c3_c3v_{n}"
+
+            captured_c3_state.append(state)
+
+            wen7_eid = cands_by_name["温七"]
+            chu6_eid = cands_by_name["褚六"]
+            fort_eid = cands_by_name["玄铁堡"]
+            guild_eid = cands_by_name["玄铁盟"]
+
+            # 确认各项选择的目标均不在其自身 candidate_entity_ids 中，但在本请求 candidates 中
+            self.assertNotIn(wen7_eid, items_by_surf["沈甲剑客"]["candidate_entity_ids"])
+            self.assertNotIn(wen7_eid, items_by_surf["林昭"]["candidate_entity_ids"])
+            self.assertNotIn(chu6_eid, items_by_surf["沈甲师爷"]["candidate_entity_ids"])
+            self.assertNotIn(fort_eid, items_by_surf["温七随从"]["candidate_entity_ids"])
+            self.assertNotIn(guild_eid, items_by_surf["沈甲使者"]["candidate_entity_ids"])
+
+            links_dict = {
+                # 1. 同粗类越项选择（person -> 温七），通过 D1 与 cannot_merge_by_obj -> c3_model
+                items_by_surf["沈甲剑客"]["mention_id"]: {"selected_entity_id": wen7_eid, "reason": "越项同粗类合法"},
+                # 2. 越项选择违反 D1（专名提及“林昭” -> 温七） -> c3_rejected_name_mismatch
+                items_by_surf["林昭"]["mention_id"]: {"selected_entity_id": wen7_eid, "reason": "越项违反D1"},
+                # 3. 对象项越项选择违反 cannot_merge_by_obj（第一章被 C2.0 剥离的“沈甲师爷” -> 原父对象“褚六”） -> c3_rejected_name_mismatch
+                items_by_surf["沈甲师爷"]["mention_id"]: {"selected_entity_id": chu6_eid, "reason": "越项违反同章不可合并"},
+                # 4a. 跨粗类越项选择（person“温七随从” -> place“玄铁堡”） -> c3_rejected_name_mismatch
+                items_by_surf["温七随从"]["mention_id"]: {"selected_entity_id": fort_eid, "reason": "跨粗类person-place"},
+                # 4b. 跨粗类越项选择（person“沈甲使者” -> organization“玄铁盟”）
+                items_by_surf["沈甲使者"]["mention_id"]: {"selected_entity_id": guild_eid, "reason": "跨粗类person-org"},
+                # 其余项正常处理
+                items_by_surf["那座玄铁堡"]["mention_id"]: {"selected_entity_id": fort_eid, "reason": "本项候选"},
+                items_by_surf["玄铁盟分舵"]["mention_id"]: {"selected_entity_id": guild_eid, "reason": "本项候选"},
+            }
+            return {
+                "links": [
+                    {"mention_id": it["mention_id"], **links_dict[it["mention_id"]]}
+                    for it in state["items"]
+                ]
+            }, f"c3_c3v_{n}"
+
+        models = ScriptedRosterModels({
+            "roster-c1": handle_c1,
+            "roster-c2-propose": lambda state, n: ({"proposals": []}, f"prop_c3v_{n}"),
+            "roster-c2-review": lambda state, n: (
+                {
+                    "groups": [
+                        {"group_id": f"g{idx}", "name": r["name"], "kind": r["kind"], "row_ids": [r["row_id"]], "member_ids": [], "reason": "分立"}
+                        for idx, r in enumerate(state["rows"], start=1)
+                    ],
+                    "unresolved_row_ids": [],
+                    "unresolved_member_ids": [],
+                },
+                f"rev_c3v_{n}",
+            ),
+            "roster-c3-link": handle_c3,
+        })
+        out = resolve_roster(self.store, models, source, run_id, concurrency=1, log=lambda _: None)
+        self.assertTrue(out["complete"], out)
+        self.assertGreaterEqual(len(captured_c3_state), 1)
+
+        # (5) 验证第一章 C3 请求 state 不含 item_kind，且 c3_tid 与按公开字段计算的摘要逐字节一致
+        c3_state = captured_c3_state[0]
+        for it in c3_state["items"]:
+            self.assertEqual(set(it.keys()), {"mention_id", "surface", "context", "candidate_entity_ids"})
+        c3_task_rows = self.store.rows("SELECT id, result FROM tasks WHERE run_id=? AND stage='roster-c3-link'", (run_id,))
+        import json
+        ch1_c3_row = next(r for r in c3_task_rows if len(json.loads(r["result"])["links"]) == 7)
+        stored_c3_tid = ch1_c3_row["id"]
+        stored_c3_links = json.loads(ch1_c3_row["result"])["links"]
+        roster_out = self.store.records(run_id, "roster_output")[0]
+        by_surf_m = {m["text"]: m for m in roster_out["mentions"] if m["chapter_id"] == chapters[0]["id"]}
+        short_to_full_mid = {f"m{idx}": row["mention_id"] for idx, row in enumerate(stored_c3_links, start=1)}
+        cand_full_ids = sorted(
+            e["id"]
+            for e in roster_out["entities"]
+            if set(e["aliases"]) & {"沈甲一", "沈甲二", "沈甲三", "沈甲四", "沈甲五", "褚六", "玄铁堡", "温七", "林昭", "玄铁盟"}
+        )
+        short_to_full_eid = {f"e{idx}": rid for idx, rid in enumerate(cand_full_ids, start=1)}
+        expected_c3_tid = digest([VERSION, "c3-link", tasks[0]["id"], c3_state, {"items": short_to_full_mid, "candidates": short_to_full_eid}, C3_LINK_PROMPT])
+        self.assertEqual(stored_c3_tid, expected_c3_tid)
+
+        # 验证 (1) 沈甲剑客 -> 温七 按 c3_model 成功归入，不产生待审
+        wen7_ent = next(e for e in roster_out["entities"] if "温七" in e["aliases"])
+        self.assertEqual(by_surf_m["沈甲剑客"]["entity_id"], wen7_ent["id"])
+        self.assertEqual(by_surf_m["沈甲剑客"]["link_method"], "c3_model")
+
+        # 验证 (2) 林昭（第一章未决专名提及） -> 温七 因违反 D1 转 c3_rejected_name_mismatch 并生成待审
+        self.assertEqual(by_surf_m["林昭"]["link_method"], "c3_rejected_name_mismatch")
+        # 验证 (3) 沈甲师爷 -> 褚六 因违反 cannot_merge_by_obj 转 c3_rejected_name_mismatch 并生成待审
+        self.assertEqual(by_surf_m["沈甲师爷"]["link_method"], "c3_rejected_name_mismatch")
+        # 验证 (4a) 温七随从(person) -> 玄铁堡(place) 因跨粗类转 c3_rejected_name_mismatch 并生成待审
+        self.assertEqual(by_surf_m["温七随从"]["link_method"], "c3_rejected_name_mismatch")
+        # 验证 (4b) 沈甲使者(person) -> 玄铁盟(organization)：V2 在通过 D1 与 cannot_merge_by_obj 时按 c3_model 采纳
+        guild_ent = next(e for e in roster_out["entities"] if "玄铁盟" in e["aliases"])
+        self.assertEqual(by_surf_m["沈甲使者"]["entity_id"], guild_ent["id"])
+        self.assertEqual(by_surf_m["沈甲使者"]["link_method"], "c3_model")
+
+        c3_mismatch_surfaces = {
+            r["surface"]
+            for r in roster_out["reviews"]
+            if r["stage"] == "roster-c3-link" and r["reason"] == "C3 选中条目违反专名一致性硬约束，已作废转待审"
+        }
+        self.assertEqual(c3_mismatch_surfaces, {"林昭", "沈甲师爷", "温七随从"})
+
     def test_roster_module_does_not_import_gold(self):
         source = (ROOT / "entitytrace/roster.py").read_text(encoding="utf-8")
         self.assertNotIn("entity-gold", source)

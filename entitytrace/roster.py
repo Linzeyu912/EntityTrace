@@ -2054,6 +2054,7 @@ def resolve_roster(
                 "item_id": item_id,
                 "is_object": True,
                 "obj_key": k,
+                "item_kind": obj["kind"],
                 "surface": obj["name"],
                 "start": first_m["start"],
                 "end": first_m["end"],
@@ -2134,6 +2135,7 @@ def resolve_roster(
                 "item_id": m["id"],
                 "is_object": False,
                 "mention": m,
+                "item_kind": m_kind,
                 "surface": m["text"],
                 "start": m["start"],
                 "end": m["end"],
@@ -2145,10 +2147,12 @@ def resolve_roster(
 
     c3_tasks = []
     c3_results: dict[str, dict] = {}
+    c3_task_cand_ids: dict[str, set[str]] = {}
     for t_id, items in sorted(c3_by_task.items()):
         all_cand_ids: set[str] = set()
         for it in items:
             all_cand_ids.update(it["candidate_ids"])
+        c3_task_cand_ids[t_id] = set(all_cand_ids)
         sorted_cand_ids = sorted(all_cand_ids)
         full_to_short_eid = {rid: f"e{idx}" for idx, rid in enumerate(sorted_cand_ids, start=1)}
         short_to_full_eid = {f"e{idx}": rid for idx, rid in enumerate(sorted_cand_ids, start=1)}
@@ -2250,6 +2254,7 @@ def resolve_roster(
             unmatched_desc_objs.append(k)
 
     for t_id, items in sorted(c3_by_task.items()):
+        task_cand_ids = c3_task_cand_ids.get(t_id, set())
         for it in items:
             req_pnorms = it.get("required_proper_norms") or set()
             if it["is_object"]:
@@ -2258,8 +2263,22 @@ def resolve_roster(
                 c3_out = c3_results.get(it["item_id"])
                 sel = c3_out["selected_entity_id"] if c3_out else "uncertain"
                 if sel in roster_by_id:
-                    sel_pnorms = roster_by_id[sel].get("proper_norms", set())
-                    if (req_pnorms and not (req_pnorms <= sel_pnorms)) or sel not in set(it["candidate_ids"]):
+                    sel_entry = roster_by_id[sel]
+                    sel_pnorms = sel_entry.get("proper_norms", set())
+                    d1_ok = not req_pnorms or (req_pnorms <= sel_pnorms)
+                    if sel in set(it["candidate_ids"]):
+                        can_accept = d1_ok
+                    elif sel in task_cand_ids:
+                        forb_keys = cannot_merge_by_obj.get(k, set())
+                        kind_ok = (
+                            _kind_compatible(it["item_kind"], sel_entry["kind"])
+                            or {it["item_kind"], sel_entry["kind"]} == {"person", "organization"}
+                        )
+                        no_forb = not (forb_keys and any(mk in forb_keys for mk in sel_entry.get("member_keys", [])))
+                        can_accept = d1_ok and kind_ok and no_forb
+                    else:
+                        can_accept = False
+                    if not can_accept:
                         req_id = c3_out["request_id"] if c3_out else ""
                         refs = [r for r in [obj["request_id"], req_id] if r]
                         e = _register_roster_cluster([k], [req_id] if req_id else [], default_method="c3_rejected_name_mismatch")
@@ -2307,8 +2326,20 @@ def resolve_roster(
                 c3_out = c3_results.get(mid)
                 sel = c3_out["selected_entity_id"] if c3_out else "uncertain"
                 if sel in roster_by_id:
-                    sel_pnorms = roster_by_id[sel].get("proper_norms", set())
-                    if (req_pnorms and not (req_pnorms <= sel_pnorms)) or sel not in set(it["candidate_ids"]):
+                    sel_entry = roster_by_id[sel]
+                    sel_pnorms = sel_entry.get("proper_norms", set())
+                    d1_ok = not req_pnorms or (req_pnorms <= sel_pnorms)
+                    if sel in set(it["candidate_ids"]):
+                        can_accept = d1_ok
+                    elif sel in task_cand_ids:
+                        kind_ok = (
+                            _kind_compatible(it["item_kind"], sel_entry["kind"])
+                            or {it["item_kind"], sel_entry["kind"]} == {"person", "organization"}
+                        )
+                        can_accept = d1_ok and kind_ok
+                    else:
+                        can_accept = False
+                    if not can_accept:
                         c1_out = mention_c1.get(mid, {})
                         req_id = c3_out["request_id"] if c3_out else ""
                         refs = [r for r in [c1_out.get("request_id"), req_id] if r]
