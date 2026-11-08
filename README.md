@@ -118,12 +118,13 @@ python -X utf8 -m entitytrace entities 运行编号 --kind person --min-mentions
 python -X utf8 -m entitytrace entities 运行编号 --surface "称呼"
 python -X utf8 -m entitytrace entity 运行编号 实体ID --limit 50 --offset 0 --context 80
 python -X utf8 -m entitytrace review 运行编号 --status pending --limit 50 --offset 0
+python -X utf8 -m entitytrace rank 运行编号 --kind person --from-chapter 1 --to-chapter 10 --limit 50 --offset 0
 python -X utf8 -m entitytrace quote 运行编号 100 120 --json --context 80
 python -X utf8 -m entitytrace quote 运行编号 100 120
 python -X utf8 -m entitytrace export 运行编号
 ```
 
-分页查询（`entities`、`entity`、`review`）的 `--limit` 默认 `50`、上限 `200`（超限按 `input` 拒绝，退出码 `1`），响应含 `total` 与 `next_offset`（无下一页时为 `null`）；`entity` 的 `snippet` 上下文上限 `400` 码点且不跨章节边界；`quote` 不加 `--json` 时纯文本输出保持原样。
+分页查询（`entities`、`entity`、`review`、`rank`）的 `--limit` 默认 `50`、上限 `200`（超限按 `input` 拒绝，退出码 `1`），响应含 `total` 与 `next_offset`（无下一页时为 `null`）；`rank` 按 `sqrt(范围内提及数 × 范围内章节数)` 对范围内至少出现一次的实体排序，`--from-chapter`／`--to-chapter` 为正文章序（只计 `kind=="chapter"` 条目，两端含，缺省全书含卷题区间提及），`--kind` 限定粗类，每项返回 `kind_rank`、`score`、`mention_count_in_range`、`chapter_count_in_range`、`first_chapter_id`、`last_chapter_id`、`span_chapters`；`entity` 的 `snippet` 上下文上限 `400` 码点且不跨章节边界；`quote` 不加 `--json` 时纯文本输出保持原样。
 
 对已完成的默认 `entity-roster-v1` 运行，可通过 `correct` 叠加确定性更正或撤回（零模型调用，`groups-v2` 与未完成运行不支持）：
 

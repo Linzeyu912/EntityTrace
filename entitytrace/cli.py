@@ -21,14 +21,15 @@ from .query import (
     query_entities,
     query_entity,
     query_quote_json,
+    query_rank,
     query_review,
     query_status,
 )
 from .storage import Store
 from .text import address, validate_span
 
-KNOWN_COMMANDS = frozenset({"run", "status", "entities", "entity", "review", "quote", "export", "correct"})
-DEFAULT_JSON_COMMANDS = frozenset({"status", "entities", "entity", "review", "correct"})
+KNOWN_COMMANDS = frozenset({"run", "status", "entities", "entity", "review", "quote", "rank", "export", "correct"})
+DEFAULT_JSON_COMMANDS = frozenset({"status", "entities", "entity", "review", "rank", "correct"})
 
 
 class _CliHelpExit(Exception):
@@ -174,6 +175,16 @@ def _build_parser() -> _CliParser:
     review.add_argument("--db", type=Path, default=Path("data/entitytrace.sqlite3"))
     review.add_argument("--json", action="store_true", help="输出单行 JSON（默认已启用）")
 
+    rank = subs.add_parser("rank", help="只读实体优先级排名：按范围内提及数与章节数计算 score 排序（默认 JSON）")
+    rank.add_argument("run_id")
+    rank.add_argument("--kind", default=None, help="按实体粗类筛选（person/place/object/ability/concept/organization）")
+    rank.add_argument("--from-chapter", type=int, default=None, help="正文章序起点（含，缺省与 --to-chapter 均未给时为全书）")
+    rank.add_argument("--to-chapter", type=int, default=None, help="正文章序终点（含，只给 --from-chapter 时默认到最后一章）")
+    rank.add_argument("--limit", type=int, default=DEFAULT_LIMIT, help="单页条数上限（1—200，默认 50）")
+    rank.add_argument("--offset", type=int, default=0, help="分页起始偏移（默认 0）")
+    rank.add_argument("--db", type=Path, default=Path("data/entitytrace.sqlite3"))
+    rank.add_argument("--json", action="store_true", help="输出单行 JSON（默认已启用）")
+
     export = subs.add_parser("export", help="从已保存数据重新导出，不调用模型")
     export.add_argument("run_id")
     export.add_argument("--db", type=Path, default=Path("data/entitytrace.sqlite3"))
@@ -305,6 +316,18 @@ def main(argv=None) -> int:
                         args.run_id,
                         status=args.status,
                         stage=args.stage,
+                        limit=args.limit,
+                        offset=args.offset,
+                    )
+                )
+            elif args.command == "rank":
+                _emit_json_line(
+                    query_rank(
+                        store,
+                        args.run_id,
+                        kind=args.kind,
+                        from_chapter=args.from_chapter,
+                        to_chapter=args.to_chapter,
                         limit=args.limit,
                         offset=args.offset,
                     )

@@ -78,6 +78,12 @@ python -X utf8 -m entitytrace run "<输入TXT路径>" --db "<数据库路径>" -
    python -X utf8 -m entitytrace entity <run_id> <entity_id> --limit 50 --offset 0 --context 80 --db "<数据库路径>"
    ```
    返回：`entity_id`、`name`、`names`、`aliases`、`kind`、`identity_status`、`mention_count`、`first_chapter_id`、`link_methods`、`review_ids`（相关未决待审 ID），以及分页 `mentions`（每项含 `id`、`chapter_id`、`start`、`end`、`text`、`link_method`、`snippet`；`--context` 范围 `0—400` 码点，默认 `80`，`snippet` 绝不跨章节边界）。
+5. **查实体优先级排名**（按 `score = sqrt(范围内提及数 × 范围内章节数)` 降序，并列依次按提及数、章节数、首处最小 `start`、实体 `id` 排序；与 `entities` 同一实体集合）：
+   ```powershell
+   python -X utf8 -m entitytrace rank <run_id> --kind person --from-chapter 1 --to-chapter 10 --limit 50 --offset 0 --db "<数据库路径>"
+   ```
+   可选：`--kind <粗类>`（只返回该类，顺序与 `kind_rank` 一致）；`--from-chapter N` / `--to-chapter M` 按正文章序（只计 `kind=="chapter"` 的条目，从 1 起、两端含）限定统计范围，只给一端时另一端补全为首／末章，两端都不给时为全书（含卷题／附章区间内的提及）；`--limit`、`--offset` 分页。
+   返回：`range`（`from_chapter`、`to_chapter`、`chapter_count`）与分页 `items`，每项含 `id`、`name`、`kind`、`identity_status`、`kind_rank`（范围内同 `kind` 名次，从 1 起）、`score`（保留 6 位小数）、`mention_count_in_range`（范围内提及数 `m`）、`chapter_count_in_range`（范围内有提及的不同章节数 `c`）、`first_chapter_id`、`last_chapter_id`（范围内首末出现的 `chapter_id`）、`span_chapters`（范围内首末正文章序之差 +1；只出现在卷题区间时为 0）。越界、`N > M`、非法 `--kind` 或分页参数按 `input` 错误拒绝（退出码 `1`）。
 
 ### 第 3 步：按码点地址回取原文核实证据（`quote --json`）
 

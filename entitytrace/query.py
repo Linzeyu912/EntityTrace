@@ -1,7 +1,8 @@
-"""阶段 F：只读状态、名册、实体详情、待审与原文摘录查询（零模型调用，按需构建并复用只读查询快照）。"""
+"""阶段 F：只读状态、名册、实体详情、待审、原文摘录与实体优先级排名查询（零模型调用，按需构建并复用只读查询快照）。"""
 from __future__ import annotations
 
 import json
+import math
 from pathlib import Path
 
 from .discovery import KINDS
@@ -17,6 +18,7 @@ from .text import address, validate_span
 
 DEFAULT_LIMIT = 50
 MAX_LIMIT = 200
+SNAPSHOT_VERSION = 2
 DEFAULT_CONTEXT = 80
 MAX_ENTITY_CONTEXT = 400
 MAX_QUOTE_CONTEXT = 4000
@@ -61,13 +63,26 @@ def _load_roster_snapshot(
     rows = store.rows(sql, (run_id,))
     if not rows or rows[0]["fingerprint"] != fp:
         build_export_bundle(store, run_id)
-        rows = store.rows(sql, (run_id,))
+        rows = store.rows(sql, (run_id))
     row = rows[0]
     snap: dict = {"meta": json.loads(row["meta_json"])}
     if need_entities:
         snap["entities"] = json.loads(row["entities_json"])
     if need_reviews:
         snap["reviews"] = json.loads(row["reviews_json"])
+    # 旧版快照缺少新字段（snapshot_version / chapter_stats）时自动重建，不报错
+    stale = snap["meta"].get("snapshot_version") != SNAPSHOT_VERSION or (
+        need_entities and snap["entities"] and "chapter_stats" not in snap["entities"][0]
+    )
+    if stale:
+        build_export_bundle(store, run_id)
+        rows = store.rows(sql, (run_id,))
+        row = rows[0]
+        snap = {"meta": json.loads(row["meta_json"])}
+        if need_entities:
+            snap["entities"] = json.loads(row["entities_json"])
+        if need_reviews:
+            snap["reviews"] = json.loads(row["reviews_json"])
     return run, snap
 
 
@@ -356,4 +371,139 @@ def query_quote_json(
         "context_before": full_text[max(0, start - context):start],
         "context_after": full_text[end:min(len(full_text), end + context)],
         "chapter_id": chapter_id,
+    }
+
+
+def query_rank(
+    store: Store,
+    run_id: str,
+    kind: str | None = None,
+    from_chapter: int | None = None,
+    to_chapter: int | None = None,
+    limit: int = DEFAULT_LIMIT,
+    offset: int = 0,
+) -> dict:
+    """实体优先级排名：按 sqrt(范围内提及数 × 范围内章节数) 排序，零模型调用、只读。"""
+    _validate_page(limit, offset)
+    if kind is not None and kind not in KINDS:
+        raise ValueError(f"不支持的实体粗类：{kind}（可选：{', '.join(sorted(KINDS))}）")
+    _, snap = _load_roster_snapshot(store, run_id, need_entities=True)
+    meta = snap["meta"]
+    chapters = meta["chapters"]
+    body_seq: dict[str, int] = {}
+    seq = 0
+    for ch in chapters:
+        if ch.get("kind") == "chapter":
+            seq += 1
+            body_seq[ch["id"]] = seq
+    doc_order = {ch["id"]: idx for idx, ch in enumerate(chapters)}
+    total_body = len(body_seq)
+
+    if from_chapter is None and to_chapter is None:
+        # 缺省全书：统计全部提及（包括卷题/附章区间内的提及）
+        selected_ids = {ch["id"] for ch in chapters}
+        range_info = {
+            "from_chapter": 1 if total_body else None,
+            "to_chapter": total_body if total_body else None,
+            "chapter_count": total_body,
+        }
+    else:
+        if total_body == 0:
+            raise ValueError("当前运行无正文章节，不支持按章序范围筛选")
+        n = 1 if from_chapter is None else from_chapter
+        m_ = total_body if to_chapter is None else to_chapter
+        if not (1 <= n <= total_body):
+            raise ValueError(f"--from-chapter 须在 1—{total_body} 之间")
+        if not (1 <= m_ <= total_body):
+            raise ValueError(f"--to-chapter 须在 1—{total_body} 之间")
+        if n > m_:
+            raise ValueError("--from-chapter 不能大于 --to-chapter")
+        selected_ids = {cid for cid, s in body_seq.items() if n <= s <= m_}
+        range_info = {"from_chapter": n, "to_chapter": m_, "chapter_count": m_ - n + 1}
+
+    scored: list[dict] = []
+    for ent in snap["entities"]:
+        ch_stats = ent.get("chapter_stats") or {}
+        m = 0
+        touched_ids: list[str] = []
+        min_start: int | None = None
+        for cid, stat in ch_stats.items():
+            if cid not in selected_ids:
+                continue
+            cnt = int(stat.get("count", 0))
+            if cnt <= 0:
+                continue
+            m += cnt
+            touched_ids.append(cid)
+            s_min = stat.get("min_start")
+            if isinstance(s_min, int) and (min_start is None or s_min < min_start):
+                min_start = s_min
+        if m == 0:
+            continue
+        c = len(touched_ids)
+        touched_ids.sort(key=lambda cid: doc_order[cid])
+        body_seqs = [body_seq[cid] for cid in touched_ids if cid in body_seq]
+        raw_score = math.sqrt(m * c)
+        scored.append({
+            "id": ent["id"],
+            "name": ent["name"],
+            "kind": ent["kind"],
+            "identity_status": ent["identity_status"],
+            "_m": m,
+            "_c": c,
+            "_raw": raw_score,
+            "_min_start": min_start if min_start is not None else 0,
+            "first_chapter_id": touched_ids[0],
+            "last_chapter_id": touched_ids[-1],
+            "span_chapters": (max(body_seqs) - min(body_seqs) + 1) if body_seqs else 0,
+        })
+
+    def sort_key(e: dict) -> tuple:
+        # 第一级 (m*c, raw_score) 降序与未舍入 sqrt(m*c) 完全等价且无浮点抖动
+        return (-(e["_m"] * e["_c"]), -e["_raw"], -e["_m"], -e["_c"], e["_min_start"], e["id"])
+
+    by_kind: dict[str, list[dict]] = {}
+    for e in scored:
+        by_kind.setdefault(e["kind"], []).append(e)
+    rank_map: dict[str, int] = {}
+    for k, members in by_kind.items():
+        members.sort(key=sort_key)
+        for rank, e in enumerate(members, start=1):
+            rank_map[e["id"]] = rank
+    for e in scored:
+        e["kind_rank"] = rank_map[e["id"]]
+
+    if kind is not None:
+        ordered = sorted(by_kind.get(kind, []), key=lambda e: e["kind_rank"])
+    else:
+        ordered = sorted(scored, key=sort_key)
+    page, total, next_offset = _paginate(ordered, limit, offset)
+    items = [
+        {
+            "id": e["id"],
+            "name": e["name"],
+            "kind": e["kind"],
+            "identity_status": e["identity_status"],
+            "kind_rank": e["kind_rank"],
+            "score": round(e["_raw"], 6),
+            "mention_count_in_range": e["_m"],
+            "chapter_count_in_range": e["_c"],
+            "first_chapter_id": e["first_chapter_id"],
+            "last_chapter_id": e["last_chapter_id"],
+            "span_chapters": e["span_chapters"],
+        }
+        for e in page
+    ]
+    return {
+        "protocol": PROTOCOL,
+        "command": "rank",
+        "run_id": run_id,
+        "result_revision": meta["result_revision"],
+        "error": None,
+        "total": total,
+        "limit": limit,
+        "offset": offset,
+        "next_offset": next_offset,
+        "range": range_info,
+        "items": items,
     }

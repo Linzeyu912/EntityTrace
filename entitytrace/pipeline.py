@@ -187,17 +187,22 @@ def _save_roster_query_snapshot(store: Store, run_id: str, result: dict, review_
         "chapters": result["chapters"],
         "counts": manifest["counts"],
         "review_counts": review_doc["counts"],
+        "snapshot_version": 2,
     }
     mentions_by_id = {m["id"]: m for m in result["mentions"]}
     entities_obj: list[dict] = []
     entity_mentions_rows: list[tuple[str, str, str]] = []
     for ent in result["entities"]:
         surface_counts: dict[str, int] = {}
+        chapter_stats: dict[str, dict] = {}
         ent_mentions: list[dict] = []
         for mid in ent["mention_ids"]:
             m = mentions_by_id[mid]
             t = m["text"]
             surface_counts[t] = surface_counts.get(t, 0) + 1
+            stat = chapter_stats.setdefault(m["chapter_id"], {"count": 0, "min_start": m["start"]})
+            stat["count"] += 1
+            stat["min_start"] = min(stat["min_start"], m["start"])
             ent_mentions.append(m)
         entities_obj.append({
             "id": ent["id"],
@@ -207,6 +212,7 @@ def _save_roster_query_snapshot(store: Store, run_id: str, result: dict, review_
             "first_chapter_id": ent["first_chapter_id"],
             "identity_status": ent["identity_status"],
             "surface_counts": surface_counts,
+            "chapter_stats": chapter_stats,
         })
         ent_mentions.sort(key=lambda m: (m["start"], m["end"], m["id"]))
         slim_mentions = [
