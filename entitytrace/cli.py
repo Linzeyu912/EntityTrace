@@ -6,8 +6,9 @@ import os
 import sys
 from pathlib import Path
 
-from .config import OPENAI_DEFAULT_CONCURRENCY, read_env
+from .config import OPENAI_DEFAULT_CONCURRENCY, load_services, read_env
 from .corrections import apply_correction
+from .describe import run_describe
 from .pipeline import (
     EXIT_CODE_BY_CATEGORY,
     PROTOCOL,
@@ -28,8 +29,8 @@ from .query import (
 from .storage import Store
 from .text import address, validate_span
 
-KNOWN_COMMANDS = frozenset({"run", "status", "entities", "entity", "review", "quote", "rank", "export", "correct"})
-DEFAULT_JSON_COMMANDS = frozenset({"status", "entities", "entity", "review", "rank", "correct"})
+KNOWN_COMMANDS = frozenset({"run", "status", "entities", "entity", "review", "quote", "rank", "export", "correct", "describe"})
+DEFAULT_JSON_COMMANDS = frozenset({"status", "entities", "entity", "review", "rank", "correct", "describe"})
 
 
 class _CliHelpExit(Exception):
@@ -185,6 +186,26 @@ def _build_parser() -> _CliParser:
     rank.add_argument("--db", type=Path, default=Path("data/entitytrace.sqlite3"))
     rank.add_argument("--json", action="store_true", help="输出单行 JSON（默认已启用）")
 
+    describe = subs.add_parser("describe", help="抽取 top-K 实体的描述事实与状态变化事件（默认 JSON，调用模型）")
+    describe.add_argument("run_id")
+    describe.add_argument("--db", type=Path, default=Path("data/entitytrace.sqlite3"))
+    describe.add_argument("--method", choices=["d1", "d2"], required=True,
+                          help="d1：按发现任务块抽取；d2：按 top-K 实体的提及窗口抽取")
+    describe.add_argument("--top-k", type=int, default=20, help="每个实际类别取前多少实体（1—200，默认 20）")
+    describe.add_argument("--kinds", default="person,place,object,ability",
+                          help="逗号分隔的实体类别，默认 person,place,object,ability")
+    describe.add_argument("--topk-file", type=Path, default=None,
+                          help="预登记 top-K 名单 JSON；给出时不重新排名")
+    describe.add_argument("--concurrency", type=int, default=8, help="同时进行的生成请求上限（1—32，默认 8）")
+    describe.add_argument("--generator", choices=["deepseek", "openai"], default=None,
+                          help="生成服务商，默认读取 GENERATOR_PROVIDER 配置（缺省 deepseek）")
+    describe.add_argument("--config", type=Path, default=Path(".env.models.local"))
+    describe.add_argument("--max-requests", type=int, default=None,
+                          help="本次调用最大新网络请求预算，默认不限；超限保留断点并以退出码 2 停止")
+    describe.add_argument("--max-seconds", type=float, default=None,
+                          help="本次调用最大运行秒数预算，默认不限；超限保留断点并以退出码 2 停止")
+    describe.add_argument("--out", type=Path, default=None, help="将描述事实导出 JSON 写入该路径")
+
     export = subs.add_parser("export", help="从已保存数据重新导出，不调用模型")
     export.add_argument("run_id")
     export.add_argument("--db", type=Path, default=Path("data/entitytrace.sqlite3"))
@@ -332,6 +353,29 @@ def main(argv=None) -> int:
                         offset=args.offset,
                     )
                 )
+            elif args.command == "describe":
+                services = load_services(args.config, generator=args.generator)
+                result = run_describe(
+                    store,
+                    args.run_id,
+                    args.method,
+                    services=services,
+                    top_k=args.top_k,
+                    kinds=args.kinds,
+                    topk_file=args.topk_file,
+                    concurrency=args.concurrency,
+                    out=args.out,
+                    max_requests=args.max_requests,
+                    max_seconds=args.max_seconds,
+                )
+                _emit_json_line({
+                    "ok": True,
+                    "describe_id": result["describe_id"],
+                    "run_id": result["run_id"],
+                    "method": result["method"],
+                    "counts": result["counts"],
+                    "out": str(args.out.resolve()) if args.out is not None else None,
+                })
             elif args.command == "export":
                 print(export_run(store, args.run_id, args.output).resolve())
             elif args.command == "correct":

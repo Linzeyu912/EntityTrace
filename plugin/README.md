@@ -11,6 +11,7 @@
 1. **实体提及发现**：定位全文具体人物、地点、组织、器物等提及的 Unicode 码点地址 `[start, end)`。
 2. **身份判断与名册归组**：将跨章全名、简称、别名与指代链接为实体名册（默认算法 `entity-roster-v1`），并按影响范围（`impact`）列出待审疑点。
 3. **按需取证与确定性纠错**：无需将整份数兆字节的 `result.json` 读入上下文窗口，直接通过只读查询分页检视实体、回溯原文上下文，并在获得用户明确确认后叠加可撤回的更正。
+4. **描述事实抽取（可选）**：按 top-K 实体收集原文明写的描述事实与状态变化事件，带逐字引用地址、facet 空缺清单与待审项，供下游写作或设定核对。
 
 ---
 
@@ -29,6 +30,7 @@
   {"protocol":"entitytrace.v1","command":"<命令名>","run_id":"<已知则填，否则 null>","error":{"category":"...","message":"...","retryable":false}}
   ```
   注：`run --json` 在运行尚未建立（`run_id` 为 `null`）即失败时，`status` 固定为 `"failed"`，退出码为 `1`。
+- **例外**：`describe` 成功时按描述抽取契约输出 `{"ok":true,"describe_id":...,"run_id":...,"method":...,"counts":{...},"out":...}`，不带 `protocol` 字段；失败仍输出上述统一错误 JSON。
 
 ---
 
@@ -113,6 +115,19 @@ python -X utf8 -m entitytrace correct <run_id> revoke <更正ID> [--cascade] --s
 ### 第 5 步：复查或移交下游
 
 更正生效后 `result_revision` 更新；可再次调用 `review`、`entities` 或 `entity` 确认待审项已转为 `resolved` 且名册已更新。
+
+### 第 6 步（可选）：描述事实抽取（`describe`）
+
+需要按实体收集原文描述事实与状态变化事件时调用（只给原文事实与空缺清单，不推断、不补全）；只读上游运行，不改变名册与已有导出：
+
+```powershell
+python -X utf8 -m entitytrace describe <run_id> --method d1 --top-k 20 --kinds person,place,object,ability --concurrency 8 --out "<描述导出路径>" --db "<数据库路径>" --config "<凭证配置文件>"
+```
+
+- `--method d1` 按发现任务块抽取并跳过不含 top-K 实体的块；`--method d2` 以每处提及为中心取前后各 200 码点窗口，合并同章相邻或重叠窗口，按每请求不超过 9,000 码点打包，每实体最多 8 个请求。`--topk-file` 可固定预登记名单。
+- 相同配置得到相同 `describe_id` 并自动续跑；更换方法、`--top-k` 或名单会得到新编号。需要独立冷跑时使用新的 `--db` 副本。
+- 成功输出单行 `{"ok":true,"describe_id","run_id","method","counts":{"tasks","facts","events","reviews"},"out"}`；失败沿用统一错误 JSON 与退出码。401/402/429 等硬额度停止后保留断点，用原命令同库续跑。
+- 导出 `entities[]` 每项含 `facts`、`state_events` 与 `gaps`；待审项在 `reviews[]` 中给出原因（未知实体、facet 与类别不符、枚举非法、引用找不到或超长等）。
 
 ---
 

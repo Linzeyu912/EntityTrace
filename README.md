@@ -126,6 +126,21 @@ python -X utf8 -m entitytrace export 运行编号
 
 分页查询（`entities`、`entity`、`review`、`rank`）的 `--limit` 默认 `50`、上限 `200`（超限按 `input` 拒绝，退出码 `1`），响应含 `total` 与 `next_offset`（无下一页时为 `null`）；`rank` 按 `sqrt(范围内提及数 × 范围内章节数)` 对范围内至少出现一次的实体排序，`--from-chapter`／`--to-chapter` 为正文章序（只计 `kind=="chapter"` 条目，两端含，缺省全书含卷题区间提及），`--kind` 限定粗类，每项返回 `kind_rank`、`score`、`mention_count_in_range`、`chapter_count_in_range`、`first_chapter_id`、`last_chapter_id`、`span_chapters`；`entity` 的 `snippet` 上下文上限 `400` 码点且不跨章节边界；`quote` 不加 `--json` 时纯文本输出保持原样。
 
+### 描述事实抽取（`describe`）
+
+在已完成的 `entity-roster-v1` 运行上，按 top-K 实体抽取原文描述事实与状态变化事件（只给原文事实与空缺清单，不推断、不补全）。只读上游原文与查询快照，不改动已有名册、提及、待审与导出：
+
+```powershell
+python -X utf8 -m entitytrace describe 运行编号 --db 数据库路径 --method d1 --top-k 20 --kinds person,place,object,ability --concurrency 8 --out 描述导出.json
+python -X utf8 -m entitytrace describe 运行编号 --db 数据库路径 --method d2 --topk-file 预登记名单.json --out 描述导出.json
+```
+
+- `--method d1` 按发现任务块逐块抽取，跳过不含 top-K 实体的块；`--method d2` 以每处提及为中心取前后各 `200` 码点窗口，合并同章内相邻或重叠窗口，按每请求不超过 `9,000` 码点打包，每实体最多 `8` 个请求；超限时先取每章首个窗口，再按章节轮询补足，选取与打包均可复现。
+- 相同上游运行、方法、top-K 名单与生成配置得到相同 `describe_id`，自动续跑已完成任务；更换方法、`--top-k`、实体名单或生成配置会得到新编号。需要独立冷跑时使用新的 `--db` 副本。
+- 成功时 stdout 输出单行 JSON：`{"ok":true,"describe_id":...,"run_id":...,"method":...,"counts":{"tasks","facts","events","reviews"},"out":...}`。`--out` 导出 `{describe_id, run_id, method, top_k, kinds, entities, reviews, stats}`；每个实体含 `facts`、`state_events` 与按 facet 枚举顺序生成的 `gaps`，`stats` 含请求数、token、墙钟与超限截断实体。
+- facet 枚举：person 为 `age/gender/build/face/hair/feature/costume/demeanor/voice`，place 为 `terrain/architecture/scale/atmosphere`，object 为 `shape/size/color_material/visual_effect/holder`，ability 为 `visual_effect/sound_effect`；事件类型为 `costume_change/injury/disguise/transform/age_jump/upgrade/damage/owner_change/death/other`。
+- 模型输出逐条核验：`quote` 必须在请求输入原文内逐字出现且不超过 `120` 码点，多次出现时取距该实体提及最近的一处；未知实体、facet 与类别不符、枚举非法、引用找不到或超长会写入该次运行的描述待审（`describe_reviews`），不中断整轮。401/402/429 等硬额度与预算停止保留断点，按原命令同库续跑。
+
 对已完成的默认 `entity-roster-v1` 运行，可通过 `correct` 叠加确定性更正或撤回（零模型调用，`groups-v2` 与未完成运行不支持）：
 
 ```powershell

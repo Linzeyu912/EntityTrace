@@ -54,6 +54,24 @@ class Store:
           run_id TEXT NOT NULL, entity_id TEXT NOT NULL,
           entity_json TEXT NOT NULL, mentions_json TEXT NOT NULL,
           PRIMARY KEY(run_id,entity_id));
+        CREATE TABLE IF NOT EXISTS describe_runs(
+          id TEXT PRIMARY KEY, run_id TEXT NOT NULL, config TEXT NOT NULL,
+          state TEXT NOT NULL, created TEXT NOT NULL, updated TEXT NOT NULL);
+        CREATE TABLE IF NOT EXISTS describe_tasks(
+          describe_id TEXT NOT NULL, id TEXT NOT NULL, entity_id TEXT, start INTEGER, end INTEGER,
+          status TEXT NOT NULL, result TEXT, error TEXT, PRIMARY KEY(describe_id,id));
+        CREATE TABLE IF NOT EXISTS facts(
+          describe_id TEXT NOT NULL, id TEXT NOT NULL, entity_id TEXT NOT NULL, facet TEXT NOT NULL,
+          value TEXT NOT NULL, quote TEXT NOT NULL, start INTEGER NOT NULL, end INTEGER NOT NULL,
+          chapter_id TEXT, source TEXT NOT NULL, holder_entity_id TEXT, task_id TEXT NOT NULL,
+          PRIMARY KEY(describe_id,id));
+        CREATE TABLE IF NOT EXISTS state_events(
+          describe_id TEXT NOT NULL, id TEXT NOT NULL, entity_id TEXT NOT NULL, event_type TEXT NOT NULL,
+          splits_entity INTEGER NOT NULL, value TEXT NOT NULL, quote TEXT NOT NULL, start INTEGER NOT NULL,
+          end INTEGER NOT NULL, chapter_id TEXT, task_id TEXT NOT NULL, PRIMARY KEY(describe_id,id));
+        CREATE TABLE IF NOT EXISTS describe_reviews(
+          describe_id TEXT NOT NULL, id TEXT NOT NULL, task_id TEXT NOT NULL, reason TEXT NOT NULL,
+          data TEXT NOT NULL, PRIMARY KEY(describe_id,id));
         """)
         self.db.commit()
 
