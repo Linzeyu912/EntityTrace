@@ -1268,7 +1268,7 @@ class ChapterCandidateAndStructureTests(unittest.TestCase):
 
         # 构造超過 240 条候选（产生 3 个批次），验证并发 1 与并发 8 下章节表版本与决策记录逐字节相同
         lines = []
-        for idx in range(1, 130):
+        for idx in range(1, 210):
             lines.append(f"第{idx}章 风起\n短行正文{idx}。\n")
         text = "".join(lines)
         with tempfile.TemporaryDirectory() as d:

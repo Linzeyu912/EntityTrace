@@ -9,7 +9,7 @@ from .util import digest
 HEAD_KINDS = {"chapter", "volume", "extra"}
 CANDIDATE_MAX_CHARS = 120
 NEIGHBOR_MAX_CHARS = 80
-BATCH_MAX_CANDIDATES = 120
+BATCH_MAX_CANDIDATES = 400
 LABEL_CONCURRENCY = 3
 
 LABEL_PROMPT = """你负责从小说原文的候选短行中识别全书结构标题，只按候选 id 标注类别。
