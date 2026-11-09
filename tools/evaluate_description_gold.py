@@ -8,8 +8,12 @@
 本工具只读金标准与数据库，不改动金标准文件，也不调用任何模型。
 
 清单格式（`--manifest`）：
-    {"runs": [{"label": "d1-1", "method": "d1", "db": "臂数据库副本",
+    {"runs": [{"label": "e1-1", "arm": "e1", "method": "d1", "db": "臂数据库副本",
                "run_id": "上游运行编号", "describe": "describe --out 导出 JSON"}]}
+
+`arm` 可省略：标签形如 `e1-1` 时取前缀，否则等于 `method`。聚合既按 `method` 也按 `arm` 计算。
+`--reuse-adjudication` 指向旧裁定结果 JSONL，按键复用已裁定未匹配项，只把新键导出到 `--adjudication`；
+`--blind-labels` 指定全书盲审抽样的运行标签（默认优先 `e2-1,e3-1`）。
 
 盲审回填格式（`--blind-result`，JSONL）：每行
     {"sample_id": "...", "wrong_entity": false, "wrong_facet": true,
@@ -24,6 +28,7 @@ import collections
 import hashlib
 import json
 import random
+import re
 import sys
 from pathlib import Path
 
@@ -400,6 +405,86 @@ def _adj_id(kind: str, item: dict) -> str:
     ])[:24]
 
 
+def _int_span(item: dict) -> tuple[int, int] | None:
+    try:
+        return int(item["start"]), int(item["end"])
+    except (KeyError, TypeError, ValueError):
+        return None
+
+
+def _reuse_key(kind: str, item: dict) -> tuple | None:
+    span = _int_span(item)
+    if span is None:
+        return None
+    start, end = span
+    if kind == "fact":
+        return (item.get("entity_id"), item.get("facet"), start, end, item.get("value"))
+    return (item.get("entity_id"), item.get("event_type"), start, end, item.get("value"))
+
+
+def _load_reuse_table(path: Path | None) -> dict:
+    """读取旧裁定结果，建立事实/事件键与 adj_id 的复用查找表。"""
+    table = {
+        "by_adj_id": {},
+        "facts": {},
+        "events": {},
+        "rows": 0,
+        "path": str(path) if path is not None else None,
+    }
+    if path is None or not Path(path).is_file():
+        return table
+    for row in _read_jsonl(Path(path)):
+        verdict = row.get("verdict")
+        if verdict not in ADJUDICATION_VERDICTS:
+            continue
+        table["rows"] += 1
+        adj_id = row.get("adj_id")
+        if adj_id:
+            table["by_adj_id"][adj_id] = verdict
+        span = _int_span(row)
+        if span is None:
+            continue
+        start, end = span
+        kind = row.get("kind")
+        if kind == "event" or (kind != "fact" and row.get("event_type")):
+            entity_id, event_type, value = row.get("entity_id"), row.get("event_type"), row.get("value")
+            table["events"][(entity_id, event_type, start, end, value)] = verdict
+            table["events"][(entity_id, None, start, end, value)] = verdict
+        elif kind == "fact" or row.get("facet"):
+            table["facts"][
+                (row.get("entity_id"), row.get("facet"), start, end, row.get("value"))
+            ] = verdict
+    return table
+
+
+def _reuse_verdict(reuse: dict | None, kind: str, item: dict) -> str | None:
+    if not reuse:
+        return None
+    verdict = reuse["by_adj_id"].get(_adj_id(kind, item))
+    if verdict is not None:
+        return verdict
+    key = _reuse_key(kind, item)
+    if key is None:
+        return None
+    if kind == "fact":
+        return reuse["facts"].get(key)
+    verdict = reuse["events"].get(key)
+    if verdict is not None:
+        return verdict
+    return reuse["events"].get((key[0], None, key[2], key[3], key[4]))
+
+
+def _arm_for(spec: dict) -> str:
+    arm = spec.get("arm")
+    if isinstance(arm, str) and arm:
+        return arm
+    label = str(spec.get("label") or "")
+    matched = re.match(r"^([A-Za-z]+\d+)-\d+$", label)
+    if matched:
+        return matched.group(1)
+    return str(spec.get("method"))
+
+
 def _match_system_item(gold_items: list[dict], item: dict, kind: str) -> dict | None:
     for gold in gold_items:
         if gold["gold_id"] != item.get("_gold_id"):
@@ -420,6 +505,7 @@ def _precision(
     kind: str,
     adjudication: dict[str, str] | None,
     entity_by_id: dict[str, dict] | None = None,
+    reuse: dict | None = None,
 ) -> tuple[dict, list[dict]]:
     items = [item for item in system_items if _in_sampled(int(item["start"]), sampled)]
     for item in items:
@@ -431,16 +517,37 @@ def _precision(
     adjudicated_correct = 0
     unresolved = 0
     adj_correct_ids: set[int] = set()
+    reused_items = 0
+    new_items = 0
+    reused_keys: set[tuple] = set()
+    new_keys: set[tuple] = set()
     for item in unmatched:
         verdict = (adjudication or {}).get(_adj_id(kind, item))
+        reused = False
+        if verdict is None:
+            verdict = _reuse_verdict(reuse, kind, item)
+            reused = verdict is not None
+        key = _reuse_key(kind, item)
         if verdict is None:
             unresolved += 1
+            new_items += 1
+            if key is not None:
+                new_keys.add(key)
             continue
+        if reused:
+            reused_items += 1
+            if key is not None:
+                reused_keys.add(key)
+        else:
+            new_items += 1
+            if key is not None:
+                new_keys.add(key)
         verdict_counts[verdict] += 1
         if verdict == "gold_missed":
             adjudicated_correct += 1
             adj_correct_ids.add(id(item))
 
+    judged = adjudication is not None or bool(reuse)
     field = "facet" if kind == "fact" else "event_type"
     by_kind: dict[str, dict] = {}
     for et in ENTITY_TYPES:
@@ -452,7 +559,7 @@ def _precision(
         et_adj = [it for it in et_items if id(it) in matched_object_ids or id(it) in adj_correct_ids]
         by_kind[et] = {
             "raw": fraction(len(et_raw), len(et_items)),
-            "adjudicated": fraction(len(et_adj), len(et_items)) if adjudication is not None else None,
+            "adjudicated": fraction(len(et_adj), len(et_items)) if judged else None,
         }
     facets = sorted({it.get(field) for it in items if it.get(field)})
     by_facet: dict[str, dict] = {}
@@ -462,19 +569,23 @@ def _precision(
         fc_adj = [it for it in fc_items if id(it) in matched_object_ids or id(it) in adj_correct_ids]
         by_facet[fc] = {
             "raw": fraction(len(fc_raw), len(fc_items)),
-            "adjudicated": fraction(len(fc_adj), len(fc_items)) if adjudication is not None else None,
+            "adjudicated": fraction(len(fc_adj), len(fc_items)) if judged else None,
         }
 
     result = {
         "raw": fraction(len(auto_matched), len(items)),
         "adjudicated": (
             fraction(len(auto_matched) + adjudicated_correct, len(items))
-            if adjudication is not None else None
+            if judged else None
         ),
         "total": len(items),
         "auto_matched": len(auto_matched),
         "unmatched": len(unmatched),
         "unresolved_adjudication": unresolved,
+        "reused_adjudication_count": reused_items,
+        "reused_adjudication_keys": len(reused_keys),
+        "new_adjudication_count": new_items,
+        "new_adjudication_keys": len(new_keys),
         "verdict_counts": dict(sorted(verdict_counts.items())),
         "by_kind": by_kind,
         "by_facet": by_facet,
@@ -536,15 +647,194 @@ def _load_manifest(path: Path) -> list[dict]:
         seen.add(label)
         if run.get("method") not in ("d1", "d2"):
             raise ValueError(f"manifest 运行 {label} 的 method 必须为 d1 或 d2")
+        arm = run.get("arm")
+        if arm is not None and (not isinstance(arm, str) or not arm):
+            raise ValueError(f"manifest 运行 {label} 的 arm 必须为非空字符串")
         for key in ("db", "run_id", "describe"):
             if not run.get(key):
                 raise ValueError(f"manifest 运行 {label} 缺少 {key}")
     return runs
 
 
+def _arm_means(run_results: dict, arm: str) -> tuple[float | None, float | None]:
+    runs = [run for run in run_results.values() if run.get("arm") == arm]
+    recalls = [run["recall"]["strict"]["20"]["fraction"]["value"] for run in runs]
+    precisions = []
+    for run in runs:
+        sampled_p = run["precision_sampled"]
+        chosen = sampled_p.get("adjudicated") or sampled_p.get("raw") or {}
+        precisions.append(chosen.get("value"))
+    return _mean(recalls), _mean(precisions)
+
+
+def _select_union_labels(
+    run_context: dict, run_results: dict
+) -> tuple[str, str | None, str | None, dict]:
+    """按预登记规则确定主方法 W 与 W-1、E3-1 两个运行标签。"""
+    labels = set(run_context)
+    e1_label = "e1-1" if "e1-1" in labels else next(
+        (label for label, run in run_results.items() if run["method"] == "d1"), None
+    )
+    e2_label = "e2-1" if "e2-1" in labels else next(
+        (label for label, run in run_results.items() if run["arm"] == "e2"), None
+    )
+    e3_label = "e3-1" if "e3-1" in labels else next(
+        (label for label, run in run_results.items() if run["method"] == "d2"), None
+    )
+    e1_rec, e1_prec = _arm_means(run_results, "e1")
+    e2_rec, e2_prec = _arm_means(run_results, "e2")
+    rule = {
+        "e1_recall_strict_K20_mean": e1_rec,
+        "e1_precision_adjudicated_mean": e1_prec,
+        "e2_recall_strict_K20_mean": e2_rec,
+        "e2_precision_adjudicated_mean": e2_prec,
+        "recall_margin": 0.03,
+        "precision_margin": 0.03,
+    }
+    winner = "e1"
+    if (
+        e1_rec is not None and e2_rec is not None
+        and e1_prec is not None and e2_prec is not None
+        and e2_rec >= e1_rec + 0.03 and e2_prec >= e1_prec - 0.03
+    ):
+        winner = "e2"
+    w_label = (e2_label if winner == "e2" else e1_label) or e2_label or e1_label
+    return winner, w_label, e3_label, rule
+
+
+def _union_result(
+    left_label: str,
+    right_label: str,
+    run_context: dict,
+    run_results: dict,
+    gold_facts: list[dict],
+    all_gold_fact_ids: set[str],
+    sampled: list[dict],
+    adjudication: dict[str, str] | None,
+    reuse: dict | None,
+) -> dict:
+    left, right = run_context[left_label], run_context[right_label]
+    merged: list[dict] = []
+    seen: set[tuple] = set()
+    for source in (left, right):
+        for fact in source["facts"]:
+            key = (fact.get("entity_id"), fact.get("facet"), int(fact["start"]), int(fact["end"]))
+            if key in seen:
+                continue
+            seen.add(key)
+            merged.append(fact)
+    mapping = dict(right["mapping"])
+    mapping.update(left["mapping"])
+    entity_by_id = dict(right["entity_by_id"])
+    entity_by_id.update(left["entity_by_id"])
+
+    strict: dict[str, dict] = {}
+    loose: dict[str, dict] = {}
+    full_strict: dict[str, dict] = {}
+    full_loose: dict[str, dict] = {}
+    for k in (5, 10, 20):
+        top_eids = set(_top_k_entities(left["doc"], k)) | set(_top_k_entities(right["doc"], k))
+        top_ids = {mapping[eid] for eid in top_eids if eid in mapping}
+        facts_k = [item for item in merged if item.get("entity_id") in top_eids]
+        strict[str(k)] = recall_metrics(gold_facts, facts_k, mapping, top_ids, "fact")
+        loose[str(k)] = recall_metrics(gold_facts, facts_k, mapping, top_ids, "fact", loose=True)
+        full_strict[str(k)] = recall_metrics(gold_facts, facts_k, mapping, all_gold_fact_ids, "fact")
+        full_loose[str(k)] = recall_metrics(
+            gold_facts, facts_k, mapping, all_gold_fact_ids, "fact", loose=True,
+        )
+
+    precision, _unmatched = _precision(
+        gold_facts, merged, mapping, sampled, "fact", adjudication, entity_by_id, reuse,
+    )
+    left_precision = run_results[left_label]["precision_sampled"]
+    left_precision_value = left_precision.get("adjudicated") or left_precision["raw"]
+    union_precision_value = precision.get("adjudicated") or precision["raw"]
+    left_strict_20 = run_results[left_label]["recall"]["strict"]["20"]["fraction"]["value"]
+    union_strict_20 = strict["20"]["fraction"]["value"]
+    recall_gain = (
+        round(union_strict_20 - left_strict_20, 6)
+        if union_strict_20 is not None and left_strict_20 is not None else None
+    )
+    precision_diff = (
+        round(union_precision_value["value"] - left_precision_value["value"], 6)
+        if union_precision_value["value"] is not None and left_precision_value["value"] is not None
+        else None
+    )
+    full_all = recall_metrics(gold_facts, merged, mapping, all_gold_fact_ids, "fact")
+    return {
+        "left": left_label,
+        "right": right_label,
+        "facts_total": len(merged),
+        "facts_added": len(merged) - len(left["facts"]),
+        "recall": {
+            "strict": strict,
+            "loose": loose,
+            "full": {
+                **full_all,
+                "strict_by_k": full_strict,
+                "loose_by_k": full_loose,
+                "loose_all": recall_metrics(
+                    gold_facts, merged, mapping, all_gold_fact_ids, "fact", loose=True,
+                ),
+            },
+        },
+        "precision_sampled": precision,
+        "recall_strict_K20": union_strict_20,
+        "precision_adjudicated": union_precision_value["value"],
+        "recall_gain": recall_gain,
+        "precision_diff": precision_diff,
+    }
+
+
+def _build_union(
+    run_context: dict,
+    run_results: dict,
+    gold_facts: list[dict],
+    all_gold_fact_ids: set[str],
+    sampled: list[dict],
+    adjudication: dict[str, str] | None,
+    reuse: dict | None,
+) -> dict:
+    """W-1 ∪ E3-1 并集评估；存在 e1-1/e2-1/e3-1 时同时给出两组对照。"""
+    winner, w_label, e3_label, rule = _select_union_labels(run_context, run_results)
+    if w_label is None or e3_label is None or w_label == e3_label:
+        return {
+            "available": False,
+            "reason": "缺少可比较的 W-1 或 E3-1 运行",
+            "winner_method": winner,
+            "rule": rule,
+        }
+    labels = set(run_context)
+    pair_specs: list[tuple[str, str]] = []
+    if "e1-1" in labels and "e3-1" in labels:
+        pair_specs.append(("e1-1", "e3-1"))
+    if "e2-1" in labels and "e3-1" in labels:
+        pair_specs.append(("e2-1", "e3-1"))
+    selected_key = f"{w_label}∪{e3_label}"
+    if all(f"{left}∪{right}" != selected_key for left, right in pair_specs):
+        pair_specs.append((w_label, e3_label))
+    pairs: dict[str, dict] = {}
+    for left_label, right_label in pair_specs:
+        pairs[f"{left_label}∪{right_label}"] = _union_result(
+            left_label, right_label, run_context, run_results,
+            gold_facts, all_gold_fact_ids, sampled, adjudication, reuse,
+        )
+    selected = pairs[selected_key]
+    return {
+        "available": True,
+        "winner_method": winner,
+        "selected_pair": selected_key,
+        "rule": rule,
+        **selected,
+        "pairs": pairs,
+    }
+
+
 def evaluate(gold_path: Path, manifest: list[dict], adjudication_path: Path,
              adjudication_result_path: Path, blind_sample_path: Path,
-             blind_result_path: Path | None, seed: int) -> dict:
+             blind_result_path: Path | None, seed: int,
+             reuse_adjudication_path: Path | None = None,
+             blind_labels: str | None = None) -> dict:
     gold_doc = _read_json(gold_path)
     gold_dir = gold_path.parent
     roster_doc = _read_json(gold_dir / "roster.json")
@@ -572,16 +862,19 @@ def evaluate(gold_path: Path, manifest: list[dict], adjudication_path: Path,
             if verdict not in ADJUDICATION_VERDICTS:
                 raise ValueError(f"未知裁定结果：{verdict}")
             adjudication[row["adj_id"]] = verdict
+    reuse = _load_reuse_table(reuse_adjudication_path)
 
     run_results: dict[str, dict] = {}
     adjudication_entries: dict[str, dict] = {}
     first_by_method: dict[str, str] = {}
     describe_docs: dict[str, dict] = {}
+    run_context: dict[str, dict] = {}
     ref_text = ""
     ref_chapters: list[dict] = []
     for spec in manifest:
         label = spec["label"]
         method = spec["method"]
+        arm = _arm_for(spec)
         if method not in first_by_method:
             first_by_method[method] = label
         describe_doc = _read_json(Path(spec["describe"]))
@@ -634,16 +927,18 @@ def evaluate(gold_path: Path, manifest: list[dict], adjudication_path: Path,
 
         entity_by_id = {entity["entity_id"]: entity for entity in describe_doc.get("entities", [])}
         precision, unmatched_facts = _precision(
-            gold_facts, facts, mapping, sampled, "fact", adjudication, entity_by_id,
+            gold_facts, facts, mapping, sampled, "fact", adjudication, entity_by_id, reuse,
         )
         event_precision, unmatched_events = _precision(
-            gold_events, events, mapping, sampled, "event", adjudication, entity_by_id,
+            gold_events, events, mapping, sampled, "event", adjudication, entity_by_id, reuse,
         )
         event_recall = recall_metrics(gold_events, events, mapping, sampled_gold_ids, "event")
         event_recall_full = recall_metrics(gold_events, events, mapping, all_gold_event_ids, "event")
 
         for kind, items in (("fact", unmatched_facts), ("event", unmatched_events)):
             for item in items:
+                if _reuse_verdict(reuse, kind, item) is not None:
+                    continue
                 entry = _adjudication_entry(kind, item, entity_by_id, sampled, text)
                 adjudication_entries.setdefault(entry["adj_id"], entry)
 
@@ -659,6 +954,7 @@ def evaluate(gold_path: Path, manifest: list[dict], adjudication_path: Path,
         ]
         run_results[label] = {
             "method": method,
+            "arm": arm,
             "first": first_by_method[method] == label,
             "describe_id": describe_doc.get("describe_id"),
             "run_id": describe_doc.get("run_id"),
@@ -677,24 +973,32 @@ def evaluate(gold_path: Path, manifest: list[dict], adjudication_path: Path,
             "facts_total": len(facts),
             "events_total": len(events),
         }
+        run_context[label] = {
+            "method": method,
+            "arm": arm,
+            "doc": describe_doc,
+            "facts": facts,
+            "mapping": mapping,
+            "entity_by_id": entity_by_id,
+            "unmatched_facts": unmatched_facts,
+            "unmatched_events": unmatched_events,
+        }
 
     adjudication_list = sorted(adjudication_entries.values(), key=lambda item: item["adj_id"])
     _write_jsonl(adjudication_path, adjudication_list)
 
-    blind_items, arm_by_sample_id = _build_blind_sample(
-        describe_docs, first_by_method, ref_chapters or sampled, ref_text, seed,
+    blind_label_list = _blind_sample_labels(blind_labels, run_results, first_by_method)
+    arm_by_label = {label: run_results[label]["arm"] for label in run_results}
+    blind_items, blind_meta = _build_blind_sample(
+        describe_docs, blind_label_list, ref_chapters or sampled, ref_text, seed, arm_by_label,
     )
     _write_jsonl(blind_sample_path, blind_items)
     blind_summary = (
-        _summarize_blind(blind_result_path, blind_items, arm_by_sample_id)
+        _summarize_blind(blind_result_path, blind_items, blind_meta)
         if blind_result_path else None
     )
 
-    aggregate: dict[str, dict] = {}
-    for method in ("d1", "d2"):
-        labels = [label for label, run in run_results.items() if run["method"] == method]
-        if not labels:
-            continue
+    def _aggregate(labels: list[str]) -> dict:
         strict_20 = [run_results[label]["recall"]["strict"]["20"]["fraction"]["value"] for label in labels]
         loose_20 = [run_results[label]["recall"]["loose"]["20"]["fraction"]["value"] for label in labels]
         full_vals = [run_results[label]["recall"]["full"]["fraction"]["value"] for label in labels]
@@ -709,7 +1013,7 @@ def evaluate(gold_path: Path, manifest: list[dict], adjudication_path: Path,
             precisions.append(chosen["value"])
         event_values = [run_results[label]["events"]["recall"]["fraction"]["value"] for label in labels]
         event_full_values = [run_results[label]["events"]["recall_full"]["fraction"]["value"] for label in labels]
-        aggregate[method] = {
+        return {
             "runs": labels,
             "recall_strict_K20_mean": _mean(strict_20),
             "recall_strict_K20_values": strict_20,
@@ -724,6 +1028,44 @@ def evaluate(gold_path: Path, manifest: list[dict], adjudication_path: Path,
             "event_recall_mean": _mean(event_values),
             "event_recall_full_mean": _mean(event_full_values),
         }
+
+    aggregate: dict[str, dict] = {}
+    for method in ("d1", "d2"):
+        labels = [label for label, run in run_results.items() if run["method"] == method]
+        if labels:
+            aggregate[method] = _aggregate(labels)
+    aggregate_by_arm: dict[str, dict] = {}
+    for arm in sorted({run["arm"] for run in run_results.values()}):
+        labels = [label for label, run in run_results.items() if run["arm"] == arm]
+        if not labels:
+            continue
+        aggregate_by_arm[arm] = _aggregate(labels)
+        aggregate[arm] = aggregate_by_arm[arm]
+
+    union = _build_union(
+        run_context, run_results, gold_facts, all_gold_fact_ids, sampled,
+        adjudication, reuse,
+    )
+
+    reused_key_set: set[tuple] = set()
+    new_key_set: set[tuple] = set()
+    reused_item_total = 0
+    new_item_total = 0
+    for label, run in run_results.items():
+        for kind in ("fact", "event"):
+            sampled_p = run["precision_sampled"] if kind == "fact" else run["events"]["precision_sampled"]
+            reused_item_total += int(sampled_p.get("reused_adjudication_count") or 0)
+            new_item_total += int(sampled_p.get("new_adjudication_count") or 0)
+        for kind, unmatched in (("fact", run_context[label]["unmatched_facts"]),
+                                ("event", run_context[label]["unmatched_events"])):
+            for item in unmatched:
+                key = _reuse_key(kind, item)
+                if key is None:
+                    continue
+                if _reuse_verdict(reuse, kind, item) is not None:
+                    reused_key_set.add((kind, key))
+                else:
+                    new_key_set.add((kind, key))
 
     return {
         "gold": {
@@ -741,46 +1083,81 @@ def evaluate(gold_path: Path, manifest: list[dict], adjudication_path: Path,
             "verdicts": dict(sorted(collections.Counter(
                 row["verdict"] for row in adjudication_rows
             ).items())),
+            "reuse_source_path": reuse["path"],
+            "reuse_source_rows": reuse["rows"],
+            "reused_adjudication_count": len(reused_key_set),
+            "reused_adjudication_items": reused_item_total,
+            "new_adjudication_count": len(new_key_set),
+            "new_adjudication_items": new_item_total,
         },
         "blind_sample": {
             "path": str(blind_sample_path),
             "count": len(blind_items),
             "per_arm": BLIND_PER_ARM,
+            "labels": blind_label_list,
             "seed": seed,
         },
         "blind_summary": blind_summary,
         "runs": run_results,
         "aggregate": aggregate,
+        "aggregate_by_arm": aggregate_by_arm,
+        "union": union,
     }
+
+
+def _blind_sample_labels(
+    raw: str | None, run_results: dict, first_by_method: dict[str, str]
+) -> list[str]:
+    """默认优先 e2-1 与 e3-1，缺失时回退到各方法首个运行。"""
+    labels: list[str] = []
+    if raw:
+        labels = [part.strip() for part in raw.split(",") if part.strip()]
+    elif "e2-1" in run_results and "e3-1" in run_results:
+        labels = ["e2-1", "e3-1"]
+    else:
+        labels = [
+            first_by_method[method]
+            for method in ("d1", "d2")
+            if method in first_by_method
+        ]
+    ordered: list[str] = []
+    for label in labels:
+        if label not in run_results:
+            raise ValueError(f"盲审抽样运行不存在：{label}")
+        if label not in ordered:
+            ordered.append(label)
+    return ordered
 
 
 def _build_blind_sample(
     describe_docs: dict[str, dict],
-    first_by_method: dict[str, str],
+    labels: list[str],
     chapters: list[dict],
     text: str,
     seed: int,
-) -> tuple[list[dict], dict[str, str]]:
+    arm_by_label: dict[str, str] | None = None,
+) -> tuple[list[dict], dict[str, dict]]:
     entries: list[dict] = []
-    arm_by_sample_id: dict[str, str] = {}
-    for method in ("d1", "d2"):
-        label = first_by_method.get(method)
-        if label is None:
-            continue
+    meta_by_sample_id: dict[str, dict] = {}
+    for index, label in enumerate(labels):
         doc = describe_docs[label]
         entity_by_id = {entity["entity_id"]: entity for entity in doc.get("entities", [])}
         facts = _entity_facts(doc)
-        rng = random.Random(seed + (0 if method == "d1" else 1))
+        rng = random.Random(seed + index)
         picked = rng.sample(facts, min(BLIND_PER_ARM, len(facts)))
         for idx, fact in enumerate(picked):
             entity = entity_by_id.get(fact.get("entity_id"), {})
             start, end = int(fact["start"]), int(fact["end"])
             sample_id = digest([
-                "description-blind-v1", method, idx, fact.get("entity_id"),
+                "description-blind-v1", label, idx, fact.get("entity_id"),
                 fact.get("facet"), fact.get("value"), fact.get("quote"),
                 start, end,
             ])[:24]
-            arm_by_sample_id[sample_id] = method
+            meta_by_sample_id[sample_id] = {
+                "label": label,
+                "arm": (arm_by_label or {}).get(label, label.split("-")[0]),
+                "method": doc.get("method"),
+            }
             entries.append({
                 "sample_id": sample_id,
                 "entity_name": entity.get("name"),
@@ -795,27 +1172,27 @@ def _build_blind_sample(
                 "context_after": text[end:end + CONTEXT_CHARS] if text else "",
             })
     random.Random(seed + 2).shuffle(entries)
-    return entries, arm_by_sample_id
+    return entries, meta_by_sample_id
 
 
 def _summarize_blind(
     blind_result_path: Path,
     blind_items: list[dict],
-    arm_by_sample_id: dict[str, str],
+    meta_by_sample_id: dict[str, dict],
 ) -> dict:
     rows = _read_jsonl(blind_result_path)
     by_id = {item["sample_id"]: item for item in blind_items}
     fields = ("wrong_entity", "wrong_facet", "unsupported_value")
+    group_keys = ("method", "label", "arm")
     counts = {field: 0 for field in fields}
-    by_method_counts = {
-        method: {field: 0 for field in fields}
-        for method in ("d1", "d2")
-    }
-    by_method_judged = {"d1": 0, "d2": 0}
-    by_method_total = {
-        method: sum(1 for sid, m in arm_by_sample_id.items() if m == method)
-        for method in ("d1", "d2")
-    }
+    group_counts: dict[str, dict[str, dict[str, int]]] = {key: {} for key in group_keys}
+    group_totals: dict[str, collections.Counter] = {key: collections.Counter() for key in group_keys}
+    group_judged: dict[str, collections.Counter] = {key: collections.Counter() for key in group_keys}
+    for meta in meta_by_sample_id.values():
+        for key in group_keys:
+            value = meta.get(key)
+            if value:
+                group_totals[key][value] += 1
     judged = 0
     seen_ids: set[str] = set()
     for row in rows:
@@ -824,34 +1201,47 @@ def _summarize_blind(
             continue
         seen_ids.add(sid)
         judged += 1
-        method = arm_by_sample_id.get(sid)
-        if method in by_method_judged:
-            by_method_judged[method] += 1
+        meta = meta_by_sample_id.get(sid) or {}
+        for key in group_keys:
+            value = meta.get(key)
+            if value:
+                group_judged[key][value] += 1
         for field in fields:
             if bool(row.get(field)):
                 counts[field] += 1
-                if method in by_method_counts:
-                    by_method_counts[method][field] += 1
-    by_method = {
-        method: {
-            "judged": by_method_judged[method],
-            "total": by_method_total[method],
-            "counts": by_method_counts[method],
-            "rates": {
-                field: fraction(by_method_counts[method][field], by_method_judged[method])
-                for field in fields
-            },
-        }
-        for method in ("d1", "d2")
-        if by_method_total[method] > 0
-    }
+                for key in group_keys:
+                    value = meta.get(key)
+                    if not value:
+                        continue
+                    bucket = group_counts[key].setdefault(
+                        value, {name: 0 for name in fields}
+                    )
+                    bucket[field] += 1
+
+    def _group_summary(key: str) -> dict[str, dict]:
+        summary: dict[str, dict] = {}
+        for value, total in sorted(group_totals[key].items()):
+            judged_value = group_judged[key][value]
+            value_counts = group_counts[key].get(value, {name: 0 for name in fields})
+            summary[value] = {
+                "judged": judged_value,
+                "total": total,
+                "counts": dict(value_counts),
+                "rates": {
+                    field: fraction(value_counts[field], judged_value) for field in fields
+                },
+            }
+        return summary
+
     return {
         "result_path": str(blind_result_path),
         "judged": judged,
         "total": len(blind_items),
         "counts": counts,
         "rates": {field: fraction(counts[field], judged) for field in fields},
-        "by_method": by_method,
+        "by_method": _group_summary("method"),
+        "by_label": _group_summary("label"),
+        "by_arm": _group_summary("arm"),
     }
 
 
@@ -860,19 +1250,27 @@ def main(argv=None) -> int:
     parser.add_argument("--gold", type=Path,
                         default=ROOT / "test/entity-gold/fengshen/reference/descriptions.json")
     parser.add_argument("--manifest", type=Path, required=True,
-                        help="评分清单 JSON：{\"runs\":[{\"label\",\"method\",\"db\",\"run_id\",\"describe\"}]}")
+                        help="评分清单 JSON：{\"runs\":[{\"label\",\"arm\",\"method\",\"db\",\"run_id\",\"describe\"}]}")
     parser.add_argument("--out", type=Path, required=True, help="评分结果 JSON 路径")
     parser.add_argument("--adjudication", type=Path, default=ROOT / ".local/016a/adjudication.jsonl")
     parser.add_argument("--adjudication-result", type=Path,
                         default=ROOT / ".local/016a/adjudication_result.jsonl")
+    parser.add_argument("--reuse-adjudication", type=Path, default=None,
+                        help="旧裁定结果 JSONL；命中的未匹配项直接复用，只把新键导出到 --adjudication")
     parser.add_argument("--blind-sample", type=Path, default=ROOT / ".local/016a/blind_sample.jsonl")
     parser.add_argument("--blind-result", type=Path, default=None)
+    parser.add_argument("--blind-labels", default=None,
+                        help="全书盲审抽样运行标签，逗号分隔；默认优先 e2-1,e3-1")
     parser.add_argument("--seed", type=int, default=DEFAULT_SEED)
     args = parser.parse_args(argv)
     try:
         manifest = _load_manifest(args.manifest)
-        result = evaluate(args.gold, manifest, args.adjudication, args.adjudication_result,
-                          args.blind_sample, args.blind_result, args.seed)
+        result = evaluate(
+            args.gold, manifest, args.adjudication, args.adjudication_result,
+            args.blind_sample, args.blind_result, args.seed,
+            reuse_adjudication_path=args.reuse_adjudication,
+            blind_labels=args.blind_labels,
+        )
         write_json(args.out, result)
     except Exception as exc:
         print(json.dumps({"ok": False, "error": str(exc)}, ensure_ascii=False))
@@ -884,7 +1282,9 @@ def main(argv=None) -> int:
         "runs": len(result["runs"]),
         "aggregate": result["aggregate"],
         "adjudication_items": result["adjudication"]["package_items"],
+        "reused_adjudication_count": result["adjudication"]["reused_adjudication_count"],
         "blind_sample_count": result["blind_sample"]["count"],
+        "union_available": result["union"]["available"],
     }, ensure_ascii=False))
     return 0
 

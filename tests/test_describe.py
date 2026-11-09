@@ -21,16 +21,19 @@ from entitytrace.describe import (
     build_d2_tasks,
     build_windows,
     check_output,
+    export_describe_run,
     ground_output,
     locate_quote,
     pack_windows,
     run_describe,
+    select_windows,
 )
 from entitytrace.models import ModelError
 from entitytrace.roster import VERSION as ROSTER_VERSION
 from entitytrace.storage import Store
 from entitytrace.text import import_text
-from entitytrace.util import dumps
+from entitytrace.util import digest, dumps
+from tools.evaluate_description_gold import evaluate as evaluate_description_gold
 
 TEXT = (
     "第一章 山门\n"
@@ -206,6 +209,17 @@ class FieldReviewTests(unittest.TestCase):
             ["bad-enum", "bad-enum", "quote-not-found", "bad-enum", "bad-enum"],
         )
 
+    def test_other_event_becomes_bad_enum_review(self):
+        value = {"facts": [], "events": [
+            {"entity_id": "e1", "event_type": "other", "splits_entity": False,
+             "value": "其他变化", "quote": "身长八尺"},
+            {"entity_id": "e1", "event_type": "death", "splits_entity": True,
+             "value": "身死", "quote": "面如冠玉"},
+        ]}
+        result = ground_output("did", self.task, value, self.chapters, {"e1"})
+        self.assertEqual([r["reason"] for r in result["reviews"]], ["bad-enum"])
+        self.assertEqual([item["event_type"] for item in result["events"]], ["death"])
+
     def test_event_and_holder_persist(self):
         value = {"facts": [{
             "entity_id": "e1", "facet": "costume", "value": "青衫", "quote": "身长八尺",
@@ -254,8 +268,79 @@ class D1TaskTests(unittest.TestCase):
         self.assertEqual(len(target), 1)
         self.assertEqual(target[0]["state"]["entities"], [{
             "entity_id": "e1", "kind": "person", "surfaces_in_chunk": ["沈墨"],
+            "allowed_facets": list(FACETS["person"]),
         }])
         self.assertEqual(target[0]["entity_kinds"], {"e1": "person"})
+
+
+class D1GroupingTests(unittest.TestCase):
+    TEXT = "甲乙丙丁同游山门。"
+
+    def setUp(self):
+        text = self.TEXT
+        self.source = {"id": "s1", "text": text}
+        self.chapters = [{"id": "ch1", "chapter_set_version": "v1", "title": "第一章",
+                          "kind": "chapter", "start": 0, "body_start": 0, "end": len(text)}]
+        self.entities = [
+            {"entity_id": "e1", "kind": "person", "kind_rank": 1, "name": "甲", "score": 1.0},
+            {"entity_id": "e2", "kind": "person", "kind_rank": 2, "name": "乙", "score": 3.0},
+            {"entity_id": "e3", "kind": "person", "kind_rank": 3, "name": "丙", "score": 2.0},
+            {"entity_id": "e4", "kind": "place", "kind_rank": 4, "name": "山门", "score": 0.5},
+        ]
+        self.mentions = {}
+        for ent in self.entities:
+            surface = ent["name"]
+            start = text.index(surface)
+            self.mentions[ent["entity_id"]] = [{
+                "start": start, "end": start + len(surface), "text": surface, "chapter_id": "ch1",
+            }]
+
+    def _build(self, **kwargs):
+        return build_d1_tasks(self.source, self.chapters, self.entities, self.mentions,
+                              "did", task_chars=9000, **kwargs)
+
+    def test_grouping_is_ordered_and_deterministic(self):
+        tasks = self._build(entities_per_request=2)
+        self.assertEqual(len(tasks), 2)
+        self.assertEqual([list(task["entity_kinds"]) for task in tasks],
+                         [["e2", "e3"], ["e1", "e4"]])
+        spans = {(task["start"], task["end"]) for task in tasks}
+        self.assertEqual(len(spans), 1)
+        start, end = tasks[0]["start"], tasks[0]["end"]
+        self.assertTrue(all(task["start"] == start and task["end"] == end for task in tasks))
+        self.assertEqual({task["state"]["text"] for task in tasks},
+                         {self.source["text"][start:end]})
+        expected = [digest(["describe-d1-task-v1", "did", start, end, idx]) for idx in (0, 1)]
+        self.assertEqual([task["id"] for task in tasks], expected)
+        self.assertEqual(len({task["id"] for task in tasks}), 2)
+        for task in tasks:
+            self.assertEqual(set(task["mentions_by_entity"]), set(task["entity_kinds"]))
+            for item in task["state"]["entities"]:
+                self.assertEqual(item["allowed_facets"], list(FACETS[item["kind"]]))
+                self.assertEqual(set(item), {"entity_id", "kind", "surfaces_in_chunk",
+                                             "allowed_facets"})
+        self.assertEqual(self._build(entities_per_request=2), tasks)
+
+    def test_zero_entities_per_request_equals_no_grouping(self):
+        tasks = self._build()
+        self.assertEqual(len(tasks), 1)
+        task = tasks[0]
+        self.assertEqual([item["entity_id"] for item in task["state"]["entities"]],
+                         [ent["entity_id"] for ent in self.entities])
+        self.assertEqual(task["id"],
+                         digest(["describe-d1-task-v1", "did", task["start"], task["end"]]))
+        self.assertEqual(set(task["mentions_by_entity"]), {"e1", "e2", "e3", "e4"})
+
+    def test_group_size_larger_than_chunk_entities(self):
+        tasks = self._build(entities_per_request=10)
+        self.assertEqual(len(tasks), 1)
+        self.assertEqual([item["entity_id"] for item in tasks[0]["state"]["entities"]],
+                         ["e2", "e3", "e1", "e4"])
+
+    def test_negative_or_non_integer_is_rejected(self):
+        for bad in (-1, 1.5, "2", True):
+            with self.assertRaises(ValueError):
+                self._build(entities_per_request=bad)
 
 
 class D2WindowTests(unittest.TestCase):
@@ -334,6 +419,57 @@ class D2WindowTests(unittest.TestCase):
         windows = build_windows(text, chapters, mentions, window=200)
         self.assertEqual(len(windows), 1)
         self.assertEqual(windows[0], {"start": 0, "end": 504, "chapter_id": "c1"})
+
+
+class D2ContractTests(unittest.TestCase):
+    def _high_frequency_case(self):
+        text = "丙" * 20000
+        chapters = [
+            {"id": f"c{i}", "start": i * 2000, "body_start": i * 2000, "end": (i + 1) * 2000}
+            for i in range(10)
+        ]
+        mentions = []
+        for i in range(10):
+            for j in range(4):
+                start = i * 2000 + 100 + j * 500
+                mentions.append({"start": start, "end": start + 2, "text": "丙丙",
+                                 "chapter_id": f"c{i}"})
+        top = [{"entity_id": "e1", "kind": "person", "kind_rank": 1, "name": "丙"}]
+        return {"id": "s1", "text": text}, chapters, top, mentions
+
+    def test_allowed_facets_enter_d2_state(self):
+        text = "山门隐在云雾里。"
+        chapters = [{"id": "c1", "start": 0, "body_start": 0, "end": len(text)}]
+        mentions = [{"start": 0, "end": 2, "text": "山门", "chapter_id": "c1"}]
+        top = [{"entity_id": "e1", "kind": "place", "kind_rank": 1, "name": "山门"}]
+        tasks, truncated = build_d2_tasks({"id": "s1", "text": text}, chapters, top,
+                                          {"e1": mentions}, "did")
+        self.assertEqual(truncated, [])
+        self.assertEqual(len(tasks), 1)
+        self.assertEqual(tasks[0]["state"]["entity"]["allowed_facets"], list(FACETS["place"]))
+
+    def test_max_requests_zero_does_not_truncate(self):
+        source, chapters, top, mentions = self._high_frequency_case()
+        windows = build_windows(source["text"], chapters, mentions, window=200)
+        self.assertEqual(len(windows), 40)
+        limited, limited_used = select_windows(source["text"], windows, pack_chars=50,
+                                               max_requests=D2_MAX_REQUESTS_PER_ENTITY)
+        self.assertEqual(limited_used, D2_MAX_REQUESTS_PER_ENTITY)
+        self.assertLess(len(limited), 40)
+        full, full_used = select_windows(source["text"], windows, pack_chars=50, max_requests=0)
+        self.assertEqual(full_used, 40)
+        self.assertEqual(len(full), 40)
+        tasks, truncated = build_d2_tasks(source, chapters, top, {"e1": mentions}, "did",
+                                          pack_chars=50, max_requests=0)
+        self.assertEqual(len(tasks), 40)
+        self.assertEqual(truncated, [])
+        self.assertEqual(len({task["id"] for task in tasks}), 40)
+
+    def test_select_windows_rejects_invalid_limit(self):
+        windows = [{"start": 0, "end": 10, "chapter_id": "c1"}]
+        for bad in (-1, 1.5, "8", True):
+            with self.assertRaises(ValueError):
+                select_windows("甲" * 10, windows, max_requests=bad)
 
 
 class FixtureCase(unittest.TestCase):
@@ -470,6 +606,23 @@ class RunDescribeTests(FixtureCase):
                                                     "example", "example/model"))
         self.assertNotEqual(base, build_describe_id("d1", 20, ["person"], ["e2"], "run",
                                                     "example", "example/model"))
+        self.assertNotEqual(base, build_describe_id("d1", 20, ["person"], ["e1"], "run",
+                                                    "example", "example/model",
+                                                    entities_per_request=4))
+        self.assertNotEqual(base, build_describe_id("d1", 20, ["person"], ["e1"], "run",
+                                                    "example", "example/model",
+                                                    max_requests_per_entity=0))
+        with patch("entitytrace.describe.DESCRIBE_VERSION", "describe-v1"):
+            legacy = build_describe_id("d1", 20, ["person"], ["e1"], "run",
+                                       "example", "example/model")
+        self.assertNotEqual(base, legacy)
+        for bad in (-1, 1.5, "4"):
+            with self.assertRaises(ValueError):
+                build_describe_id("d1", 20, ["person"], ["e1"], "run", "example",
+                                  "example/model", entities_per_request=bad)
+            with self.assertRaises(ValueError):
+                build_describe_id("d1", 20, ["person"], ["e1"], "run", "example",
+                                  "example/model", max_requests_per_entity=bad)
 
     def test_gaps_are_deterministic_zero_request(self):
         models = FakeModels(SERVICES, self._handler)
@@ -499,9 +652,12 @@ class RunDescribeTests(FixtureCase):
                                   top_k=10, kinds="person", concurrency=2, out=self.out_path)
             self.assertTrue(self.out_path.is_file())
             doc = json.loads(self.out_path.read_text(encoding="utf-8"))
-            self.assertEqual(set(doc), {"describe_id", "run_id", "method", "top_k", "kinds",
-                                        "entities", "reviews", "stats"})
+            self.assertEqual(set(doc), {"describe_id", "run_id", "method",
+                                        "entities_per_request", "max_requests_per_entity",
+                                        "top_k", "kinds", "entities", "reviews", "stats"})
             self.assertEqual(doc["method"], "d2")
+            self.assertEqual(doc["entities_per_request"], 0)
+            self.assertEqual(doc["max_requests_per_entity"], D2_MAX_REQUESTS_PER_ENTITY)
             self.assertEqual(doc["top_k"], 10)
             self.assertEqual(set(doc["stats"]), {"requests", "prompt_tokens", "completion_tokens",
                                                  "wall_seconds", "truncated_entities"})
@@ -531,6 +687,37 @@ class RunDescribeTests(FixtureCase):
             self.assertTrue(store_rows)
             self.assertTrue(all(row["reason"] == "invalid-output" and row["status"] == "completed"
                                 for row in store_rows))
+        finally:
+            store.close()
+
+    def test_entities_per_request_changes_id_and_task_count(self):
+        models = FakeModels(SERVICES, self._handler)
+        store = Store(self.db_path)
+        try:
+            plain = run_describe(store, self.run_id, "d1", services=SERVICES, models=models,
+                                 top_k=10, kinds="person,place,object,ability", concurrency=1)
+            plain_calls = len(models.calls)
+            grouped = run_describe(store, self.run_id, "d1", services=SERVICES, models=models,
+                                   top_k=10, kinds="person,place,object,ability", concurrency=1,
+                                   entities_per_request=1)
+            grouped_calls = models.calls[plain_calls:]
+            self.assertNotEqual(plain["describe_id"], grouped["describe_id"])
+            self.assertEqual(plain["entities_per_request"], 0)
+            self.assertEqual(grouped["entities_per_request"], 1)
+            self.assertGreater(len(grouped_calls), plain_calls)
+            self.assertEqual(grouped["counts"]["tasks"], len(grouped_calls))
+            self.assertTrue(all(len(call["state"]["entities"]) == 1 for call in grouped_calls))
+            unlimited = run_describe(store, self.run_id, "d1", services=SERVICES, models=models,
+                                     top_k=10, kinds="person", concurrency=1,
+                                     max_requests_per_entity=0)
+            self.assertEqual(unlimited["max_requests_per_entity"], 0)
+            self.assertEqual(unlimited["document"]["stats"]["truncated_entities"], [])
+            with self.assertRaises(ValueError):
+                run_describe(store, self.run_id, "d1", services=SERVICES, models=models,
+                             top_k=10, kinds="person", entities_per_request=-1)
+            with self.assertRaises(ValueError):
+                run_describe(store, self.run_id, "d1", services=SERVICES, models=models,
+                             top_k=10, kinds="person", max_requests_per_entity=-1)
         finally:
             store.close()
 
@@ -586,6 +773,215 @@ class RunDescribeTests(FixtureCase):
             reopened.close()
 
 
+class LegacyDescribeExportTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.root = Path(self.temp.name)
+        self.db_path = self.root / "legacy.sqlite3"
+        self.out_path = self.root / "legacy-export.json"
+
+    def tearDown(self):
+        self.temp.cleanup()
+
+    def _seed_v1(self):
+        store = Store(self.db_path)
+        try:
+            config = {
+                "describe_version": "describe-v1", "method": "d1", "top_k": 20,
+                "kinds": ["person"], "entity_ids": ["e1"], "run_id": "run_v1",
+                "generator": {"provider": "example", "model": "example/model"},
+            }
+            store.execute("INSERT INTO describe_runs VALUES(?,?,?,?,?,?)",
+                          ("did-v1", "run_v1", dumps(config),
+                           dumps({"status": "completed", "method": "d1"}), "t0", "t0"))
+            store.execute("INSERT INTO facts VALUES(?,?,?,?,?,?,?,?,?,?,?,?)",
+                          ("did-v1", "f1", "e1", "build", "高大", "身长八尺", 2, 6, "ch1",
+                           "narration", None, "task-1"))
+            store.execute("INSERT INTO state_events VALUES(?,?,?,?,?,?,?,?,?,?,?)",
+                          ("did-v1", "ev1", "e1", "other", 0, "其他变化", "白衣", 10, 12,
+                           "ch1", "task-1"))
+            store.execute("INSERT INTO describe_reviews VALUES(?,?,?,?,?)",
+                          ("did-v1", "rv1", "task-1", "bad-enum",
+                           dumps({"kind": "event", "entry": {"event_type": "other"}})))
+        finally:
+            store.close()
+
+    def test_v1_run_can_be_read_and_exported(self):
+        self._seed_v1()
+        store = Store(self.db_path)
+        try:
+            doc = export_describe_run(store, "did-v1", self.out_path)
+        finally:
+            store.close()
+        self.assertTrue(self.out_path.is_file())
+        written = json.loads(self.out_path.read_text(encoding="utf-8"))
+        self.assertEqual(written, doc)
+        self.assertEqual(doc["describe_id"], "did-v1")
+        self.assertEqual(doc["run_id"], "run_v1")
+        self.assertEqual(doc["method"], "d1")
+        self.assertEqual(doc["entities_per_request"], 0)
+        self.assertEqual(doc["max_requests_per_entity"], D2_MAX_REQUESTS_PER_ENTITY)
+        self.assertEqual(set(doc["stats"]), {"requests", "prompt_tokens", "completion_tokens",
+                                             "wall_seconds", "truncated_entities"})
+        entity = doc["entities"][0]
+        self.assertEqual(entity["entity_id"], "e1")
+        self.assertEqual(entity["kind"], "person")
+        self.assertEqual([fact["facet"] for fact in entity["facts"]], ["build"])
+        self.assertEqual([event["event_type"] for event in entity["state_events"]], ["other"])
+        self.assertEqual(entity["gaps"],
+                         [facet for facet in FACETS["person"] if facet != "build"])
+        self.assertEqual([review["reason"] for review in doc["reviews"]], ["bad-enum"])
+
+
+class DescriptionGoldToolTests(unittest.TestCase):
+    TEXT = "沈墨身长八尺，面如冠玉，黑发披肩。"
+
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.root = Path(self.temp.name)
+        self.gold_dir = self.root / "gold"
+        self.gold_dir.mkdir()
+        self.db_path = self.root / "eval.sqlite3"
+        self._build_gold()
+        self._build_db()
+
+    def tearDown(self):
+        self.temp.cleanup()
+
+    def _build_gold(self):
+        sampled = [{"start": 0, "end": len(self.TEXT)}]
+        (self.gold_dir / "descriptions.json").write_text(json.dumps({
+            "facts": [{
+                "fact_id": "gf1", "gold_id": "g1", "entity_type": "person",
+                "facet": "build", "value": "高大", "start": 2, "end": 6,
+            }],
+            "events": [],
+            "sampled_chapters": sampled,
+        }, ensure_ascii=False), encoding="utf-8")
+        (self.gold_dir / "roster.json").write_text(json.dumps({
+            "entities": [{
+                "gold_id": "g1", "entity_type": "person", "canonical_name": "沈墨",
+                "aliases": ["沈墨"],
+                "representative_mentions": [{"start": 0, "end": 2, "text": "沈墨"}],
+            }],
+        }, ensure_ascii=False), encoding="utf-8")
+        (self.gold_dir / "mentions.json").write_text(json.dumps({
+            "mentions": [], "sampled_chapters": sampled,
+        }, ensure_ascii=False), encoding="utf-8")
+
+    def _build_db(self):
+        store = Store(self.db_path)
+        try:
+            store.execute("INSERT INTO sources VALUES(?,?,?,?)",
+                          ("s1", dumps({"id": "s1"}), self.TEXT, b""))
+            store.execute("INSERT INTO runs VALUES(?,?,?,?,?,?)",
+                          ("run1", "s1", "{}", "{}", "t0", "t0"))
+            meta = {"chapters": [{"id": "ch1", "kind": "chapter", "start": 0,
+                                  "end": len(self.TEXT)}]}
+            store.execute(
+                "INSERT INTO query_snapshots VALUES(?,?,?,?,?,?)",
+                ("run1", "fp1", dumps(meta), "[]", "[]", "t0"),
+            )
+            store.execute(
+                "INSERT INTO query_entity_mentions VALUES(?,?,?,?)",
+                ("run1", "e1", dumps({"name": "沈墨", "aliases": [], "names": []}), "[]"),
+            )
+        finally:
+            store.close()
+
+    def _write_describe(self, name: str, method: str, facts: list[dict]) -> Path:
+        path = self.root / name
+        path.write_text(json.dumps({
+            "describe_id": f"describe-{name}",
+            "run_id": "run1",
+            "method": method,
+            "entities": [{
+                "entity_id": "e1", "kind": "person", "kind_rank": 1, "name": "沈墨",
+                "facts": facts, "state_events": [],
+            }],
+        }, ensure_ascii=False), encoding="utf-8")
+        return path
+
+    def _run(self, reuse_path: Path | None, adjudication_result: Path | None = None) -> dict:
+        e1_doc = self._write_describe("e1.json", "d1", [
+            {"entity_id": "e1", "facet": "build", "value": "身长八尺", "quote": "身长八尺",
+             "start": 2, "end": 6},
+            {"entity_id": "e1", "facet": "face", "value": "面如冠玉", "quote": "面如冠玉",
+             "start": 7, "end": 11},
+        ])
+        e3_doc = self._write_describe("e3.json", "d2", [
+            {"entity_id": "e1", "facet": "build", "value": "身高八尺", "quote": "身长八尺",
+             "start": 2, "end": 6},
+            {"entity_id": "e1", "facet": "hair", "value": "黑发", "quote": "黑发披肩",
+             "start": 12, "end": 14},
+        ])
+        manifest = [
+            {"label": "e1-1", "method": "d1", "db": str(self.db_path),
+             "run_id": "run1", "describe": str(e1_doc)},
+            {"label": "e3-1", "method": "d2", "db": str(self.db_path),
+             "run_id": "run1", "describe": str(e3_doc)},
+        ]
+        return evaluate_description_gold(
+            self.gold_dir / "descriptions.json", manifest,
+            self.root / "adjudication.jsonl",
+            adjudication_result or (self.root / "adjudication_result.jsonl"),
+            self.root / "blind_sample.jsonl", None, 20261109,
+            reuse_adjudication_path=reuse_path,
+        )
+
+    def _write_reuse(self) -> Path:
+        path = self.root / "reuse.jsonl"
+        path.write_text(json.dumps({
+            "adj_id": "old-face", "kind": "fact", "entity_id": "e1", "facet": "face",
+            "event_type": None, "value": "面如冠玉", "quote": "面如冠玉",
+            "start": 7, "end": 11, "verdict": "gold_missed",
+        }, ensure_ascii=False) + "\n", encoding="utf-8")
+        return path
+
+    def test_reuse_adjudication_only_exports_new_keys(self):
+        result = self._run(self._write_reuse())
+        precision = result["runs"]["e1-1"]["precision_sampled"]
+        self.assertEqual(precision["unmatched"], 1)
+        self.assertEqual(precision["reused_adjudication_count"], 1)
+        self.assertEqual(precision["new_adjudication_count"], 0)
+        self.assertEqual(precision["unresolved_adjudication"], 0)
+        self.assertEqual(precision["adjudicated"]["value"], 1.0)
+        package = [json.loads(line) for line in
+                   (self.root / "adjudication.jsonl").read_text(encoding="utf-8").splitlines()
+                   if line.strip()]
+        self.assertEqual([entry["facet"] for entry in package], ["hair"])
+        self.assertEqual(result["adjudication"]["reused_adjudication_count"], 1)
+        self.assertEqual(result["adjudication"]["package_items"], 1)
+        self.assertEqual(result["runs"]["e3-1"]["precision_sampled"]["new_adjudication_count"], 1)
+
+    def test_union_dedupes_and_reuses_adjudication(self):
+        result = self._run(self._write_reuse())
+        self.assertEqual(result["runs"]["e1-1"]["arm"], "e1")
+        self.assertEqual(result["runs"]["e3-1"]["arm"], "e3")
+        self.assertIn("d1", result["aggregate"])
+        self.assertIn("d2", result["aggregate"])
+        self.assertIn("e1", result["aggregate"])
+        self.assertIn("e3", result["aggregate_by_arm"])
+        self.assertIn("e1", result["aggregate_by_arm"])
+
+        union = result["union"]
+        self.assertTrue(union["available"])
+        self.assertEqual(union["winner_method"], "e1")
+        self.assertEqual(union["selected_pair"], "e1-1∪e3-1")
+        self.assertEqual(union["facts_total"], 3)
+        self.assertEqual(union["facts_added"], 1)
+        self.assertEqual(union["recall"]["strict"]["20"]["fraction"]["value"], 1.0)
+        self.assertEqual(union["recall"]["strict"]["5"]["fraction"]["value"], 1.0)
+        self.assertEqual(union["recall"]["loose"]["20"]["fraction"]["value"], 1.0)
+        self.assertEqual(union["recall"]["full"]["fraction"]["value"], 1.0)
+        self.assertEqual(union["precision_adjudicated"], 0.666667)
+        self.assertEqual(union["precision_sampled"]["reused_adjudication_count"], 1)
+        self.assertEqual(union["precision_sampled"]["unresolved_adjudication"], 1)
+        self.assertEqual(union["recall_gain"], 0.0)
+        self.assertEqual(union["precision_diff"], -0.333333)
+        self.assertIn("e1-1∪e3-1", union["pairs"])
+
+
 class CliContractTests(FixtureCase):
     def setUp(self):
         super().setUp()
@@ -624,7 +1020,9 @@ class CliContractTests(FixtureCase):
         lines = out_buf.getvalue().splitlines()
         self.assertEqual(len(lines), 1, out_buf.getvalue())
         receipt = json.loads(lines[0])
-        self.assertEqual(set(receipt), {"ok", "describe_id", "run_id", "method", "counts", "out"})
+        self.assertEqual(set(receipt), {"ok", "describe_id", "run_id", "method",
+                                        "entities_per_request", "max_requests_per_entity",
+                                        "counts", "out"})
         self.assertTrue(receipt["ok"])
         self.assertEqual(receipt["method"], "d1")
         self.assertEqual(receipt["run_id"], self.run_id)

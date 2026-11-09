@@ -204,6 +204,10 @@ def _build_parser() -> _CliParser:
                           help="本次调用最大新网络请求预算，默认不限；超限保留断点并以退出码 2 停止")
     describe.add_argument("--max-seconds", type=float, default=None,
                           help="本次调用最大运行秒数预算，默认不限；超限保留断点并以退出码 2 停止")
+    describe.add_argument("--entities-per-request", type=int, default=0,
+                          help="仅 d1 生效，每请求最多包含多少个块内实体，默认 0（不分组）")
+    describe.add_argument("--max-requests-per-entity", type=int, default=8,
+                          help="仅 d2 生效，每实体最大请求数，默认 8（0 表示不设上限）")
     describe.add_argument("--out", type=Path, default=None, help="将描述事实导出 JSON 写入该路径")
 
     export = subs.add_parser("export", help="从已保存数据重新导出，不调用模型")
@@ -367,12 +371,16 @@ def main(argv=None) -> int:
                     out=args.out,
                     max_requests=args.max_requests,
                     max_seconds=args.max_seconds,
+                    entities_per_request=args.entities_per_request,
+                    max_requests_per_entity=args.max_requests_per_entity,
                 )
                 _emit_json_line({
                     "ok": True,
                     "describe_id": result["describe_id"],
                     "run_id": result["run_id"],
                     "method": result["method"],
+                    "entities_per_request": result["entities_per_request"],
+                    "max_requests_per_entity": result["max_requests_per_entity"],
                     "counts": result["counts"],
                     "out": str(args.out.resolve()) if args.out is not None else None,
                 })
