@@ -77,10 +77,16 @@ class RequestBudget:
             # 在预算包装层读完响应，连接阶段和读取阶段失败都能计入停止条件。
             with self.opener(request, timeout=effective_timeout) as response:
                 body = response.read()
-        except urllib.error.HTTPError:
-            # HTTP 错误由生产客户端解析、重试或触发硬额度保护。
+        except urllib.error.HTTPError as exc:
+            # HTTP 502/503/504/529 计入连续网络失败；其余 HTTP 错误由生产客户端解析、重试或触发硬额度保护。
             with self.lock:
-                self.consecutive_network_failures = 0
+                if exc.code in {502, 503, 504, 529}:
+                    self.consecutive_network_failures += 1
+                    self.network_errors[f"HTTP {exc.code}"] += 1
+                    if self.consecutive_network_failures >= self.max_network_failures:
+                        self.stop_reason = "network_outage"
+                else:
+                    self.consecutive_network_failures = 0
             raise
         except OSError as exc:
             with self.lock:
@@ -196,7 +202,7 @@ class Models:
                 else payload
             )
             temperature_sent = send_payload.get("temperature")
-            detail: dict = {"temperature_sent": temperature_sent}
+            detail: dict = {"temperature_sent": temperature_sent, "served_model": None}
             raw = None
             with self.gates[service_name]:
                 with self.lock:
@@ -210,11 +216,17 @@ class Models:
                         headers={"Authorization": "Bearer " + service.key, "Content-Type": "application/json"}, method="POST")
                     with self.opener(request, timeout=self.timeout) as response:
                         raw = json.loads(response.read().decode("utf-8"))
+                    served_model = raw.get("model") if isinstance(raw, dict) and isinstance(raw.get("model"), str) else None
                     validate(raw)
                     # Authorization 头从不写入日志；不保存模型内部推理字段。
                     for choice in raw.get("choices", []):
                         choice.get("message", {}).pop("reasoning_content", None)
-                    detail = {"usage": raw.get("usage", {}), "active_requests": active, "temperature_sent": temperature_sent}
+                    detail = {
+                        "usage": raw.get("usage", {}),
+                        "active_requests": active,
+                        "temperature_sent": temperature_sent,
+                        "served_model": served_model,
+                    }
                 except urllib.error.HTTPError as exc:
                     error_status = exc.code
                     error = f"{service_name} 请求失败（HTTP {exc.code}）"
@@ -236,7 +248,13 @@ class Models:
                             retry_after = parsedate_to_datetime(header).timestamp() - time.time()
                         except (TypeError, ValueError, OverflowError):
                             retry_after = 0
-                    detail = {"http_status": exc.code, "hard_quota": hard_quota, "error_type": error_code, "temperature_sent": temperature_sent}
+                    detail = {
+                        "http_status": exc.code,
+                        "hard_quota": hard_quota,
+                        "error_type": error_code,
+                        "temperature_sent": temperature_sent,
+                        "served_model": None,
+                    }
                     if hard_quota:
                         error += "，余额或硬额度不足，本次运行停止该服务的新请求；成功缓存仍可复用"
                         with self.lock:
@@ -245,14 +263,16 @@ class Models:
                 except (urllib.error.URLError, TimeoutError, socket.timeout, OSError):
                     error = f"{service_name} 网络失败或超时"
                     error_code = "network_error"
-                    detail = {"temperature_sent": temperature_sent}
+                    detail = {"temperature_sent": temperature_sent, "served_model": None}
                     raw = None
                 except (ValueError, KeyError, TypeError, ModelError) as exc:
                     drop_temperature = True
                     error = f"{service_name} 返回格式不符合约定"
+                    served_model = raw.get("model") if isinstance(raw, dict) and isinstance(raw.get("model"), str) else None
                     detail = {
                         "validation_error": str(exc)[:160] if isinstance(exc, ModelError) else type(exc).__name__,
                         "temperature_sent": temperature_sent,
+                        "served_model": served_model,
                     }
                     if isinstance(raw, dict) and isinstance(raw.get("usage"), dict) and raw["usage"]:
                         detail["usage"] = raw["usage"]
