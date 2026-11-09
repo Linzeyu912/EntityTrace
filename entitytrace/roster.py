@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import collections
+import copy
 import unicodedata
 from typing import Callable
 
@@ -726,6 +727,79 @@ def apply_c1_task_result(
     }
 
 
+def _normalize_c2_review(value: dict) -> tuple[dict, dict]:
+    """在 C2 分歧复核校验前整理模型输出：组内重复成员/行去重，跨组重复成员转待审。
+
+    纯函数：不修改入参（先深拷贝），输出确定。无重复时输出的 JSON 序列化与入参逐字节相同。
+    返回 (normalized_value, notes)，notes 恒含 dedup_in_group 与 cross_group_members 两键。
+    row_id 跨组重复不在此处理，仍由 _check_c2_review 报“C2 重复分配 row_id”。
+    """
+    normalized = copy.deepcopy(value)
+    notes: dict = {"dedup_in_group": 0, "cross_group_members": []}
+    if not isinstance(normalized, dict):
+        return normalized, notes
+    groups = normalized.get("groups")
+    if not isinstance(groups, list):
+        return normalized, notes
+    group_members: list[list[str]] = []
+    for g in groups:
+        if not isinstance(g, dict):
+            group_members.append([])
+            continue
+        mids = g.get("member_ids")
+        if isinstance(mids, list):
+            seen_mids: set[str] = set()
+            kept_mids: list[str] = []
+            for mid in mids:
+                if isinstance(mid, str):
+                    if mid in seen_mids:
+                        notes["dedup_in_group"] += 1
+                        continue
+                    seen_mids.add(mid)
+                kept_mids.append(mid)
+            g["member_ids"] = kept_mids
+            group_members.append([mid for mid in kept_mids if isinstance(mid, str)])
+        else:
+            group_members.append([])
+        rids = g.get("row_ids")
+        if isinstance(rids, list):
+            seen_rids: set[str] = set()
+            kept_rids: list[str] = []
+            for rid in rids:
+                if isinstance(rid, str):
+                    if rid in seen_rids:
+                        notes["dedup_in_group"] += 1
+                        continue
+                    seen_rids.add(rid)
+                kept_rids.append(rid)
+            g["row_ids"] = kept_rids
+    first_seen: dict[str, int] = {}
+    counts: collections.Counter[str] = collections.Counter()
+    for mids in group_members:
+        for mid in mids:
+            if mid not in first_seen:
+                first_seen[mid] = len(first_seen)
+            counts[mid] += 1
+    cross = sorted((mid for mid, n in counts.items() if n > 1), key=lambda mid: first_seen[mid])
+    if not cross:
+        return normalized, notes
+    cross_set = set(cross)
+    for g in groups:
+        if isinstance(g, dict) and isinstance(g.get("member_ids"), list):
+            g["member_ids"] = [mid for mid in g["member_ids"] if mid not in cross_set]
+    unresolved = normalized.get("unresolved_member_ids")
+    if isinstance(unresolved, list):
+        existing = {mid for mid in unresolved if isinstance(mid, str)}
+        for mid in cross:
+            if mid not in existing:
+                unresolved.append(mid)
+                existing.add(mid)
+    elif unresolved is None or "unresolved_member_ids" not in normalized:
+        normalized["unresolved_member_ids"] = list(cross)
+    notes["cross_group_members"] = cross
+    return normalized, notes
+
+
 def _check_c2_review(value: dict, allowed_row_ids: set[str], allowed_member_ids: set[str] | None = None) -> None:
     if not isinstance(value, dict) or not isinstance(value.get("groups"), list) or not isinstance(value.get("unresolved_row_ids"), list):
         raise ModelError("C2 分歧复核返回格式错误")
@@ -1387,20 +1461,21 @@ def resolve_roster(
                 task_id = digest([VERSION, stage_tag, member_keys, b_idx, batch, prior_context, C2_REVIEW_PROMPT])
                 old = store.task(run_id, task_id)
                 if old and old["status"] == "completed" and old["result"]:
-                    val = old["result"]["value"]
+                    val, notes = _normalize_c2_review(old["result"]["value"])
                     req_id = old["result"]["request_id"]
                     from_cache = True
                 else:
                     allowed_rids = {r["row_id"] for r in batch}
                     allowed_mids = {m["member_id"] for r in batch for m in r.get("members", [])}
                     state = {"prior_groups": prior_context, "rows": batch}
-                    val, req_id = models.generate(
+                    raw_val, req_id = models.generate(
                         C2_REVIEW_PROMPT,
                         state,
                         "roster-c2-review",
-                        lambda v, ar=allowed_rids, am=allowed_mids: _check_c2_review(v, ar, am),
+                        lambda v, ar=allowed_rids, am=allowed_mids: _check_c2_review(_normalize_c2_review(v)[0], ar, am),
                         temperature=0,
                     )
+                    val, notes = _normalize_c2_review(raw_val)
                     from_cache = False
                 batch_outputs.append({
                     "task_id": task_id,
@@ -1408,6 +1483,7 @@ def resolve_roster(
                     "val": val,
                     "req_id": req_id,
                     "from_cache": from_cache,
+                    "normalization": notes,
                 })
                 for g in val["groups"]:
                     prior_context.append({"name": g.get("name", ""), "kind": g.get("kind", "unknown"), "row_ids": g.get("row_ids", [])})
@@ -1443,7 +1519,11 @@ def resolve_roster(
 
             for b_idx, bo in enumerate(res["batch_outputs"]):
                 if not bo["from_cache"]:
-                    store.finish_task(run_id, {"id": bo["task_id"], "stage": "roster-c2-review"}, {"value": bo["val"], "request_id": bo["req_id"]})
+                    task_result = {"value": bo["val"], "request_id": bo["req_id"]}
+                    notes = bo["normalization"]
+                    if notes["dedup_in_group"] > 0 or notes["cross_group_members"]:
+                        task_result["normalization"] = notes
+                    store.finish_task(run_id, {"id": bo["task_id"], "stage": "roster-c2-review"}, task_result)
                 cluster_req_ids.append(bo["req_id"])
                 val = bo["val"]
                 # 先收集显式指定在 unresolved_member_ids 中的成员
