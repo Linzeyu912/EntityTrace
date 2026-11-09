@@ -1,6 +1,6 @@
 # EntityTrace 宿主 Agent 调用说明（`entitytrace.v1`）
 
-> **边界声明**：本文档**提供通用 CLI 调用说明，平台封装待核实**。当前交付形态为本地 Python CLI（Python 3.12+，标准库 SQLite），尚未完成 特定平台的专用安装包、宿主适配或集成验证。
+> **边界声明**：本文档**提供通用 CLI 调用说明，平台封装待核实**。当前交付形态为本地 Python CLI（Python 3.12+，标准库 SQLite），尚未完成任一宿主平台的专用安装包、宿主适配或集成验证。
 
 ---
 
@@ -37,6 +37,8 @@
 宿主 agent 应按以下 5 步编排，全程通过分页查询与码点取证控制上下文体积：
 
 ### 第 1 步：启动或续跑全文处理（`run --json`）
+
+> **生成服务配置**：默认生成服务商为 `deepseek`（需配置 `DEEPSEEK_API_KEY`，并发默认 6、超时 120 秒）；也可传 `--generator openai`（或设 `GENERATOR_PROVIDER=openai`）接入通用 OpenAI 兼容服务地址，通过 `ENTITYTRACE_OPENAI_BASE_URL`、`ENTITYTRACE_OPENAI_MODEL`、`ENTITYTRACE_OPENAI_API_KEY`、`ENTITYTRACE_OPENAI_EXTRA_BODY`（可选 JSON 对象）与 `ENTITYTRACE_OPENAI_TIMEOUT_SECONDS`（默认 420 秒，并发默认 8）配置。默认 `roster` 流程无需 `TYPESAFE_API_KEY`（仅 `--identity-algorithm groups-v2` 需要）。
 
 ```powershell
 python -X utf8 -m entitytrace run "<输入TXT路径>" --db "<数据库路径>" --output "<输出根目录>" --config "<凭证配置文件>" --max-requests 1000 --max-seconds 2400 --json
@@ -118,10 +120,10 @@ python -X utf8 -m entitytrace correct <run_id> revoke <更正ID> [--cascade] --s
 | `2` | `network` | `true` | 网络连接中断、超时、服务端 `5xx` 或连续断网熔断，数据库已保存断点 | 可退避等待后使用**同一 `--db` 与输入参数**自动重跑 `run --json` 断点续跑 |
 | `2` | `budget` | `true` | 触达 `--max-requests` 或 `--max-seconds` 预算上限停止，已完成任务保存在库 | 在宿主被授予的总预算范围内可扩大预算参数同库续跑；超出用户授权预算时询问用户 |
 | `2` | `model_output` | `true` | 个别任务模型输出连续格式错误，阶段未完成但留有断点（注：C3 链接任务连续返回非法输出时自动将该任务待链项转待审并正常完成，不阻断全书） | 允许同库自动续跑 **1 次**（已完成任务全部复用不重发）；若仍失败则停止并向用户报告 |
-| `2` | `quota` | **`false`** | API 余额不足、硬额度耗尽（`hard_quota`）或 `402/429` 配额限制，库内保留断点 | **严禁自动重跑**；必须立即向用户报告额度耗尽，待用户充值或更换凭证后再同库恢复 |
+| `2` | `quota` | **`false`** | API 余额不足、硬额度耗尽（`hard_quota`）或 `402/429` 额度限制，库内保留断点 | **严禁立即自动重跑**；若为 `429` 或额度窗口限制，保留断点稍后同库续跑；若为 DeepSeek 余额不足，告知用户充值后再同库续跑 |
 | `2` | `null` | — | 显式指定 `--stop-after chapters` 或 `--stop-after discovery` 到达阶段断点 | 按编排计划决定是否继续推进后续阶段 |
 | `1` | `conflict` | `false` | `correct --expect-revision` 与当前实际 `result_revision` 不一致（结果版本已过期） | **不得直接用旧参数强推**；必须重新调用 `status` / `entities` / `entity` / `review` 读取最新状态与实体 ID，核对后再提交 |
-| `1` | `config` | `false` | 缺少 `DEEPSEEK_API_KEY`、配置文件路径错误、服务地址非法或 `401/403` 鉴权失败 | **禁止自动重试**；提示用户检查本地配置文件或环境变量凭证配置 |
+| `1` | `config` | `false` | 缺少模型 API 密钥或必填服务配置、配置文件格式错误、服务地址非法或 `401/403` 鉴权失败 | **禁止自动重试**；提示用户检查配置文件或环境变量凭证配置 |
 | `1` | `input` | `false` | 输入文件不存在／编码错误、章节结构阻断（经唯一未标注章题补齐后区间内仍存在歧义／非整行缺失章号疑似标题或重复章节，`blocking=true`）、未知 `run_id`／`entity_id`、`--limit > 200`、`groups-v2` 运行调用只读查询、未完成运行调用 `correct` | **禁止自动重跑**（章节阻断重跑命中缓存结果相同，可通过 `review <run_id> --stage chapters` 核查；唯一未标注章题缺口与后接章的无正文卷／部标题由程序确定性补齐或改判，原文章号跳号或回退后按新章题连续递增记为 `blocking=false` 提示，不阻断运行）；检查参数或询问用户 |
 | `1` | `local` | `false` | 保存的原文 SHA-256 指纹不匹配或本地覆盖不变量校验异常 | **立即停止**并向用户报告数据库／产物完整性异常，不得覆盖原库 |
 

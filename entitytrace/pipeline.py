@@ -7,7 +7,7 @@ import uuid
 from pathlib import Path
 
 from .chapters import detect_chapters
-from .config import load_services
+from .config import OPENAI_DEFAULT_TIMEOUT_SECONDS, load_services
 from .corrections import CorrectionConflictError, partition_active_corrections, replay_user_corrections
 from .discovery import discover
 from .identity import group_entities
@@ -471,6 +471,7 @@ def run_pipeline(input_path: Path, db_path: Path, output_root: Path, config_path
                  max_requests: int | None = None, max_seconds: float | None = None,
                  max_network_failures: int = 9,
                  identity_algorithm: str = "roster",
+                 generator: str | None = None,
                  receipt_out: dict | None = None) -> tuple[str, Path, bool]:
     wall_begin = time.monotonic()
     if identity_algorithm not in IDENTITY_ALGORITHMS:
@@ -487,6 +488,7 @@ def run_pipeline(input_path: Path, db_path: Path, output_root: Path, config_path
     begin, invocation = time.monotonic(), uuid.uuid4().hex
     started, stages = utc_now(), {}
     run_id = None
+    generator_info: dict = {}
     caught_exc: Exception | None = None
     try:
         try:
@@ -495,10 +497,22 @@ def run_pipeline(input_path: Path, db_path: Path, output_root: Path, config_path
             exc.et_category = "input"  # type: ignore[attr-defined]
             raise
         try:
-            services = load_services(config_path, require_decision=(algo_version == RESOLUTION_VERSION))
+            services = load_services(config_path, require_decision=(algo_version == RESOLUTION_VERSION), generator=generator)
         except Exception as exc:
             exc.et_category = "config"  # type: ignore[attr-defined]
             raise
+        generator_provider = services["discovery"].provider
+        if generator_provider == "openai":
+            raw_timeout = services["discovery"].timeout_seconds or OPENAI_DEFAULT_TIMEOUT_SECONDS
+            generator_timeout: int | float = int(raw_timeout) if float(raw_timeout).is_integer() else raw_timeout
+        else:
+            generator_timeout = 120
+        generator_info = {
+            "generator_provider": generator_provider,
+            "generator_model": services["discovery"].model,
+            "generator_timeout_seconds": generator_timeout,
+            "discovery_concurrency": discovery_concurrency,
+        }
         # 预算参数（max_requests / max_seconds / max_network_failures）不写入 config 摘要，保证扩大预算可续跑同一 run_id
         config = {"implementation": implementation_hash(), "models": {k: v.public() for k, v in services.items()},
                   "discovery_concurrency": discovery_concurrency, "decision_concurrency": decision_concurrency,
@@ -509,7 +523,8 @@ def run_pipeline(input_path: Path, db_path: Path, output_root: Path, config_path
             config["group_candidates"] = group_candidates
         run_id = digest([source["id"], config])
         store.execute("INSERT OR IGNORE INTO runs VALUES(?,?,?,?,?,?)", (run_id, source["id"], dumps(config), "{}", started, started))
-        models = Models(store, run_id, invocation, services, discovery_concurrency, decision_concurrency, budget=budget)
+        models = Models(store, run_id, invocation, services, discovery_concurrency, decision_concurrency,
+                        timeout=generator_timeout, budget=budget)
         log(f"运行编号：{run_id}\n原文：{source['metadata']['code_points']} 个码点；开始处理 {input_path.name}")
         state = store.run(run_id)["state"]
         for name in ("chapters", "discovery", "identity"):
@@ -570,7 +585,7 @@ def run_pipeline(input_path: Path, db_path: Path, output_root: Path, config_path
         error = None
     invocation_record = {"id": invocation, "started": started, "ended": utc_now(), "seconds": round(time.monotonic() - begin, 4),
                          "stages": stages, "model_metrics": metrics(store, run_id, invocation),
-                         "budget": budget.summary(),
+                         "budget": budget.summary(), "generator": generator_info,
                          "peak_active_requests": models.peaks if 'models' in locals() else {}, "error": error}
     store.put(run_id, "invocation", invocation_record)
     store.state(run_id, last_invocation=invocation, last_error=error)
@@ -646,6 +661,10 @@ def run_pipeline(input_path: Path, db_path: Path, output_root: Path, config_path
                 },
                 "review_top": review_top,
                 "error": receipt_error,
+                "generator_provider": generator_info.get("generator_provider"),
+                "generator_model": generator_info.get("generator_model"),
+                "generator_timeout_seconds": generator_info.get("generator_timeout_seconds"),
+                "discovery_concurrency": generator_info.get("discovery_concurrency"),
             })
         log(f"输出目录：{output.resolve()}\n本次主输出完成用时：{invocation_record['wall_seconds']:.2f} 秒；状态：{'流程完成，查看待审清单' if complete else '未完成，可恢复'}")
         if error:

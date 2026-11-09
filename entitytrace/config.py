@@ -1,8 +1,15 @@
 from __future__ import annotations
 
+import json
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any
+from urllib.parse import urlsplit
+
+OPENAI_DEFAULT_TIMEOUT_SECONDS = 420.0
+OPENAI_DEFAULT_CONCURRENCY = 8
+GENERATOR_PROVIDERS = ("deepseek", "openai")
 
 
 def read_env(path: Path) -> dict[str, str]:
@@ -21,15 +28,60 @@ class Service:
     url: str
     model: str
     key: str = field(repr=False)
+    provider: str = "deepseek"
+    extra_body: dict[str, Any] = field(default_factory=dict, repr=False)
+    timeout_seconds: float | None = field(default=None, repr=False)
 
     def public(self) -> dict:
         return {"service": self.name, "url": self.url, "model": self.model}
 
 
-def load_services(path: Path, require_decision: bool = False) -> dict[str, Service]:
+def _config_error(message: str) -> ValueError:
+    exc = ValueError(message)
+    exc.et_category = "config"  # type: ignore[attr-defined]
+    return exc
+
+
+def _check_openai_base_url(url: str) -> str:
+    if not url:
+        raise _config_error("未配置 ENTITYTRACE_OPENAI_BASE_URL，请检查本机配置或环境变量")
+    parts = urlsplit(url)
+    if parts.scheme not in {"http", "https"} or not parts.hostname:
+        raise _config_error("ENTITYTRACE_OPENAI_BASE_URL 必须是包含主机名的 http 或 https 地址")
+    return url
+
+
+def _parse_extra_body(raw: str) -> dict[str, Any]:
+    if not raw:
+        return {}
+    try:
+        parsed = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        raise _config_error("ENTITYTRACE_OPENAI_EXTRA_BODY 不是合法 JSON") from exc
+    if not isinstance(parsed, dict):
+        raise _config_error("ENTITYTRACE_OPENAI_EXTRA_BODY 必须是 JSON 对象")
+    return parsed
+
+
+def _parse_timeout_seconds(raw: str) -> float:
+    if not raw:
+        return OPENAI_DEFAULT_TIMEOUT_SECONDS
+    try:
+        val = float(raw)
+    except ValueError as exc:
+        raise _config_error("ENTITYTRACE_OPENAI_TIMEOUT_SECONDS 必须是大于 0 的数值") from exc
+    if val <= 0:
+        raise _config_error("ENTITYTRACE_OPENAI_TIMEOUT_SECONDS 必须大于 0")
+    return val
+
+
+def load_services(path: Path, require_decision: bool = False, generator: str | None = None) -> dict[str, Service]:
     local = read_env(path)
     def setting(name: str, default: str = "") -> str:
         return os.environ.get(name, local.get(name, default)).strip()
+    provider = (generator or setting("GENERATOR_PROVIDER", "deepseek")).strip()
+    if provider not in GENERATOR_PROVIDERS:
+        raise _config_error(f"不支持的生成服务商：{provider or '(空)'}（可选：deepseek、openai）")
     services: dict[str, Service] = {}
     jev_model = ""
     if require_decision:
@@ -38,8 +90,28 @@ def load_services(path: Path, require_decision: bool = False) -> dict[str, Servi
             jev_model = "jev-1.13.0"
         services["decision"] = Service("decision", setting("TYPESAFE_BASE_URL", "https://api.typesafe.ai/v1").rstrip("/"),
                                        jev_model, setting("TYPESAFE_API_KEY"))
-    services["discovery"] = Service("discovery", setting("DEEPSEEK_BASE_URL", "https://api.deepseek.com").rstrip("/"),
-                                    setting("DEEPSEEK_MODEL", "deepseek-flash"), setting("DEEPSEEK_API_KEY"))
+    if provider == "openai":
+        base = _check_openai_base_url(setting("ENTITYTRACE_OPENAI_BASE_URL").rstrip("/"))
+        model = setting("ENTITYTRACE_OPENAI_MODEL")
+        if not model:
+            raise _config_error("未配置 ENTITYTRACE_OPENAI_MODEL，请检查本机配置或环境变量")
+        api_key = setting("ENTITYTRACE_OPENAI_API_KEY")
+        if not api_key:
+            raise _config_error("未配置 ENTITYTRACE_OPENAI_API_KEY，请检查本机配置或环境变量")
+        extra_body = _parse_extra_body(setting("ENTITYTRACE_OPENAI_EXTRA_BODY"))
+        timeout_seconds = _parse_timeout_seconds(setting("ENTITYTRACE_OPENAI_TIMEOUT_SECONDS"))
+        services["discovery"] = Service(
+            "discovery",
+            base,
+            model,
+            api_key,
+            provider="openai",
+            extra_body=extra_body,
+            timeout_seconds=timeout_seconds,
+        )
+    else:
+        services["discovery"] = Service("discovery", setting("DEEPSEEK_BASE_URL", "https://api.deepseek.com").rstrip("/"),
+                                        setting("DEEPSEEK_MODEL", "deepseek-flash"), setting("DEEPSEEK_API_KEY"))
     allowed = {"decision": {"https://api.typesafe.ai/v1"},
                "discovery": {"https://api.deepseek.com", "https://api.deepseek.com/v1"}}
     for name, service in services.items():
@@ -47,7 +119,7 @@ def load_services(path: Path, require_decision: bool = False) -> dict[str, Servi
             if name == "decision":
                 raise ValueError("groups-v2 需要 TypeSafe/Jev 凭证，请配置 TYPESAFE_API_KEY")
             raise ValueError(f"未配置 {name} 模型密钥，请检查本机配置文件")
-        if service.url not in allowed[name]:
+        if service.provider == "deepseek" and service.url not in allowed[name]:
             raise ValueError(f"{name} 的服务地址不是已核对的官方地址")
     if require_decision and (not jev_model.startswith("jev-") or jev_model == "jev-latest"):
         raise ValueError("Decision 模型需要明确版本")

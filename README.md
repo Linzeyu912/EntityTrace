@@ -6,7 +6,7 @@ EntityTrace 是面向 agent 的插件，提供小说实体发现、身份判断�
 
 **面向 agent 调用的插件（plugin）**，回答“以什么形式被使用”。目标调用方包括各类宿主 agent；宿主负责理解用户需求、组织调用、解释结果及衔接后续工作。由此确定开发边界：不建设独立前端、实体编辑页面或人工操作工作台，需要人参与的确认由宿主在对话中承接。
 
-当前交付形态是可供 agent 执行的本地 CLI 与 JSON 文件，使用 Python 3.12+ 和标准库 SQLite，无额外运行依赖，不需要 Docker 或数据库服务。**尚未提供 特定平台的专用安装包、宿主适配或接入验证。** 插件定位已确定，具体分发与协议封装待落实。默认流程仅调用在线 DeepSeek（仅在显式切换 `--identity-algorithm groups-v2` 时才需要 TypeSafe/Jev）；宿主 agent 的模型与插件内部模型分工独立，本机运行不等于模型离线运行。
+当前交付形态是可供 agent 执行的本地 CLI 与 JSON 文件，使用 Python 3.12+ 和标准库 SQLite，无额外运行依赖，不需要 Docker 或数据库服务。**尚未提供特定平台的专用安装包、宿主适配或接入验证。** 插件定位已确定，具体分发与协议封装待落实。默认流程调用在线 DeepSeek API，也支持通过 `--generator openai`（或配置 `GENERATOR_PROVIDER=openai`）接入通用 OpenAI 兼容服务地址（仅在显式切换 `--identity-algorithm groups-v2` 时才需要 TypeSafe/Jev）；宿主 agent 的模型与插件内部模型分工独立，本机运行不等于模型离线运行。
 
 ## 功能定位
 
@@ -46,11 +46,11 @@ EntityTrace 是面向 agent 的插件，提供小说实体发现、身份判断�
 | 未决与非专名链接（C3） | 本地唯一称呼直连 + DeepSeek 候选链接 | 章内对象确定性落入名册；只含非专名称呼的对象与章内未决提及在候选名册与原文证据下链接，受专名一致性硬约束保护；单任务若连续返回非法格式则自动将该任务待链项转入待审而不阻断全书完成 |
 | 待审排序与统一导出（C4） | 本地程序 | 同任务无歧义 C1 专名补全（`same_task_proper`）并自动消解已完整覆盖的同任务定位待审（`auto_same_task_covered`）；汇总身份与定位待审并按受影响提及数（`impact`）降序排列，校验全部码点地址与覆盖完整性，导出 `schema_version=3` 产物 |
 
-默认模型配置仅使用 `deepseek-flash`（章节标注、提及发现与名册身份全部阶段默认固定 `temperature=0`，若单次尝试因模型输出截断或格式校验失败则下一次重试自动恢复服务端默认温度），无需配置 `TYPESAFE_API_KEY`；仅在切换 `--identity-algorithm groups-v2` 时加载并使用固定版本 `jev-1.13.0` 执行配对身份消歧。`entity-roster-v1` 不使用未校准概率分数作主路由，而是显式记录每处提及的链接来源（`chapter_local`、`c3_model`、`surface_unique`、`same_task_proper`、`unresolved`、`c3_rejected_name_mismatch`、`not_entity_suggested`）与关联请求 ID。
+默认生成服务商为 `deepseek`（模型默认 `deepseek-flash`，并发默认 6、单请求超时 120 秒；章节标注、提及发现与名册身份全部阶段默认固定 `temperature=0`，若单次尝试因模型输出截断或格式校验失败则下一次重试自动恢复服务端默认温度），无需配置 `TYPESAFE_API_KEY`；仅在切换 `--identity-algorithm groups-v2` 时加载并使用固定版本 `jev-1.13.0` 执行配对身份消歧。也可传 `--generator openai`（或设 `GENERATOR_PROVIDER=openai`）接入通用 OpenAI 兼容地址，通过 `ENTITYTRACE_OPENAI_BASE_URL`、`ENTITYTRACE_OPENAI_MODEL`、`ENTITYTRACE_OPENAI_API_KEY`、`ENTITYTRACE_OPENAI_EXTRA_BODY`（可选 JSON 对象，顶层合并至请求载荷，`null` 值删除对应键）与 `ENTITYTRACE_OPENAI_TIMEOUT_SECONDS`（默认 420 秒，并发默认 8）配置。`entity-roster-v1` 不使用未校准概率分数作主路由，而是显式记录每处提及的链接来源（`chapter_local`、`c3_model`、`surface_unique`、`same_task_proper`、`unresolved`、`c3_rejected_name_mismatch`、`not_entity_suggested`）与关联请求 ID。
 
 ## 运行
 
-以下命令既是宿主 agent 当前的调用入口，也可用于开发调试。以仓库目录为工作目录执行，或显式指定输入、配置、数据库和输出路径。默认 `roster` 流程只需配置 `DEEPSEEK_API_KEY`（即使环境或配置文件中存在 TypeSafe 配置亦忽略，不影响 `run_id`）；仅 `--identity-algorithm groups-v2` 需要额外配置 `TYPESAFE_API_KEY`。新环境可从 `.env.example` 创建配置文件并填写自己的密钥；系统环境变量优先于文件。配置、数据库和运行产物均被 Git 忽略。
+以下命令既是宿主 agent 当前的调用入口，也可用于开发调试。以仓库目录为工作目录执行，或显式指定输入、配置、数据库和输出路径。默认 `roster` 流程在 `deepseek` 服务商下只需配置 `DEEPSEEK_API_KEY`（即使环境或配置文件中存在 TypeSafe 配置亦忽略，不影响 `run_id`）；切换 `--generator openai` 时配置 `ENTITYTRACE_OPENAI_BASE_URL`、`ENTITYTRACE_OPENAI_MODEL` 与 `ENTITYTRACE_OPENAI_API_KEY`；仅 `--identity-algorithm groups-v2` 需要额外配置 `TYPESAFE_API_KEY`。新环境可从 `.env.example` 创建配置文件并填写自己的密钥；系统环境变量优先于文件。配置、数据库和运行产物均被 Git 忽略。
 
 ```powershell
 python -X utf8 -m entitytrace run "test/text-library/texts/03_中文长篇_九命奇冤_36回.txt"
@@ -68,9 +68,10 @@ python -X utf8 -m entitytrace run "D:\小说\样本.txt" --identity-algorithm gr
 
 重复同一命令会复用完成阶段和任务；失败任务可重试。输入、业务源码、模型或核心流程参数（如 `--identity-algorithm`、`--task-chars`）变化会产生新运行编号，内容完全相同的成功 HTTP 请求仍可命中缓存。**预算参数（`--max-requests`、`--max-seconds`）不写入 `run_id` 配置摘要**：当运行因预算耗尽或连续网络传输失败（默认连续 9 次）停止时，扩大预算或待网络恢复后重跑同一命令，将在同一 `run_id` 上断点续跑，已完成任务不会重复发起网络请求。需要独立无缓存验证时，使用新的 `--db` 路径；不要把缓存复用计时当成首次全文处理速度。
 
-服务明确返回余额或硬额度不足时，本次运行停止该服务的新请求，仍可读取成功缓存；未完成任务保留。额度恢复后可重新执行命令。服务错误、预算停止与断网不会转换为身份裁决。
+服务明确返回 429、额度限制或余额不足（`quota`）时，本次运行停止该服务的新请求，仍可读取成功缓存；数据库保留未完成断点。若为 429 或额度窗口限制，稍后用同一命令同库续跑；若为 DeepSeek 余额不足，充值后同库续跑。服务错误、预算停止与断网不会转换为身份裁决。
 
 `run` 主要参数（详见 `python -X utf8 -m entitytrace run --help`）：
+- `--generator deepseek|openai`：生成服务商，默认读取 `GENERATOR_PROVIDER`（缺省 `deepseek`）。
 - `--identity-algorithm roster|groups-v2`：身份归组算法，默认 `roster`（`entity-roster-v1`）；`groups-v2` 为旧版实体组消歧。
 - `--max-requests N`、`--max-seconds S`：单次运行的新网络请求上限与运行秒数上限，默认不限（宿主需要设置单次预算时，可按实测约每万字 10—17 次请求、14—18 秒估算）；另内置连续 9 次传输层网络失败自动熔断停止。
 - `--encoding`、`--task-chars`、`--discovery-concurrency`、`--decision-concurrency`：输入编码、发现任务长度预算与各服务单进程并发上限。

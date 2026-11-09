@@ -133,6 +133,19 @@ def check_choices(raw: dict, questions: dict, model: str) -> dict:
     return answers
 
 
+def _strip_code_fence(content: str) -> str:
+    """去掉首尾 Markdown 代码围栏；仅通用兼容路径启用。"""
+    text = content.strip()
+    if not text.startswith("```"):
+        return text
+    lines = text.splitlines()
+    if lines and lines[0].startswith("```"):
+        lines = lines[1:]
+    if lines and lines[-1].strip() == "```":
+        lines = lines[:-1]
+    return "\n".join(lines).strip()
+
+
 class Models:
     def __init__(self, store: Store, run_id: str, invocation: str, services: dict[str, Service],
                  discovery_concurrency: int = 6, decision_concurrency: int = 3,
@@ -272,9 +285,18 @@ class Models:
 
     def generate(self, system: str, state: dict, stage: str, validate: Callable,
                  max_tokens: int = 8000, temperature: float | None = None) -> tuple[dict, str]:
-        payload = {"model": self.services["discovery"].model,
+        service = self.services["discovery"]
+        is_openai = service.provider == "openai"
+        payload = {"model": service.model,
                    "messages": [{"role": "system", "content": system}, {"role": "user", "content": dumps(state)}],
                    "response_format": {"type": "json_object"}, "thinking": {"type": "disabled"}, "max_tokens": max_tokens}
+        if is_openai:
+            del payload["thinking"]
+            for k, v in (service.extra_body or {}).items():
+                if v is None:
+                    payload.pop(k, None)
+                else:
+                    payload[k] = v
         if temperature is not None:
             payload["temperature"] = temperature
         def check(raw):
@@ -282,11 +304,13 @@ class Models:
                 choice = raw["choices"][0]
                 if choice["finish_reason"] != "stop":
                     raise ModelError("生成输出被截断，未记为完成")
-                validate(json.loads(choice["message"]["content"]))
+                content = choice["message"]["content"]
+                validate(json.loads(_strip_code_fence(content) if is_openai else content))
             except (KeyError, IndexError, TypeError, json.JSONDecodeError) as exc:
                 raise ModelError("生成返回不是有效 JSON") from exc
         raw, request_id = self._request("discovery", "/chat/completions", payload, stage, check)
-        return json.loads(raw["choices"][0]["message"]["content"]), request_id
+        content = raw["choices"][0]["message"]["content"]
+        return json.loads(_strip_code_fence(content) if is_openai else content), request_id
 
 
 def bounded_map(items: list, worker: Callable, workers: int):

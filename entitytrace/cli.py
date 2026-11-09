@@ -2,9 +2,11 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
+from .config import OPENAI_DEFAULT_CONCURRENCY, read_env
 from .corrections import apply_correction
 from .pipeline import (
     EXIT_CODE_BY_CATEGORY,
@@ -102,6 +104,10 @@ def _build_failed_run_receipt(err: dict) -> dict:
         "counts": None,
         "review_top": [],
         "error": err,
+        "generator_provider": None,
+        "generator_model": None,
+        "generator_timeout_seconds": None,
+        "discovery_concurrency": None,
     }
 
 
@@ -115,7 +121,10 @@ def _build_parser() -> _CliParser:
     run.add_argument("--output", type=Path, default=Path("outputs"))
     run.add_argument("--config", type=Path, default=Path(".env.models.local"))
     run.add_argument("--encoding", default="utf-8")
-    run.add_argument("--discovery-concurrency", type=int, default=6)
+    run.add_argument("--generator", choices=["deepseek", "openai"], default=None,
+                     help="生成服务商，默认读取 GENERATOR_PROVIDER 配置（缺省 deepseek）")
+    run.add_argument("--discovery-concurrency", type=int, default=None,
+                     help="发现阶段并发；未显式给出时 deepseek 为 6、openai 为 8")
     run.add_argument("--decision-concurrency", type=int, default=3)
     run.add_argument("--task-chars", type=int, default=9000)
     run.add_argument("--stop-after", choices=["chapters", "discovery", "identity"], default="identity")
@@ -223,12 +232,20 @@ def main(argv=None) -> int:
         if args.command == "run":
             log_stream = sys.stderr if args.json else sys.stdout
             receipt: dict = {}
+            discovery_concurrency = args.discovery_concurrency
+            if discovery_concurrency is None:
+                local_env = read_env(args.config)
+                provider = (
+                    args.generator
+                    or os.environ.get("GENERATOR_PROVIDER", local_env.get("GENERATOR_PROVIDER", "deepseek"))
+                ).strip()
+                discovery_concurrency = OPENAI_DEFAULT_CONCURRENCY if provider == "openai" else 6
             _, _, complete = run_pipeline(
                 args.input,
                 args.db,
                 args.output,
                 args.config,
-                args.discovery_concurrency,
+                discovery_concurrency,
                 args.decision_concurrency,
                 args.task_chars,
                 args.encoding,
@@ -239,6 +256,7 @@ def main(argv=None) -> int:
                 max_requests=args.max_requests,
                 max_seconds=args.max_seconds,
                 identity_algorithm=args.identity_algorithm,
+                generator=args.generator,
                 receipt_out=receipt,
             )
             if args.json:
