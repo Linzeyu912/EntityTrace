@@ -1303,7 +1303,8 @@ class CliContractTests(FixtureCase):
              patch("entitytrace.describe.Models", CliFakeModels), \
              contextlib.redirect_stdout(out_buf), contextlib.redirect_stderr(err_buf):
             rc = cli_main(["describe", self.run_id, "--db", str(self.db_path),
-                           "--views", "2", "--top-k", "10", "--kinds", "person",
+                           "--views", "2", "--entities-per-request", "0", "--verify", "0",
+                           "--top-k", "10", "--kinds", "person",
                            "--concurrency", "1", "--config", str(self.config_path),
                            "--out", str(self.out_path)])
         self.assertEqual(rc, 0, err_buf.getvalue())

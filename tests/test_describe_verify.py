@@ -846,6 +846,19 @@ class VerifyCliTests(FixtureCase):
         self.assertEqual(document["verification"]["passes"], 3)
         self.assertEqual(document["verification"]["kept"], 1)
 
+    def test_default_cli_uses_views_3_entities_4_verify_1(self):
+        rc, out, err = self._call(_CliVerifyingModels, ["--out", str(self.out_path)])
+        self.assertEqual(rc, 0, out + err)
+        receipt = json.loads(out.strip().splitlines()[-1])
+        self.assertEqual(receipt["views"], 3)
+        self.assertEqual(receipt["entities_per_request"], 4)
+        self.assertEqual(receipt["verify"], 1)
+        document = json.loads(self.out_path.read_text(encoding="utf-8"))
+        self.assertEqual(document["views"], 3)
+        self.assertEqual(document["entities_per_request"], 4)
+        self.assertEqual(document["verification"]["enabled"], True)
+        self.assertEqual(document["verification"]["passes"], 1)
+
     def test_invalid_verify_value_exits_nonzero_before_any_request(self):
         for bad in ("2", "-1", "4"):
             rc, out, err = self._call(_CliVerifyingModels, ["--verify", bad])

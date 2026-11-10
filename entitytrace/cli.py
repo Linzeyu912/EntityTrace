@@ -189,8 +189,8 @@ def _build_parser() -> _CliParser:
     describe = subs.add_parser("describe", help="抽取 top-K 实体的描述事实与状态变化事件（默认 JSON，调用模型）")
     describe.add_argument("run_id")
     describe.add_argument("--db", type=Path, default=Path("data/entitytrace.sqlite3"))
-    describe.add_argument("--views", type=int, default=1,
-                          help="多遍抽取与过半表决遍数（1—5，默认 1）")
+    describe.add_argument("--views", type=int, default=3,
+                          help="多遍抽取与过半表决遍数（1—5，默认 3；传 1 可回到单遍）")
     describe.add_argument("--top-k", type=int, default=20, help="每个实际类别取前多少实体（1—200，默认 20）")
     describe.add_argument("--kinds", default="person,place,object,ability",
                           help="逗号分隔的实体类别，默认 person,place,object,ability")
@@ -204,10 +204,10 @@ def _build_parser() -> _CliParser:
                           help="本次调用最大新网络请求预算，默认不限；超限保留断点并以退出码 2 停止")
     describe.add_argument("--max-seconds", type=float, default=None,
                           help="本次调用最大运行秒数预算，默认不限；超限保留断点并以退出码 2 停止")
-    describe.add_argument("--entities-per-request", type=int, default=0,
-                          help="每请求最多包含多少个块内实体，默认 0（整块一组）")
-    describe.add_argument("--verify", type=int, default=0,
-                          help="对过半表决后的描述事实逐条复核（0 关闭，1 单遍，3 三遍表决，默认 0）")
+    describe.add_argument("--entities-per-request", type=int, default=4,
+                          help="每请求最多包含多少个块内实体，默认 4（传 0 表示整块一组）")
+    describe.add_argument("--verify", type=int, default=1,
+                          help="对过半表决后的描述事实逐条复核（0 关闭，1 单遍，3 三遍表决，默认 1；--views 1 --entities-per-request 0 --verify 0 可回到最省请求的单遍）")
     describe.add_argument("--out", type=Path, default=None, help="将描述事实导出 JSON 写入该路径")
 
     export = subs.add_parser("export", help="从已保存数据重新导出，不调用模型")
