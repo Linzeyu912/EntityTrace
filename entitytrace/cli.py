@@ -189,8 +189,8 @@ def _build_parser() -> _CliParser:
     describe = subs.add_parser("describe", help="抽取 top-K 实体的描述事实与状态变化事件（默认 JSON，调用模型）")
     describe.add_argument("run_id")
     describe.add_argument("--db", type=Path, default=Path("data/entitytrace.sqlite3"))
-    describe.add_argument("--method", choices=["d1", "d2"], required=True,
-                          help="d1：按发现任务块抽取；d2：按 top-K 实体的提及窗口抽取")
+    describe.add_argument("--views", type=int, default=1,
+                          help="多遍抽取与过半表决遍数（1—5，默认 1）")
     describe.add_argument("--top-k", type=int, default=20, help="每个实际类别取前多少实体（1—200，默认 20）")
     describe.add_argument("--kinds", default="person,place,object,ability",
                           help="逗号分隔的实体类别，默认 person,place,object,ability")
@@ -205,9 +205,7 @@ def _build_parser() -> _CliParser:
     describe.add_argument("--max-seconds", type=float, default=None,
                           help="本次调用最大运行秒数预算，默认不限；超限保留断点并以退出码 2 停止")
     describe.add_argument("--entities-per-request", type=int, default=0,
-                          help="仅 d1 生效，每请求最多包含多少个块内实体，默认 0（不分组）")
-    describe.add_argument("--max-requests-per-entity", type=int, default=8,
-                          help="仅 d2 生效，每实体最大请求数，默认 8（0 表示不设上限）")
+                          help="每请求最多包含多少个块内实体，默认 0（整块一组）")
     describe.add_argument("--out", type=Path, default=None, help="将描述事实导出 JSON 写入该路径")
 
     export = subs.add_parser("export", help="从已保存数据重新导出，不调用模型")
@@ -362,25 +360,23 @@ def main(argv=None) -> int:
                 result = run_describe(
                     store,
                     args.run_id,
-                    args.method,
                     services=services,
                     top_k=args.top_k,
                     kinds=args.kinds,
                     topk_file=args.topk_file,
                     concurrency=args.concurrency,
                     out=args.out,
+                    views=args.views,
                     max_requests=args.max_requests,
                     max_seconds=args.max_seconds,
                     entities_per_request=args.entities_per_request,
-                    max_requests_per_entity=args.max_requests_per_entity,
                 )
                 _emit_json_line({
                     "ok": True,
                     "describe_id": result["describe_id"],
                     "run_id": result["run_id"],
-                    "method": result["method"],
+                    "views": result["views"],
                     "entities_per_request": result["entities_per_request"],
-                    "max_requests_per_entity": result["max_requests_per_entity"],
                     "counts": result["counts"],
                     "out": str(args.out.resolve()) if args.out is not None else None,
                 })

@@ -131,18 +131,18 @@ python -X utf8 -m entitytrace export 运行编号
 在已完成的 `entity-roster-v1` 运行上，按 top-K 实体抽取原文描述事实与状态变化事件（只给原文事实与空缺清单，不推断、不补全）。只读上游原文与查询快照，不改动已有名册、提及、待审与导出：
 
 ```powershell
-python -X utf8 -m entitytrace describe 运行编号 --db 数据库路径 --method d1 --top-k 20 --kinds person,place,object,ability --concurrency 8 --entities-per-request 4 --out 描述导出.json
-python -X utf8 -m entitytrace describe 运行编号 --db 数据库路径 --method d2 --topk-file 预登记名单.json --max-requests-per-entity 0 --out 描述导出.json
+python -X utf8 -m entitytrace describe 运行编号 --db 数据库路径 --top-k 20 --kinds person,place,object,ability --concurrency 8 --entities-per-request 4 --out 描述导出.json
+python -X utf8 -m entitytrace describe 运行编号 --db 数据库路径 --topk-file 预登记名单.json --views 3 --entities-per-request 0 --out 描述导出.json
 ```
 
-- `--method d1` 按发现任务块逐块抽取，跳过不含 top-K 实体的块；`--method d2` 以每处提及为中心取前后各 `200` 码点窗口，合并同章内相邻或重叠窗口，按每请求不超过 `9,000` 码点打包。
-- `--entities-per-request N` 仅对 `d1` 生效，默认 `0` 表示不分组；`N > 0` 时块内实体按全书优先级（`score` 降序、`entity_id` 升序）排序，每 `N` 个一组单独请求，块正文相同、任务编号含组序号。
-- `--max-requests-per-entity N` 仅对 `d2` 生效，默认 `8`；`0` 表示不设上限。超限时先取每章首个窗口，再按章节轮询补足，选取与打包均可复现。
-- 相同上游运行、方法、top-K 名单与生成配置得到相同 `describe_id`，自动续跑已完成任务；更换方法、`--top-k`、实体名单、`--entities-per-request`、`--max-requests-per-entity` 或生成配置会得到新编号。需要独立冷跑时使用新的 `--db` 副本。
-- 成功时 stdout 输出单行 JSON：`{"ok":true,"describe_id":...,"run_id":...,"method":...,"entities_per_request":...,"max_requests_per_entity":...,"counts":{"tasks","facts","events","reviews"},"out":...}`。`--out` 导出 `{describe_id, run_id, method, entities_per_request, max_requests_per_entity, top_k, kinds, entities, reviews, stats}`；每个实体含 `facts`、`state_events` 与按 facet 枚举顺序生成的 `gaps`，`stats` 含请求数、token、墙钟与超限截断实体。
-- facet 枚举：person 为 `age/gender/build/face/hair/feature/costume/demeanor/voice`，place 为 `terrain/architecture/scale/atmosphere`，object 为 `shape/size/color_material/visual_effect/holder`，ability 为 `visual_effect/sound_effect`；D1 与 D2 的每个实体输入都带 `allowed_facets`（按类别取自该枚举）。
+- 按发现任务块逐块抽取，跳过不含 top-K 实体的块。
+- `--views N`（`1`—`5`，默认 `1`）：多遍轮换分组请求并按跨遍地址重叠做过半表决。第 `v` 遍把块内实体按全书优先级排序后循环左移 `v − 1` 位再分组，输入带 `view` 字段，各遍负载因此不同；导出只给支持数达到 `⌊N/2⌋ + 1` 的条目并附 `support`。原始各遍结果照常落库，`--views` 以约 `N` 倍请求数换取更高精确率。
+- `--entities-per-request N` 默认 `0` 表示整块一组；`N > 0` 时块内实体按全书优先级（`score` 降序、`entity_id` 升序）排序，每 `N` 个一组单独请求，块正文相同、任务编号含遍号与组序号。
+- 相同上游运行、top-K 名单、`--views`、`--entities-per-request` 与生成配置得到相同 `describe_id`，自动续跑已完成任务；更换其中任一项或生成配置会得到新编号。需要独立冷跑时使用新的 `--db` 副本。
+- 成功时 stdout 输出单行 JSON：`{"ok":true,"describe_id":...,"run_id":...,"views":...,"entities_per_request":...,"counts":{"tasks","facts","events","reviews"},"out":...}`。`--out` 导出 `{describe_id, run_id, views, entities_per_request, top_k, kinds, entities, reviews, stats}`；每个实体含 `facts`、`state_events` 与按 facet 枚举顺序生成的 `gaps`，`stats` 含请求数、token 与墙钟。
+- facet 枚举：person 为 `age/gender/build/face/hair/feature/costume/voice`，place 为 `terrain/architecture/scale/atmosphere`，object 为 `shape/size/color_material/visual_effect/holder`，ability 为 `visual_effect/sound_effect`；每个实体输入都带 `allowed_facets`（按类别取自该枚举）。
 - 事件类型为九类 `costume_change/injury/disguise/transform/age_jump/upgrade/damage/owner_change/death`；模型输出其它事件类型（含 `other`）会按 `bad-enum` 转入描述待审，不进入事件导出。
-- 模型输出逐条核验：`quote` 必须在请求输入原文内逐字出现且不超过 `120` 码点，多次出现时取距该实体提及最近的一处；未知实体、facet 与类别不符、枚举非法、引用找不到或超长会写入该次运行的描述待审（`describe_reviews`），不中断整轮。401/402/429 等硬额度与预算停止保留断点，按原命令同库续跑。
+- 模型输出逐条核验：`quote` 必须在请求输入原文内逐字出现且不超过 `120` 码点，多次出现时取距该实体提及最近的一处；未知实体、facet 与类别不符（含已删除的 `demeanor`）、枚举非法、引用找不到或超长会写入该次运行的描述待审（`describe_reviews`），不中断整轮。401/402/429 等硬额度与预算停止保留断点，按原命令同库续跑。
 
 对已完成的默认 `entity-roster-v1` 运行，可通过 `correct` 叠加确定性更正或撤回（零模型调用，`groups-v2` 与未完成运行不支持）：
 

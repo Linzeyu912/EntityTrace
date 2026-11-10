@@ -12,8 +12,14 @@
                "run_id": "上游运行编号", "describe": "describe --out 导出 JSON"}]}
 
 `arm` 可省略：标签形如 `e1-1` 时取前缀，否则等于 `method`。聚合既按 `method` 也按 `arm` 计算。
-`--reuse-adjudication` 指向旧裁定结果 JSONL，按键复用已裁定未匹配项，只把新键导出到 `--adjudication`；
-`--blind-labels` 指定全书盲审抽样的运行标签（默认优先 `e2-1,e3-1`）。
+`--reuse-adjudication` 指向旧裁定结果 JSONL（可用逗号分隔多个文件，按顺序合并），按键复用已裁定未匹配项，只把新键导出到 `--adjudication`；
+`--exclude-facets` 去掉指定 facet（如 `demeanor`），同时作用于金标准分母与导出事实；
+`--blind-labels` 指定全书盲审抽样的运行标签（默认优先 `e2-1,e3-1`），`--blind-per-label` 控制每个标签的抽样条数。
+`method` 可省略（缺省 `d1`），旧清单仍可传 `d1` / `d2`。
+
+若导出文档带 `describe_id` 且运行库中存在该描述运行，还会读取各遍原始事实与事件，
+统计 `raw_counts_by_view`、`support_distribution`，并把第 1 遍原始结果单独评分到
+`runs[label].view1_raw`（只报告，不进门禁；新键不写入 `--adjudication`）。
 
 盲审回填格式（`--blind-result`，JSONL）：每行
     {"sample_id": "...", "wrong_entity": false, "wrong_facet": true,
@@ -422,38 +428,53 @@ def _reuse_key(kind: str, item: dict) -> tuple | None:
     return (item.get("entity_id"), item.get("event_type"), start, end, item.get("value"))
 
 
-def _load_reuse_table(path: Path | None) -> dict:
-    """读取旧裁定结果，建立事实/事件键与 adj_id 的复用查找表。"""
+def _load_reuse_table(path) -> dict:
+    """读取旧裁定结果，建立事实/事件键与 adj_id 的复用查找表。
+
+    `path` 可以是单个路径（`Path` / `str`）或路径列表；多个文件按给定顺序合并，
+    先出现的裁定优先。
+    """
+    if path is None:
+        paths: list[Path] = []
+    elif isinstance(path, (list, tuple)):
+        paths = [Path(item) for item in path if item]
+    else:
+        paths = [Path(path)]
     table = {
         "by_adj_id": {},
         "facts": {},
         "events": {},
         "rows": 0,
-        "path": str(path) if path is not None else None,
+        "path": (
+            [str(item) for item in paths] if len(paths) > 1
+            else (str(paths[0]) if paths else None)
+        ),
     }
-    if path is None or not Path(path).is_file():
-        return table
-    for row in _read_jsonl(Path(path)):
-        verdict = row.get("verdict")
-        if verdict not in ADJUDICATION_VERDICTS:
+    for item_path in paths:
+        if not item_path.is_file():
             continue
-        table["rows"] += 1
-        adj_id = row.get("adj_id")
-        if adj_id:
-            table["by_adj_id"][adj_id] = verdict
-        span = _int_span(row)
-        if span is None:
-            continue
-        start, end = span
-        kind = row.get("kind")
-        if kind == "event" or (kind != "fact" and row.get("event_type")):
-            entity_id, event_type, value = row.get("entity_id"), row.get("event_type"), row.get("value")
-            table["events"][(entity_id, event_type, start, end, value)] = verdict
-            table["events"][(entity_id, None, start, end, value)] = verdict
-        elif kind == "fact" or row.get("facet"):
-            table["facts"][
-                (row.get("entity_id"), row.get("facet"), start, end, row.get("value"))
-            ] = verdict
+        for row in _read_jsonl(item_path):
+            verdict = row.get("verdict")
+            if verdict not in ADJUDICATION_VERDICTS:
+                continue
+            table["rows"] += 1
+            adj_id = row.get("adj_id")
+            if adj_id:
+                table["by_adj_id"].setdefault(adj_id, verdict)
+            span = _int_span(row)
+            if span is None:
+                continue
+            start, end = span
+            kind = row.get("kind")
+            if kind == "event" or (kind != "fact" and row.get("event_type")):
+                entity_id, event_type, value = row.get("entity_id"), row.get("event_type"), row.get("value")
+                table["events"].setdefault((entity_id, event_type, start, end, value), verdict)
+                table["events"].setdefault((entity_id, None, start, end, value), verdict)
+            elif kind == "fact" or row.get("facet"):
+                table["facts"].setdefault(
+                    (row.get("entity_id"), row.get("facet"), start, end, row.get("value")),
+                    verdict,
+                )
     return table
 
 
@@ -472,6 +493,96 @@ def _reuse_verdict(reuse: dict | None, kind: str, item: dict) -> str | None:
     if verdict is not None:
         return verdict
     return reuse["events"].get((key[0], None, key[2], key[3], key[4]))
+
+
+def _task_views(store: Store, describe_id: str) -> dict[str, int]:
+    """从 `describe_tasks.result` 读回 `task_id -> view`；旧库缺失或非法时按 1 处理。"""
+    try:
+        rows = store.rows(
+            "SELECT id, result FROM describe_tasks WHERE describe_id=?", (describe_id,),
+        )
+    except Exception:
+        return {}
+    mapping: dict[str, int] = {}
+    for row in rows:
+        view = 1
+        try:
+            payload = json.loads(row["result"]) if row["result"] else None
+        except (TypeError, ValueError):
+            payload = None
+        if isinstance(payload, dict):
+            raw = payload.get("view", 1)
+            if isinstance(raw, int) and not isinstance(raw, bool) and raw >= 1:
+                view = int(raw)
+        mapping[row["id"]] = view
+    return mapping
+
+
+def _load_raw_items(store: Store, describe_id: str) -> tuple[dict[str, int], list[dict], list[dict]]:
+    """读取运行库中该描述运行的全部原始事实与事件，并附上所在任务遍号。"""
+    view_by_task = _task_views(store, describe_id)
+    try:
+        fact_rows = store.rows(
+            "SELECT * FROM facts WHERE describe_id=? ORDER BY start,id", (describe_id,),
+        )
+        event_rows = store.rows(
+            "SELECT * FROM state_events WHERE describe_id=? ORDER BY start,id", (describe_id,),
+        )
+    except Exception:
+        return view_by_task, [], []
+    facts = [
+        {
+            "id": row["id"],
+            "entity_id": row["entity_id"],
+            "facet": row["facet"],
+            "value": row["value"],
+            "quote": row["quote"],
+            "start": row["start"],
+            "end": row["end"],
+            "chapter_id": row["chapter_id"],
+            "source": row["source"],
+            "holder_entity_id": row["holder_entity_id"],
+            "task_id": row["task_id"],
+            "view": int(view_by_task.get(row["task_id"], 1)),
+        }
+        for row in fact_rows
+    ]
+    events = [
+        {
+            "id": row["id"],
+            "entity_id": row["entity_id"],
+            "event_type": row["event_type"],
+            "splits_entity": bool(row["splits_entity"]),
+            "value": row["value"],
+            "quote": row["quote"],
+            "start": row["start"],
+            "end": row["end"],
+            "chapter_id": row["chapter_id"],
+            "task_id": row["task_id"],
+            "view": int(view_by_task.get(row["task_id"], 1)),
+        }
+        for row in event_rows
+    ]
+    return view_by_task, facts, events
+
+
+def _raw_counts_by_view(facts: list[dict], events: list[dict]) -> dict[str, dict]:
+    counts: dict[str, dict] = {}
+    for kind, items in (("facts", facts), ("events", events)):
+        for item in items:
+            bucket = counts.setdefault(str(int(item.get("view", 1))), {"facts": 0, "events": 0})
+            bucket[kind] += 1
+    return counts
+
+
+def _support_distribution(facts: list[dict], events: list[dict]) -> dict[str, dict]:
+    def _distribution(items: list[dict]) -> dict[str, int]:
+        counts: collections.Counter[str] = collections.Counter()
+        for item in items:
+            counts[str(int(item.get("support") or 1))] += 1
+        return dict(sorted(counts.items(), key=lambda pair: int(pair[0])))
+
+    return {"facts": _distribution(facts), "events": _distribution(events)}
 
 
 def _arm_for(spec: dict) -> str:
@@ -645,8 +756,10 @@ def _load_manifest(path: Path) -> list[dict]:
         if not isinstance(label, str) or not label or label in seen:
             raise ValueError("manifest 的 label 必须为非空且唯一")
         seen.add(label)
-        if run.get("method") not in ("d1", "d2"):
+        method = run.get("method", "d1")
+        if method not in ("d1", "d2"):
             raise ValueError(f"manifest 运行 {label} 的 method 必须为 d1 或 d2")
+        run["method"] = method
         arm = run.get("arm")
         if arm is not None and (not isinstance(arm, str) or not arm):
             raise ValueError(f"manifest 运行 {label} 的 arm 必须为非空字符串")
@@ -830,11 +943,22 @@ def _build_union(
     }
 
 
+def _normalize_exclusions(value) -> set[str]:
+    if value is None:
+        return set()
+    if isinstance(value, str):
+        return {part.strip() for part in value.split(",") if part.strip()}
+    return {str(part).strip() for part in value if str(part).strip()}
+
+
 def evaluate(gold_path: Path, manifest: list[dict], adjudication_path: Path,
              adjudication_result_path: Path, blind_sample_path: Path,
              blind_result_path: Path | None, seed: int,
              reuse_adjudication_path: Path | None = None,
-             blind_labels: str | None = None) -> dict:
+             blind_labels: str | None = None,
+             exclude_facets=None,
+             blind_per_label: int = BLIND_PER_ARM) -> dict:
+    excluded_facets = _normalize_exclusions(exclude_facets)
     gold_doc = _read_json(gold_path)
     gold_dir = gold_path.parent
     roster_doc = _read_json(gold_dir / "roster.json")
@@ -842,7 +966,10 @@ def evaluate(gold_path: Path, manifest: list[dict], adjudication_path: Path,
     hard_cases_path = gold_dir / "hard_cases.json"
     hard_cases_doc = _read_json(hard_cases_path) if hard_cases_path.is_file() else None
     sampled = gold_doc.get("sampled_chapters") or mentions_doc.get("sampled_chapters") or []
-    gold_facts = _gold_items(gold_doc, "facts")
+    gold_facts = [
+        item for item in _gold_items(gold_doc, "facts")
+        if str(item.get("facet")) not in excluded_facets
+    ]
     gold_events = _gold_items(gold_doc, "events")
     all_gold_fact_ids = {g["gold_id"] for g in gold_facts}
     all_gold_event_ids = {g["gold_id"] for g in gold_events}
@@ -873,7 +1000,7 @@ def evaluate(gold_path: Path, manifest: list[dict], adjudication_path: Path,
     ref_chapters: list[dict] = []
     for spec in manifest:
         label = spec["label"]
-        method = spec["method"]
+        method = spec.get("method") or "d1"
         arm = _arm_for(spec)
         if method not in first_by_method:
             first_by_method[method] = label
@@ -887,6 +1014,12 @@ def evaluate(gold_path: Path, manifest: list[dict], adjudication_path: Path,
             if not ref_text:
                 ref_text = text
                 ref_chapters = book_chapters
+            raw_facts: list[dict] = []
+            raw_events: list[dict] = []
+            if describe_doc.get("describe_id"):
+                _views_map, raw_facts, raw_events = _load_raw_items(
+                    store, describe_doc["describe_id"],
+                )
         finally:
             store.close()
         mapping, mapping_details = map_entities(
@@ -894,8 +1027,16 @@ def evaluate(gold_path: Path, manifest: list[dict], adjudication_path: Path,
             full_gold_mentions=full_gold_mentions, entity_headers=headers,
         )
         sampled_gold_ids = set(mapping.values())
-        facts = _entity_facts(describe_doc)
+        raw_counts_by_view = _raw_counts_by_view(raw_facts, raw_events)
+        facts = [
+            item for item in _entity_facts(describe_doc)
+            if str(item.get("facet")) not in excluded_facets
+        ]
         events = _entity_events(describe_doc)
+        raw_facts = [
+            item for item in raw_facts if str(item.get("facet")) not in excluded_facets
+        ]
+        support_distribution = _support_distribution(facts, events)
 
         recall_strict: dict[str, dict] = {}
         recall_loose: dict[str, dict] = {}
@@ -935,6 +1076,28 @@ def evaluate(gold_path: Path, manifest: list[dict], adjudication_path: Path,
         event_recall = recall_metrics(gold_events, events, mapping, sampled_gold_ids, "event")
         event_recall_full = recall_metrics(gold_events, events, mapping, all_gold_event_ids, "event")
 
+        view1_facts = [item for item in raw_facts if int(item.get("view", 1)) == 1]
+        view1_events = [item for item in raw_events if int(item.get("view", 1)) == 1]
+        top_eids_20 = set(_top_k_entities(describe_doc, 20))
+        top_ids_20 = {mapping[eid] for eid in top_eids_20 if eid in mapping}
+        view1_precision, _view1_unmatched_facts = _precision(
+            gold_facts, view1_facts, mapping, sampled, "fact", adjudication, entity_by_id, reuse,
+        )
+        view1_event_precision, _view1_unmatched_events = _precision(
+            gold_events, view1_events, mapping, sampled, "event", adjudication, entity_by_id, reuse,
+        )
+        view1_facts_k20 = [f for f in view1_facts if f.get("entity_id") in top_eids_20]
+        view1_raw = {
+            "facts_total": len(view1_facts),
+            "events_total": len(view1_events),
+            "recall": recall_metrics(gold_facts, view1_facts_k20, mapping, top_ids_20, "fact"),
+            "precision_sampled": view1_precision,
+            "events": {
+                "recall": recall_metrics(gold_events, view1_events, mapping, sampled_gold_ids, "event"),
+                "precision_sampled": view1_event_precision,
+            },
+        }
+
         for kind, items in (("fact", unmatched_facts), ("event", unmatched_events)):
             for item in items:
                 if _reuse_verdict(reuse, kind, item) is not None:
@@ -970,6 +1133,9 @@ def evaluate(gold_path: Path, manifest: list[dict], adjudication_path: Path,
                 "recall_full": event_recall_full,
                 "precision_sampled": event_precision,
             },
+            "view1_raw": view1_raw,
+            "raw_counts_by_view": raw_counts_by_view,
+            "support_distribution": support_distribution,
             "facts_total": len(facts),
             "events_total": len(events),
         }
@@ -991,6 +1157,7 @@ def evaluate(gold_path: Path, manifest: list[dict], adjudication_path: Path,
     arm_by_label = {label: run_results[label]["arm"] for label in run_results}
     blind_items, blind_meta = _build_blind_sample(
         describe_docs, blind_label_list, ref_chapters or sampled, ref_text, seed, arm_by_label,
+        per_label=blind_per_label, excluded_facets=excluded_facets,
     )
     _write_jsonl(blind_sample_path, blind_items)
     blind_summary = (
@@ -1013,6 +1180,30 @@ def evaluate(gold_path: Path, manifest: list[dict], adjudication_path: Path,
             precisions.append(chosen["value"])
         event_values = [run_results[label]["events"]["recall"]["fraction"]["value"] for label in labels]
         event_full_values = [run_results[label]["events"]["recall_full"]["fraction"]["value"] for label in labels]
+        event_precision_raw = [
+            run_results[label]["events"]["precision_sampled"]["raw"]["value"] for label in labels
+        ]
+        event_precision_adjudicated = [
+            (run_results[label]["events"]["precision_sampled"].get("adjudicated") or {}).get("value")
+            for label in labels
+        ]
+        view1_recall = [
+            run_results[label]["view1_raw"]["recall"]["fraction"]["value"] for label in labels
+        ]
+        view1_precision_raw = [
+            run_results[label]["view1_raw"]["precision_sampled"]["raw"]["value"] for label in labels
+        ]
+        view1_precision_adjudicated = [
+            (run_results[label]["view1_raw"]["precision_sampled"].get("adjudicated") or {}).get("value")
+            for label in labels
+        ]
+        view1_unresolved_total = sum(
+            int(run_results[label]["view1_raw"]["precision_sampled"].get("unresolved_adjudication") or 0)
+            for label in labels
+        )
+        view1_precision_adjudicated_mean = (
+            None if view1_unresolved_total else _mean(view1_precision_adjudicated)
+        )
         return {
             "runs": labels,
             "recall_strict_K20_mean": _mean(strict_20),
@@ -1027,6 +1218,12 @@ def evaluate(gold_path: Path, manifest: list[dict], adjudication_path: Path,
             "precision_values": precisions,
             "event_recall_mean": _mean(event_values),
             "event_recall_full_mean": _mean(event_full_values),
+            "event_precision_raw_mean": _mean(event_precision_raw),
+            "event_precision_adjudicated_mean": _mean(event_precision_adjudicated),
+            "view1_recall_strict_K20_mean": _mean(view1_recall),
+            "view1_precision_raw_mean": _mean(view1_precision_raw),
+            "view1_precision_adjudicated_mean": view1_precision_adjudicated_mean,
+            "view1_unresolved_total": view1_unresolved_total,
         }
 
     aggregate: dict[str, dict] = {}
@@ -1073,6 +1270,7 @@ def evaluate(gold_path: Path, manifest: list[dict], adjudication_path: Path,
             "sha256": _sha256(gold_path),
             "facts": len(gold_facts),
             "events": len(gold_events),
+            "excluded_facets": sorted(excluded_facets),
             "sampled_chapters": sampled,
         },
         "adjudication": {
@@ -1093,7 +1291,7 @@ def evaluate(gold_path: Path, manifest: list[dict], adjudication_path: Path,
         "blind_sample": {
             "path": str(blind_sample_path),
             "count": len(blind_items),
-            "per_arm": BLIND_PER_ARM,
+            "per_arm": int(blind_per_label),
             "labels": blind_label_list,
             "seed": seed,
         },
@@ -1136,15 +1334,21 @@ def _build_blind_sample(
     text: str,
     seed: int,
     arm_by_label: dict[str, str] | None = None,
+    per_label: int = BLIND_PER_ARM,
+    excluded_facets: set[str] | None = None,
 ) -> tuple[list[dict], dict[str, dict]]:
     entries: list[dict] = []
     meta_by_sample_id: dict[str, dict] = {}
+    excluded = excluded_facets or set()
     for index, label in enumerate(labels):
         doc = describe_docs[label]
         entity_by_id = {entity["entity_id"]: entity for entity in doc.get("entities", [])}
-        facts = _entity_facts(doc)
+        facts = [
+            item for item in _entity_facts(doc)
+            if str(item.get("facet")) not in excluded
+        ]
         rng = random.Random(seed + index)
-        picked = rng.sample(facts, min(BLIND_PER_ARM, len(facts)))
+        picked = rng.sample(facts, min(int(per_label), len(facts)))
         for idx, fact in enumerate(picked):
             entity = entity_by_id.get(fact.get("entity_id"), {})
             start, end = int(fact["start"]), int(fact["end"])
@@ -1182,18 +1386,20 @@ def _summarize_blind(
 ) -> dict:
     rows = _read_jsonl(blind_result_path)
     by_id = {item["sample_id"]: item for item in blind_items}
-    fields = ("wrong_entity", "wrong_facet", "unsupported_value")
+    fields = ("wrong_entity", "wrong_facet", "unsupported_value", "not_description")
     group_keys = ("method", "label", "arm")
     counts = {field: 0 for field in fields}
     group_counts: dict[str, dict[str, dict[str, int]]] = {key: {} for key in group_keys}
     group_totals: dict[str, collections.Counter] = {key: collections.Counter() for key in group_keys}
     group_judged: dict[str, collections.Counter] = {key: collections.Counter() for key in group_keys}
+    group_clean: dict[str, collections.Counter] = {key: collections.Counter() for key in group_keys}
     for meta in meta_by_sample_id.values():
         for key in group_keys:
             value = meta.get(key)
             if value:
                 group_totals[key][value] += 1
     judged = 0
+    clean_count = 0
     seen_ids: set[str] = set()
     for row in rows:
         sid = row.get("sample_id")
@@ -1206,6 +1412,12 @@ def _summarize_blind(
             value = meta.get(key)
             if value:
                 group_judged[key][value] += 1
+        if not any(bool(row.get(field)) for field in fields):
+            clean_count += 1
+            for key in group_keys:
+                value = meta.get(key)
+                if value:
+                    group_clean[key][value] += 1
         for field in fields:
             if bool(row.get(field)):
                 counts[field] += 1
@@ -1223,6 +1435,7 @@ def _summarize_blind(
         for value, total in sorted(group_totals[key].items()):
             judged_value = group_judged[key][value]
             value_counts = group_counts[key].get(value, {name: 0 for name in fields})
+            clean_value = group_clean[key][value]
             summary[value] = {
                 "judged": judged_value,
                 "total": total,
@@ -1230,6 +1443,8 @@ def _summarize_blind(
                 "rates": {
                     field: fraction(value_counts[field], judged_value) for field in fields
                 },
+                "clean_count": clean_value,
+                "clean_rate": fraction(clean_value, judged_value),
             }
         return summary
 
@@ -1239,6 +1454,8 @@ def _summarize_blind(
         "total": len(blind_items),
         "counts": counts,
         "rates": {field: fraction(counts[field], judged) for field in fields},
+        "clean_count": clean_count,
+        "clean_rate": fraction(clean_count, judged),
         "by_method": _group_summary("method"),
         "by_label": _group_summary("label"),
         "by_arm": _group_summary("arm"),
@@ -1255,21 +1472,34 @@ def main(argv=None) -> int:
     parser.add_argument("--adjudication", type=Path, default=ROOT / ".local/016a/adjudication.jsonl")
     parser.add_argument("--adjudication-result", type=Path,
                         default=ROOT / ".local/016a/adjudication_result.jsonl")
-    parser.add_argument("--reuse-adjudication", type=Path, default=None,
-                        help="旧裁定结果 JSONL；命中的未匹配项直接复用，只把新键导出到 --adjudication")
+    parser.add_argument("--reuse-adjudication", default=None,
+                        help="旧裁定结果 JSONL（可用逗号分隔多个路径，按顺序合并）；"
+                             "命中的未匹配项直接复用，只把新键导出到 --adjudication")
+    parser.add_argument("--exclude-facets", default="",
+                        help="逗号分隔的 facet；给定时召回分母与精确率都去掉这些 facet")
     parser.add_argument("--blind-sample", type=Path, default=ROOT / ".local/016a/blind_sample.jsonl")
     parser.add_argument("--blind-result", type=Path, default=None)
     parser.add_argument("--blind-labels", default=None,
                         help="全书盲审抽样运行标签，逗号分隔；默认优先 e2-1,e3-1")
+    parser.add_argument("--blind-per-label", type=int, default=BLIND_PER_ARM,
+                        help=f"每个盲审抽样运行抽多少条（默认 {BLIND_PER_ARM}）")
     parser.add_argument("--seed", type=int, default=DEFAULT_SEED)
     args = parser.parse_args(argv)
+    reuse_arg = None
+    if args.reuse_adjudication:
+        parts = [part.strip() for part in str(args.reuse_adjudication).split(",") if part.strip()]
+        reuse_arg = [Path(part) for part in parts]
+        if len(reuse_arg) == 1:
+            reuse_arg = reuse_arg[0]
     try:
         manifest = _load_manifest(args.manifest)
         result = evaluate(
             args.gold, manifest, args.adjudication, args.adjudication_result,
             args.blind_sample, args.blind_result, args.seed,
-            reuse_adjudication_path=args.reuse_adjudication,
+            reuse_adjudication_path=reuse_arg,
             blind_labels=args.blind_labels,
+            exclude_facets=args.exclude_facets,
+            blind_per_label=args.blind_per_label,
         )
         write_json(args.out, result)
     except Exception as exc:
