@@ -75,6 +75,10 @@ class Store:
         CREATE TABLE IF NOT EXISTS fact_verdicts(
           describe_id TEXT NOT NULL, fact_id TEXT NOT NULL, verdict TEXT NOT NULL,
           reason TEXT, task_id TEXT NOT NULL, PRIMARY KEY(describe_id,fact_id));
+        CREATE TABLE IF NOT EXISTS fact_verify_votes(
+          describe_id TEXT NOT NULL, fact_id TEXT NOT NULL, pass INTEGER NOT NULL,
+          verdict TEXT NOT NULL, reason TEXT, task_id TEXT NOT NULL,
+          PRIMARY KEY(describe_id,fact_id,pass));
         """)
         self.db.commit()
 

@@ -207,7 +207,7 @@ def _build_parser() -> _CliParser:
     describe.add_argument("--entities-per-request", type=int, default=0,
                           help="每请求最多包含多少个块内实体，默认 0（整块一组）")
     describe.add_argument("--verify", type=int, default=0,
-                          help="对过半表决后的描述事实逐条复核（0 关闭，1 开启，默认 0）")
+                          help="对过半表决后的描述事实逐条复核（0 关闭，1 单遍，3 三遍表决，默认 0）")
     describe.add_argument("--out", type=Path, default=None, help="将描述事实导出 JSON 写入该路径")
 
     export = subs.add_parser("export", help="从已保存数据重新导出，不调用模型")

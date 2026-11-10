@@ -132,18 +132,18 @@ python -X utf8 -m entitytrace export 运行编号
 
 ```powershell
 python -X utf8 -m entitytrace describe 运行编号 --db 数据库路径 --top-k 20 --kinds person,place,object,ability --concurrency 8 --entities-per-request 4 --out 描述导出.json
-python -X utf8 -m entitytrace describe 运行编号 --db 数据库路径 --topk-file 预登记名单.json --views 3 --entities-per-request 0 --verify 1 --out 描述导出.json
+python -X utf8 -m entitytrace describe 运行编号 --db 数据库路径 --topk-file 预登记名单.json --views 3 --entities-per-request 0 --verify 3 --out 描述导出.json
 ```
 
 - 按发现任务块逐块抽取，跳过不含 top-K 实体的块。
 - `--views N`（`1`—`5`，默认 `1`）：多遍轮换分组请求并按跨遍地址重叠做过半表决。第 `v` 遍把块内实体按全书优先级排序后循环左移 `v − 1` 位再分组，输入带 `view` 字段，各遍负载因此不同；导出只给支持数达到 `⌊N/2⌋ + 1` 的条目并附 `support`。原始各遍结果照常落库，`--views` 以约 `N` 倍请求数换取更高精确率。
 - `--entities-per-request N` 默认 `0` 表示整块一组；`N > 0` 时块内实体按全书优先级（`score` 降序、`entity_id` 升序）排序，每 `N` 个一组单独请求，块正文相同、任务编号含遍号与组序号。
-- `--verify {0,1}` 默认 `0`：开启后，全部抽取任务完成时先做前述过半表决，再把表决后的事实按固定键排序、每 `12` 条一批逐条复核（keep / drop），只导出判为 keep 的事实；复核请求量约为每 `12` 条表决后事实一个请求，事件不复核。输出 `verification` 给出 `checked`、`kept`、四类 `dropped` 计数与 `unverified`；复核批次按任务编号续跑，已完成批次不重发，网络或额度停止仍保留断点并以退出码 `2` 结束。
+- `--verify {0,1,3}` 默认 `0`：`1` 在全部抽取任务完成后先做前述过半表决，再把表决后的事实按固定键排序、每 `12` 条一批逐条复核（keep / drop），只导出判为 keep 的事实；`3` 把同一批复核跑三遍并按票数表决，`drop` 票至少两票判 `drop`（原因取多数，并列按 `not_description → wrong_entity → wrong_facet → unsupported_value`），否则有效票至少两票判 `keep`，不足两票判 `unverified`。三遍的第一批分别为 `12`、`8`、`4` 条，其后每批 `12` 条，第 0 遍的批次与负载与 `1` 完全相同。复核要求模型逐字回抄输入的 `value`，不一致会按现有重试处理并在 `verification.echo_mismatch_retries` 计数。复核请求量约为每 `12` 条表决后事实一个请求（`3` 约为三倍），事件不复核。输出 `verification` 给出 `passes`、`checked`、`kept`、四类 `dropped` 计数、`unverified` 与 `echo_mismatch_retries`；复核批次按任务编号续跑，已完成批次不重发，网络或额度停止仍保留断点并以退出码 `2` 结束。
 - 相同上游运行、top-K 名单、`--views`、`--entities-per-request`、`--verify` 与生成配置得到相同 `describe_id`，自动续跑已完成任务；更换其中任一项或生成配置会得到新编号。需要独立冷跑时使用新的 `--db` 副本。
 - 成功时 stdout 输出单行 JSON：`{"ok":true,"describe_id":...,"run_id":...,"views":...,"entities_per_request":...,"verify":...,"counts":{"tasks","facts","events","reviews"},"out":...}`。`--out` 导出 `{describe_id, run_id, views, entities_per_request, top_k, kinds, entities, reviews, verification, stats}`；每个实体含 `facts`、`state_events` 与按 facet 枚举顺序生成的 `gaps`，`stats` 含请求数、token 与墙钟。
 - facet 枚举：person 为 `age/gender/build/face/hair/feature/costume/voice`，place 为 `terrain/architecture/scale/atmosphere`，object 为 `shape/size/color_material/visual_effect/holder`，ability 为 `visual_effect/sound_effect`；每个实体输入都带 `allowed_facets`（按类别取自该枚举）。
 - 事件类型为九类 `costume_change/injury/disguise/transform/age_jump/upgrade/damage/owner_change/death`；模型输出其它事件类型（含 `other`）会按 `bad-enum` 转入描述待审，不进入事件导出。
-- 模型输出逐条核验：`quote` 必须在请求输入原文内逐字出现且不超过 `120` 码点，多次出现时取距该实体提及最近的一处；未知实体、facet 与类别不符（含已删除的 `demeanor`）、枚举非法、引用找不到或超长会写入该次运行的描述待审（`describe_reviews`），不中断整轮。`holder` 事实的引文不含称呼时，会在同一片段内向左扩展到最近的持有者称呼；扩展不到则按 `holder-not-in-quote` 转入描述待审。401/402/429 等硬额度与预算停止保留断点，按原命令同库续跑。
+- 模型输出逐条核验：`quote` 必须在请求输入原文内逐字出现且不超过 `120` 码点，多次出现时取距该实体提及最近的一处；未知实体、facet 与类别不符（含已删除的 `demeanor`）、枚举非法、引用找不到或超长会写入该次运行的描述待审（`describe_reviews`），不中断整轮。`holder` 事实的引文不含称呼时，会在同一片段内向左扩展到最近的持有者称呼；候选称呼取事实 `value`、`holder_entity_id` 的全书称呼（不要求该实体出现在本请求中）以及 `value` 中可解析出的人物实体的全书称呼，后者按最长匹配解析、并列属不同实体时不解析；扩展不到则按 `holder-not-in-quote` 转入描述待审。401/402/429 等硬额度与预算停止保留断点，按原命令同库续跑。
 
 对已完成的默认 `entity-roster-v1` 运行，可通过 `correct` 叠加确定性更正或撤回（零模型调用，`groups-v2` 与未完成运行不支持）：
 
