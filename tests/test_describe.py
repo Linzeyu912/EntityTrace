@@ -718,7 +718,8 @@ class RunDescribeTests(FixtureCase):
             doc = json.loads(self.out_path.read_text(encoding="utf-8"))
             self.assertEqual(set(doc), {"describe_id", "run_id", "views",
                                         "entities_per_request", "top_k", "kinds",
-                                        "entities", "reviews", "stats"})
+                                        "entities", "reviews", "verification", "stats"})
+            self.assertEqual(doc["verification"], {"enabled": False})
             self.assertEqual(doc["views"], 1)
             self.assertEqual(doc["entities_per_request"], 0)
             self.assertEqual(doc["top_k"], 10)
@@ -912,6 +913,7 @@ class LegacyDescribeExportTests(unittest.TestCase):
         self.assertEqual(doc["run_id"], "run_v1")
         self.assertEqual(doc["views"], 1)
         self.assertEqual(doc["entities_per_request"], 0)
+        self.assertEqual(doc["verification"], {"enabled": False})
         self.assertNotIn("method", doc)
         self.assertNotIn("max_requests_per_entity", doc)
         self.assertEqual(set(doc["stats"]), {"requests", "prompt_tokens", "completion_tokens",
@@ -1309,9 +1311,10 @@ class CliContractTests(FixtureCase):
         self.assertEqual(len(lines), 1, out_buf.getvalue())
         receipt = json.loads(lines[0])
         self.assertEqual(set(receipt), {"ok", "describe_id", "run_id", "views",
-                                        "entities_per_request", "counts", "out"})
+                                        "entities_per_request", "verify", "counts", "out"})
         self.assertTrue(receipt["ok"])
         self.assertEqual(receipt["views"], 2)
+        self.assertEqual(receipt["verify"], 0)
         self.assertEqual(receipt["run_id"], self.run_id)
         self.assertEqual(set(receipt["counts"]), {"tasks", "facts", "events", "reviews"})
         self.assertEqual(receipt["counts"]["facts"], 1)

@@ -206,6 +206,8 @@ def _build_parser() -> _CliParser:
                           help="本次调用最大运行秒数预算，默认不限；超限保留断点并以退出码 2 停止")
     describe.add_argument("--entities-per-request", type=int, default=0,
                           help="每请求最多包含多少个块内实体，默认 0（整块一组）")
+    describe.add_argument("--verify", type=int, default=0,
+                          help="对过半表决后的描述事实逐条复核（0 关闭，1 开启，默认 0）")
     describe.add_argument("--out", type=Path, default=None, help="将描述事实导出 JSON 写入该路径")
 
     export = subs.add_parser("export", help="从已保存数据重新导出，不调用模型")
@@ -370,6 +372,7 @@ def main(argv=None) -> int:
                     max_requests=args.max_requests,
                     max_seconds=args.max_seconds,
                     entities_per_request=args.entities_per_request,
+                    verify=args.verify,
                 )
                 _emit_json_line({
                     "ok": True,
@@ -377,6 +380,7 @@ def main(argv=None) -> int:
                     "run_id": result["run_id"],
                     "views": result["views"],
                     "entities_per_request": result["entities_per_request"],
+                    "verify": result["verify"],
                     "counts": result["counts"],
                     "out": str(args.out.resolve()) if args.out is not None else None,
                 })

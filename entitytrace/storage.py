@@ -72,6 +72,9 @@ class Store:
         CREATE TABLE IF NOT EXISTS describe_reviews(
           describe_id TEXT NOT NULL, id TEXT NOT NULL, task_id TEXT NOT NULL, reason TEXT NOT NULL,
           data TEXT NOT NULL, PRIMARY KEY(describe_id,id));
+        CREATE TABLE IF NOT EXISTS fact_verdicts(
+          describe_id TEXT NOT NULL, fact_id TEXT NOT NULL, verdict TEXT NOT NULL,
+          reason TEXT, task_id TEXT NOT NULL, PRIMARY KEY(describe_id,fact_id));
         """)
         self.db.commit()
 
