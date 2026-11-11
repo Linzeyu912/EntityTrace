@@ -30,7 +30,7 @@
   {"protocol":"entitytrace.v1","command":"<命令名>","run_id":"<已知则填，否则 null>","error":{"category":"...","message":"...","retryable":false}}
   ```
   注：`run --json` 在运行尚未建立（`run_id` 为 `null`）即失败时，`status` 固定为 `"failed"`，退出码为 `1`。
-- **例外**：`describe` 成功时按描述抽取契约输出 `{"ok":true,"describe_id":...,"run_id":...,"views":...,"entities_per_request":...,"verify":...,"counts":{...},"out":...}`，不带 `protocol` 字段；失败仍输出上述统一错误 JSON。
+- **例外**：`describe` 成功时按描述抽取契约输出 `{"ok":true,"describe_id":...,"run_id":...,"views":...,"entities_per_request":...,"verify":...,"chapter_range":{...},"counts":{...},"out":...}`，不带 `protocol` 字段；失败仍输出上述统一错误 JSON。
 
 ---
 
@@ -124,16 +124,18 @@ python -X utf8 -m entitytrace correct <run_id> revoke <更正ID> [--cascade] --s
 
 ```powershell
 python -X utf8 -m entitytrace describe <run_id> --top-k 20 --kinds person,place,object,ability --concurrency 8 --out "<描述导出路径>" --db "<数据库路径>" --config "<凭证配置文件>"
+python -X utf8 -m entitytrace describe <run_id> --from-chapter 1 --to-chapter 15 --out "<描述导出路径>" --db "<数据库路径>" --config "<凭证配置文件>"
 python -X utf8 -m entitytrace describe <run_id> --views 1 --entities-per-request 0 --verify 0 --out "<描述导出路径>" --db "<数据库路径>" --config "<凭证配置文件>"
 ```
 
-- 按发现任务块抽取并跳过不含 top-K 实体的块。默认启用 `--views 3 --entities-per-request 4 --verify 1`（`--top-k` 默认 `20`）：以《封神演义》百回四类 top-20 实测为准，默认三遍且每请求最多 `4` 个实体的抽取任务数为 `1,545` 次，约为 `--views 1 --entities-per-request 0` 单遍整块抽取（`114` 次）的 `13.6` 倍（单遍按 `4` 实体分组为 `515` 次，三遍为其 `3` 倍）；复核每 `12` 条表决后事实约 `1` 个请求（单遍复核实测 `84`—`89` 次，`--verify 3` 三遍复核约为单遍的 `3` 倍，实测 `269`—`280` 次）。显式传入 `--views 1 --entities-per-request 0 --verify 0` 可回到最省请求的单遍模式。
+- 按发现任务块抽取并跳过不含 top-K 实体的块。默认启用 `--views 3 --entities-per-request 4 --verify 1`（`--top-k` 默认 `20`）：以《封神演义》百回四类 top-20 实测为准，默认三遍且每请求最多 `4` 个实体的抽取任务数为 `1,545` 次，约为 `--views 1 --entities-per-request 0` 单遍整块抽取（`114` 次）的 `13.6` 倍（单遍按 `4` 实体分组为 `515` 次，三遍为其 `3` 倍）；事实复核每 `12` 条表决后事实约 `1` 个请求（单遍实测 `84`—`89` 次，`--verify 3` 三遍实测 `269`—`280` 次），状态变化事件复核每 `12` 条表决后事件约 `1` 个请求（单遍约 `10` 次，三遍约 `30` 次）。显式传入 `--views 1 --entities-per-request 0 --verify 0` 可回到最省请求的单遍模式。
+- `--from-chapter N` / `--to-chapter M`（同义别名 `--start-chapter` / `--end-chapter`）按正文章序（只计 `kind=="chapter"` 条目，从 `1` 起、两端含；单端缺省补全首／末章）限定范围，未传 `--topk-file` 时按该章序范围重新排名 top-K，只扫描所选正文章节分块并保留全书实体称呼名册；越界或 `N > M` 按 `input` 拒绝（退出码 `1`）。
 - `--views N`（`1`—`5`，默认 `3`）多遍轮换分组请求并按跨遍地址重叠做过半表决，以约 `N` 倍请求数换更高精确率；原始各遍落库，导出只给过半表决后的条目并附 `support`。`--topk-file` 可固定预登记名单。
-- `--entities-per-request N` 默认 `4`（传 `0` 表示整块一组）；`N > 0` 时块内实体按全书优先级（`score` 降序、`entity_id` 升序）每 `N` 个一组单独请求，任务编号含遍号与组序号。
-- `--verify {0,1,3}` 默认 `1`：`1` 对表决后的事实每 `12` 条一批逐条复核（keep / drop，复核请求量约为每 `12` 条事实一个请求），只导出 keep；`3` 将同一批复核跑三遍并按票数表决（`drop` 票至少两票判 `drop`，原因取多数；否则有效票至少两票判 `keep`，不足两票判 `unverified`），三遍首批分别为 `12`、`8`、`4` 条，第 0 遍批次与负载与 `1` 相同。复核要求模型逐字回抄输入 `value`，不一致会重试并计入 `echo_mismatch_retries`；事件不复核。导出顶层 `verification` 含 `passes`、`checked`、`kept`、四类 `dropped`、`unverified` 与 `echo_mismatch_retries`，复核批次按任务编号续跑，已完成批次不重发。
-- 相同配置得到相同 `describe_id` 并自动续跑；更换 `--top-k`、名单、`--views`、`--entities-per-request` 或 `--verify` 会得到新编号。需要独立冷跑时使用新的 `--db` 副本。
-- 成功输出单行 `{"ok":true,"describe_id","run_id","views","entities_per_request","verify","counts":{"tasks","facts","events","reviews"},"out"}`；失败沿用统一错误 JSON 与退出码。401/402/429 等硬额度停止后保留断点，用原命令同库续跑。
-- 导出 `entities[]` 每项含 `facts`、`state_events` 与 `gaps`，导出顶层含 `views`、`entities_per_request` 与 `verification`；待审项在 `reviews[]` 中给出原因（未知实体、facet 与类别不符、枚举非法、引用找不到或超长、`holder` 引文不含持有者称呼的 `holder-not-in-quote` 等）。`holder` 事实的引文会在同一片段内向左扩展到最近的持有者称呼，候选称呼来自全书名册（事实 `value`、`holder_entity_id` 的称呼及 `value` 中可解析人物的称呼，不要求持有者实体出现在本请求中）。
+- `--entities-per-request N` 默认 `4`（传 `0` 表示整块一组）；`N > 0` 时块内实体按优先级（`score` 降序、`entity_id` 升序）每 `N` 个一组单独请求，任务编号含遍号与组序号。
+- `--verify {0,1,3}` 默认 `1`：`1` 对表决后的描述事实与状态变化事件分别每 `12` 条一批逐条复核（keep / drop），只导出 keep 并为保留事件判定 `stage_split`；`3` 将同一批复核跑三遍并按票数表决（`drop` 票至少两票判 `drop`，原因取多数；有效票至少两票判 `keep`，事件 `stage_split` 在 `3 keep` 时取至少两票、在 `2 keep + 1 drop` 时要求两张 `keep` 都为 `true`；不足两票判 `unverified`），三遍首批分别为 `12`、`8`、`4` 条，第 0 遍批次与负载与 `1` 相同。复核要求模型逐字回抄输入 `value`，不一致会重试并计入 `echo_mismatch_retries`。导出顶层 `verification` 与 `event_verification` 分别给出事实与事件复核统计，复核批次按任务编号续跑，已完成批次不重发。
+- 相同配置得到相同 `describe_id` 并自动续跑；更换 `--top-k`、名单、章节范围、`--views`、`--entities-per-request` 或 `--verify` 会得到新编号。需要独立冷跑时使用新的 `--db` 副本。
+- 成功输出单行 `{"ok":true,"describe_id","run_id","views","entities_per_request","verify","chapter_range","counts":{"tasks","facts","events","stages","multi_stage_entities","reviews"},"out"}`；失败沿用统一错误 JSON 与退出码。401/402/429 等硬额度停止后保留断点，用原命令同库续跑。
+- 导出 `entities[]` 每项含 `facts`、`state_events`、确定性非空阶段列表 `stages`（每项含 `stage_index`、`start`、`end`、`from_chapter`、`to_chapter`、`first_fact_chapter_id`、`last_fact_chapter_id`、`trigger_events`、`facts`、`gaps`）与整体 `gaps`，导出顶层含 `views`、`entities_per_request`、`chapter_range`、`verification` 与 `event_verification`；待审项在 `reviews[]` 中给出原因（未知实体、facet 与类别不符、枚举非法、引用找不到或超长、`holder` 引文不含持有者称呼的 `holder-not-in-quote` 等）。`holder` 事实的引文会在同一片段内向左扩展到最近的持有者称呼，候选称呼来自全书名册（事实 `value`、`holder_entity_id` 的称呼及 `value` 中可解析人物的称呼，不要求持有者实体出现在本请求中）。
 
 ---
 

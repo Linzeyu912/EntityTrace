@@ -207,7 +207,11 @@ def _build_parser() -> _CliParser:
     describe.add_argument("--entities-per-request", type=int, default=4,
                           help="每请求最多包含多少个块内实体，默认 4（传 0 表示整块一组）")
     describe.add_argument("--verify", type=int, default=1,
-                          help="对过半表决后的描述事实逐条复核（0 关闭，1 单遍，3 三遍表决，默认 1；--views 1 --entities-per-request 0 --verify 0 可回到最省请求的单遍）")
+                          help="对过半表决后的描述事实与状态变化事件逐条复核（0 关闭，1 单遍，3 三遍表决，默认 1；--views 1 --entities-per-request 0 --verify 0 可回到最省请求的单遍）")
+    describe.add_argument("--from-chapter", "--start-chapter", dest="from_chapter", type=int, default=None,
+                          help="起始正文章序（从 1 起，缺省为首章；只计 kind==\"chapter\" 条目）")
+    describe.add_argument("--to-chapter", "--end-chapter", dest="to_chapter", type=int, default=None,
+                          help="截止正文章序（两端含，缺省为末章；只计 kind==\"chapter\" 条目）")
     describe.add_argument("--out", type=Path, default=None, help="将描述事实导出 JSON 写入该路径")
 
     export = subs.add_parser("export", help="从已保存数据重新导出，不调用模型")
@@ -373,6 +377,8 @@ def main(argv=None) -> int:
                     max_seconds=args.max_seconds,
                     entities_per_request=args.entities_per_request,
                     verify=args.verify,
+                    from_chapter=args.from_chapter,
+                    to_chapter=args.to_chapter,
                 )
                 _emit_json_line({
                     "ok": True,
@@ -381,6 +387,7 @@ def main(argv=None) -> int:
                     "views": result["views"],
                     "entities_per_request": result["entities_per_request"],
                     "verify": result["verify"],
+                    "chapter_range": result["chapter_range"],
                     "counts": result["counts"],
                     "out": str(args.out.resolve()) if args.out is not None else None,
                 })

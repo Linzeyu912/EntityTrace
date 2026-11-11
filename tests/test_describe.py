@@ -718,8 +718,10 @@ class RunDescribeTests(FixtureCase):
             doc = json.loads(self.out_path.read_text(encoding="utf-8"))
             self.assertEqual(set(doc), {"describe_id", "run_id", "views",
                                         "entities_per_request", "top_k", "kinds",
-                                        "entities", "reviews", "verification", "stats"})
+                                        "chapter_range", "entities", "reviews",
+                                        "verification", "event_verification", "stats"})
             self.assertEqual(doc["verification"], {"enabled": False})
+            self.assertEqual(doc["event_verification"], {"enabled": False})
             self.assertEqual(doc["views"], 1)
             self.assertEqual(doc["entities_per_request"], 0)
             self.assertEqual(doc["top_k"], 10)
@@ -727,7 +729,7 @@ class RunDescribeTests(FixtureCase):
                                                  "wall_seconds"})
             entity = doc["entities"][0]
             self.assertEqual(set(entity), {"entity_id", "kind", "kind_rank", "name", "facts",
-                                           "state_events", "gaps"})
+                                           "state_events", "stages", "gaps"})
             self.assertTrue(all(fact["support"] == 1 for fact in entity["facts"]))
             self.assertGreater(result["counts"]["tasks"], 0)
         finally:
@@ -1312,12 +1314,14 @@ class CliContractTests(FixtureCase):
         self.assertEqual(len(lines), 1, out_buf.getvalue())
         receipt = json.loads(lines[0])
         self.assertEqual(set(receipt), {"ok", "describe_id", "run_id", "views",
-                                        "entities_per_request", "verify", "counts", "out"})
+                                        "entities_per_request", "verify", "chapter_range",
+                                        "counts", "out"})
         self.assertTrue(receipt["ok"])
         self.assertEqual(receipt["views"], 2)
         self.assertEqual(receipt["verify"], 0)
         self.assertEqual(receipt["run_id"], self.run_id)
-        self.assertEqual(set(receipt["counts"]), {"tasks", "facts", "events", "reviews"})
+        self.assertEqual(set(receipt["counts"]), {"tasks", "facts", "events", "stages",
+                                                  "multi_stage_entities", "reviews"})
         self.assertEqual(receipt["counts"]["facts"], 1)
         self.assertTrue(Path(receipt["out"]).is_file())
         self.assertEqual(len(CliFakeModels.calls), receipt["counts"]["tasks"])

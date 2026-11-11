@@ -79,6 +79,14 @@ class Store:
           describe_id TEXT NOT NULL, fact_id TEXT NOT NULL, pass INTEGER NOT NULL,
           verdict TEXT NOT NULL, reason TEXT, task_id TEXT NOT NULL,
           PRIMARY KEY(describe_id,fact_id,pass));
+        CREATE TABLE IF NOT EXISTS event_verify_votes(
+          describe_id TEXT NOT NULL, event_id TEXT NOT NULL, pass INTEGER NOT NULL,
+          verdict TEXT NOT NULL, reason TEXT, stage_split INTEGER NOT NULL,
+          task_id TEXT NOT NULL, PRIMARY KEY(describe_id,event_id,pass));
+        CREATE TABLE IF NOT EXISTS event_verdicts(
+          describe_id TEXT NOT NULL, event_id TEXT NOT NULL, verdict TEXT NOT NULL,
+          reason TEXT, stage_split INTEGER NOT NULL, task_id TEXT NOT NULL,
+          PRIMARY KEY(describe_id,event_id));
         """)
         self.db.commit()
 

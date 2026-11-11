@@ -745,7 +745,11 @@ class VerifyRunTests(FixtureCase):
             other_batch = build_describe_id(20, ["person"], ["e1"], "run", "example",
                                             "example/model", verify=3)
         self.assertNotEqual(three, other_batch)
-        self.assertEqual(DESCRIBE_VERSION, "describe-v5")
+        with patch("entitytrace.describe.EVENT_VERIFY_PROMPT_VERSION", "event-verify-v9"):
+            other_event = build_describe_id(20, ["person"], ["e1"], "run", "example",
+                                            "example/model", verify=3)
+        self.assertNotEqual(three, other_event)
+        self.assertEqual(DESCRIBE_VERSION, "describe-v6")
         for bad in (-1, 2, 4, True, 1.5, "1"):
             with self.assertRaises(ValueError):
                 build_describe_id(20, ["person"], ["e1"], "run", "example",
