@@ -5,7 +5,7 @@ import collections
 
 from .discovery import _word_boundary
 from .roster import _unit_for_mention, normalize_surface
-from .text import address, exact_matches, validate_span
+from .text import address, exact_matches, is_dirty_surface, validate_span
 from .util import digest
 
 
@@ -48,7 +48,7 @@ def propagate_same_task_proper(
 
         qualifying_t: dict[str, str] = {}
         for s, ms in by_s.items():
-            if len(s) < 2:
+            if len(s) < 2 or is_dirty_surface(s):
                 continue
             ns = normalize_surface(s)
             if ns not in prop_norms or ns in weak_norms:
@@ -72,10 +72,13 @@ def propagate_same_task_proper(
             continue
 
         existing_spans = [(m["start"], m["end"]) for m in t_mentions]
+        masked_spans = dtask.get("masked_spans") or []
         cands = []
         for s, (eid, method) in all_q.items():
             for a, b in exact_matches(text, s, dtask["start"], dtask["end"]):
                 if not _word_boundary(text, a, b, s):
+                    continue
+                if masked_spans and any(max(a, sa) < min(b, sb) for sa, sb in masked_spans):
                     continue
                 if any(max(a, ea) < min(b, eb) for ea, eb in existing_spans):
                     continue

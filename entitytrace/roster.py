@@ -8,7 +8,7 @@ from typing import Callable
 
 from .discovery import KINDS, plan_tasks
 from .models import ModelError, bounded_map
-from .text import address
+from .text import address, is_dirty_surface
 from .util import digest
 
 VERSION = "entity-roster-v1"
@@ -181,8 +181,10 @@ def resolve_surface_direct(source: dict, chapters: list[dict], mentions: list[di
     mentions_sorted = sorted(mentions, key=lambda m: (m["start"], m["end"], m["id"]))
     by_id = {m["id"]: m for m in mentions_sorted}
     chapter_order = {c["id"]: idx for idx, c in enumerate(chapters)}
+    clean_mentions = [m for m in mentions_sorted if not is_dirty_surface(m["text"])]
+    dirty_mentions = [m for m in mentions_sorted if is_dirty_surface(m["text"])]
 
-    parent = {m["id"]: m["id"] for m in mentions_sorted}
+    parent = {m["id"]: m["id"] for m in clean_mentions}
 
     def root(x: str) -> str:
         while parent[x] != x:
@@ -199,7 +201,7 @@ def resolve_surface_direct(source: dict, chapters: list[dict], mentions: list[di
                 parent[ra] = rb
 
     by_norm: dict[str, list[str]] = collections.defaultdict(list)
-    for m in mentions_sorted:
+    for m in clean_mentions:
         ns = normalize_surface(m["text"])
         by_norm[ns].append(m["id"])
 
@@ -222,7 +224,7 @@ def resolve_surface_direct(source: dict, chapters: list[dict], mentions: list[di
                     link_refs_by_mid[mid].append(link["id"])
 
     clusters: dict[str, list[str]] = collections.defaultdict(list)
-    for m in mentions_sorted:
+    for m in clean_mentions:
         clusters[root(m["id"])].append(m["id"])
 
     entities = []
@@ -262,15 +264,38 @@ def resolve_surface_direct(source: dict, chapters: list[dict], mentions: list[di
             "link_methods": dict(methods_count),
         })
 
+    # 脏称呼不参与同名合并与关系线索，单独作为 not_entity 占位项导出，保证提及全覆盖。
+    for m in dirty_mentions:
+        ne_id = digest(["roster-not-entity", source["id"], [m["start"], m["end"]], [m["text"]]])
+        mention_entity[m["id"]] = ne_id
+        mention_method[m["id"]] = "not_entity_suggested"
+        entities.append({
+            "id": ne_id,
+            "name": m["text"],
+            "names": [m["text"]],
+            "aliases": [],
+            "mention_ids": [m["id"]],
+            "mention_count": 1,
+            "start": m["start"],
+            "first_chapter_id": m["chapter_id"],
+            "kind": "unknown",
+            "identity_status": "not_entity_suggested",
+            "link_methods": {"not_entity_suggested": 1},
+        })
+
     updated_mentions = []
     for m in mentions_sorted:
         mid = m["id"]
-        updated_mentions.append({
+        updated = {
             **m,
             "entity_id": mention_entity[mid],
             "link_method": mention_method[mid],
             "link_refs": link_refs_by_mid.get(mid, []),
-        })
+        }
+        if mention_method[mid] == "not_entity_suggested":
+            updated["link_refs"] = []
+            updated["identity_status"] = "not_entity_suggested"
+        updated_mentions.append(updated)
 
     kept_reviews = [r for r in existing_reviews if r.get("stage") in {"grounding", "discovery"}]
     method_totals = collections.Counter(m["link_method"] for m in updated_mentions)
@@ -405,12 +430,15 @@ def apply_c1_task_result(
         surf_types: dict[str, str] = {}
         for s_item in ent["surfaces"]:
             s_str, s_type = _extract_surface_item(s_item, require_surface_type=require_surface_type)
+            if is_dirty_surface(s_str):
+                continue
             if s_str in allowed_surfaces:
                 valid_surfs.append(s_str)
                 surf_types[s_str] = s_type
                 if s_type == "proper_name":
                     declared_proper_surfaces.add(s_str)
-        name = ent["name"] if ent["name"] in allowed_surfaces else (
+        raw_name = ent["name"]
+        name = raw_name if raw_name in allowed_surfaces and not is_dirty_surface(raw_name) else (
             sorted(valid_surfs, key=lambda s: (-len(s), s))[0] if valid_surfs else None
         )
         if name is None:
@@ -502,6 +530,16 @@ def apply_c1_task_result(
     repaired_surfaces: list[str] = []
 
     for surf, ms in sorted(by_surface.items()):
+        if is_dirty_surface(surf):
+            for m in ms:
+                mention_outcomes[m["id"]] = {
+                    "mention_id": m["id"],
+                    "task_id": task["id"],
+                    "status": "not_entity",
+                    "local_id": None,
+                    "request_id": request_id,
+                }
+            continue
         strong_lids = surface_to_strong_lids.get(surf, [])
         in_assign = surf in assigned_surfaces
         in_not_ent = surf in not_entity_surfaces
@@ -725,6 +763,70 @@ def apply_c1_task_result(
         "repaired_surfaces": repaired_surfaces,
         "reviews": reviews,
     }
+
+
+def _sanitize_c1_result_dirty_surfaces(res: dict, t_mentions: list[dict]) -> dict:
+    """加载已完成的章内归并缓存时清洗脏称呼；洁净任务原样返回，缓存键与结果零改动。"""
+    if not any(is_dirty_surface(m["text"]) for m in t_mentions):
+        return res
+    dirty_surfaces = {m["text"] for m in t_mentions if is_dirty_surface(m["text"])}
+    dirty_mids = [m["id"] for m in t_mentions if m["text"] in dirty_surfaces]
+    dirty_set = set(dirty_mids)
+    dirty_norms = {normalize_surface(s) for s in dirty_surfaces}
+    cleaned = copy.deepcopy(res)
+    task_id = cleaned.get("task_id", "")
+    request_id = cleaned.get("request_id", "")
+
+    entities: list[dict] = []
+    mid_text = {m["id"]: m["text"] for m in t_mentions}
+    for ent in cleaned.get("entities", []):
+        surfaces = [s for s in ent.get("surfaces", []) if not is_dirty_surface(s)]
+        surface_types = {s: t for s, t in (ent.get("surface_types") or {}).items() if not is_dirty_surface(s)}
+        proper_surfaces = [s for s in ent.get("proper_surfaces", []) if not is_dirty_surface(s)]
+        mention_ids = [mid for mid in ent.get("mention_ids", []) if mid not in dirty_set]
+        # 无剩余提及的对象没有任何证据可导出；无剩余合法称呼时也一并移除。
+        if not mention_ids:
+            continue
+        name = ent.get("name", "")
+        if is_dirty_surface(name):
+            name = sorted(surfaces, key=lambda s: (-len(s), s))[0] if surfaces else ""
+        if not name:
+            name = mid_text.get(mention_ids[0], "")
+        entities.append({
+            **ent,
+            "name": name,
+            "surfaces": surfaces,
+            "surface_types": surface_types,
+            "proper_surfaces": proper_surfaces,
+            "mention_ids": mention_ids,
+        })
+    cleaned["entities"] = entities
+
+    cleaned["declared_proper_norms"] = [
+        norm for norm in cleaned.get("declared_proper_norms", []) if norm not in dirty_norms
+    ]
+    cleaned["weak_norms"] = [norm for norm in cleaned.get("weak_norms", []) if norm not in dirty_norms]
+    cleaned["repaired_surfaces"] = [
+        s for s in cleaned.get("repaired_surfaces", []) if not is_dirty_surface(s)
+    ]
+    cleaned["reviews"] = [
+        rv for rv in cleaned.get("reviews", [])
+        if not (rv.get("stage") == "roster-c1-repair" and is_dirty_surface(rv.get("surface", "")))
+    ]
+
+    outcomes: list[dict] = [
+        out for out in cleaned.get("mention_outcomes", []) if out.get("mention_id") not in dirty_set
+    ]
+    for mid in dirty_mids:
+        outcomes.append({
+            "mention_id": mid,
+            "task_id": task_id,
+            "status": "not_entity",
+            "local_id": None,
+            "request_id": request_id,
+        })
+    cleaned["mention_outcomes"] = outcomes
+    return cleaned
 
 
 def _normalize_c2_review(value: dict) -> tuple[dict, dict]:
@@ -1035,7 +1137,7 @@ def resolve_roster(
     for t in c1_tasks:
         old = store.task(run_id, t["id"])
         if old and old["status"] == "completed" and old["result"]:
-            c1_results[t["discovery_task"]["id"]] = old["result"]
+            c1_results[t["discovery_task"]["id"]] = _sanitize_c1_result_dirty_surfaces(old["result"], t["mentions"])
         else:
             c1_pending.append(t)
 
@@ -2159,10 +2261,11 @@ def resolve_roster(
         mid = m["id"]
         c1_out = mention_c1.get(mid)
         if c1_out and c1_out["status"] == "not_entity":
+            c1_request_id = c1_out["request_id"]
             mention_link[mid] = {
                 "entity_id": None,
                 "link_method": "not_entity_suggested",
-                "link_refs": [c1_out["request_id"]],
+                "link_refs": [c1_request_id] if c1_request_id else [],
             }
             continue
         if c1_out and c1_out["status"] == "assigned" and c1_out.get("local_id"):

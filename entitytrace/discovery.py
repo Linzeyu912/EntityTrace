@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from .models import ModelError, bounded_map
-from .text import address, exact_matches, units, validate_span, windows
+from .text import address, detect_noise_spans, exact_matches, is_dirty_surface, units, validate_span, windows
 from .util import digest
 
 KINDS = {"person", "place", "object", "organization", "ability", "concept", "unknown"}
@@ -38,14 +38,21 @@ def check_discovery(value: dict) -> None:
 
 def plan_tasks(source: dict, chapters: list[dict], task_chars: int = 9000) -> list[dict]:
     tasks = []
+    noise_spans = detect_noise_spans(source["text"], chapters)
     for chapter in chapters:
-        batches = windows(units(source["text"], chapter["body_start"], chapter["end"], limit=500), task_chars, 64)
+        batches = windows(units(source["text"], chapter["body_start"], chapter["end"], limit=500,
+                                skip_spans=noise_spans), task_chars, 64)
         cursor = chapter["body_start"]
         for i, batch in enumerate(batches):
             end = batches[i + 1][0]["start"] if i + 1 < len(batches) else chapter["end"]
             task_id = digest(["discovery-v1", source["id"], chapter["chapter_set_version"], cursor, end, PROMPT])
-            tasks.append({"id": task_id, "stage": "discovery", "start": cursor, "end": end,
-                          "chapter_id": chapter["id"], "chapter_title": chapter["title"], "section_kind": chapter["kind"], "units": batch})
+            task = {"id": task_id, "stage": "discovery", "start": cursor, "end": end,
+                    "chapter_id": chapter["id"], "chapter_title": chapter["title"], "section_kind": chapter["kind"], "units": batch}
+            task_masked = [(span_start, span_end) for span_start, span_end in noise_spans
+                           if max(span_start, cursor) < min(span_end, end)]
+            if task_masked:
+                task["masked_spans"] = task_masked
+            tasks.append(task)
             cursor = end
     return tasks
 
@@ -70,6 +77,10 @@ def ground_result(source: dict, task: dict, value: dict, request_id: str) -> dic
         observation_id = digest([task["id"], index, item])
         observation = {"id": observation_id, "task_id": task["id"], "request_id": request_id,
                        "text": item["text"], "kind": item["kind"], "reported_refs": item["refs"], "mention_ids": []}
+        if is_dirty_surface(item["text"]):
+            observation["status"] = "filtered_dirty_surface"
+            observations.append(observation)
+            continue
         for ref in sorted(set(item["refs"])):
             unit = by_id.get(ref)
             if unit is None:
@@ -100,6 +111,8 @@ def ground_result(source: dict, task: dict, value: dict, request_id: str) -> dic
                             "observation_id": observation_id, "status": "pending"})
         observations.append(observation)
     for item in value["links"]:
+        if is_dirty_surface(item["left"]) or is_dirty_surface(item["right"]):
+            continue
         unit = by_id.get(item["ref"])
         record = {"id": digest([task["id"], item]), "task_id": task["id"], "request_id": request_id, **item}
         if unit is not None:
