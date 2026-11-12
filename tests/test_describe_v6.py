@@ -15,14 +15,18 @@ from entitytrace.chapters import build_chapters
 from entitytrace.cli import main as cli_main
 from entitytrace.config import Service
 from entitytrace.describe import (
+    ALLOWED_EVENT_TYPES_BY_KIND,
     D1_PROMPT,
     DESCRIBE_VERSION,
     EVENT_TYPE_DEFINITIONS,
     EVENT_VERIFY_PROMPT,
     EVENT_VERIFY_PROMPT_VERSION,
     FACETS,
+    TIMELINE_ANCHOR_FACETS,
+    TIMELINE_MAX_ITEMS,
     VERIFY_PROMPT,
     VERIFY_PROMPT_VERSION,
+    _subsample_timeline,
     build_entity_stages,
     build_event_verify_tasks,
     check_event_verify_output,
@@ -99,7 +103,7 @@ def _assert_stage_invariants(testcase: unittest.TestCase, entity: dict,
 
 
 class EventVerifyBatchAndValidationTests(unittest.TestCase):
-    """T1 & T2: 事件复核分批、第 0 遍字节等价与回抄防错位校验。"""
+    """T1 & T2: 按实体聚批、第 0 遍字节等价与回抄防错位校验。"""
 
     def _make_events(self, count: int) -> tuple[str, list[dict], list[dict], dict[str, str]]:
         body = "".join(f"沈墨第{i:02d}段换衣受创。" for i in range(count))
@@ -126,23 +130,60 @@ class EventVerifyBatchAndValidationTests(unittest.TestCase):
             })
         return text, chapters, list(reversed(events)), {"e_shen": "person"}
 
-    def test_t1_staggered_batches_and_pass0_byte_equivalence(self):
+    def _make_facts(self, text: str) -> list[dict]:
+        specs = (
+            ("age", "十六岁"),
+            ("build", "身长七尺"),
+            ("costume", "青衫"),
+            ("face", "面如冠玉"),
+        )
+        facts = []
+        for index, (facet, value) in enumerate(specs):
+            start = 7 + index
+            facts.append({
+                "id": f"secret-fact-{index}",
+                "entity_id": "e_shen",
+                "facet": facet,
+                "value": value,
+                "quote": value,
+                "start": start,
+                "end": start + 2,
+                "chapter_id": "ch1",
+                "support": 2,
+            })
+        return facts
+
+    def test_t1_entity_batches_and_pass0_byte_equivalence(self):
         text, chapters, events, kinds = self._make_events(25)
+        facts = self._make_facts(text)
         names = {"e_shen": ["沈墨", "沈道人"]}
         tasks_1 = build_event_verify_tasks(
             "did-one", events, kinds, names, text, chapters, passes=1,
+            facts_by_pass={0: facts},
         )
         tasks_3 = build_event_verify_tasks(
             "did-three", events, kinds, names, text, chapters, passes=3,
+            facts_by_pass={0: facts, 1: facts, 2: facts},
         )
         pass0 = [t for t in tasks_3 if t["pass"] == 0]
         pass1 = [t for t in tasks_3 if t["pass"] == 1]
         pass2 = [t for t in tasks_3 if t["pass"] == 2]
 
+        # 单实体 25 条事件先切成 12/12/1 三个单元，再按遍轮换装批。
         self.assertEqual([len(t["event_ids"]) for t in pass0], [12, 12, 1])
-        self.assertEqual([len(t["event_ids"]) for t in pass1], [8, 12, 5])
-        self.assertEqual([len(t["event_ids"]) for t in pass2], [4, 12, 9])
+        self.assertEqual([len(t["event_ids"]) for t in pass1], [8, 5, 12])
+        self.assertEqual([len(t["event_ids"]) for t in pass2], [1, 12, 12])
         self.assertEqual(len(tasks_1), len(pass0))
+        self.assertEqual(
+            sorted(eid for task in tasks_3 for eid in task["event_ids"]),
+            sorted([ev["id"] for ev in events] * 3),
+        )
+
+        layouts = {
+            tuple(tuple(task["event_ids"]) for task in tasks_3 if task["pass"] == p)
+            for p in range(3)
+        }
+        self.assertEqual(len(layouts), 3)
 
         for t1, t3 in zip(tasks_1, pass0):
             self.assertEqual(t1["prompt"], EVENT_VERIFY_PROMPT)
@@ -152,11 +193,29 @@ class EventVerifyBatchAndValidationTests(unittest.TestCase):
 
         for task in tasks_3:
             raw_state = dumps(task["state"])
+            self.assertEqual(set(task["state"]), {"entities", "items"})
             self.assertNotIn("did-three", raw_state)
-            self.assertNotIn("pass", raw_state)
+            self.assertNotIn('"pass"', raw_state)
+            self.assertNotIn("entity_id", raw_state)
             for eid in task["event_ids"]:
                 self.assertNotIn(eid, raw_state)
+            entity = task["state"]["entities"][0]
+            self.assertEqual(entity["entity_ref"], "ENT1")
+            self.assertEqual(entity["kind"], "person")
+            self.assertEqual(entity["names"], ["沈墨", "沈道人"])
+            self.assertEqual(entity["fact_count"], len(facts))
+            self.assertEqual(entity["first_fact_chapter"], 1)
+            self.assertEqual(entity["last_fact_chapter"], 1)
+            self.assertEqual(
+                [anchor["facet"] for anchor in entity["anchor_facts"]],
+                ["age", "build", "costume"],
+            )
+            self.assertEqual(entity["candidate_events"][0]["chapter"], 1)
+            self.assertEqual(len(entity["candidate_events"]), TIMELINE_MAX_ITEMS)
             for item in task["state"]["items"]:
+                self.assertEqual(item["entity_ref"], "ENT1")
+                self.assertEqual(item["chapter"], 1)
+                self.assertEqual(item["names"], ["沈墨", "沈道人"])
                 self.assertEqual(
                     item["event_type_definition"],
                     EVENT_TYPE_DEFINITIONS[item["event_type"]],
@@ -287,6 +346,211 @@ class EventVerdictVotingTests(unittest.TestCase):
             decide_event_verdict([(0, "keep", None, True)], 3),
             ("unverified", "invalid-output", False),
         )
+
+
+class EventTimelinePayloadTests(unittest.TestCase):
+    """T9: 按实体聚批与实体全书纵向时间线摘要（`entities`）。"""
+
+    def _book(self) -> tuple[str, list[dict]]:
+        text = (
+            "第一章 初出\n"
+            "沈墨年方十六，身长七尺，穿青衫，面如冠玉。\n"
+            "第二章 夜行\n"
+            "沈墨身长八尺，仍穿青衫。\n"
+            "第三章 归山\n"
+            "沈墨换了白袍，眉间朱砂。\n"
+        )
+        ch2 = text.index("第二章 夜行")
+        ch3 = text.index("第三章 归山")
+        chapters = [
+            {"id": "front", "kind": "front_matter", "start": 0, "end": 0},
+            {"id": "ch1", "kind": "chapter", "start": 0, "end": ch2},
+            {"id": "ch2", "kind": "chapter", "start": ch2, "end": ch3},
+            {"id": "ch3", "kind": "chapter", "start": ch3, "end": len(text)},
+        ]
+        return text, chapters
+
+    def _fact(self, text: str, fid: str, chapter_id: str, facet: str,
+              value: str, needle: str) -> dict:
+        start = text.index(needle)
+        return {
+            "id": fid, "entity_id": "e_shen", "facet": facet, "value": value,
+            "quote": needle, "start": start, "end": start + len(needle),
+            "chapter_id": chapter_id, "support": 2,
+        }
+
+    def _event(self, text: str, eid: str, event_type: str, value: str,
+               needle: str, chapter_id: str) -> dict:
+        start = text.index(needle)
+        return {
+            "id": eid, "entity_id": "e_shen", "event_type": event_type,
+            "splits_entity": False, "value": value, "quote": needle,
+            "start": start, "end": start + len(needle), "chapter_id": chapter_id,
+        }
+
+    def test_t9_entity_timeline_fields_dedupe_and_anchor_facets(self):
+        text, chapters = self._book()
+        facts = [
+            self._fact(text, "f1", "ch1", "age", "十六岁", "年方十六"),
+            self._fact(text, "f2", "ch1", "build", "身长七尺", "身长七尺"),
+            self._fact(text, "f3", "ch1", "costume", "青衫", "穿青衫"),
+            self._fact(text, "f4", "ch1", "face", "面如冠玉", "面如冠玉"),
+            self._fact(text, "f5", "ch2", "costume", "青衫", "仍穿青衫"),
+            self._fact(text, "f6", "ch2", "costume", "青衫", "仍穿青衫"),
+            self._fact(text, "f7", "ch3", "feature", "眉间朱砂", "眉间朱砂"),
+            self._fact(text, "f8", "ch3", "costume", "白袍", "换了白袍"),
+        ]
+        events = [
+            self._event(text, "ev-1", "costume_change", "换白袍", "换了白袍", "ch3"),
+            self._event(text, "ev-2", "disguise", "乔装", "仍穿青衫", "ch2"),
+            self._event(text, "ev-3", "disguise", "乔装", "仍穿青衫", "ch2"),
+        ]
+        tasks = build_event_verify_tasks(
+            "did-timeline", events, {"e_shen": "person"}, {"e_shen": ["沈墨"]},
+            text, chapters, passes=1, facts_by_pass={0: facts},
+        )
+        self.assertEqual(len(tasks), 1)
+        state = tasks[0]["state"]
+        entity = state["entities"][0]
+        self.assertEqual(entity["fact_count"], 8)
+        self.assertEqual(entity["first_fact_chapter"], 1)
+        self.assertEqual(entity["last_fact_chapter"], 3)
+        self.assertEqual(entity["anchor_facts"], [
+            {"chapter": 1, "facet": "age", "value": "十六岁"},
+            {"chapter": 1, "facet": "build", "value": "身长七尺"},
+            {"chapter": 1, "facet": "costume", "value": "青衫"},
+            {"chapter": 2, "facet": "costume", "value": "青衫"},
+            {"chapter": 3, "facet": "costume", "value": "白袍"},
+            {"chapter": 3, "facet": "feature", "value": "眉间朱砂"},
+        ])
+        self.assertNotIn("face", [anchor["facet"] for anchor in entity["anchor_facts"]])
+        # 同章同类型同 value 的连续重复候选事件去重后保留一条。
+        self.assertEqual(entity["candidate_events"], [
+            {"chapter": 2, "event_type": "disguise", "value": "乔装"},
+            {"chapter": 3, "event_type": "costume_change", "value": "换白袍"},
+        ])
+        self.assertEqual([item["chapter"] for item in state["items"]], [2, 2, 3])
+        self.assertEqual([item["entity_ref"] for item in state["items"]],
+                         ["ENT1", "ENT1", "ENT1"])
+        self.assertEqual(TIMELINE_ANCHOR_FACETS["person"], ("age", "build", "feature", "costume"))
+        self.assertTrue(set(TIMELINE_ANCHOR_FACETS) <= set(ALLOWED_EVENT_TYPES_BY_KIND))
+
+    def test_t10_multi_entity_units_and_full_book_candidates(self):
+        pieces = [f"沈墨换衣{i:02d}。" for i in range(14)] + ["林川换衣99。"]
+        text = "第一章 聚义\n" + "".join(pieces)
+        chapters = [{"id": "ch1", "kind": "chapter", "start": 0, "end": len(text)}]
+        events = []
+        for index in range(14):
+            needle = pieces[index]
+            start = text.index(needle)
+            events.append({
+                "id": f"ev-shen-{index:02d}", "entity_id": "e_shen",
+                "event_type": "costume_change", "splits_entity": False,
+                "value": f"换衣{index:02d}", "quote": needle,
+                "start": start, "end": start + len(needle), "chapter_id": "ch1",
+            })
+        needle = pieces[-1]
+        start = text.index(needle)
+        events.append({
+            "id": "ev-lin-00", "entity_id": "e_lin", "event_type": "costume_change",
+            "splits_entity": False, "value": "换衣99", "quote": needle,
+            "start": start, "end": start + len(needle), "chapter_id": "ch1",
+        })
+        facts = [
+            {"id": "f1", "entity_id": "e_shen", "facet": "costume", "value": "青衫",
+             "quote": "沈墨", "start": 0, "end": 2, "chapter_id": "ch1", "support": 1},
+            {"id": "f2", "entity_id": "e_lin", "facet": "costume", "value": "白袍",
+             "quote": "林川", "start": text.index("林川"), "end": text.index("林川") + 2,
+             "chapter_id": "ch1", "support": 1},
+        ]
+        tasks = build_event_verify_tasks(
+            "did-units", events, {"e_shen": "person", "e_lin": "person"},
+            {"e_shen": ["沈墨"], "e_lin": ["林川"]}, text, chapters,
+            passes=1, facts_by_pass=facts,
+        )
+        # 单元按 entity_id 字典序：e_lin 单条，e_shen 切成 12 + 2，共三批。
+        self.assertEqual(len(tasks), 3)
+        self.assertEqual([len(task["state"]["items"]) for task in tasks], [1, 12, 2])
+        self.assertEqual(tasks[0]["state"]["items"][0]["entity_ref"], "ENT1")
+        self.assertEqual(tasks[0]["state"]["entities"][0]["fact_count"], 1)
+        for task in tasks[1:]:
+            state = task["state"]
+            entity = state["entities"][0]
+            self.assertEqual(entity["entity_ref"], "ENT1")
+            self.assertEqual(entity["fact_count"], 1)
+            # 单实体超过 12 条时按时间切片，但批内时间线仍是该实体全书 14 条候选事件。
+            self.assertEqual(len(entity["candidate_events"]), 14)
+            self.assertEqual(entity["candidate_events"][-1]["value"], "换衣13")
+
+        short_text = "第一章 聚义\n沈墨换衣。林川换衣。"
+        short_chapters = [
+            {"id": "ch1", "kind": "chapter", "start": 0, "end": len(short_text)},
+        ]
+        shen_at = short_text.index("沈墨换衣")
+        lin_at = short_text.index("林川换衣")
+        short_events = [
+            {"id": "short-shen", "entity_id": "e_shen", "event_type": "costume_change",
+             "splits_entity": False, "value": "换衣", "quote": "沈墨换衣",
+             "start": shen_at, "end": shen_at + 4, "chapter_id": "ch1"},
+            {"id": "short-lin", "entity_id": "e_lin", "event_type": "costume_change",
+             "splits_entity": False, "value": "换衣", "quote": "林川换衣",
+             "start": lin_at, "end": lin_at + 4, "chapter_id": "ch1"},
+        ]
+        short_tasks = build_event_verify_tasks(
+            "did-short", short_events, {"e_shen": "person", "e_lin": "person"},
+            {"e_shen": ["沈墨"], "e_lin": ["林川"]}, short_text, short_chapters,
+        )
+        self.assertEqual(len(short_tasks), 1)
+        short_state = short_tasks[0]["state"]
+        self.assertEqual([entity["entity_ref"] for entity in short_state["entities"]],
+                         ["ENT1", "ENT2"])
+        self.assertEqual([entity["names"] for entity in short_state["entities"]],
+                         [["林川"], ["沈墨"]])
+        self.assertEqual([item["entity_ref"] for item in short_state["items"]],
+                         ["ENT1", "ENT2"])
+        self.assertEqual(short_state["entities"][0]["fact_count"], 0)
+        self.assertIsNone(short_state["entities"][0]["first_fact_chapter"])
+
+    def test_t11_anchor_timeline_subsampled_to_limit(self):
+        body = "".join(f"衣{index:02d}。" for index in range(30))
+        text = "第一章 换装\n" + body
+        chapters = [{"id": "ch1", "kind": "chapter", "start": 0, "end": len(text)}]
+        facts = []
+        cursor = len("第一章 换装\n")
+        for index in range(30):
+            needle = f"衣{index:02d}。"
+            facts.append({
+                "id": f"f{index:02d}", "entity_id": "e_shen", "facet": "costume",
+                "value": f"衣{index:02d}", "quote": needle,
+                "start": cursor, "end": cursor + len(needle), "chapter_id": "ch1",
+            })
+            cursor += len(needle)
+        events = [{
+            "id": "ev-1", "entity_id": "e_shen", "event_type": "costume_change",
+            "splits_entity": False, "value": "换装", "quote": body[:8],
+            "start": len("第一章 换装\n"), "end": len("第一章 换装\n") + 8,
+            "chapter_id": "ch1",
+        }]
+        tasks = build_event_verify_tasks(
+            "did-sample", events, {"e_shen": "person"}, {"e_shen": ["沈墨"]},
+            text, chapters, passes=1, facts_by_pass=facts,
+        )
+        anchors = tasks[0]["state"]["entities"][0]["anchor_facts"]
+        self.assertEqual(len(anchors), TIMELINE_MAX_ITEMS)
+        self.assertEqual(anchors[0]["value"], "衣00")
+        self.assertEqual(anchors[-1]["value"], "衣29")
+        self.assertEqual(len({anchor["value"] for anchor in anchors}), TIMELINE_MAX_ITEMS)
+
+    def test_t12_subsample_timeline_keeps_bounds_and_length(self):
+        items = [{"value": f"v{index}"} for index in range(30)]
+        sampled = _subsample_timeline(items)
+        self.assertEqual(len(sampled), TIMELINE_MAX_ITEMS)
+        self.assertEqual(sampled[0], items[0])
+        self.assertEqual(sampled[-1], items[-1])
+        short = items[:5]
+        self.assertEqual(_subsample_timeline(short), short)
+        self.assertEqual(len(_subsample_timeline(items, 2)), 2)
+        self.assertEqual(_subsample_timeline(items, 2), [items[0], items[-1]])
 
 
 class EntityStageSplittingTests(unittest.TestCase):
@@ -555,6 +819,268 @@ class CacheUpgradeAndEchoRetryTests(FixtureCase):
             ev_sum = res["document"]["event_verification"]
             self.assertEqual(ev_sum["echo_mismatch_retries"], 1)
             self.assertEqual(ev_sum["kept"], 1)
+        finally:
+            store.close()
+
+
+class EventVerifyDeterminismTests(FixtureCase):
+    """T13—T15: 粗类白名单拦截、disguise 非切点与三遍转单遍零网络。"""
+
+    def test_t13_coarse_kind_whitelist_blocks_without_model_requests(self):
+        specs = [
+            ("e_shen", "damage", "铁剑折断", "铁剑仍在"),
+            ("e_skill", "transform", "化作剑光", "运起御剑术"),
+            ("e_skill", "damage", "剑身碎裂", "运起御剑术"),
+            ("e_men", "owner_change", "山门易主", "山门大开"),
+            ("e_jian", "costume_change", "铁剑换鞘", "铁剑仍在"),
+            ("e_shen", "costume_change", "换白衣", "换了白衣"),
+            ("e_jian", "owner_change", "易主沈墨", "铁剑仍在"),
+        ]
+
+        def handler(stage, state, call_index):
+            if stage == "describe-d1":
+                chunk = state.get("text", "")
+                events = []
+                if "换了白衣" in chunk:
+                    events = [
+                        {"entity_id": entity_id, "event_type": event_type,
+                         "splits_entity": False, "value": value, "quote": quote}
+                        for entity_id, event_type, value, quote in specs
+                    ]
+                return {"facts": [], "events": events}
+            if stage == "describe-event-verify":
+                return {"verdicts": [
+                    {"id": item["id"], "value": item["value"], "verdict": "keep",
+                     "reason": None, "stage_split": False}
+                    for item in state["items"]
+                ]}
+            return {"verdicts": []}
+
+        models = FakeModels(SERVICES, handler)
+        store = Store(self.db_path)
+        try:
+            result = run_describe(
+                store, self.run_id, services=SERVICES, models=models,
+                top_k=10, views=1, entities_per_request=0, verify=1, concurrency=1,
+            )
+            event_calls = [
+                call for call in models.calls if call["stage"] == "describe-event-verify"
+            ]
+            self.assertEqual(len(event_calls), 1)
+            items = event_calls[0]["state"]["items"]
+            self.assertEqual({item["event_type"] for item in items},
+                             {"owner_change", "costume_change"})
+            self.assertEqual({(item["entity_ref"], item["kind"]) for item in items},
+                             {("ENT1", "object"), ("ENT2", "person")})
+            self.assertEqual(
+                [entity["entity_ref"] for entity in event_calls[0]["state"]["entities"]],
+                ["ENT1", "ENT2"],
+            )
+            summary = result["document"]["event_verification"]
+            self.assertEqual(summary["checked"], 7)
+            self.assertEqual(summary["kept"], 2)
+            self.assertEqual(summary["dropped"]["wrong_event_type"], 5)
+            self.assertEqual(summary["split_events"], 0)
+
+            exported = {
+                entity["entity_id"]: entity["state_events"]
+                for entity in result["document"]["entities"]
+            }
+            self.assertEqual([ev["event_type"] for ev in exported["e_shen"]],
+                             ["costume_change"])
+            self.assertEqual([ev["event_type"] for ev in exported["e_jian"]],
+                             ["owner_change"])
+            self.assertEqual(exported["e_skill"], [])
+            self.assertEqual(exported["e_men"], [])
+
+            verdicts = {
+                str(row["event_id"]): (str(row["verdict"]), row["reason"],
+                                       int(row["stage_split"]))
+                for row in store.rows(
+                    "SELECT * FROM event_verdicts WHERE describe_id=?",
+                    (result["describe_id"],),
+                )
+            }
+            kept_ids = {
+                str(ev["id"]) for events in exported.values() for ev in events
+            }
+            self.assertEqual(len(verdicts), 7)
+            self.assertEqual(kept_ids, {
+                event_id for event_id, (verdict, _, _) in verdicts.items()
+                if verdict == "keep"
+            })
+            for event_id, (verdict, reason, stage_split) in verdicts.items():
+                if event_id in kept_ids:
+                    self.assertEqual((verdict, reason, stage_split), ("keep", None, 0))
+                else:
+                    self.assertEqual(
+                        (verdict, reason, stage_split),
+                        ("drop", "wrong_event_type", 0),
+                    )
+        finally:
+            store.close()
+
+        models_zero = FakeModels(SERVICES, handler)
+        store = Store(self.db_path)
+        try:
+            result_zero = run_describe(
+                store, self.run_id, services=SERVICES, models=models_zero,
+                top_k=10, views=1, entities_per_request=0, verify=0, concurrency=1,
+            )
+            self.assertEqual(result_zero["document"]["event_verification"],
+                             {"enabled": False})
+            total = sum(len(entity["state_events"])
+                        for entity in result_zero["document"]["entities"])
+            self.assertEqual(total, 7)
+            self.assertEqual(
+                [call["stage"] for call in models_zero.calls].count("describe-event-verify"),
+                0,
+            )
+            self.assertEqual(
+                [call["stage"] for call in models_zero.calls].count("describe-verify"),
+                0,
+            )
+        finally:
+            store.close()
+
+    def test_t14_disguise_never_becomes_stage_split(self):
+        def handler(stage, state, call_index):
+            if stage == "describe-d1":
+                chunk = state.get("text", "")
+                events = []
+                if "换了白衣" in chunk:
+                    events = [{
+                        "entity_id": "e_shen", "event_type": "disguise",
+                        "splits_entity": True, "value": "乔装白衣", "quote": "换了白衣",
+                    }]
+                return {"facts": [], "events": events}
+            if stage == "describe-event-verify":
+                return {"verdicts": [
+                    {"id": item["id"], "value": item["value"], "verdict": "keep",
+                     "reason": None, "stage_split": True}
+                    for item in state["items"]
+                ]}
+            return {"verdicts": []}
+
+        models = FakeModels(SERVICES, handler)
+        store = Store(self.db_path)
+        try:
+            result = run_describe(
+                store, self.run_id, services=SERVICES, models=models,
+                top_k=10, views=1, entities_per_request=0, verify=1, concurrency=1,
+            )
+            summary = result["document"]["event_verification"]
+            self.assertEqual(summary["kept"], 1)
+            self.assertEqual(summary["split_events"], 0)
+            entity = next(
+                item for item in result["document"]["entities"]
+                if item["entity_id"] == "e_shen"
+            )
+            self.assertEqual(len(entity["state_events"]), 1)
+            self.assertEqual(entity["state_events"][0]["event_type"], "disguise")
+            self.assertIs(entity["state_events"][0]["stage_split"], False)
+            self.assertEqual(len(entity["stages"]), 1)
+            row = store.rows(
+                "SELECT verdict, reason, stage_split FROM event_verdicts WHERE describe_id=?",
+                (result["describe_id"],),
+            )[0]
+            self.assertEqual((row["verdict"], row["reason"], int(row["stage_split"])),
+                             ("keep", None, 0))
+        finally:
+            store.close()
+
+    def test_t15_verify_three_then_one_reexport_is_zero_network(self):
+        service = Service(
+            name="discovery", url="http://127.0.0.1:9/v1", model="example/model",
+            key="example", provider="openai",
+        )
+        services = {"discovery": service, "decision": service}
+        stages: list[str] = []
+
+        def opener(request, timeout=None):
+            payload = json.loads(request.data.decode("utf-8"))
+            sys_prompt = payload["messages"][0]["content"]
+            user_state = json.loads(payload["messages"][1]["content"])
+            if sys_prompt == D1_PROMPT:
+                stage = "describe-d1"
+                text = user_state.get("text", "")
+                facts, events = [], []
+                if "穿着一领青衫" in text:
+                    facts.append({
+                        "entity_id": "e_shen", "facet": "costume", "value": "青衫",
+                        "quote": "穿着一领青衫", "source": "narration",
+                    })
+                if "换了白衣" in text:
+                    facts.append({
+                        "entity_id": "e_shen", "facet": "costume", "value": "白衣",
+                        "quote": "换了白衣", "source": "narration",
+                    })
+                    events.append({
+                        "entity_id": "e_shen", "event_type": "costume_change",
+                        "splits_entity": True, "value": "换了白衣", "quote": "换了白衣",
+                    })
+                content = dumps({"facts": facts, "events": events})
+            elif sys_prompt == VERIFY_PROMPT:
+                stage = "describe-verify"
+                content = dumps({"verdicts": [
+                    {"id": item["id"], "value": item["value"],
+                     "verdict": "keep", "reason": None}
+                    for item in user_state["items"]
+                ]})
+            elif sys_prompt == EVENT_VERIFY_PROMPT:
+                stage = "describe-event-verify"
+                content = dumps(_event_echo(
+                    user_state["items"],
+                    {item["id"]: {"stage_split": True} for item in user_state["items"]},
+                ))
+            else:
+                raise AssertionError("未知 prompt")
+            stages.append(stage)
+            return _FakeHttpResponse({
+                "choices": [{"finish_reason": "stop", "message": {"content": content}}],
+                "usage": {"prompt_tokens": 10, "completion_tokens": 5},
+            })
+
+        store = Store(self.db_path)
+        try:
+            models_three = Models(store, self.run_id, "inv-three", services, opener=opener)
+            result_three = run_describe(
+                store, self.run_id, services=services, models=models_three,
+                top_k=10, kinds="person", views=1, entities_per_request=0,
+                verify=3, concurrency=1,
+            )
+            self.assertEqual(stages.count("describe-d1"), 2)
+            self.assertGreaterEqual(stages.count("describe-verify"), 1)
+            self.assertGreaterEqual(stages.count("describe-event-verify"), 1)
+            document_three = result_three["document"]
+
+            stages.clear()
+            models_one = Models(store, self.run_id, "inv-one", services, opener=opener)
+            result_one = run_describe(
+                store, self.run_id, services=services, models=models_one,
+                top_k=10, kinds="person", views=1, entities_per_request=0,
+                verify=1, concurrency=1,
+            )
+            # 先 --verify 3 后 --verify 1：D1、事实复核与事件复核全部命中缓存。
+            self.assertEqual(stages, [])
+            self.assertEqual(result_one["new_tasks"], 2)
+            self.assertEqual(result_one["verify_tasks"], 1)
+            self.assertEqual(result_one["event_verify_tasks"], 1)
+
+            def _fact_keys(document):
+                return [
+                    (fact["facet"], fact["value"], fact["quote"], fact["start"], fact["end"])
+                    for entity in document["entities"] for fact in entity["facts"]
+                ]
+
+            self.assertEqual(_fact_keys(result_one["document"]),
+                             _fact_keys(document_three))
+            events = next(
+                entity for entity in result_one["document"]["entities"]
+                if entity["entity_id"] == "e_shen"
+            )["state_events"]
+            self.assertEqual(len(events), 1)
+            self.assertIs(events[0]["stage_split"], True)
         finally:
             store.close()
 
@@ -880,7 +1406,7 @@ class ChapterRangeAndLegacyCompatibilityTests(unittest.TestCase):
                 hits.append(f"{rel}: {m.group(0)}")
         self.assertEqual(hits, [], f"已跟踪文件命中禁词: {hits}")
         self.assertEqual(DESCRIBE_VERSION, "describe-v6")
-        self.assertEqual(EVENT_VERIFY_PROMPT_VERSION, "event-verify-v1")
+        self.assertEqual(EVENT_VERIFY_PROMPT_VERSION, "event-verify-v2")
 
 
 if __name__ == "__main__":
