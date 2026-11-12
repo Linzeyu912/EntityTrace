@@ -100,7 +100,7 @@ class RankQueryTests(unittest.TestCase):
                     span("第四章 远行", "chapter"),
                 ],
             )
-            run_id = "run_rank_fixture_0001_abcdef123456"
+            run_id = hashlib.sha256(b"run_rank_fixture_0001").hexdigest()
             cfg = {"identity_algorithm": ROSTER_VERSION, "task_chars": 9000}
             state = {
                 "chapters": {"complete": True, "chapter_set_version": ver, "issues": 0, "path_counts": {"adopted": 5}},
@@ -459,6 +459,52 @@ class RankQueryTests(unittest.TestCase):
                 store.rows("SELECT entities_json FROM query_snapshots WHERE run_id=?", (self.run_id,))[0]["entities_json"]
             )
             self.assertIn("chapter_stats", ents2[0])
+            # 情形 C：query_snapshots 记录缺失（首次冷重建）
+            self.assertEqual(len(self.run_id), 64)
+            store.execute("DELETE FROM query_snapshots WHERE run_id=?", (self.run_id,))
+        finally:
+            store.close()
+        rc_s, out_s, err_s = self._invoke([
+            "status", self.run_id, "--db", str(self.db_path), "--output", str(self.out_root),
+        ])
+        self.assertEqual(rc_s, 0, err_s)
+        status_doc = json.loads(out_s.splitlines()[0])
+        self.assertEqual(status_doc["run_id"], self.run_id)
+        store = Store(self.db_path)
+        try:
+            store.execute("DELETE FROM query_snapshots WHERE run_id=?", (self.run_id,))
+        finally:
+            store.close()
+        doc_c = self._rank_ok(["--from-chapter", "1", "--to-chapter", "2"])
+        self.assertEqual(doc_c["range"], {"from_chapter": 1, "to_chapter": 2, "chapter_count": 2})
+        self.assertEqual(sorted(i["name"] for i in doc_c["items"]), ["沈墨", "茶杯", "铁剑", "青石渡"])
+        store = Store(self.db_path)
+        try:
+            row_c = store.rows("SELECT fingerprint, meta_json FROM query_snapshots WHERE run_id=?", (self.run_id,))[0]
+            self.assertEqual(json.loads(row_c["meta_json"])["snapshot_version"], 2)
+            # 情形 D：query_snapshots.fingerprint 过期不一致
+            store.execute("UPDATE query_snapshots SET fingerprint='stale_fp' WHERE run_id=?", (self.run_id,))
+        finally:
+            store.close()
+        rc_e, out_e, err_e = self._invoke([
+            "entities", self.run_id, "--db", str(self.db_path),
+        ])
+        self.assertEqual(rc_e, 0, err_e)
+        store = Store(self.db_path)
+        try:
+            expected_fp = store.query_fingerprint(self.run_id)
+            row_d1 = store.rows("SELECT fingerprint FROM query_snapshots WHERE run_id=?", (self.run_id,))[0]
+            self.assertEqual(row_d1["fingerprint"], expected_fp)
+            store.execute("UPDATE query_snapshots SET fingerprint='stale_fp' WHERE run_id=?", (self.run_id,))
+        finally:
+            store.close()
+        doc_d = self._rank_ok(["--limit", "50"])
+        self.assertEqual(doc_d["total"], 6)
+        store = Store(self.db_path)
+        try:
+            expected_fp = store.query_fingerprint(self.run_id)
+            row_d2 = store.rows("SELECT fingerprint FROM query_snapshots WHERE run_id=?", (self.run_id,))[0]
+            self.assertEqual(row_d2["fingerprint"], expected_fp)
         finally:
             store.close()
 

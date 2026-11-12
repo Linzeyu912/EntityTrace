@@ -63,7 +63,7 @@ def _load_roster_snapshot(
     rows = store.rows(sql, (run_id,))
     if not rows or rows[0]["fingerprint"] != fp:
         build_export_bundle(store, run_id)
-        rows = store.rows(sql, (run_id))
+        rows = store.rows(sql, (run_id,))
     row = rows[0]
     snap: dict = {"meta": json.loads(row["meta_json"])}
     if need_entities:
