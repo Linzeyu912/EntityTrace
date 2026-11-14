@@ -40,10 +40,10 @@
 
 ### 第 1 步：启动或续跑全文处理（`run --json`）
 
-> **生成服务配置**：默认生成服务商为 `deepseek`（需配置 `DEEPSEEK_API_KEY`，并发默认 6、超时 120 秒）；也可传 `--generator openai`（或设 `GENERATOR_PROVIDER=openai`）接入通用 OpenAI 兼容服务地址，通过 `ENTITYTRACE_OPENAI_BASE_URL`、`ENTITYTRACE_OPENAI_MODEL`、`ENTITYTRACE_OPENAI_API_KEY`、`ENTITYTRACE_OPENAI_EXTRA_BODY`（可选 JSON 对象）与 `ENTITYTRACE_OPENAI_TIMEOUT_SECONDS`（默认 420 秒，并发默认 8）配置。默认 `roster` 流程无需 `TYPESAFE_API_KEY`（仅 `--identity-algorithm groups-v2` 需要）。
+> **生成与可选 Decision 配置**：默认生成服务商为 `deepseek`（需配置 `DEEPSEEK_API_KEY`，并发默认 6、超时 120 秒）；也可传 `--generator openai`（或设 `GENERATOR_PROVIDER=openai`）接入通用 OpenAI 兼容服务地址，通过 `ENTITYTRACE_OPENAI_BASE_URL`、`ENTITYTRACE_OPENAI_MODEL`、`ENTITYTRACE_OPENAI_API_KEY`、`ENTITYTRACE_OPENAI_EXTRA_BODY`（可选 JSON 对象）与 `ENTITYTRACE_OPENAI_TIMEOUT_SECONDS`（默认 420 秒，并发默认 8）配置。默认 `roster` 与 `describe` 支持 `--decision {auto,on,off}`（或 `ENTITYTRACE_DECISION_MODE`，默认 `auto`）：配置可选 `TYPESAFE_API_KEY`（默认模型 `jev-latest`）时，`auto`/`on` 启用 TypeSafe 封闭集提速（`roster` 阶段 Decision 默认并发 8，其余阶段默认并发 3，可用 `--decision-concurrency` 覆盖）；未配置 `TYPESAFE_API_KEY` 时 `auto` 静默使用纯生成链路且 `run_id`/`describe_id` 与 `off` 一致，`on` 则按 `config` 错误拒绝。运行时 `auto` 遇到非预算类的 Decision 异常会在本轮内软熔断回退生成模型并恢复失败计数，预算超限错误仍正常停止。仅 `--identity-algorithm groups-v2` 固定要求 `TYPESAFE_API_KEY` 与版本 `jev-1.13.0`。
 
 ```powershell
-python -X utf8 -m entitytrace run "<输入TXT路径>" --db "<数据库路径>" --output "<输出根目录>" --config "<凭证配置文件>" --max-requests 1000 --max-seconds 2400 --json
+python -X utf8 -m entitytrace run "<输入TXT路径>" --db "<数据库路径>" --output "<输出根目录>" --config "<凭证配置文件>" --decision auto --max-requests 1000 --max-seconds 2400 --json
 ```
 
 > **续跑**：更换 API 凭证不影响续跑；更换服务地址或模型会产生新的运行编号，此前成功的相同请求仍从缓存复用。
@@ -123,7 +123,7 @@ python -X utf8 -m entitytrace correct <run_id> revoke <更正ID> [--cascade] --s
 需要按实体收集原文描述事实与状态变化事件时调用（只给原文事实与空缺清单，不推断、不补全）；只读上游运行，不改变名册与已有导出：
 
 ```powershell
-python -X utf8 -m entitytrace describe <run_id> --top-k 20 --kinds person,place,object,ability --concurrency 8 --out "<描述导出路径>" --db "<数据库路径>" --config "<凭证配置文件>"
+python -X utf8 -m entitytrace describe <run_id> --top-k 20 --kinds person,place,object,ability --concurrency 8 --decision auto --out "<描述导出路径>" --db "<数据库路径>" --config "<凭证配置文件>"
 python -X utf8 -m entitytrace describe <run_id> --from-chapter 1 --to-chapter 15 --out "<描述导出路径>" --db "<数据库路径>" --config "<凭证配置文件>"
 python -X utf8 -m entitytrace describe <run_id> --views 1 --entities-per-request 0 --verify 0 --out "<描述导出路径>" --db "<数据库路径>" --config "<凭证配置文件>"
 ```
@@ -132,8 +132,8 @@ python -X utf8 -m entitytrace describe <run_id> --views 1 --entities-per-request
 - `--from-chapter N` / `--to-chapter M`（同义别名 `--start-chapter` / `--end-chapter`）按正文章序（只计 `kind=="chapter"` 条目，从 `1` 起、两端含；单端缺省补全首／末章）限定范围，未传 `--topk-file` 时按该章序范围重新排名 top-K，只扫描所选正文章节分块并保留全书实体称呼名册；越界或 `N > M` 按 `input` 拒绝（退出码 `1`）。
 - `--views N`（`1`—`5`，默认 `3`）多遍轮换分组请求并按跨遍地址重叠做过半表决，以约 `N` 倍请求数换更高精确率；原始各遍落库，导出只给过半表决后的条目并附 `support`。`--topk-file` 可固定预登记名单。
 - `--entities-per-request N` 默认 `4`（传 `0` 表示整块一组）；`N > 0` 时块内实体按优先级（`score` 降序、`entity_id` 升序）每 `N` 个一组单独请求，任务编号含遍号与组序号。
-- `--verify {0,1,3}` 默认 `1`：`1` 对表决后的描述事实与状态变化事件分别每 `12` 条一批逐条复核（keep / drop），只导出 keep 并为保留事件判定 `stage_split`；`3` 将同一批复核跑三遍并按票数表决（`drop` 票至少两票判 `drop`，原因取多数；有效票至少两票判 `keep`，事件 `stage_split` 在 `3 keep` 时取至少两票、在 `2 keep + 1 drop` 时要求两张 `keep` 都为 `true`；不足两票判 `unverified`），三遍首批分别为 `12`、`8`、`4` 条，第 0 遍批次与负载与 `1` 相同。复核要求模型逐字回抄输入 `value`，不一致会重试并计入 `echo_mismatch_retries`。导出顶层 `verification` 与 `event_verification` 分别给出事实与事件复核统计，复核批次按任务编号续跑，已完成批次不重发。
-- 相同配置得到相同 `describe_id` 并自动续跑；更换 `--top-k`、名单、章节范围、`--views`、`--entities-per-request` 或 `--verify` 会得到新编号。需要独立冷跑时使用新的 `--db` 副本。
+- `--verify {0,1,3}` 默认 `1`：`1` 对表决后的描述事实与状态变化事件分别每 `12` 条一批逐条复核（keep / drop），只导出 keep 并为保留事件判定 `stage_split`；`3` 将同一批复核跑三遍并按票数表决（`drop` 票至少两票判 `drop`，原因取多数；有效票至少两票判 `keep`，事件 `stage_split` 在 `3 keep` 时取至少两票、在 `2 keep + 1 drop` 时要求两张 `keep` 都为 `true`；不足两票判 `unverified`），三遍首批分别为 `12`、`8`、`4` 条，第 0 遍批次与负载与 `1` 相同。启用 `--decision auto|on` 且已配置 `TYPESAFE_API_KEY` 时，事实复核（每批最多 `8` 条）与事件复核（每批最多 `6` 条）均先走 `p_max ≥ 0.80` 混合筛，低于阈值仅将低置信项回退原生成模型；复核强制执行 `disguise` 禁止切分与空侧时间线整数守卫，且不发送内部 64 位 ID。复核要求模型逐字回抄输入 `value`，不一致会重试并计入 `echo_mismatch_retries`。导出顶层 `verification` 与 `event_verification` 分别给出事实与事件复核统计，复核批次按任务编号续跑，已完成批次不重发。
+- `--decision {auto,on,off}` / `--decision-concurrency N` 同样作用于 `describe`；相同实际生效配置得到相同 `describe_id` 并自动续跑（未配置 `TYPESAFE_API_KEY` 时 `auto` 与 `off` 产生相同 `describe_id`）；更换 `--top-k`、名单、章节范围、`--views`、`--entities-per-request`、`--verify` 或生效配置会得到新编号。需要独立冷跑时使用新的 `--db` 副本。
 - 成功输出单行 `{"ok":true,"describe_id","run_id","views","entities_per_request","verify","chapter_range","counts":{"tasks","facts","events","stages","multi_stage_entities","reviews"},"out"}`；失败沿用统一错误 JSON 与退出码。401/402/429 等硬额度停止后保留断点，用原命令同库续跑。
 - 导出 `entities[]` 每项含 `facts`、`state_events`、确定性非空阶段列表 `stages`（每项含 `stage_index`、`start`、`end`、`from_chapter`、`to_chapter`、`first_fact_chapter_id`、`last_fact_chapter_id`、`trigger_events`、`facts`、`gaps`）与整体 `gaps`，导出顶层含 `views`、`entities_per_request`、`chapter_range`、`verification` 与 `event_verification`；待审项在 `reviews[]` 中给出原因（未知实体、facet 与类别不符、枚举非法、引用找不到或超长、`holder` 引文不含持有者称呼的 `holder-not-in-quote` 等）。`holder` 事实的引文会在同一片段内向左扩展到最近的持有者称呼，候选称呼来自全书名册（事实 `value`、`holder_entity_id` 的称呼及 `value` 中可解析人物的称呼，不要求持有者实体出现在本请求中）。
 
@@ -152,7 +152,7 @@ python -X utf8 -m entitytrace describe <run_id> --views 1 --entities-per-request
 | `2` | `quota` | **`false`** | API 余额不足、硬额度耗尽（`hard_quota`）或 `402/429` 额度限制，库内保留断点 | **严禁立即自动重跑**；若为 `429` 或额度窗口限制，保留断点稍后同库续跑；若为 DeepSeek 余额不足，告知用户充值后再同库续跑 |
 | `2` | `null` | — | 显式指定 `--stop-after chapters` 或 `--stop-after discovery` 到达阶段断点 | 按编排计划决定是否继续推进后续阶段 |
 | `1` | `conflict` | `false` | `correct --expect-revision` 与当前实际 `result_revision` 不一致（结果版本已过期） | **不得直接用旧参数强推**；必须重新调用 `status` / `entities` / `entity` / `review` 读取最新状态与实体 ID，核对后再提交 |
-| `1` | `config` | `false` | 缺少模型 API 密钥或必填服务配置、配置文件格式错误、服务地址非法或 `401/403` 鉴权失败 | **禁止自动重试**；提示用户检查配置文件或环境变量凭证配置 |
+| `1` | `config` | `false` | 缺少生成或必填 Decision（如 `--decision on` 或 `groups-v2`）API 密钥、配置文件格式错误、服务地址非法或 `401/403` 鉴权失败 | **禁止自动重试**；提示用户检查配置文件或环境变量凭证配置 |
 | `1` | `input` | `false` | 输入文件不存在／编码错误、章节结构阻断（经唯一未标注章题补齐后区间内仍存在歧义／非整行缺失章号疑似标题或重复章节，`blocking=true`）、未知 `run_id`／`entity_id`、`--limit > 200`、`groups-v2` 运行调用只读查询、未完成运行调用 `correct` | **禁止自动重跑**（章节阻断重跑命中缓存结果相同，可通过 `review <run_id> --stage chapters` 核查；唯一未标注章题缺口与后接章的无正文卷／部标题由程序确定性补齐或改判，原文章号跳号或回退后按新章题连续递增记为 `blocking=false` 提示，不阻断运行）；检查参数或询问用户 |
 | `1` | `local` | `false` | 保存的原文 SHA-256 指纹不匹配或本地覆盖不变量校验异常 | **立即停止**并向用户报告数据库／产物完整性异常，不得覆盖原库 |
 

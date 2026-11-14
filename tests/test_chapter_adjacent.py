@@ -60,7 +60,7 @@ class ChapterAdjacentConflictTests(unittest.TestCase):
                 self.assertEqual(
                     outcome["path_counts"],
                     {
-                        "candidates": 7,
+                        "candidates": 6,
                         "labeled": 4,
                         "adopted": 3,
                         "dropped_no_body": 1,

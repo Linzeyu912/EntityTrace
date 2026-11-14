@@ -7,7 +7,13 @@ import uuid
 from pathlib import Path
 
 from .chapters import detect_chapters
-from .config import OPENAI_DEFAULT_TIMEOUT_SECONDS, load_services
+from .config import (
+    OPENAI_DEFAULT_TIMEOUT_SECONDS,
+    is_typesafe_decision_service,
+    load_services,
+    read_env,
+    resolve_decision_mode,
+)
 from .corrections import CorrectionConflictError, partition_active_corrections, replay_user_corrections
 from .discovery import discover
 from .identity import group_entities
@@ -471,19 +477,24 @@ def export_run(store: Store, run_id: str, output_root: Path, output_dir: Path | 
 
 
 def run_pipeline(input_path: Path, db_path: Path, output_root: Path, config_path: Path,
-                 discovery_concurrency: int = 6, decision_concurrency: int = 3, task_chars: int = 9000,
+                 discovery_concurrency: int = 6, decision_concurrency: int | None = None, task_chars: int = 9000,
                  encoding: str = "utf-8", stop_after: str = "identity", log=print,
                  identity_rounds: int = 12, group_candidates: int = 3,
                  max_requests: int | None = None, max_seconds: float | None = None,
                  max_network_failures: int = 9,
                  identity_algorithm: str = "roster",
                  generator: str | None = None,
+                 decision_mode: str | None = None,
                  receipt_out: dict | None = None) -> tuple[str, Path, bool]:
     wall_begin = time.monotonic()
     if identity_algorithm not in IDENTITY_ALGORITHMS:
         raise ValueError(f"不支持的身份归组算法：{identity_algorithm}")
     algo_version = IDENTITY_ALGORITHMS[identity_algorithm]
-    if not 1 <= discovery_concurrency <= 32 or not 1 <= decision_concurrency <= 16 or not 500 <= task_chars <= 20000:
+    if (
+        not 1 <= discovery_concurrency <= 32
+        or (decision_concurrency is not None and not 1 <= decision_concurrency <= 16)
+        or not 500 <= task_chars <= 20000
+    ):
         raise ValueError("并发数或任务长度超出本工具支持范围")
     if algo_version == RESOLUTION_VERSION and (not 1 <= identity_rounds <= 24 or not 1 <= group_candidates <= 3):
         raise ValueError("身份轮次须为 1—24，候选组上限须为 1—3")
@@ -503,10 +514,21 @@ def run_pipeline(input_path: Path, db_path: Path, output_root: Path, config_path
             exc.et_category = "input"  # type: ignore[attr-defined]
             raise
         try:
-            services = load_services(config_path, require_decision=(algo_version == RESOLUTION_VERSION), generator=generator)
+            resolved_decision_mode = resolve_decision_mode(decision_mode, read_env(config_path))
+            services = load_services(
+                config_path,
+                require_decision=(algo_version == RESOLUTION_VERSION),
+                generator=generator,
+                decision_mode=resolved_decision_mode,
+            )
         except Exception as exc:
             exc.et_category = "config"  # type: ignore[attr-defined]
             raise
+        if decision_concurrency is None:
+            if algo_version == ROSTER_VERSION and is_typesafe_decision_service(services.get("decision")):
+                decision_concurrency = 8
+            else:
+                decision_concurrency = 3
         generator_provider = services["discovery"].provider
         if generator_provider == "openai":
             raw_timeout = services["discovery"].timeout_seconds or OPENAI_DEFAULT_TIMEOUT_SECONDS
@@ -545,8 +567,17 @@ def run_pipeline(input_path: Path, db_path: Path, output_root: Path, config_path
             elif name == "discovery":
                 outcome = discover(store, models, source, run_id, store.records(run_id, "chapter"), task_chars, discovery_concurrency, log)
             elif algo_version == ROSTER_VERSION:
-                outcome = resolve_roster(store, models, source, run_id,
-                                         concurrency=discovery_concurrency, log=log, task_chars=task_chars)
+                outcome = resolve_roster(
+                    store,
+                    models,
+                    source,
+                    run_id,
+                    concurrency=discovery_concurrency,
+                    log=log,
+                    task_chars=task_chars,
+                    decision_concurrency=decision_concurrency,
+                    decision_mode=resolved_decision_mode,
+                )
             else:
                 outcome = resolve_groups(store, models, source, run_id, decision_concurrency, log,
                                          identity_rounds, group_candidates)

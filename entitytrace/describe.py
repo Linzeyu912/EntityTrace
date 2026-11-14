@@ -10,9 +10,11 @@ from __future__ import annotations
 
 import json
 import math
+import threading
 import time
 from pathlib import Path
 
+from .config import is_typesafe_decision_service, resolve_decision_mode
 from .discovery import plan_tasks
 from .models import BudgetError, ModelError, Models, RequestBudget, bounded_map
 from .query import _load_roster_snapshot, query_rank
@@ -22,6 +24,9 @@ from .util import digest, dumps, utc_now, write_json
 DESCRIBE_VERSION = "describe-v6"
 MAX_QUOTE_CHARS = 120
 VERIFY_BATCH = 12
+VERIFY_DECISION_BATCH = 8
+EVENT_VERIFY_DECISION_BATCH = 6
+DESC_VERIFY_DECISION_TAU = 0.80
 VERIFY_PROMPT_VERSION = "verify-v2"
 EVENT_VERIFY_PROMPT_VERSION = "event-verify-v2"
 VERIFY_CONTEXT_CHARS = 200
@@ -285,6 +290,7 @@ def build_describe_id(
     verify: int = 0,
     from_chapter: int | None = None,
     to_chapter: int | None = None,
+    decision_service: dict | None = None,
 ) -> str:
     views = _validate_views(views)
     verify = _validate_verify(verify)
@@ -297,6 +303,8 @@ def build_describe_id(
         "verify_prompt_version": VERIFY_PROMPT_VERSION,
         "event_verify_prompt_version": EVENT_VERIFY_PROMPT_VERSION,
     }
+    if decision_service is not None:
+        options["decision"] = decision_service
     if from_chapter is not None or to_chapter is not None:
         for flag, val in (("--from-chapter", from_chapter), ("--to-chapter", to_chapter)):
             if val is not None and (not isinstance(val, int) or isinstance(val, bool) or val < 1):
@@ -1242,6 +1250,7 @@ def _finalize_verify(
     describe_id: str,
     verify_tasks: list[dict],
     passes: int,
+    fact_ids: list[str] | None = None,
 ) -> None:
     """把 `fact_verify_votes` 汇总为最终结论写入 `fact_verdicts`（按输入顺序处理）。"""
     rows = store.rows(
@@ -1253,15 +1262,22 @@ def _finalize_verify(
         by_fact.setdefault(str(row["fact_id"]), []).append(
             (int(row["pass"]), str(row["verdict"]), row["reason"]),
         )
-    fact_ids: list[str] = []
+    ordered_fact_ids: list[str] = []
     seen: set[str] = set()
-    for task in verify_tasks:
-        for fact_id in task["fact_ids"]:
-            if fact_id not in seen:
-                seen.add(fact_id)
-                fact_ids.append(fact_id)
-    with store.lock, store.db:
+    if fact_ids is not None:
         for fact_id in fact_ids:
+            fid = str(fact_id)
+            if fid not in seen:
+                seen.add(fid)
+                ordered_fact_ids.append(fid)
+    else:
+        for task in verify_tasks:
+            for fact_id in task["fact_ids"]:
+                if fact_id not in seen:
+                    seen.add(fact_id)
+                    ordered_fact_ids.append(fact_id)
+    with store.lock, store.db:
+        for fact_id in ordered_fact_ids:
             verdict, reason = decide_verdict(by_fact.get(fact_id, []), passes)
             store.db.execute(
                 "INSERT OR REPLACE INTO fact_verdicts VALUES(?,?,?,?,?)",
@@ -1638,6 +1654,253 @@ def _save_event_verify_result(
         )
 
 
+def _resolve_guard_chapter_map(
+    facts: list[dict],
+    events: list[dict],
+    chapters: list[dict] | None = None,
+) -> dict[str, int]:
+    if chapters:
+        body_seq: dict[str, int] = {}
+        seq = 0
+        for ch in chapters:
+            if ch.get("kind") == "chapter":
+                seq += 1
+                body_seq[str(ch["id"])] = seq
+        return body_seq
+    earliest: dict[str, int] = {}
+    for item in [*facts, *events]:
+        ch_id = item.get("chapter_id")
+        if ch_id is None:
+            continue
+        key = str(ch_id)
+        st = int(item.get("start", 0))
+        if key not in earliest or st < earliest[key]:
+            earliest[key] = st
+    ordered = sorted(earliest.items(), key=lambda kv: (kv[1], kv[0]))
+    return {ch_id: idx for idx, (ch_id, _) in enumerate(ordered, start=1)}
+
+
+def _guard_chapter_index(item: dict, chapter_map: dict[str, int]) -> int | None:
+    if item.get("chapter_index") is not None:
+        return int(item["chapter_index"])
+    ch_id = item.get("chapter_id")
+    if ch_id is not None and str(ch_id) in chapter_map:
+        return chapter_map[str(ch_id)]
+    return None
+
+
+def apply_stage_split_guards(
+    facts: list[dict],
+    events: list[dict],
+    chapters: list[dict] | None = None,
+) -> list[dict]:
+    """H-1a：事件阶段切分首末事实章空侧整数时间线守卫（返回浅拷贝列表）。"""
+    chapter_map = _resolve_guard_chapter_map(facts, events, chapters)
+    facts_by_ent: dict[str, list[dict]] = {}
+    for fact in facts:
+        verdict = fact.get("verdict")
+        if verdict is not None and verdict != "keep":
+            continue
+        facts_by_ent.setdefault(str(fact["entity_id"]), []).append(fact)
+
+    guarded: list[dict] = []
+    for ev in events:
+        ev_copy = dict(ev)
+        verdict = ev_copy.get("verdict", "keep")
+        if verdict == "keep" and bool(ev_copy.get("stage_split")):
+            eid = str(ev_copy["entity_id"])
+            ef = facts_by_ent.get(eid, [])
+            c_facts = [
+                c for f in ef
+                if (c := _guard_chapter_index(f, chapter_map)) is not None
+            ]
+            c_ev = _guard_chapter_index(ev_copy, chapter_map)
+            if not ef or not c_facts:
+                ev_copy["stage_split"] = False
+            elif c_ev is not None:
+                before_facts = sum(1 for f in ef if int(f["start"]) < int(ev_copy["start"]))
+                after_facts = sum(1 for f in ef if int(f["start"]) >= int(ev_copy["start"]))
+                mn, mx = min(c_facts), max(c_facts)
+                et = str(ev_copy.get("event_type", ""))
+                fire = False
+                if c_ev < mn or c_ev > mx:
+                    fire = True
+                elif before_facts == 0 and after_facts == 0:
+                    fire = True
+                elif et not in ("owner_change", "transform", "upgrade"):
+                    if (c_ev == mn and before_facts == 0) or (c_ev == mx and after_facts == 0):
+                        fire = True
+                if fire:
+                    ev_copy["stage_split"] = False
+        guarded.append(ev_copy)
+    return guarded
+
+
+class _DescribeDecisionState:
+    def __init__(self) -> None:
+        self.lock = threading.Lock()
+        self.tripped = False
+        self.fallback_reason: str | None = None
+
+
+def _call_describe_decision(
+    models,
+    dec_state: _DescribeDecisionState,
+    decision_mode: str,
+    state: dict,
+    questions: dict,
+    stage: str,
+) -> tuple[dict, str] | None:
+    with dec_state.lock:
+        if dec_state.tripped:
+            return None
+    budget = getattr(models, "budget", None)
+    prev_net_failures = None
+    if budget is not None:
+        with budget.lock:
+            prev_net_failures = budget.consecutive_network_failures
+    try:
+        return models.choices(state, questions, stage)
+    except BudgetError:
+        raise
+    except ModelError as exc:
+        if decision_mode == "on":
+            setattr(exc, "_from_decision", True)
+            raise
+        if budget is not None and prev_net_failures is not None:
+            with budget.lock:
+                if (
+                    budget.stop_reason is None
+                    and budget.consecutive_network_failures < budget.max_network_failures
+                ):
+                    budget.consecutive_network_failures = min(
+                        budget.consecutive_network_failures,
+                        prev_net_failures,
+                    )
+        with dec_state.lock:
+            if not dec_state.tripped:
+                dec_state.tripped = True
+                dec_state.fallback_reason = str(exc)[:200]
+        return None
+
+
+def build_verify_decision_batches(
+    describe_id: str,
+    target_facts: list[dict],
+    entity_kinds: dict[str, str],
+    entity_names: dict[str, list[str]],
+    text: str,
+    chapters: list[dict],
+) -> list[dict]:
+    vtasks = build_verify_tasks(
+        describe_id, target_facts, entity_kinds, entity_names, text, chapters, passes=1,
+    )
+    fact_by_id = {str(f["id"]): f for f in target_facts}
+    all_items: list[tuple[dict, dict]] = []
+    for vt in vtasks:
+        s2f = vt["short_to_fact"]
+        for it in vt["state"]["items"]:
+            fid = str(s2f[it["id"]])
+            all_items.append((it, fact_by_id[fid]))
+
+    batches: list[dict] = []
+    for off in range(0, len(all_items), VERIFY_DECISION_BATCH):
+        chunk = all_items[off:off + VERIFY_DECISION_BATCH]
+        state_items: list[dict] = []
+        questions: dict[str, dict] = {}
+        chunk_facts: list[tuple[str, dict]] = []
+        for idx, (it, fact) in enumerate(chunk, start=1):
+            short_id = f"F{idx}"
+            it_clean = dict(it)
+            it_clean["id"] = short_id
+            state_items.append(it_clean)
+            questions[short_id] = {
+                "type": "choice",
+                "instructions": (
+                    f"判断 {short_id}（实体 {', '.join(it['names'][:4])}，"
+                    f"facet={it['facet']}，value={it['value']}）是否应保留为客观描述事实。"
+                ),
+                "criteria": {
+                    "keep": "quote 明确写出该实体本身可见或可听的描写，符合 facet_definition，且 value 被 quote 支持",
+                    "drop": "仅写动作情节或对白内容、描写他人他物、维度不符或 value 超出 quote 原意",
+                },
+            }
+            chunk_facts.append((short_id, fact))
+        batches.append({
+            "batch_idx": len(batches) + 1,
+            "items_with_facts": chunk_facts,
+            "state": {"items": state_items},
+            "questions": questions,
+        })
+    return batches
+
+
+def build_event_verify_decision_batches(
+    describe_id: str,
+    target_events: list[dict],
+    entity_kinds: dict[str, str],
+    entity_names: dict[str, list[str]],
+    text: str,
+    chapters: list[dict],
+    facts_by_pass: dict[int, list[dict]] | list[dict] | None = None,
+) -> list[dict]:
+    etasks = build_event_verify_tasks(
+        describe_id, target_events, entity_kinds, entity_names, text, chapters,
+        passes=1, facts_by_pass=facts_by_pass,
+    )
+    ev_by_id = {str(ev["id"]): ev for ev in target_events}
+    all_entries: list[tuple[dict, dict, dict]] = []
+    for et in etasks:
+        ent_by_ref = {e["entity_ref"]: e for e in et["state"]["entities"]}
+        s2e = et["short_to_event"]
+        for it in et["state"]["items"]:
+            ev_obj = ev_by_id[str(s2e[it["id"]])]
+            all_entries.append((ent_by_ref[it["entity_ref"]], it, ev_obj))
+
+    batches: list[dict] = []
+    for off in range(0, len(all_entries), EVENT_VERIFY_DECISION_BATCH):
+        chunk = all_entries[off:off + EVENT_VERIFY_DECISION_BATCH]
+        used_ents: dict[str, dict] = {}
+        ref_map: dict[str, str] = {}
+        state_items: list[dict] = []
+        questions: dict[str, dict] = {}
+        chunk_events: list[tuple[str, dict]] = []
+        for idx, (ent_obj, it, ev_obj) in enumerate(chunk, start=1):
+            real_eid = str(ev_obj["entity_id"])
+            if real_eid not in used_ents:
+                new_ref = f"ENT{len(used_ents) + 1}"
+                ent_c = dict(ent_obj)
+                ent_c["entity_ref"] = new_ref
+                used_ents[real_eid] = ent_c
+                ref_map[real_eid] = new_ref
+            short_eid = f"E{idx}"
+            it_clean = dict(it)
+            it_clean["id"] = short_eid
+            it_clean["entity_ref"] = ref_map[real_eid]
+            state_items.append(it_clean)
+            questions[short_eid] = {
+                "type": "choice",
+                "instructions": (
+                    f"结合 {it_clean['entity_ref']} 的时间线与 {short_eid}"
+                    f"（{it['event_type']}，第{it.get('chapter')}章，"
+                    f"value={it['value']}），判断状态事件复核结论与是否持久切分阶段。"
+                ),
+                "criteria": {
+                    "keep_split": "当场真实状态变更，且在后续章节开启持续的新外貌或持有人阶段",
+                    "keep_nosplit": "当场真实状态变更，但属短暂一次性变化、终局死亡或后续无对应新阶段外貌事实，不切分阶段",
+                    "drop": "非状态事件（如旧事追述、普通乘骑施法、未遂或无外在形态变更的册封）、主体错误、类型不符或无原文依据",
+                },
+            }
+            chunk_events.append((short_eid, ev_obj))
+        batches.append({
+            "batch_idx": len(batches) + 1,
+            "items_with_events": chunk_events,
+            "state": {"entities": list(used_ents.values()), "items": state_items},
+            "questions": questions,
+        })
+    return batches
+
+
 def _finalize_event_verify(
     store: Store,
     describe_id: str,
@@ -1645,12 +1908,14 @@ def _finalize_event_verify(
     passes: int,
     voted_events: list[dict] | None = None,
     entity_kinds: dict[str, str] | None = None,
+    active_facts: list[dict] | None = None,
+    chapters: list[dict] | None = None,
 ) -> None:
     """把 `event_verify_votes` 汇总为最终结论写入 `event_verdicts`。
 
     给出 `voted_events` 与 `entity_kinds` 时遍历全部表决后事件：跨粗类非法事件
     不依赖模型票，直接写入 `drop / wrong_event_type / 0`；`disguise` 临时乔装
-    永不作为阶段切点。未给出时退回按任务事件顺序汇总的兼容路径。
+    永不作为阶段切点；若提供 `active_facts` 则同步执行 H-1a 空侧整数守卫。
     """
     rows = store.rows(
         "SELECT event_id, pass, verdict, reason, stage_split FROM event_verify_votes WHERE describe_id=?",
@@ -1663,6 +1928,7 @@ def _finalize_event_verify(
         )
     entries: list[tuple[str, str, str | None]] = []
     seen: set[str] = set()
+    event_by_id: dict[str, dict] = {}
     if voted_events is None:
         for task in event_verify_tasks:
             for event_id in task["event_ids"]:
@@ -1672,34 +1938,58 @@ def _finalize_event_verify(
     else:
         for ev in voted_events:
             event_id = str(ev["id"])
+            event_by_id[event_id] = ev
             if event_id in seen:
                 continue
             seen.add(event_id)
             entries.append((event_id, str(ev["entity_id"]), str(ev["event_type"])))
-    with store.lock, store.db:
-        for event_id, entity_id, event_type in entries:
-            if voted_events is None:
+
+    computed: list[dict] = []
+    for event_id, entity_id, event_type in entries:
+        if voted_events is None:
+            verdict, reason, stage_split = decide_event_verdict(
+                by_event.get(event_id, []), passes,
+            )
+        else:
+            kind = str((entity_kinds or {}).get(entity_id, ""))
+            if event_type not in ALLOWED_EVENT_TYPES_BY_KIND.get(kind, ()):
+                verdict, reason, stage_split = "drop", "wrong_event_type", False
+            else:
                 verdict, reason, stage_split = decide_event_verdict(
                     by_event.get(event_id, []), passes,
                 )
-            else:
-                kind = str((entity_kinds or {}).get(entity_id, ""))
-                if event_type not in ALLOWED_EVENT_TYPES_BY_KIND.get(kind, ()):
-                    verdict, reason, stage_split = "drop", "wrong_event_type", False
-                else:
-                    verdict, reason, stage_split = decide_event_verdict(
-                        by_event.get(event_id, []), passes,
-                    )
-            if verdict == "keep" and event_type == "disguise":
-                stage_split = False
+        if verdict == "keep" and event_type == "disguise":
+            stage_split = False
+        raw_ev = event_by_id.get(event_id) or {}
+        item: dict = {
+            "id": event_id,
+            "entity_id": entity_id,
+            "event_type": event_type,
+            "verdict": verdict,
+            "reason": reason,
+            "stage_split": stage_split,
+            "chapter_id": raw_ev.get("chapter_id"),
+            "start": int(raw_ev.get("start", 0)),
+            "end": int(raw_ev.get("end", 0)),
+        }
+        if raw_ev.get("chapter_index") is not None:
+            item["chapter_index"] = int(raw_ev["chapter_index"])
+        computed.append(item)
+
+    if active_facts is not None and voted_events is not None:
+        computed = apply_stage_split_guards(active_facts, computed, chapters=chapters)
+
+    with store.lock, store.db:
+        for item in computed:
+            event_id = str(item["id"])
             store.db.execute(
                 "INSERT OR REPLACE INTO event_verdicts VALUES(?,?,?,?,?,?)",
                 (
                     describe_id,
                     event_id,
-                    verdict,
-                    reason,
-                    1 if stage_split else 0,
+                    item["verdict"],
+                    item["reason"],
+                    1 if item["stage_split"] else 0,
                     digest(["describe-event-verdict-v2", describe_id, event_id, passes]),
                 ),
             )
@@ -2048,6 +2338,17 @@ def _export_document(
         voted_events, event_verification = _event_verification_summary(
             store, describe_id, voted_events, passes=verify,
         )
+        has_event_verdicts = bool(
+            store.rows(
+                "SELECT 1 FROM event_verdicts WHERE describe_id=? LIMIT 1",
+                (describe_id,),
+            )
+        )
+        if has_event_verdicts:
+            voted_events = apply_stage_split_guards(voted_facts, voted_events, chapters=chapters_list)
+            event_verification["split_events"] = sum(
+                1 for item in voted_events if item.get("stage_split") is True
+            )
     else:
         exported_events: list[dict] = []
         for item in voted_events:
@@ -2253,6 +2554,419 @@ def export_describe_run(store: Store, describe_id: str, out: Path | None = None)
     return document
 
 
+def _run_verify(
+    store: Store,
+    models,
+    describe_id: str,
+    voted_facts: list[dict],
+    entity_kinds: dict[str, str],
+    entity_names: dict[str, list[str]],
+    text: str,
+    chapters: list[dict],
+    *,
+    verify: int,
+    concurrency: int,
+    decision_concurrency: int,
+    use_decision: bool,
+    decision_mode: str,
+    dec_state: _DescribeDecisionState,
+    verify_worker,
+) -> tuple[int, int]:
+    if not use_decision or dec_state.tripped:
+        verify_tasks = build_verify_tasks(
+            describe_id, voted_facts, entity_kinds, entity_names, text, chapters,
+            passes=verify,
+        )
+        completed_ids = {
+            row["id"] for row in store.rows(
+                "SELECT id FROM describe_tasks WHERE describe_id=? AND status='completed'",
+                (describe_id,),
+            )
+        }
+        pending_verify = [task for task in verify_tasks if task["id"] not in completed_ids]
+        verify_completed_new = 0
+        for vtask, vresult, verror in bounded_map(pending_verify, verify_worker, concurrency):
+            if verror is not None:
+                if isinstance(verror, BudgetError):
+                    raise verror
+                if isinstance(verror, ModelError) and verror.status is not None:
+                    raise verror
+                if isinstance(verror, ModelError):
+                    _save_verify_result(store, describe_id, vtask, [], {"error": "invalid-output"})
+                    verify_completed_new += 1
+                    continue
+                raise verror
+            _save_verify_result(
+                store,
+                describe_id,
+                vtask,
+                list(vresult["value"]["verdicts"]),
+                {"request_id": vresult["request_id"]},
+            )
+            verify_completed_new += 1
+        _finalize_verify(store, describe_id, verify_tasks, verify)
+        return len(verify_tasks), verify_completed_new
+
+    existing_passes: dict[str, set[int]] = {}
+    for row in store.rows(
+        "SELECT fact_id, pass FROM fact_verify_votes WHERE describe_id=?",
+        (describe_id,),
+    ):
+        existing_passes.setdefault(str(row["fact_id"]), set()).add(int(row["pass"]))
+    pending_facts = [
+        fact for fact in voted_facts
+        if len({p for p in existing_passes.get(str(fact["id"]), set()) if 0 <= p < verify}) < verify
+    ]
+    if not pending_facts:
+        _finalize_verify(
+            store, describe_id, [], verify,
+            fact_ids=[str(f["id"]) for f in voted_facts],
+        )
+        return 0, 0
+
+    dec_batches = build_verify_decision_batches(
+        describe_id, pending_facts, entity_kinds, entity_names, text, chapters,
+    )
+    fallback_facts: list[dict] = []
+    verify_completed_new = 0
+
+    def _dec_fact_worker(batch: dict):
+        return _call_describe_decision(
+            models, dec_state, decision_mode, batch["state"], batch["questions"],
+            "describe-verify-decision",
+        )
+
+    for batch, dec_res, dec_err in bounded_map(dec_batches, _dec_fact_worker, decision_concurrency):
+        if dec_err is not None:
+            if isinstance(dec_err, BudgetError) or getattr(dec_err, "_from_decision", False):
+                raise dec_err
+            raise dec_err
+        if dec_res is None:
+            fallback_facts.extend(fact for _, fact in batch["items_with_facts"])
+            continue
+        answers, req_id = dec_res
+        direct_votes: list[tuple[str, str, str | None]] = []
+        batch_facts: list[dict] = []
+        for short_id, fact in batch["items_with_facts"]:
+            batch_facts.append(fact)
+            ans = answers[short_id]
+            p_max = max(ans["probabilities"].values())
+            if p_max >= DESC_VERIFY_DECISION_TAU:
+                choice = str(ans["choice"])
+                verdict = "keep" if choice == "keep" else "drop"
+                reason = None if verdict == "keep" else "not_description"
+                direct_votes.append((str(fact["id"]), verdict, reason))
+            else:
+                fallback_facts.append(fact)
+        if direct_votes:
+            dec_tid = digest([
+                "describe-verify-decision-v1",
+                describe_id,
+                batch["batch_idx"],
+                [str(f["id"]) for f in batch_facts],
+            ])
+            b_start = min(int(f["start"]) for f in batch_facts)
+            b_end = max(int(f["end"]) for f in batch_facts)
+            with store.lock, store.db:
+                for fact_id, verdict, reason in direct_votes:
+                    for pass_index in range(verify):
+                        store.db.execute(
+                            "INSERT OR REPLACE INTO fact_verify_votes VALUES(?,?,?,?,?,?)",
+                            (describe_id, fact_id, pass_index, verdict, reason, dec_tid),
+                        )
+                store.db.execute(
+                    "INSERT OR REPLACE INTO describe_tasks VALUES(?,?,?,?,?,?,?,?)",
+                    (
+                        describe_id,
+                        dec_tid,
+                        None,
+                        b_start,
+                        b_end,
+                        "completed",
+                        dumps({
+                            "stage": "describe-verify-decision",
+                            "request_id": req_id,
+                            "checked": len(direct_votes),
+                        }),
+                        None,
+                    ),
+                )
+        verify_completed_new += 1
+
+    fb_tasks: list[dict] = []
+    if fallback_facts:
+        fb_tasks = build_verify_tasks(
+            describe_id, fallback_facts, entity_kinds, entity_names, text, chapters,
+            passes=verify,
+        )
+        completed_ids = {
+            row["id"] for row in store.rows(
+                "SELECT id FROM describe_tasks WHERE describe_id=? AND status='completed'",
+                (describe_id,),
+            )
+        }
+        pending_fb = [task for task in fb_tasks if task["id"] not in completed_ids]
+        for vtask, vresult, verror in bounded_map(pending_fb, verify_worker, concurrency):
+            if verror is not None:
+                if isinstance(verror, BudgetError):
+                    raise verror
+                if isinstance(verror, ModelError) and verror.status is not None:
+                    raise verror
+                if isinstance(verror, ModelError):
+                    _save_verify_result(store, describe_id, vtask, [], {"error": "invalid-output"})
+                    verify_completed_new += 1
+                    continue
+                raise verror
+            _save_verify_result(
+                store,
+                describe_id,
+                vtask,
+                list(vresult["value"]["verdicts"]),
+                {"request_id": vresult["request_id"]},
+            )
+            verify_completed_new += 1
+
+    _finalize_verify(
+        store,
+        describe_id,
+        fb_tasks,
+        verify,
+        fact_ids=[str(f["id"]) for f in voted_facts],
+    )
+    return len(dec_batches) + len(fb_tasks), verify_completed_new
+
+
+def _run_event_verify(
+    store: Store,
+    models,
+    describe_id: str,
+    voted_events: list[dict],
+    facts_by_pass: dict[int, list[dict]],
+    active_facts: list[dict],
+    entity_kinds: dict[str, str],
+    entity_names: dict[str, list[str]],
+    text: str,
+    chapters: list[dict],
+    *,
+    verify: int,
+    concurrency: int,
+    decision_concurrency: int,
+    use_decision: bool,
+    decision_mode: str,
+    dec_state: _DescribeDecisionState,
+    event_verify_worker,
+) -> tuple[int, int]:
+    if not use_decision or dec_state.tripped:
+        event_verify_tasks = build_event_verify_tasks(
+            describe_id, voted_events, entity_kinds, entity_names, text, chapters,
+            passes=verify, facts_by_pass=facts_by_pass,
+        )
+        completed_ids = {
+            row["id"] for row in store.rows(
+                "SELECT id FROM describe_tasks WHERE describe_id=? AND status='completed'",
+                (describe_id,),
+            )
+        }
+        pending_event_verify = [
+            task for task in event_verify_tasks if task["id"] not in completed_ids
+        ]
+        event_verify_completed_new = 0
+        for evtask, evresult, everror in bounded_map(
+            pending_event_verify, event_verify_worker, concurrency,
+        ):
+            if everror is not None:
+                if isinstance(everror, BudgetError):
+                    raise everror
+                if isinstance(everror, ModelError) and everror.status is not None:
+                    raise everror
+                if isinstance(everror, ModelError):
+                    _save_event_verify_result(
+                        store, describe_id, evtask, [], {"error": "invalid-output"},
+                    )
+                    event_verify_completed_new += 1
+                    continue
+                raise everror
+            _save_event_verify_result(
+                store,
+                describe_id,
+                evtask,
+                list(evresult["value"]["verdicts"]),
+                {"request_id": evresult["request_id"]},
+            )
+            event_verify_completed_new += 1
+        _finalize_event_verify(
+            store,
+            describe_id,
+            event_verify_tasks,
+            verify,
+            voted_events=voted_events,
+            entity_kinds=entity_kinds,
+            active_facts=active_facts,
+            chapters=chapters,
+        )
+        return len(event_verify_tasks), event_verify_completed_new
+
+    allowed_events = [
+        ev for ev in voted_events
+        if str(ev["event_type"]) in ALLOWED_EVENT_TYPES_BY_KIND.get(
+            str(entity_kinds.get(str(ev["entity_id"]), "")), (),
+        )
+    ]
+    existing_passes: dict[str, set[int]] = {}
+    for row in store.rows(
+        "SELECT event_id, pass FROM event_verify_votes WHERE describe_id=?",
+        (describe_id,),
+    ):
+        existing_passes.setdefault(str(row["event_id"]), set()).add(int(row["pass"]))
+    pending_events = [
+        ev for ev in allowed_events
+        if len({p for p in existing_passes.get(str(ev["id"]), set()) if 0 <= p < verify}) < verify
+    ]
+    if not pending_events:
+        _finalize_event_verify(
+            store,
+            describe_id,
+            [],
+            verify,
+            voted_events=voted_events,
+            entity_kinds=entity_kinds,
+            active_facts=active_facts,
+            chapters=chapters,
+        )
+        return 0, 0
+
+    dec_batches = build_event_verify_decision_batches(
+        describe_id, pending_events, entity_kinds, entity_names, text, chapters,
+        facts_by_pass=facts_by_pass,
+    )
+    fallback_events: list[dict] = []
+    event_verify_completed_new = 0
+
+    def _dec_event_worker(batch: dict):
+        return _call_describe_decision(
+            models, dec_state, decision_mode, batch["state"], batch["questions"],
+            "describe-event-verify-decision",
+        )
+
+    for batch, dec_res, dec_err in bounded_map(dec_batches, _dec_event_worker, decision_concurrency):
+        if dec_err is not None:
+            if isinstance(dec_err, BudgetError) or getattr(dec_err, "_from_decision", False):
+                raise dec_err
+            raise dec_err
+        if dec_res is None:
+            fallback_events.extend(ev for _, ev in batch["items_with_events"])
+            continue
+        answers, req_id = dec_res
+        direct_votes: list[tuple[str, str, str | None, bool]] = []
+        batch_events: list[dict] = []
+        for short_eid, ev in batch["items_with_events"]:
+            batch_events.append(ev)
+            ans = answers[short_eid]
+            p_max = max(ans["probabilities"].values())
+            if p_max >= DESC_VERIFY_DECISION_TAU:
+                choice = str(ans["choice"])
+                if choice == "keep_split":
+                    is_split = str(ev.get("event_type")) != "disguise"
+                    direct_votes.append((str(ev["id"]), "keep", None, is_split))
+                elif choice == "keep_nosplit":
+                    direct_votes.append((str(ev["id"]), "keep", None, False))
+                else:
+                    direct_votes.append((str(ev["id"]), "drop", "not_state_event", False))
+            else:
+                fallback_events.append(ev)
+        if direct_votes:
+            dec_tid = digest([
+                "describe-event-verify-decision-v1",
+                describe_id,
+                batch["batch_idx"],
+                [str(ev["id"]) for ev in batch_events],
+            ])
+            b_start = min(int(ev["start"]) for ev in batch_events)
+            b_end = max(int(ev["end"]) for ev in batch_events)
+            with store.lock, store.db:
+                for event_id, verdict, reason, stage_split in direct_votes:
+                    for pass_index in range(verify):
+                        store.db.execute(
+                            "INSERT OR REPLACE INTO event_verify_votes VALUES(?,?,?,?,?,?,?)",
+                            (
+                                describe_id,
+                                event_id,
+                                pass_index,
+                                verdict,
+                                reason,
+                                1 if stage_split else 0,
+                                dec_tid,
+                            ),
+                        )
+                store.db.execute(
+                    "INSERT OR REPLACE INTO describe_tasks VALUES(?,?,?,?,?,?,?,?)",
+                    (
+                        describe_id,
+                        dec_tid,
+                        None,
+                        b_start,
+                        b_end,
+                        "completed",
+                        dumps({
+                            "stage": "describe-event-verify-decision",
+                            "request_id": req_id,
+                            "checked": len(direct_votes),
+                        }),
+                        None,
+                    ),
+                )
+        event_verify_completed_new += 1
+
+    fb_tasks: list[dict] = []
+    if fallback_events:
+        fb_tasks = build_event_verify_tasks(
+            describe_id, fallback_events, entity_kinds, entity_names, text, chapters,
+            passes=verify, facts_by_pass=facts_by_pass,
+        )
+        completed_ids = {
+            row["id"] for row in store.rows(
+                "SELECT id FROM describe_tasks WHERE describe_id=? AND status='completed'",
+                (describe_id,),
+            )
+        }
+        pending_fb = [task for task in fb_tasks if task["id"] not in completed_ids]
+        for evtask, evresult, everror in bounded_map(
+            pending_fb, event_verify_worker, concurrency,
+        ):
+            if everror is not None:
+                if isinstance(everror, BudgetError):
+                    raise everror
+                if isinstance(everror, ModelError) and everror.status is not None:
+                    raise everror
+                if isinstance(everror, ModelError):
+                    _save_event_verify_result(
+                        store, describe_id, evtask, [], {"error": "invalid-output"},
+                    )
+                    event_verify_completed_new += 1
+                    continue
+                raise everror
+            _save_event_verify_result(
+                store,
+                describe_id,
+                evtask,
+                list(evresult["value"]["verdicts"]),
+                {"request_id": evresult["request_id"]},
+            )
+            event_verify_completed_new += 1
+
+    _finalize_event_verify(
+        store,
+        describe_id,
+        fb_tasks,
+        verify,
+        voted_events=voted_events,
+        entity_kinds=entity_kinds,
+        active_facts=active_facts,
+        chapters=chapters,
+    )
+    return len(dec_batches) + len(fb_tasks), event_verify_completed_new
+
+
 def run_describe(
     store: Store,
     run_id: str,
@@ -2271,15 +2985,20 @@ def run_describe(
     max_seconds: float | None = None,
     from_chapter: int | None = None,
     to_chapter: int | None = None,
+    decision_concurrency: int = 8,
+    decision_mode: str | None = None,
 ) -> dict:
     begin = time.monotonic()
     if not isinstance(concurrency, int) or not 1 <= concurrency <= 32:
         raise ValueError("--concurrency 须在 1—32 之间")
+    if isinstance(decision_concurrency, bool) or not isinstance(decision_concurrency, int) or not 1 <= decision_concurrency <= 16:
+        raise ValueError("--decision-concurrency 须在 1—16 之间")
     views = _validate_views(views)
     verify = _validate_verify(verify)
     _non_negative_int(entities_per_request, "entities_per_request")
     kinds_list = _normalize_kinds(kinds)
     top_k = _validate_top_k(top_k)
+    resolved_decision_mode = resolve_decision_mode(decision_mode)
 
     run, snap = _load_roster_snapshot(store, run_id, need_entities=True)
     chapters = snap["meta"]["chapters"]
@@ -2301,10 +3020,15 @@ def run_describe(
     }
     if services is not None:
         discovery = services["discovery"]
+        svc_map = services
     elif models is not None and getattr(models, "services", None):
         discovery = models.services["discovery"]
+        svc_map = models.services
     else:
         raise ValueError("describe 需要生成服务配置")
+    dec_service = svc_map.get("decision")
+    use_decision = resolved_decision_mode != "off" and is_typesafe_decision_service(dec_service)
+    dec_public = dec_service.public() if (use_decision and dec_service is not None) else None
     fc_id = chapter_range["from_chapter"] if chapter_range["filtered"] else None
     tc_id = chapter_range["to_chapter"] if chapter_range["filtered"] else None
     describe_id = build_describe_id(
@@ -2317,6 +3041,7 @@ def run_describe(
         verify=verify,
         from_chapter=fc_id,
         to_chapter=tc_id,
+        decision_service=dec_public,
     )
     config = {
         "describe_version": DESCRIBE_VERSION,
@@ -2338,6 +3063,8 @@ def run_describe(
         "event_verify_prompt_version": EVENT_VERIFY_PROMPT_VERSION,
         "chapter_range": chapter_range,
     }
+    if dec_public is not None:
+        config["decision"] = dec_public
     now = utc_now()
     running_state = {"status": "running", "views": views, "verify": verify}
     store.execute(
@@ -2371,7 +3098,7 @@ def run_describe(
         timeout = getattr(discovery, "timeout_seconds", None) or 120
         budget = RequestBudget(max_requests=max_requests, max_seconds=max_seconds)
         models = Models(
-            store, run_id, describe_id, services, concurrency, 1,
+            store, run_id, describe_id, services, concurrency, decision_concurrency,
             timeout=timeout, budget=budget,
         )
 
@@ -2408,11 +3135,12 @@ def run_describe(
         )
         return {"value": value, "request_id": request_id}
 
+    dec_state = _DescribeDecisionState()
     completed_new = 0
     verify_completed_new = 0
     event_verify_completed_new = 0
-    verify_tasks: list[dict] = []
-    event_verify_tasks: list[dict] = []
+    verify_task_count = 0
+    event_verify_task_count = 0
     try:
         for task, result, error in bounded_map(pending, worker, concurrency):
             if error is not None:
@@ -2450,36 +3178,23 @@ def run_describe(
                 )
                 for ent in top_entities
             }
-            verify_tasks = build_verify_tasks(
-                describe_id, voted_facts, entity_kinds, entity_names, text, chapters,
-                passes=verify,
+            verify_task_count, verify_completed_new = _run_verify(
+                store,
+                models,
+                describe_id,
+                voted_facts,
+                entity_kinds,
+                entity_names,
+                text,
+                chapters,
+                verify=verify,
+                concurrency=concurrency,
+                decision_concurrency=decision_concurrency,
+                use_decision=use_decision,
+                decision_mode=resolved_decision_mode,
+                dec_state=dec_state,
+                verify_worker=verify_worker,
             )
-            completed_ids = {
-                row["id"] for row in store.rows(
-                    "SELECT id FROM describe_tasks WHERE describe_id=? AND status='completed'",
-                    (describe_id,),
-                )
-            }
-            pending_verify = [
-                task for task in verify_tasks if task["id"] not in completed_ids
-            ]
-            for vtask, vresult, verror in bounded_map(pending_verify, verify_worker, concurrency):
-                if verror is not None:
-                    if isinstance(verror, BudgetError):
-                        raise verror
-                    if isinstance(verror, ModelError) and verror.status is not None:
-                        raise verror
-                    if isinstance(verror, ModelError):
-                        _save_verify_result(store, describe_id, vtask, [],
-                                            {"error": "invalid-output"})
-                        verify_completed_new += 1
-                        continue
-                    raise verror
-                _save_verify_result(store, describe_id, vtask,
-                                    list(vresult["value"]["verdicts"]),
-                                    {"request_id": vresult["request_id"]})
-                verify_completed_new += 1
-            _finalize_verify(store, describe_id, verify_tasks, verify)
 
             vote_rows = store.rows(
                 "SELECT fact_id, pass, verdict FROM fact_verify_votes WHERE describe_id=?",
@@ -2494,44 +3209,36 @@ def run_describe(
                 p: [f for f in voted_facts if str(f["id"]) in kept_ids_by_pass[p]]
                 for p in range(verify)
             }
+            kept_fact_ids = {
+                str(row["fact_id"])
+                for row in store.rows(
+                    "SELECT fact_id FROM fact_verdicts WHERE describe_id=? AND verdict='keep'",
+                    (describe_id,),
+                )
+            }
+            active_facts = [f for f in voted_facts if str(f["id"]) in kept_fact_ids]
 
             voted_events = vote_facts(
                 _raw_events_with_views(store, describe_id), views=views, field="event_type",
             )
-            event_verify_tasks = build_event_verify_tasks(
-                describe_id, voted_events, entity_kinds, entity_names, text, chapters,
-                passes=verify, facts_by_pass=facts_by_pass,
-            )
-            completed_ids = {
-                row["id"] for row in store.rows(
-                    "SELECT id FROM describe_tasks WHERE describe_id=? AND status='completed'",
-                    (describe_id,),
-                )
-            }
-            pending_event_verify = [
-                task for task in event_verify_tasks if task["id"] not in completed_ids
-            ]
-            for evtask, evresult, everror in bounded_map(
-                pending_event_verify, event_verify_worker, concurrency,
-            ):
-                if everror is not None:
-                    if isinstance(everror, BudgetError):
-                        raise everror
-                    if isinstance(everror, ModelError) and everror.status is not None:
-                        raise everror
-                    if isinstance(everror, ModelError):
-                        _save_event_verify_result(store, describe_id, evtask, [],
-                                                  {"error": "invalid-output"})
-                        event_verify_completed_new += 1
-                        continue
-                    raise everror
-                _save_event_verify_result(store, describe_id, evtask,
-                                          list(evresult["value"]["verdicts"]),
-                                          {"request_id": evresult["request_id"]})
-                event_verify_completed_new += 1
-            _finalize_event_verify(
-                store, describe_id, event_verify_tasks, verify,
-                voted_events=voted_events, entity_kinds=entity_kinds,
+            event_verify_task_count, event_verify_completed_new = _run_event_verify(
+                store,
+                models,
+                describe_id,
+                voted_events,
+                facts_by_pass,
+                active_facts,
+                entity_kinds,
+                entity_names,
+                text,
+                chapters,
+                verify=verify,
+                concurrency=concurrency,
+                decision_concurrency=decision_concurrency,
+                use_decision=use_decision,
+                decision_mode=resolved_decision_mode,
+                dec_state=dec_state,
+                event_verify_worker=event_verify_worker,
             )
     except Exception as exc:
         store.execute(
@@ -2562,7 +3269,7 @@ def run_describe(
          utc_now(), describe_id),
     )
     counts = {
-        "tasks": len(tasks) + len(verify_tasks) + len(event_verify_tasks),
+        "tasks": len(tasks) + verify_task_count + event_verify_task_count,
         "facts": sum(len(entity["facts"]) for entity in document["entities"]),
         "events": sum(len(entity["state_events"]) for entity in document["entities"]),
         "reviews": len(document["reviews"]),
@@ -2580,9 +3287,9 @@ def run_describe(
         "out": str(Path(out)) if out is not None else None,
         "resumed_tasks": len(tasks) - len(pending),
         "new_tasks": completed_new,
-        "verify_tasks": len(verify_tasks),
+        "verify_tasks": verify_task_count,
         "new_verify_tasks": verify_completed_new,
-        "event_verify_tasks": len(event_verify_tasks),
+        "event_verify_tasks": event_verify_task_count,
         "new_event_verify_tasks": event_verify_completed_new,
         "document": document,
     }

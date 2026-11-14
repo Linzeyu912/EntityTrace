@@ -75,8 +75,51 @@ def _parse_timeout_seconds(raw: str) -> float:
     return val
 
 
-def load_services(path: Path, require_decision: bool = False, generator: str | None = None) -> dict[str, Service]:
+DECISION_MODES = ("auto", "on", "off")
+
+
+def resolve_decision_mode(
+    explicit: str | None = None,
+    config_path: Path | dict[str, str] | None = None,
+) -> str:
+    if isinstance(config_path, Path):
+        local = read_env(config_path)
+    elif isinstance(config_path, dict):
+        local = config_path
+    else:
+        local = {}
+    if explicit is not None:
+        mode = explicit.strip().lower()
+    else:
+        env_val = os.environ.get("ENTITYTRACE_DECISION_MODE", "").strip().lower()
+        local_val = local.get("ENTITYTRACE_DECISION_MODE", "").strip().lower()
+        mode = env_val or local_val or "auto"
+    if mode not in DECISION_MODES:
+        raise _config_error(f"不支持的 Decision 模式：{mode or '(空)'}（可选：auto、on、off）")
+    return mode
+
+
+def is_typesafe_decision_service(service: Service | None) -> bool:
+    if service is None or not getattr(service, "key", ""):
+        return False
+    if getattr(service, "name", None) != "decision":
+        return False
+    model = getattr(service, "model", None)
+    if not (isinstance(model, str) and model.startswith("jev-") and len(model) > 4):
+        return False
+    url = str(getattr(service, "url", "")).rstrip("/")
+    return url.startswith("https://api.typesafe.ai") or getattr(service, "provider", None) == "typesafe"
+
+
+def load_services(
+    path: Path = Path(".env.models.local"),
+    require_decision: bool = False,
+    generator: str | None = None,
+    *,
+    decision_mode: str | None = None,
+) -> dict[str, Service]:
     local = read_env(path)
+    mode = resolve_decision_mode(decision_mode, local)
     def setting(name: str, default: str = "") -> str:
         return os.environ.get(name, local.get(name, default)).strip()
     provider = (generator or setting("GENERATOR_PROVIDER", "deepseek")).strip()
@@ -90,6 +133,12 @@ def load_services(path: Path, require_decision: bool = False, generator: str | N
             jev_model = "jev-1.13.0"
         services["decision"] = Service("decision", setting("TYPESAFE_BASE_URL", "https://api.typesafe.ai/v1").rstrip("/"),
                                        jev_model, setting("TYPESAFE_API_KEY"))
+    elif mode != "off":
+        ts_key = setting("TYPESAFE_API_KEY")
+        if mode == "on" or ts_key:
+            jev_model = setting("TYPESAFE_MODEL", "jev-latest") or "jev-latest"
+            services["decision"] = Service("decision", setting("TYPESAFE_BASE_URL", "https://api.typesafe.ai/v1").rstrip("/"),
+                                           jev_model, ts_key)
     if provider == "openai":
         base = _check_openai_base_url(setting("ENTITYTRACE_OPENAI_BASE_URL").rstrip("/"))
         model = setting("ENTITYTRACE_OPENAI_MODEL")
@@ -117,10 +166,16 @@ def load_services(path: Path, require_decision: bool = False, generator: str | N
     for name, service in services.items():
         if not service.key:
             if name == "decision":
-                raise ValueError("groups-v2 需要 TypeSafe/Jev 凭证，请配置 TYPESAFE_API_KEY")
+                if require_decision:
+                    raise ValueError("groups-v2 需要 TypeSafe/Jev 凭证，请配置 TYPESAFE_API_KEY")
+                raise _config_error("已启用 --decision on，但未配置 TYPESAFE_API_KEY")
             raise ValueError(f"未配置 {name} 模型密钥，请检查本机配置文件")
         if service.provider == "deepseek" and service.url not in allowed[name]:
+            if name == "decision" and not require_decision:
+                raise _config_error(f"{name} 的服务地址不是已核对的官方地址")
             raise ValueError(f"{name} 的服务地址不是已核对的官方地址")
     if require_decision and (not jev_model.startswith("jev-") or jev_model == "jev-latest"):
         raise ValueError("Decision 模型需要明确版本")
+    if "decision" in services and not (jev_model.startswith("jev-") and len(jev_model) > 4):
+        raise _config_error("Decision 模型版本非法（须以 jev- 开头）")
     return services

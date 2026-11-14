@@ -1380,15 +1380,30 @@ class CredentialDecouplingAndTemperatureTests(unittest.TestCase):
                     rid_ds_only, out_ds_only, ok1 = run_pipeline(
                         text, root / "db1.sqlite3", root / "out1", deepseek_only_cfg, log=lambda _: None,
                     )
-                    rid_with_ts, _, ok2 = run_pipeline(
+                    rid_with_ts_off, out_with_ts_off, ok2_off = run_pipeline(
+                        text, root / "db2_off.sqlite3", root / "out2_off", both_keys_cfg,
+                        decision_mode="off", log=lambda _: None,
+                    )
+                    rid_with_ts, out_with_ts, ok2 = run_pipeline(
                         text, root / "db2.sqlite3", root / "out2", both_keys_cfg, log=lambda _: None,
                     )
                 self.assertTrue(ok1)
+                self.assertTrue(ok2_off)
                 self.assertTrue(ok2)
-                # 默认 roster 流程彻底忽略本机是否配有 TypeSafe，run_id 恒定不变
-                self.assertEqual(rid_ds_only, rid_with_ts)
+                # 无 TypeSafe Key 时 auto 静默回退，run_id 与显式 off 完全一致
+                self.assertEqual(rid_ds_only, rid_with_ts_off)
                 manifest = json.loads((out_ds_only / "manifest.json").read_text(encoding="utf-8"))
                 self.assertEqual(set(manifest["config"]["models"]), {"discovery"})
+                self.assertEqual(manifest["config"]["decision_concurrency"], 3)
+                manifest_off = json.loads((out_with_ts_off / "manifest.json").read_text(encoding="utf-8"))
+                self.assertEqual(set(manifest_off["config"]["models"]), {"discovery"})
+                self.assertEqual(manifest_off["config"]["decision_concurrency"], 3)
+                # 默认 auto 检测到 TYPESAFE_API_KEY 时自动启用 jev-latest 且并发升至 8
+                self.assertNotEqual(rid_ds_only, rid_with_ts)
+                manifest_ts = json.loads((out_with_ts / "manifest.json").read_text(encoding="utf-8"))
+                self.assertEqual(set(manifest_ts["config"]["models"]), {"discovery", "decision"})
+                self.assertEqual(manifest_ts["config"]["models"]["decision"]["model"], "jev-latest")
+                self.assertEqual(manifest_ts["config"]["decision_concurrency"], 8)
 
                 with patch("entitytrace.pipeline.Models", FakeModels):
                     with self.assertRaises(ValueError) as pipe_ctx:

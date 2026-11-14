@@ -116,7 +116,13 @@ def choice_question(instructions: str, criteria: dict[str, str]) -> dict:
 
 
 def check_choices(raw: dict, questions: dict, model: str) -> dict:
-    if not isinstance(raw, dict) or raw.get("model") != model or not isinstance(raw.get("answers"), dict):
+    if not isinstance(raw, dict) or not isinstance(raw.get("answers"), dict):
+        raise ModelError("Decision 返回结构或模型版本不一致")
+    served = raw.get("model")
+    if model == "jev-latest":
+        if not (isinstance(served, str) and served.startswith("jev-") and len(served) > 4):
+            raise ModelError("Decision 返回结构或模型版本不一致")
+    elif served != model:
         raise ModelError("Decision 返回结构或模型版本不一致")
     answers = raw["answers"]
     if set(answers) != set(questions):

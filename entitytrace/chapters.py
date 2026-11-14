@@ -473,9 +473,66 @@ def build_chapters(source: dict, headings: list[dict]) -> tuple[str, list[dict]]
     return version, chapters
 
 
+_EXEMPT_PREFIX_RE = re.compile(
+    r"^(?:"
+    r"第[〇零一二两三四五六七八九十百千万\d]+[章回节卷部集篇]"
+    r"|卷[〇零一二两三四五六七八九十百千万\d]+(?:\s|$)"
+    r"|(?:chapter|part|book|volume|section|act|scene)\s+(?:[ivxlcdm]+|\d+)(?![a-z0-9])"
+    r"|(?:[ivxlcdm]+|\d+)\.(?!\d)"
+    r"|(?:序[言曲章]?|前[言记序]|引[首子]|楔子|尾声|后[记序]|附录|终章|结语|番外|epilogue|prologue|preface|introduction|etymology|extracts)(?:[\s.:：—\-]|$)"
+    r")",
+    re.IGNORECASE,
+)
+_SPEC_EXTRA_RE = re.compile(
+    r"^(?:自序|代序|序幕|外传|上篇|中篇|下篇|上部|中部|下部|前篇|后篇|续篇|卷首语?|foreword|afterword|appendix|interlude)(?:[\s.:：—\-]|$)",
+    re.IGNORECASE,
+)
+_OPEN_QUOTES = ("“", "\"", "「", "『", "‘")
+_PAIR_QUOTES = {
+    "“": "”",
+    "\"": "\"",
+    "「": "」",
+    "『": "』",
+    "‘": "’",
+}
+_MID_PUNCT_RE = re.compile(r"[，；,;]")
+_END_SENTENCE_RE = re.compile(r"[。！？!?…][”\"’'）)】」』]*$")
+
+
+def is_exempt_heading_syntax(title: str) -> bool:
+    s = title.strip()
+    if not s:
+        return False
+    if parse_chapter_number(s) is not None:
+        return True
+    return bool(_EXEMPT_PREFIX_RE.match(s) or _SPEC_EXTRA_RE.match(s))
+
+
+def classify_non_heading(title: str) -> str | None:
+    """确定性拦截语法上不可能是全书结构标题的候选行；保留返回 None。"""
+    s = title.strip()
+    if not s:
+        return "empty"
+    if is_exempt_heading_syntax(s):
+        return None
+    first_ch = s[0]
+    if first_ch in _PAIR_QUOTES and s.endswith(_PAIR_QUOTES[first_ch]):
+        return "paired_quote_dialogue"
+    if first_ch in _OPEN_QUOTES:
+        return "leading_quote_dialogue"
+    if _MID_PUNCT_RE.search(s) and _END_SENTENCE_RE.search(s):
+        return "mid_punct_sentence"
+    return None
+
+
+def filter_heading_candidates(candidates: list[dict]) -> list[dict]:
+    return [cand for cand in candidates if classify_non_heading(cand["title"]) is None]
+
+
 def detect_chapters(store, models, source: dict, run_id: str, log, concurrency: int = LABEL_CONCURRENCY) -> dict:
     text, source_id = source["text"], source["id"]
-    candidates = collect_candidates(text)
+    raw_candidates = collect_candidates(text)
+    candidates = filter_heading_candidates(raw_candidates)
     batches = [
         candidates[i:i + BATCH_MAX_CANDIDATES]
         for i in range(0, len(candidates), BATCH_MAX_CANDIDATES)
@@ -491,7 +548,7 @@ def detect_chapters(store, models, source: dict, run_id: str, log, concurrency: 
     labeled = [item for i in sorted(batch_results) for item in batch_results[i]]
     labeled_ids = {item["id"] for item in labeled}
     adopted_raw, dropped_raw = filter_headings_with_body(text, labeled)
-    gap_fills = _fill_chapter_gaps(adopted_raw, candidates, labeled_ids)
+    gap_fills = _fill_chapter_gaps(adopted_raw, raw_candidates, labeled_ids)
     if gap_fills:
         adopted_raw, dropped_raw = filter_headings_with_body(text, labeled + gap_fills)
     adopted_by_id = {h["id"]: h for h in adopted_raw}

@@ -6,7 +6,7 @@ import os
 import sys
 from pathlib import Path
 
-from .config import OPENAI_DEFAULT_CONCURRENCY, load_services, read_env
+from .config import OPENAI_DEFAULT_CONCURRENCY, load_services, read_env, resolve_decision_mode
 from .corrections import apply_correction
 from .describe import run_describe
 from .pipeline import (
@@ -127,7 +127,10 @@ def _build_parser() -> _CliParser:
                      help="生成服务商，默认读取 GENERATOR_PROVIDER 配置（缺省 deepseek）")
     run.add_argument("--discovery-concurrency", type=int, default=None,
                      help="发现阶段并发；未显式给出时 deepseek 为 6、openai 为 8")
-    run.add_argument("--decision-concurrency", type=int, default=3)
+    run.add_argument("--decision-concurrency", type=int, default=None,
+                     help="Decision 阶段并发（1—16；未显式给出时 roster+TypeSafe 为 8、groups-v2 为 3）")
+    run.add_argument("--decision", choices=["auto", "on", "off"], default=None,
+                     help="TypeSafe/Jev Decision 辅助模式（auto/on/off；默认读取 ENTITYTRACE_DECISION_MODE，缺省 auto）")
     run.add_argument("--task-chars", type=int, default=9000)
     run.add_argument("--stop-after", choices=["chapters", "discovery", "identity"], default="identity")
     run.add_argument("--identity-algorithm", choices=["roster", "groups-v2"], default="roster",
@@ -212,6 +215,10 @@ def _build_parser() -> _CliParser:
                           help="起始正文章序（从 1 起，缺省为首章；只计 kind==\"chapter\" 条目）")
     describe.add_argument("--to-chapter", "--end-chapter", dest="to_chapter", type=int, default=None,
                           help="截止正文章序（两端含，缺省为末章；只计 kind==\"chapter\" 条目）")
+    describe.add_argument("--decision", choices=["auto", "on", "off"], default=None,
+                          help="TypeSafe/Jev Decision 辅助模式（auto/on/off；默认读取 ENTITYTRACE_DECISION_MODE，缺省 auto）")
+    describe.add_argument("--decision-concurrency", type=int, default=8,
+                          help="Decision 阶段并发上限（1—16，默认 8）")
     describe.add_argument("--out", type=Path, default=None, help="将描述事实导出 JSON 写入该路径")
 
     export = subs.add_parser("export", help="从已保存数据重新导出，不调用模型")
@@ -297,6 +304,7 @@ def main(argv=None) -> int:
                 max_seconds=args.max_seconds,
                 identity_algorithm=args.identity_algorithm,
                 generator=args.generator,
+                decision_mode=args.decision,
                 receipt_out=receipt,
             )
             if args.json:
@@ -362,7 +370,12 @@ def main(argv=None) -> int:
                     )
                 )
             elif args.command == "describe":
-                services = load_services(args.config, generator=args.generator)
+                resolved_decision_mode = resolve_decision_mode(args.decision, read_env(args.config))
+                services = load_services(
+                    args.config,
+                    generator=args.generator,
+                    decision_mode=resolved_decision_mode,
+                )
                 result = run_describe(
                     store,
                     args.run_id,
@@ -379,6 +392,8 @@ def main(argv=None) -> int:
                     verify=args.verify,
                     from_chapter=args.from_chapter,
                     to_chapter=args.to_chapter,
+                    decision_concurrency=args.decision_concurrency,
+                    decision_mode=resolved_decision_mode,
                 )
                 _emit_json_line({
                     "ok": True,
