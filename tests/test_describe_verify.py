@@ -255,7 +255,7 @@ class HolderGroundingTests(unittest.TestCase):
 class D1PayloadFreezeTests(unittest.TestCase):
     # 冻结值：D1 提示词与任务 state 的任何改动都会让摘要变化。
     D1_FINGERPRINT = "16efd6ccbaa3e6ff70cf4277bb825fbaa3229ba6dc0cada58076e4c98ceb1e24"
-    VERIFY_FINGERPRINT = "eec15626b79737a5e916e7b446304abbae54842325bcbfac1fb210e2bec9e68b"
+    VERIFY_FINGERPRINT = "113e3f8e0c6bbc804f658ae56cb917064492505b6d63b53321605e9bb80fbbe0"
 
     def test_d1_tasks_keep_prompt_and_state(self):
         tasks = _d1_tasks()
@@ -268,8 +268,8 @@ class D1PayloadFreezeTests(unittest.TestCase):
         fingerprint = _sha256(dumps({"prompt": task["prompt"], "state": task["state"]}))
         self.assertEqual(fingerprint, self.D1_FINGERPRINT)
 
-    def test_verify_prompt_is_frozen_v2(self):
-        self.assertEqual(VERIFY_PROMPT_VERSION, "verify-v2")
+    def test_verify_prompt_is_frozen_v3(self):
+        self.assertEqual(VERIFY_PROMPT_VERSION, "verify-v3")
         self.assertEqual(_sha256(VERIFY_PROMPT), self.VERIFY_FINGERPRINT)
         for code in ("not_description", "wrong_entity", "wrong_facet", "unsupported_value"):
             self.assertIn(code, VERIFY_PROMPT)
