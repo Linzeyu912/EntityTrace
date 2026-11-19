@@ -749,7 +749,7 @@ class VerifyRunTests(FixtureCase):
             other_event = build_describe_id(20, ["person"], ["e1"], "run", "example",
                                             "example/model", verify=3)
         self.assertNotEqual(three, other_event)
-        self.assertEqual(DESCRIBE_VERSION, "describe-v6")
+        self.assertEqual(DESCRIBE_VERSION, "describe-v7")
         for bad in (-1, 2, 4, True, 1.5, "1"):
             with self.assertRaises(ValueError):
                 build_describe_id(20, ["person"], ["e1"], "run", "example",

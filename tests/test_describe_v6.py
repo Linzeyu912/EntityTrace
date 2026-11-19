@@ -1405,7 +1405,7 @@ class ChapterRangeAndLegacyCompatibilityTests(unittest.TestCase):
             if m:
                 hits.append(f"{rel}: {m.group(0)}")
         self.assertEqual(hits, [], f"已跟踪文件命中禁词: {hits}")
-        self.assertEqual(DESCRIBE_VERSION, "describe-v6")
+        self.assertEqual(DESCRIBE_VERSION, "describe-v7")
         self.assertEqual(EVENT_VERIFY_PROMPT_VERSION, "event-verify-v2")
 
 

@@ -189,7 +189,7 @@ class StaticVerifyPromptAndFreezeTests(unittest.TestCase):
     """静态设定边界提示词、维度定义与抽取负载冻结校验。"""
 
     def test_d1_prompt_and_event_prompt_byte_frozen(self):
-        self.assertEqual(DESCRIBE_VERSION, "describe-v6")
+        self.assertEqual(DESCRIBE_VERSION, "describe-v7")
         self.assertEqual(EVENT_VERIFY_PROMPT_VERSION, "event-verify-v2")
         self.assertEqual(_sha256(D1_PROMPT), _D1_PROMPT_SHA256)
         self.assertEqual(_sha256(EVENT_VERIFY_PROMPT), _EVENT_VERIFY_PROMPT_SHA256)

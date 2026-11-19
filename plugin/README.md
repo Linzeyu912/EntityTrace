@@ -30,7 +30,7 @@
   {"protocol":"entitytrace.v1","command":"<命令名>","run_id":"<已知则填，否则 null>","error":{"category":"...","message":"...","retryable":false}}
   ```
   注：`run --json` 在运行尚未建立（`run_id` 为 `null`）即失败时，`status` 固定为 `"failed"`，退出码为 `1`。
-- **例外**：`describe` 成功时按描述抽取契约输出 `{"ok":true,"describe_id":...,"run_id":...,"views":...,"entities_per_request":...,"verify":...,"chapter_range":{...},"counts":{...},"out":...}`，不带 `protocol` 字段；失败仍输出上述统一错误 JSON。
+- **例外**：`describe` 成功时按描述抽取契约输出 `{"ok":true,"describe_id":...,"run_id":...,"views":...,"entities_per_request":...,"verify":...,"chapter_range":{...},"counts":{...},"persistence":...,"out":...}`，不带 `protocol` 字段；失败仍输出上述统一错误 JSON。
 
 ---
 
@@ -133,9 +133,10 @@ python -X utf8 -m entitytrace describe <run_id> --views 1 --entities-per-request
 - `--views N`（`1`—`5`，默认 `3`）多遍轮换分组请求并按跨遍地址重叠做过半表决，以约 `N` 倍请求数换更高精确率；原始各遍落库，导出只给过半表决后的条目并附 `support`。`--topk-file` 可固定预登记名单。
 - `--entities-per-request N` 默认 `4`（传 `0` 表示整块一组）；`N > 0` 时块内实体按优先级（`score` 降序、`entity_id` 升序）每 `N` 个一组单独请求，任务编号含遍号与组序号。
 - `--verify {0,1,3}` 默认 `1`：`1` 对表决后的描述事实与状态变化事件分别每 `12` 条一批逐条复核（keep / drop），只导出 keep 并为保留事件判定 `stage_split`；`3` 将同一批复核跑三遍并按票数表决（`drop` 票至少两票判 `drop`，原因取多数；有效票至少两票判 `keep`，事件 `stage_split` 在 `3 keep` 时取至少两票、在 `2 keep + 1 drop` 时要求两张 `keep` 都为 `true`；不足两票判 `unverified`），三遍首批分别为 `12`、`8`、`4` 条，第 0 遍批次与负载与 `1` 相同。启用 `--decision auto|on` 且已配置 `TYPESAFE_API_KEY` 时，事实复核（每批最多 `8` 条）与事件复核（每批最多 `6` 条）均先走 `p_max ≥ 0.80` 混合筛，低于阈值仅将低置信项回退原生成模型；复核强制执行 `disguise` 禁止切分与空侧时间线整数守卫，且不发送内部 64 位 ID。复核要求模型逐字回抄输入 `value`，不一致会重试并计入 `echo_mismatch_retries`。导出顶层 `verification` 与 `event_verification` 分别给出事实与事件复核统计，复核批次按任务编号续跑，已完成批次不重发。
-- `--decision {auto,on,off}` / `--decision-concurrency N` 同样作用于 `describe`；相同实际生效配置得到相同 `describe_id` 并自动续跑（未配置 `TYPESAFE_API_KEY` 时 `auto` 与 `off` 产生相同 `describe_id`）；更换 `--top-k`、名单、章节范围、`--views`、`--entities-per-request`、`--verify` 或生效配置会得到新编号。需要独立冷跑时使用新的 `--db` 副本。
-- 成功输出单行 `{"ok":true,"describe_id","run_id","views","entities_per_request","verify","chapter_range","counts":{"tasks","facts","events","stages","multi_stage_entities","reviews"},"out"}`；失败沿用统一错误 JSON 与退出码。401/402/429 等硬额度停止后保留断点，用原命令同库续跑。
-- 导出 `entities[]` 每项含 `facts`、`state_events`、确定性非空阶段列表 `stages`（每项含 `stage_index`、`start`、`end`、`from_chapter`、`to_chapter`、`first_fact_chapter_id`、`last_fact_chapter_id`、`trigger_events`、`facts`、`gaps`）与整体 `gaps`，导出顶层含 `views`、`entities_per_request`、`chapter_range`、`verification` 与 `event_verification`；待审项在 `reviews[]` 中给出原因（未知实体、facet 与类别不符、枚举非法、引用找不到或超长、`holder` 引文不含持有者称呼的 `holder-not-in-quote` 等）。`holder` 事实的引文会在同一片段内向左扩展到最近的持有者称呼，候选称呼来自全书名册（事实 `value`、`holder_entity_id` 的称呼及 `value` 中可解析人物的称呼，不要求持有者实体出现在本请求中）。
+- `--persistence {0,1}` 默认 `1`：复核后按有保留事实的实体每实体发 1 次请求标注 `trait` 固有／长期、`stage` 阶段性、`scene` 单场，纯导出注释不删事实、不介入 `stages` 切分，单实体输出非法记入 `failed_entities`（该实体事实 `persistence` 为 `null`）不阻断导出，按任务编号续跑；传 `0` 关闭且 `describe_id` 与未开持久性标签的 `describe-v6` 逐位一致。
+- `--decision {auto,on,off}` / `--decision-concurrency N` 同样作用于 `describe`；相同实际生效配置得到相同 `describe_id` 并自动续跑（未配置 `TYPESAFE_API_KEY` 时 `auto` 与 `off` 产生相同 `describe_id`）；更换 `--top-k`、名单、章节范围、`--views`、`--entities-per-request`、`--verify`、`--persistence` 或生效配置会得到新编号。需要独立冷跑时使用新的 `--db` 副本。
+- 成功输出单行 `{"ok":true,"describe_id","run_id","views","entities_per_request","verify","chapter_range","counts":{"tasks","facts","events","stages","multi_stage_entities","reviews"},"persistence","out"}`；失败沿用统一错误 JSON 与退出码。401/402/429 等硬额度停止后保留断点，用原命令同库续跑。
+- 导出 `entities[]` 每项含 `facts`（每条事实及 `stages[].facts[]` 均含 `persistence` 字段）、`state_events`、确定性非空阶段列表 `stages`（每项含 `stage_index`、`start`、`end`、`from_chapter`、`to_chapter`、`first_fact_chapter_id`、`last_fact_chapter_id`、`trigger_events`、`facts`、`gaps`）、整体 `gaps` 与实体级 `persistence_counts`（`trait`/`stage`/`scene`/`unlabeled` 四项之和等于事实数），导出顶层含 `views`、`entities_per_request`、`chapter_range`、`verification`、`event_verification` 与 `persistence`（`enabled`/`requests`/`failed_entities`）；待审项在 `reviews[]` 中给出原因（未知实体、facet 与类别不符、枚举非法、引用找不到或超长、`holder` 引文不含持有者称呼的 `holder-not-in-quote` 等）。`holder` 事实的引文会在同一片段内向左扩展到最近的持有者称呼，候选称呼来自全书名册（事实 `value`、`holder_entity_id` 的称呼及 `value` 中可解析人物的称呼，不要求持有者实体出现在本请求中）。
 
 ---
 

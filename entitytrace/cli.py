@@ -219,6 +219,8 @@ def _build_parser() -> _CliParser:
                           help="TypeSafe/Jev Decision 辅助模式（auto/on/off；默认读取 ENTITYTRACE_DECISION_MODE，缺省 auto）")
     describe.add_argument("--decision-concurrency", type=int, default=8,
                           help="Decision 阶段并发上限（1—16，默认 8）")
+    describe.add_argument("--persistence", type=int, choices=[0, 1], default=1,
+                          help="是否为导出事实打持久性标签 trait/stage/scene（默认 1 启用，0 关闭且 describe_id 与旧版 describe-v6 一致）")
     describe.add_argument("--out", type=Path, default=None, help="将描述事实导出 JSON 写入该路径")
 
     export = subs.add_parser("export", help="从已保存数据重新导出，不调用模型")
@@ -394,6 +396,7 @@ def main(argv=None) -> int:
                     to_chapter=args.to_chapter,
                     decision_concurrency=args.decision_concurrency,
                     decision_mode=resolved_decision_mode,
+                    persistence=args.persistence,
                 )
                 _emit_json_line({
                     "ok": True,
@@ -404,6 +407,7 @@ def main(argv=None) -> int:
                     "verify": result["verify"],
                     "chapter_range": result["chapter_range"],
                     "counts": result["counts"],
+                    "persistence": result["persistence"],
                     "out": str(args.out.resolve()) if args.out is not None else None,
                 })
             elif args.command == "export":

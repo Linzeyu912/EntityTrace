@@ -719,7 +719,8 @@ class RunDescribeTests(FixtureCase):
             self.assertEqual(set(doc), {"describe_id", "run_id", "views",
                                         "entities_per_request", "top_k", "kinds",
                                         "chapter_range", "entities", "reviews",
-                                        "verification", "event_verification", "stats"})
+                                        "verification", "event_verification",
+                                        "persistence", "stats"})
             self.assertEqual(doc["verification"], {"enabled": False})
             self.assertEqual(doc["event_verification"], {"enabled": False})
             self.assertEqual(doc["views"], 1)
@@ -729,7 +730,8 @@ class RunDescribeTests(FixtureCase):
                                                  "wall_seconds"})
             entity = doc["entities"][0]
             self.assertEqual(set(entity), {"entity_id", "kind", "kind_rank", "name", "facts",
-                                           "state_events", "stages", "gaps"})
+                                           "state_events", "stages", "gaps",
+                                           "persistence_counts"})
             self.assertTrue(all(fact["support"] == 1 for fact in entity["facts"]))
             self.assertGreater(result["counts"]["tasks"], 0)
         finally:
@@ -1288,6 +1290,11 @@ class CliContractTests(FixtureCase):
 
             def generate(self, system, state, stage, validate, max_tokens=8000, temperature=None):
                 type(self).calls.append({"stage": stage, "state": state})
+                if stage == "describe-persistence":
+                    value = {"items": [{"id": i["id"], "label": "trait"}
+                                       for i in state["items"]]}
+                    validate(value)
+                    return value, "req_cli"
                 value = {"facts": [], "events": []}
                 if "身长八尺" in state.get("text", ""):
                     value["facts"].append({
@@ -1315,7 +1322,7 @@ class CliContractTests(FixtureCase):
         receipt = json.loads(lines[0])
         self.assertEqual(set(receipt), {"ok", "describe_id", "run_id", "views",
                                         "entities_per_request", "verify", "chapter_range",
-                                        "counts", "out"})
+                                        "counts", "persistence", "out"})
         self.assertTrue(receipt["ok"])
         self.assertEqual(receipt["views"], 2)
         self.assertEqual(receipt["verify"], 0)
@@ -1324,8 +1331,13 @@ class CliContractTests(FixtureCase):
                                                   "multi_stage_entities", "reviews"})
         self.assertEqual(receipt["counts"]["facts"], 1)
         self.assertTrue(Path(receipt["out"]).is_file())
-        self.assertEqual(len(CliFakeModels.calls), receipt["counts"]["tasks"])
-        self.assertTrue(all(call["state"]["view"] in (1, 2) for call in CliFakeModels.calls))
+        self.assertEqual(
+            sum(1 for c in CliFakeModels.calls if c["stage"] != "describe-persistence"),
+            receipt["counts"]["tasks"])
+        self.assertEqual(receipt["persistence"], 1)
+        self.assertTrue(all(call["state"]["view"] in (1, 2)
+                            for call in CliFakeModels.calls
+                            if call["stage"] != "describe-persistence"))
 
     def test_removed_options_are_gone(self):
         buf = io.StringIO()
