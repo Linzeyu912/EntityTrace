@@ -271,7 +271,7 @@ class FieldReviewTests(unittest.TestCase):
 
     def test_structural_invalid_output(self):
         with self.assertRaises(ModelError):
-            check_output({"facts": []})
+            check_output({})
         with self.assertRaises(ModelError):
             check_output({"facts": ["bad"], "events": []})
 

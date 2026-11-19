@@ -158,6 +158,34 @@ def _strip_code_fence(content: str) -> str:
     return "\n".join(lines).strip()
 
 
+def parse_tolerant_json(content: str, *, strip_fence: bool = False) -> object:
+    """解析模型输出中首个 JSON 值；dict 后跟零散 `,\"key\":...}` 片段时合并补齐。
+
+    合并规则：新键直接补入；已有键两侧均为 list 时拼接；其余已有键不覆盖。
+    非 dict 的首值要求其后为空，否则抛出 `json.JSONDecodeError`。
+    """
+    s = _strip_code_fence(content) if strip_fence else content.strip()
+    obj, pos = json.JSONDecoder().raw_decode(s)
+    if not isinstance(obj, dict):
+        if s[pos:].strip():
+            raise json.JSONDecodeError("Extra data", s, pos)
+        return obj
+    rest = s[pos:].strip()
+    while rest:
+        if rest.startswith(","):
+            rest = "{" + rest[1:]
+        extra, p = json.JSONDecoder().raw_decode(rest)
+        if not isinstance(extra, dict):
+            raise json.JSONDecodeError("Extra non-object data", rest, 0)
+        for k, v in extra.items():
+            if k not in obj:
+                obj[k] = v
+            elif isinstance(obj[k], list) and isinstance(v, list):
+                obj[k] = obj[k] + v
+        rest = rest[p:].strip()
+    return obj
+
+
 class Models:
     def __init__(self, store: Store, run_id: str, invocation: str, services: dict[str, Service],
                  discovery_concurrency: int = 6, decision_concurrency: int = 3,
@@ -280,6 +308,14 @@ class Models:
                         "temperature_sent": temperature_sent,
                         "served_model": served_model,
                     }
+                    if isinstance(raw, dict):
+                        try:
+                            content = raw["choices"][0]["message"]["content"]
+                        except (KeyError, IndexError, TypeError):
+                            content = None
+                        if isinstance(content, str):
+                            detail["content_head"] = content[:200]
+                            detail["content_tail"] = content[-200:]
                     if isinstance(raw, dict) and isinstance(raw.get("usage"), dict) and raw["usage"]:
                         detail["usage"] = raw["usage"]
                     raw = None
@@ -325,18 +361,20 @@ class Models:
                     payload[k] = v
         if temperature is not None:
             payload["temperature"] = temperature
+        validated: dict[int, object] = {}
         def check(raw):
             try:
                 choice = raw["choices"][0]
                 if choice["finish_reason"] != "stop":
                     raise ModelError("生成输出被截断，未记为完成")
                 content = choice["message"]["content"]
-                validate(json.loads(_strip_code_fence(content) if is_openai else content))
+                parsed = parse_tolerant_json(content, strip_fence=is_openai)
+                validate(parsed)
+                validated[id(raw)] = parsed
             except (KeyError, IndexError, TypeError, json.JSONDecodeError) as exc:
                 raise ModelError("生成返回不是有效 JSON") from exc
         raw, request_id = self._request("discovery", "/chat/completions", payload, stage, check)
-        content = raw["choices"][0]["message"]["content"]
-        return json.loads(_strip_code_fence(content) if is_openai else content), request_id
+        return validated[id(raw)], request_id
 
 
 def bounded_map(items: list, worker: Callable, workers: int):

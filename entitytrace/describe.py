@@ -208,6 +208,10 @@ def check_output(value: dict) -> None:
     if not isinstance(value, dict):
         raise ModelError("描述输出不是 JSON 对象")
     facts, events = value.get("facts"), value.get("events")
+    if facts is None and isinstance(events, list):
+        facts = value["facts"] = []
+    elif events is None and isinstance(facts, list):
+        events = value["events"] = []
     if not isinstance(facts, list) or not isinstance(events, list):
         raise ModelError("描述输出缺少 facts 或 events 数组")
     for item in [*facts, *events]:
