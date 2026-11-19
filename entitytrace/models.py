@@ -4,7 +4,9 @@ import collections
 import io
 import json
 import math
+import queue
 import socket
+import statistics
 import threading
 import time
 import urllib.error
@@ -190,7 +192,9 @@ class Models:
     def __init__(self, store: Store, run_id: str, invocation: str, services: dict[str, Service],
                  discovery_concurrency: int = 6, decision_concurrency: int = 3,
                  timeout: float = 120, attempts: int = 3, opener=None,
-                 budget: RequestBudget | None = None):
+                 budget: RequestBudget | None = None,
+                 hedge_enabled: bool = True, hedge_min_seconds: float = 20.0,
+                 hedge_min_samples: int = 8, hedge_max_ratio: float = 0.05):
         self.store, self.run_id, self.invocation, self.services = store, run_id, invocation, services
         self.timeout, self.attempts = timeout, attempts
         self.budget = budget
@@ -207,6 +211,46 @@ class Models:
         self.active = {name: 0 for name in services}
         self.peaks = {name: 0 for name in services}
         self.halted = {}
+        self.hedge_enabled = hedge_enabled
+        self.hedge_min_seconds = hedge_min_seconds
+        self.hedge_min_samples = hedge_min_samples
+        self.hedge_max_ratio = hedge_max_ratio
+        self._stage_latencies: dict[str, list[float]] = collections.defaultdict(list)
+        self._sent_count = 0
+        self._hedged_count = 0
+
+    def _hedge_delay(self, stage: str) -> float:
+        """生成请求慢请求对冲阈值：样本不足时用固定下限，否则取 3 倍成功耗时中位数。"""
+        with self.lock:
+            samples = list(self._stage_latencies.get(stage, []))
+        if len(samples) < self.hedge_min_samples:
+            return self.hedge_min_seconds
+        return max(self.hedge_min_seconds, 3.0 * statistics.median(samples))
+
+    def _try_reserve_hedge(self, service_name: str) -> bool:
+        """对冲准入判断：仅 discovery 生成请求、未停机、不在冷却、占比未超限且预算仍有剩余。"""
+        if not (self.hedge_enabled and service_name == "discovery"):
+            return False
+        with self.lock:
+            if service_name in self.halted:
+                return False
+            if self.cooldown[service_name] > time.monotonic():
+                return False
+            if not (self._sent_count > 0
+                    and (self._hedged_count + 1) <= self._sent_count * self.hedge_max_ratio):
+                return False
+            if self.budget is not None:
+                with self.budget.lock:
+                    if self.budget.stop_reason == "network_outage":
+                        return False
+                    if (self.budget.max_requests is not None
+                            and self.budget.count >= self.budget.max_requests):
+                        return False
+                    if (self.budget.max_seconds is not None
+                            and (self.budget.max_seconds - (time.perf_counter() - self.budget.started)) <= 0):
+                        return False
+            self._hedged_count += 1
+            return True
 
     def _request(self, service_name: str, path: str, payload: dict, stage: str, validate: Callable) -> tuple[dict, str]:
         service = self.services[service_name]
@@ -238,6 +282,101 @@ class Models:
             temperature_sent = send_payload.get("temperature")
             detail: dict = {"temperature_sent": temperature_sent, "served_model": None}
             raw = None
+            hedging = service_name == "discovery" and self.hedge_enabled
+            # _execute_http 在子线程内严禁写 store；结果统一经 out_q 由当前尝试线程串行落库。
+            # 返回元组：(is_hedge, success, raw, error_kind, detail, info, req_seconds)
+            #   error_kind ∈ None/"budget"/"http"/"network"/"format"；info 仅 http 附带。
+            def _execute_http(is_hedge: bool, out_q: queue.Queue | None):
+                req_begin = time.monotonic()
+                r = None
+                try:
+                    request = urllib.request.Request(service.url + path, data=dumps(send_payload).encode("utf-8"),
+                        headers={"Authorization": "Bearer " + service.key, "Content-Type": "application/json"}, method="POST")
+                    with self.opener(request, timeout=self.timeout) as response:
+                        r = json.loads(response.read().decode("utf-8"))
+                    served_model = r.get("model") if isinstance(r, dict) and isinstance(r.get("model"), str) else None
+                    validate(r)
+                    # Authorization 头从不写入日志；不保存模型内部推理字段。
+                    for choice in r.get("choices", []):
+                        choice.get("message", {}).pop("reasoning_content", None)
+                    det = {
+                        "usage": r.get("usage", {}),
+                        "active_requests": active,
+                        "temperature_sent": temperature_sent,
+                        "served_model": served_model,
+                        "hedge": is_hedge,
+                    }
+                    result = (is_hedge, True, r, None, det, {}, time.monotonic() - req_begin)
+                except BudgetError as exc:
+                    result = (is_hedge, False, None, "budget",
+                              {"temperature_sent": temperature_sent, "served_model": None, "hedge": is_hedge},
+                              {"exc": exc}, time.monotonic() - req_begin)
+                except urllib.error.HTTPError as exc:
+                    err = f"{service_name} 请求失败（HTTP {exc.code}）"
+                    body = exc.read().decode("utf-8", errors="replace").lower()
+                    code = None
+                    try:
+                        problem = json.loads(body)
+                        cand = problem.get("detail", {}).get("error_type") if isinstance(problem.get("detail"), dict) else None
+                        if isinstance(cand, str) and len(cand) <= 80 and cand.replace("_", "").isalnum():
+                            code = cand
+                    except (ValueError, TypeError, AttributeError):
+                        pass
+                    hq = any(word in body for word in ["insufficient", "balance", "billing", "余额", "资源包", "usage limit", "quota_exceeded"])
+                    rep = exc.code in {429, 500, 502, 503, 504, 529} and not hq
+                    header = exc.headers.get("Retry-After", "")
+                    ra = 0.0
+                    try:
+                        ra = float(header)
+                    except ValueError:
+                        try:
+                            ra = parsedate_to_datetime(header).timestamp() - time.time()
+                        except (TypeError, ValueError, OverflowError):
+                            ra = 0
+                    if hq:
+                        err += "，余额或硬额度不足，本次运行停止该服务的新请求；成功缓存仍可复用"
+                    det = {
+                        "http_status": exc.code,
+                        "hard_quota": hq,
+                        "error_type": code,
+                        "temperature_sent": temperature_sent,
+                        "served_model": None,
+                        "hedge": is_hedge,
+                    }
+                    result = (is_hedge, False, None, "http", det,
+                              {"error": err, "status": exc.code, "code": code, "hard_quota": hq,
+                               "retryable": rep, "retry_after": ra}, time.monotonic() - req_begin)
+                except (urllib.error.URLError, TimeoutError, socket.timeout, OSError):
+                    result = (is_hedge, False, None, "network",
+                              {"temperature_sent": temperature_sent, "served_model": None, "hedge": is_hedge},
+                              {"error": f"{service_name} 网络失败或超时"}, time.monotonic() - req_begin)
+                except (ValueError, KeyError, TypeError, ModelError) as exc:
+                    served_model = r.get("model") if isinstance(r, dict) and isinstance(r.get("model"), str) else None
+                    det = {
+                        "validation_error": str(exc)[:160] if isinstance(exc, ModelError) else type(exc).__name__,
+                        "temperature_sent": temperature_sent,
+                        "served_model": served_model,
+                        "hedge": is_hedge,
+                    }
+                    if isinstance(r, dict):
+                        try:
+                            content = r["choices"][0]["message"]["content"]
+                        except (KeyError, IndexError, TypeError):
+                            content = None
+                        if isinstance(content, str):
+                            det["content_head"] = content[:200]
+                            det["content_tail"] = content[-200:]
+                    if isinstance(r, dict) and isinstance(r.get("usage"), dict) and r["usage"]:
+                        det["usage"] = r["usage"]
+                    result = (is_hedge, False, None, "format", det,
+                              {"error": f"{service_name} 返回格式不符合约定"}, time.monotonic() - req_begin)
+                if out_q is not None:
+                    out_q.put(result)
+                else:
+                    return result
+
+            pending_calls: list[tuple[str, float, dict]] = []
+            budget_exc: BudgetError | None = None
             with self.gates[service_name]:
                 with self.lock:
                     if service_name in self.halted:
@@ -245,86 +384,100 @@ class Models:
                     self.active[service_name] += 1
                     self.peaks[service_name] = max(self.peaks[service_name], self.active[service_name])
                     active = self.active[service_name]
+                    if hedging:
+                        self._sent_count += 1
                 try:
-                    request = urllib.request.Request(service.url + path, data=dumps(send_payload).encode("utf-8"),
-                        headers={"Authorization": "Bearer " + service.key, "Content-Type": "application/json"}, method="POST")
-                    with self.opener(request, timeout=self.timeout) as response:
-                        raw = json.loads(response.read().decode("utf-8"))
-                    served_model = raw.get("model") if isinstance(raw, dict) and isinstance(raw.get("model"), str) else None
-                    validate(raw)
-                    # Authorization 头从不写入日志；不保存模型内部推理字段。
-                    for choice in raw.get("choices", []):
-                        choice.get("message", {}).pop("reasoning_content", None)
-                    detail = {
-                        "usage": raw.get("usage", {}),
-                        "active_requests": active,
-                        "temperature_sent": temperature_sent,
-                        "served_model": served_model,
-                    }
-                except urllib.error.HTTPError as exc:
-                    error_status = exc.code
-                    error = f"{service_name} 请求失败（HTTP {exc.code}）"
-                    body = exc.read().decode("utf-8", errors="replace").lower()
-                    try:
-                        problem = json.loads(body)
-                        code = problem.get("detail", {}).get("error_type") if isinstance(problem.get("detail"), dict) else None
-                        if isinstance(code, str) and len(code) <= 80 and code.replace("_", "").isalnum():
-                            error_code = code
-                    except (ValueError, TypeError, AttributeError):
-                        pass
-                    hard_quota = any(word in body for word in ["insufficient", "balance", "billing", "余额", "资源包", "usage limit", "quota_exceeded"])
-                    retryable = exc.code in {429, 500, 502, 503, 504, 529} and not hard_quota
-                    header = exc.headers.get("Retry-After", "")
-                    try:
-                        retry_after = float(header)
-                    except ValueError:
+                    if not hedging:
+                        result = _execute_http(False, None)
+                    else:
+                        out_q: queue.Queue = queue.Queue()
+                        in_flight = 1
+                        hedge_delay = self._hedge_delay(stage)
+                        threading.Thread(target=_execute_http, args=(False, out_q), daemon=True).start()
                         try:
-                            retry_after = parsedate_to_datetime(header).timestamp() - time.time()
-                        except (TypeError, ValueError, OverflowError):
-                            retry_after = 0
-                    detail = {
-                        "http_status": exc.code,
-                        "hard_quota": hard_quota,
-                        "error_type": error_code,
-                        "temperature_sent": temperature_sent,
-                        "served_model": None,
-                    }
-                    if hard_quota:
-                        error += "，余额或硬额度不足，本次运行停止该服务的新请求；成功缓存仍可复用"
-                        with self.lock:
-                            self.halted[service_name] = (error, error_status, error_code)
-                    raw = None
-                except (urllib.error.URLError, TimeoutError, socket.timeout, OSError):
-                    error = f"{service_name} 网络失败或超时"
-                    error_code = "network_error"
-                    detail = {"temperature_sent": temperature_sent, "served_model": None}
-                    raw = None
-                except (ValueError, KeyError, TypeError, ModelError) as exc:
-                    drop_temperature = True
-                    error = f"{service_name} 返回格式不符合约定"
-                    served_model = raw.get("model") if isinstance(raw, dict) and isinstance(raw.get("model"), str) else None
-                    detail = {
-                        "validation_error": str(exc)[:160] if isinstance(exc, ModelError) else type(exc).__name__,
-                        "temperature_sent": temperature_sent,
-                        "served_model": served_model,
-                    }
-                    if isinstance(raw, dict):
-                        try:
-                            content = raw["choices"][0]["message"]["content"]
-                        except (KeyError, IndexError, TypeError):
-                            content = None
-                        if isinstance(content, str):
-                            detail["content_head"] = content[:200]
-                            detail["content_tail"] = content[-200:]
-                    if isinstance(raw, dict) and isinstance(raw.get("usage"), dict) and raw["usage"]:
-                        detail["usage"] = raw["usage"]
-                    raw = None
+                            result = out_q.get(timeout=hedge_delay)
+                        except queue.Empty:
+                            if self._try_reserve_hedge(service_name):
+                                in_flight = 2
+                                threading.Thread(target=_execute_http, args=(True, out_q), daemon=True).start()
+                            result = out_q.get()
+                        while True:
+                            is_hedge, success, r, kind, det, info, req_sec = result
+                            if success:
+                                raw = r
+                                detail = det
+                                with self.lock:
+                                    self._stage_latencies[stage].append(req_sec)
+                                pending_calls.append(("success", req_sec, detail))
+                                if in_flight == 2:
+                                    loser_detail = {"hedge": not is_hedge, "discarded": True,
+                                                    "temperature_sent": temperature_sent, "served_model": None}
+                                    pending_calls.append(("discarded", 0.0, loser_detail))
+                                in_flight = 0
+                                break
+                            if kind == "budget":
+                                if not is_hedge:
+                                    budget_exc = info["exc"]
+                                    break
+                                # 对冲请求竞态耗尽预算：不打断仍在途的主请求。
+                                in_flight -= 1
+                                if in_flight <= 0:
+                                    break
+                                result = out_q.get()
+                                continue
+                            pending_calls.append(("failed", req_sec, det))
+                            if kind == "format":
+                                drop_temperature = True
+                            if kind == "http":
+                                error, error_status, error_code = info["error"], info["status"], info["code"]
+                                retryable, retry_after = info["retryable"], info["retry_after"]
+                                if info.get("hard_quota"):
+                                    with self.lock:
+                                        self.halted[service_name] = (error, error_status, error_code)
+                                    retryable = False
+                                    break
+                            else:
+                                error = info["error"]
+                                if kind == "network":
+                                    error_code = "network_error"
+                            in_flight -= 1
+                            if in_flight <= 0:
+                                break
+                            result = out_q.get()
                 finally:
                     with self.lock:
                         self.active[service_name] -= 1
-            seconds = time.monotonic() - begin
-            self.store.call(self.run_id, self.invocation, stage, request_id, service_name, attempt,
-                            "success" if raw is not None else "failed", seconds, detail)
+            if hedging:
+                for call_status, call_sec, call_det in pending_calls:
+                    self.store.call(self.run_id, self.invocation, stage, request_id, service_name,
+                                    attempt, call_status, call_sec, call_det)
+                if budget_exc is not None:
+                    raise budget_exc
+            else:
+                is_hedge, success, r, kind, det, info, req_sec = result
+                if success:
+                    raw = r
+                    detail = det
+                    with self.lock:
+                        self._stage_latencies[stage].append(req_sec)
+                elif kind == "budget":
+                    raise info["exc"]
+                else:
+                    detail = det
+                    if kind == "format":
+                        drop_temperature = True
+                    if kind == "http":
+                        error, error_status, error_code = info["error"], info["status"], info["code"]
+                        retryable, retry_after = info["retryable"], info["retry_after"]
+                        if info.get("hard_quota"):
+                            with self.lock:
+                                self.halted[service_name] = (error, error_status, error_code)
+                    else:
+                        error = info["error"]
+                        if kind == "network":
+                            error_code = "network_error"
+                self.store.call(self.run_id, self.invocation, stage, request_id, service_name, attempt,
+                                "success" if raw is not None else "failed", req_sec, detail)
             if raw is not None:
                 self.store.execute("INSERT OR REPLACE INTO request_cache VALUES(?,?,?,?,?,?)",
                     (request_id, service_name, service.model, dumps(payload), dumps(raw), utc_now()))

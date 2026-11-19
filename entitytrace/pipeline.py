@@ -161,7 +161,8 @@ def metrics(store: Store, run_id: str, invocation: str | None = None) -> dict:
         args += (invocation,)
     rows = store.rows(sql, args)
     result = {"network_attempts": 0, "successful_requests": 0, "failed_attempts": 0, "cache_hits": 0,
-              "input_tokens_reported": 0, "output_tokens_reported": 0, "request_seconds_sum": 0.0, "by_stage": {}}
+              "input_tokens_reported": 0, "output_tokens_reported": 0, "request_seconds_sum": 0.0,
+              "hedged_requests": 0, "by_stage": {}}
     for row in rows:
         stage = result["by_stage"].setdefault(row["stage"], {"attempts": 0, "success": 0, "failed": 0, "cached": 0, "seconds_sum": 0.0})
         if row["status"] == "cached":
@@ -172,10 +173,16 @@ def metrics(store: Store, run_id: str, invocation: str | None = None) -> dict:
         result["request_seconds_sum"] += row["seconds"]
         stage["attempts"] += 1
         stage["seconds_sum"] += row["seconds"]
-        usage = json.loads(row["detail"]).get("usage", {})
+        detail = json.loads(row["detail"])
+        if isinstance(detail, dict) and detail.get("hedge"):
+            result["hedged_requests"] += 1
+        usage = detail.get("usage", {}) if isinstance(detail, dict) else {}
         if isinstance(usage, dict) and usage:
             result["input_tokens_reported"] += usage.get("prompt_tokens", usage.get("input_tokens", 0)) or 0
             result["output_tokens_reported"] += usage.get("completion_tokens", usage.get("output_tokens", 0)) or 0
+        if row["status"] == "discarded":
+            # 对冲败者已计入网络尝试与阶段尝试，但不算成功也不算失败。
+            continue
         if row["status"] == "success":
             result["successful_requests"] += 1
             stage["success"] += 1
