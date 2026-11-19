@@ -229,3 +229,70 @@ def deduplicate_grounding_reviews(
         updated_reviews.append(item)
 
     return updated_reviews, resolved_items
+
+
+def resolve_redundant_grounding_reviews(
+    source: dict,
+    discovery_tasks: list[dict],
+    observations: list[dict],
+    mentions: list[dict],
+    reviews: list[dict],
+) -> tuple[list[dict], list[dict]]:
+    """导出期消解两类冗余定位待审（纯函数，零模型调用，不修改输入）。
+
+    - B1：同一条发现记录的其它引用已成功定位，且该称呼就在本任务正文内
+      （reported_refs 错指已覆盖场景）→ ``auto_ref_mismatch_covered``。
+    - A1：该称呼不在本任务正文内，但落在前后 250 码点邻文，且相邻任务已在
+      该邻文范围登记同一称呼（跨任务切片误报已覆盖场景）
+      → ``auto_context_margin_covered``。
+    """
+    text = source["text"]
+    margin = 250
+    obs_by_id = {o["id"]: o for o in observations}
+    dtask_by_id = {
+        t["id"]: t
+        for t in discovery_tasks
+        if isinstance(t.get("start"), int) and isinstance(t.get("end"), int)
+    }
+    mentions_by_surface: dict[str, list[tuple[int, str]]] = collections.defaultdict(list)
+    for m in mentions:
+        mentions_by_surface[m.get("text", "")].append((m["start"], m.get("task_id", "")))
+
+    updated_reviews: list[dict] = []
+    resolved_items: list[dict] = []
+    for item in reviews:
+        new_item = None
+        if item.get("stage") == "grounding" and item.get("status", "pending") == "pending":
+            obs = obs_by_id.get(item.get("observation_id", ""))
+            dtask = dtask_by_id.get(obs["task_id"]) if obs else None
+            if dtask is not None:
+                s, e = dtask["start"], dtask["end"]
+                surf = obs.get("text", "")
+                covered = obs.get("status") == "grounded" or bool(obs.get("mention_ids"))
+                if covered and surf in text[s:e]:
+                    new_item = {
+                        **item,
+                        "status": "resolved",
+                        "resolved_by": "auto_ref_mismatch_covered",
+                    }
+                elif surf and surf not in text[s:e] and (
+                    surf in text[max(0, s - margin):s] or surf in text[e:e + margin]
+                ):
+                    lo, hi = max(0, s - margin), e + margin
+                    if any(
+                        m_task_id != obs["task_id"]
+                        and (lo <= m_start < s or e <= m_start < hi)
+                        for m_start, m_task_id in mentions_by_surface.get(surf, [])
+                    ):
+                        new_item = {
+                            **item,
+                            "status": "resolved",
+                            "resolved_by": "auto_context_margin_covered",
+                        }
+        if new_item is not None:
+            updated_reviews.append(new_item)
+            resolved_items.append(new_item)
+        else:
+            updated_reviews.append(item)
+
+    return updated_reviews, resolved_items

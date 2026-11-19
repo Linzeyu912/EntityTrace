@@ -17,6 +17,7 @@ from .config import (
 from .corrections import CorrectionConflictError, partition_active_corrections, replay_user_corrections
 from .discovery import discover
 from .identity import group_entities
+from .propagation import resolve_redundant_grounding_reviews
 from .resolution import VERSION as RESOLUTION_VERSION, annotate_groups, resolve_groups
 from .roster import (
     DIRECT_VERSION as ROSTER_DIRECT_VERSION,
@@ -297,6 +298,21 @@ def build_export_bundle(store: Store, run_id: str) -> dict:
             all_reviews = identity_reviews + non_identity_reviews
             roster_summary = roster_out["roster_summary"]
             ambiguous_surfaces = roster_out["ambiguous_surfaces"]
+        discovery_tasks = [
+            r
+            for r in store.rows(
+                "SELECT id, start, end FROM tasks WHERE run_id=? AND stage='discovery'", (run_id,)
+            )
+            if r.get("start") is not None and r.get("end") is not None
+        ]
+        non_identity_reviews, _ = resolve_redundant_grounding_reviews(
+            source=source,
+            discovery_tasks=discovery_tasks,
+            observations=observations,
+            mentions=mentions,
+            reviews=non_identity_reviews,
+        )
+        all_reviews = identity_reviews + non_identity_reviews
         for mention in mentions:
             validate_span(text, mention["address"], source["id"], mention["text"])
             chapter = by_chapter[mention["chapter_id"]]
