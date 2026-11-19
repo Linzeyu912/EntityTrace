@@ -1260,6 +1260,53 @@ def build_c3_decision_subbatches(c3_task: dict) -> list[dict]:
     return subbatches
 
 
+def resolve_c2_merge_components(
+    active_proposals: list[dict],
+    verify_results: dict[tuple[str, str], dict],
+    prelim_entries: list[dict],
+    cannot_merge_entries: set[tuple[str, str]],
+) -> tuple[list[list[str]], list[list[str]]]:
+    """把核验判 same 的边连成无向图：含冲突对（cannot_merge_entries / different）的连通块整组不合并。完全确定性。"""
+    adj: dict[str, set[str]] = collections.defaultdict(set)
+    for prop in active_proposals:
+        pair_key = (prop["left"], prop["right"])
+        if verify_results.get(pair_key, {}).get("verdict") == "same":
+            adj[pair_key[0]].add(pair_key[1])
+            adj[pair_key[1]].add(pair_key[0])
+    seen: set[str] = set()
+    components: list[list[str]] = []
+    for node in sorted(adj):
+        if node in seen:
+            continue
+        comp = sorted(_bfs_component(adj, node))
+        seen.update(comp)
+        if len(comp) >= 2:
+            components.append(comp)
+    components.sort(key=lambda c: c[0])
+    merge_components: list[list[str]] = []
+    conflict_components: list[list[str]] = []
+    for comp in components:
+        conflict = any(
+            (min(u, v), max(u, v)) in cannot_merge_entries
+            for i, u in enumerate(comp)
+            for v in comp[i + 1:]
+        )
+        (conflict_components if conflict else merge_components).append(comp)
+    return merge_components, conflict_components
+
+
+def _bfs_component(adj: dict[str, set[str]], start: str) -> set[str]:
+    comp = {start}
+    stack = [start]
+    while stack:
+        n = stack.pop()
+        for nb in adj.get(n, ()):
+            if nb not in comp:
+                comp.add(nb)
+                stack.append(nb)
+    return comp
+
+
 def resolve_roster(
     store,
     models,
@@ -2232,12 +2279,6 @@ def resolve_roster(
                 for kb in er["member_keys"]:
                     cannot_merge_objs.add((min(ka, kb), max(ka, kb)))
 
-    def root_entry(eid: str) -> str:
-        while entry_parent[eid] != eid:
-            entry_parent[eid] = entry_parent[entry_parent[eid]]
-            eid = entry_parent[eid]
-        return eid
-
     entry_verify_refs: dict[str, list[str]] = collections.defaultdict(list)
     for prop in active_proposals:
         pair_key = (prop["left"], prop["right"])
@@ -2256,19 +2297,39 @@ def resolve_roster(
                 "options": ["same", "different", "uncertain"],
                 "status": "pending",
             })
-            continue
-        if vres["verdict"] != "same":
-            continue
-        ra, rb = root_entry(prop["left"]), root_entry(prop["right"])
-        if ra == rb:
-            continue
-        if any((min(x, y), max(x, y)) in cannot_merge_entries for x in entry_members[ra] for y in entry_members[rb]):
-            continue
-        if ra > rb:
-            ra, rb = rb, ra
-        entry_parent[rb] = ra
-        entry_members[ra].update(entry_members.pop(rb))
-        entry_verify_refs[ra].extend([prop["propose_request_id"], vres["request_id"]])
+
+    merge_components, conflict_components = resolve_c2_merge_components(
+        active_proposals, verify_results, prelim_entries, cannot_merge_entries
+    )
+    for comp in merge_components:
+        root = comp[0]
+        members = set(comp)
+        entry_members[root] = members
+        for eid in comp[1:]:
+            entry_parent[eid] = root
+            entry_members.pop(eid, None)
+        refs: list[str] = []
+        for prop in active_proposals:
+            if prop["left"] in members and prop["right"] in members:
+                vres = verify_results.get((prop["left"], prop["right"]))
+                if vres and vres["verdict"] == "same":
+                    for ref in (prop["propose_request_id"], vres["request_id"]):
+                        if ref and ref not in refs:
+                            refs.append(ref)
+        entry_verify_refs[root].extend(refs)
+    for comp in conflict_components:
+        all_reviews.append({
+            "id": digest(["c2-verify-component-conflict", comp]),
+            "stage": "roster-c2-verify",
+            "reason": "C2 名册补合并连通块内存在冲突，整组暂不合并",
+            "left_name": entry_by_id[comp[0]]["name"],
+            "right_name": entry_by_id[comp[1]]["name"],
+            "member_names": [entry_by_id[eid]["name"] for eid in comp],
+            "impact": sum(entry_by_id[eid]["mention_count"] for eid in comp),
+            "evidence": [by_mid[entry_by_id[eid]["mention_ids"][0]]["address"] for eid in comp[:4]],
+            "options": ["same", "different", "uncertain"],
+            "status": "pending",
+        })
 
     # 形成名册条目（C2.5）
     roster_entries: list[dict] = []

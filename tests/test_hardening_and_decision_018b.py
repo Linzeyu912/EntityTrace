@@ -726,7 +726,8 @@ class DecisionRuntimeRoutingAndGuardsTests(unittest.TestCase):
         self.assertEqual(len(ro["entities"]), 2)
         self.assertTrue(any(r["stage"] == "roster-c2-verify" for r in ro["reviews"]))
 
-        # 再测 transitive cannot_merge: (李青石, 王玄)=different -> 写入 cannot_merge_entries，拦截 (青石兄, 王玄)=same (0.95) 传递并入
+        # 再测 transitive cannot_merge: (李青石, 王玄)=different -> 写入 cannot_merge_entries，
+        # 与 (李青石, 青石兄)=same、(青石兄, 王玄)=same 构成含冲突连通块 -> 整组暂不合并并生成冲突待审
         self.store.db.execute("DELETE FROM tasks WHERE run_id=? AND stage LIKE 'roster%'", (run_id,))
         self.store.db.execute("DELETE FROM records WHERE run_id=? AND kind='roster_output'", (run_id,))
         self.store.db.commit()
@@ -762,7 +763,12 @@ class DecisionRuntimeRoutingAndGuardsTests(unittest.TestCase):
         out2 = resolve_roster(self.store, models2, source, run_id, concurrency=1, log=lambda _: None)
         self.assertTrue(out2["complete"])
         ro2 = self.store.records(run_id, "roster_output")[0]
-        self.assertEqual(len(ro2["entities"]), 2)
+        self.assertEqual(len(ro2["entities"]), 3)
+        self.assertTrue(any(
+            r.get("stage") == "roster-c2-verify"
+            and r.get("reason") == "C2 名册补合并连通块内存在冲突，整组暂不合并"
+            for r in ro2["reviews"]
+        ))
 
     def test_d1_c3_decision_all_high_conf_zero_generative_calls(self):
         self.assertEqual(C3_DECISION_SUBBATCH, 15)
