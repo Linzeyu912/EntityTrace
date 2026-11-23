@@ -275,6 +275,28 @@ def _apply_single_op_in_place(
         target_review["resolved_by"] = cid
 
 
+def _validate_replayed_coverage(
+    raw_ids: set[str],
+    entities: list[dict],
+    mentions: list[dict],
+    has_active_user: bool,
+) -> None:
+    ids = {m["id"] for m in mentions}
+    allowed_synthetic_methods = (
+        {"same_task_proper", "user_correction"} if has_active_user else {"same_task_proper"}
+    )
+    if (
+        not (raw_ids <= ids)
+        or any(
+            m.get("link_method") not in allowed_synthetic_methods
+            for m in mentions
+            if m["id"] not in raw_ids
+        )
+        or sorted(mid for e in entities for mid in e["mention_ids"]) != sorted(ids)
+    ):
+        raise ValueError("实体分组未恰好覆盖所有提及")
+
+
 def replay_user_corrections(
     roster_out: dict,
     raw_reviews: list[dict],
@@ -543,7 +565,14 @@ def apply_correction(
         "base_revision": before_rev,
         "created": "",
     }
-    replay_user_corrections(roster_out, raw_reviews, chapters, [*active_user, dry_probe], algorithm=algo)
+    dry_res = replay_user_corrections(roster_out, raw_reviews, chapters, [*active_user, dry_probe], algorithm=algo)
+    raw_ids = {m["id"] for m in store.records(run_id, "mention")}
+    _validate_replayed_coverage(
+        raw_ids,
+        dry_res["entities"],
+        dry_res["mentions"],
+        has_active_user=(source == "user" or bool(active_user)),
+    )
 
     created_at = utc_now()
 

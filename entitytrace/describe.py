@@ -3049,7 +3049,7 @@ def _run_persistence(
     text: str,
     chapters: list[dict],
     concurrency: int,
-) -> None:
+) -> int:
     """对有保留事实的实体逐实体打持久性标签；复用 describe_tasks 支持断点续跑。
 
     单实体输出结构非法（无 HTTP status 的 ModelError）记 failed 不阻断导出；
@@ -3111,7 +3111,7 @@ def _run_persistence(
     }
     pending = [task for task in tasks if task["id"] not in completed_ids]
     if not pending:
-        return
+        return 0
 
     def worker(task: dict) -> dict:
         value, request_id = models.generate(
@@ -3120,6 +3120,7 @@ def _run_persistence(
         )
         return {"value": value, "request_id": request_id}
 
+    written = 0
     for task, result, error in bounded_map(pending, worker, concurrency):
         if error is not None:
             if isinstance(error, BudgetError):
@@ -3133,6 +3134,7 @@ def _run_persistence(
                      "failed", dumps({"labels": {}, "error": "invalid-output"}),
                      str(error)[:200]),
                 )
+                written += 1
                 continue
             raise error
         labels: dict[str, str | None] = {}
@@ -3150,6 +3152,8 @@ def _run_persistence(
             (describe_id, task["id"], task["entity_id"], task["start"], task["end"],
              "completed", dumps({"labels": labels, "request_id": result["request_id"]}), None),
         )
+        written += 1
+    return written
 
 
 def _persistence_label_map(store: Store, describe_id: str) -> dict[str, str | None]:
@@ -3293,6 +3297,23 @@ def run_describe(
         config["persistence_prompt_version"] = PERSISTENCE_PROMPT_VERSION
     if dec_public is not None:
         config["decision"] = dec_public
+    prev_completed_wall: float | None = None
+    prev_rows = store.rows("SELECT state FROM describe_runs WHERE id=?", (describe_id,))
+    if prev_rows:
+        try:
+            prev_state = json.loads(prev_rows[0]["state"]) if prev_rows[0]["state"] else None
+        except (TypeError, ValueError):
+            prev_state = None
+        if isinstance(prev_state, dict) and prev_state.get("status") == "completed":
+            prev_stats = prev_state.get("stats")
+            prev_wall = prev_stats.get("wall_seconds") if isinstance(prev_stats, dict) else None
+            if (
+                isinstance(prev_wall, (int, float))
+                and not isinstance(prev_wall, bool)
+                and math.isfinite(prev_wall)
+                and prev_wall >= 0
+            ):
+                prev_completed_wall = float(prev_wall)
     now = utc_now()
     running_state = {"status": "running", "views": views, "verify": verify}
     store.execute(
@@ -3367,6 +3388,7 @@ def run_describe(
     completed_new = 0
     verify_completed_new = 0
     event_verify_completed_new = 0
+    persistence_completed_new = 0
     verify_task_count = 0
     event_verify_task_count = 0
     try:
@@ -3485,7 +3507,7 @@ def run_describe(
                 )
                 for ent in top_entities
             }
-            _run_persistence(
+            persistence_completed_new = _run_persistence(
                 store, models, describe_id, active_facts,
                 entity_kinds, entity_names, text, chapters, concurrency,
             )
@@ -3498,8 +3520,16 @@ def run_describe(
         )
         raise
 
-    wall_seconds = time.monotonic() - begin
-    stats = _metrics(store, run_id, describe_id, wall_seconds)
+    elapsed = time.monotonic() - begin
+    is_pure_cache_replay = (
+        prev_completed_wall is not None
+        and completed_new == 0
+        and verify_completed_new == 0
+        and event_verify_completed_new == 0
+        and persistence_completed_new == 0
+    )
+    effective_wall = prev_completed_wall if is_pure_cache_replay else elapsed
+    stats = _metrics(store, run_id, describe_id, effective_wall)
     document = _export_document(
         store, describe_id, run_id, top_k, kinds_list, top_entities, stats,
         views=views,
@@ -3542,5 +3572,6 @@ def run_describe(
         "event_verify_tasks": event_verify_task_count,
         "new_event_verify_tasks": event_verify_completed_new,
         "persistence": persistence,
+        "replay_wall_seconds": round(elapsed, 4),
         "document": document,
     }
