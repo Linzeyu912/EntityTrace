@@ -720,7 +720,8 @@ class RunDescribeTests(FixtureCase):
                                         "entities_per_request", "top_k", "kinds",
                                         "chapter_range", "entities", "reviews",
                                         "verification", "event_verification",
-                                        "persistence", "stats"})
+                                        "persistence", "stats",
+                                        "persona_alias_hints"})
             self.assertEqual(doc["verification"], {"enabled": False})
             self.assertEqual(doc["event_verification"], {"enabled": False})
             self.assertEqual(doc["views"], 1)
@@ -731,7 +732,8 @@ class RunDescribeTests(FixtureCase):
             entity = doc["entities"][0]
             self.assertEqual(set(entity), {"entity_id", "kind", "kind_rank", "name", "facts",
                                            "state_events", "stages", "gaps",
-                                           "persistence_counts"})
+                                           "persistence_counts", "base_traits",
+                                           "total_scene_appearances"})
             self.assertTrue(all(fact["support"] == 1 for fact in entity["facts"]))
             self.assertGreater(result["counts"]["tasks"], 0)
         finally:
@@ -1328,7 +1330,9 @@ class CliContractTests(FixtureCase):
         self.assertEqual(receipt["verify"], 0)
         self.assertEqual(receipt["run_id"], self.run_id)
         self.assertEqual(set(receipt["counts"]), {"tasks", "facts", "events", "stages",
-                                                  "multi_stage_entities", "reviews"})
+                                                  "multi_stage_entities", "reviews",
+                                                  "scene_appearances",
+                                                  "persona_alias_hints"})
         self.assertEqual(receipt["counts"]["facts"], 1)
         self.assertTrue(Path(receipt["out"]).is_file())
         self.assertEqual(

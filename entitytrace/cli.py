@@ -413,6 +413,10 @@ def main(argv=None) -> int:
                             1 for entity in doc["entities"] if len(entity["stages"]) > 1
                         ),
                         "reviews": len(doc["reviews"]),
+                        "scene_appearances": sum(
+                            int(entity.get("total_scene_appearances", 0)) for entity in doc["entities"]
+                        ),
+                        "persona_alias_hints": len(doc.get("persona_alias_hints") or []),
                     }
                     persistence_flag = 1 if (doc.get("persistence") or {}).get("enabled") else 0
                     _emit_json_line({

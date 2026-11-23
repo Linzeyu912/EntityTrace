@@ -32,6 +32,7 @@ LIFE_STAGE_BUCKET_LABELS: dict[str, str] = {
 }
 
 TRIGGER_SOURCE_LIFE_STAGE = "life_stage_age_sequence"
+TRIGGER_SOURCE_TIME_JUMP = "narrative_time_jump"
 
 _MORTAL_LOW_MAX = 120.0
 _MORTAL_HIGH_MAX = 150.0
@@ -971,5 +972,285 @@ def infer_life_stage_cuts(
         # 同桶或兼容年龄事实持续更新本阶段末条年龄锚点
         if sig.bucket_low <= cur_b <= sig.bucket_high:
             last_stage_age_fact = fact
+
+    return cuts
+
+
+# ---------------------------------------------------------------------------
+# 正文显式多年时间跨度跳跃切分（>= 5.0 年正向岁月流逝旁白）
+# ---------------------------------------------------------------------------
+
+_ZH_YEARS_NUM_PAT = (
+    r"(?:"
+    r"数十|几十|十有[一二两三四五六七八九]|"
+    r"[二三四五六七八九]十[一二三四五六七八九]?|"
+    r"十[一二三四五六七八九]|"
+    r"[五六七八九][六七八九]|"
+    r"[五六七八九十]|"
+    r"\d{1,3}"
+    r")"
+)
+
+_TIME_JUMP_ZH_PAT_1 = re.compile(
+    rf"(?:转眼|一晃眼|一晃|不觉|不知不觉|弹指|眨眼|光阴似箭|日月如梭|"
+    rf"过了|又过了|又过|已过|已经过了|一别|分别|离别|一去|"
+    rf"闭关了?|苦修了?|修炼了?|蛰伏了?|隐居了?|流放了?|囚禁了?|关押了?)"
+    rf"[^。！？；\n]{{0,8}}?"
+    rf"({_ZH_YEARS_NUM_PAT})(余|多|几|来|许)?(?:年|载)"
+    rf"(?:之后|以后|后|过去了|过去|光景|时间|工夫|功夫|才出关|方才出关|出关)?"
+)
+
+_TIME_JUMP_ZH_PAT_2 = re.compile(
+    rf"(?:^|[，、；：\s\u3000])"
+    rf"({_ZH_YEARS_NUM_PAT})(余|多|几|来|许)?(?:年|载)"
+    rf"(?:之后|以后|后|过去了|一晃而过|转瞬即逝|光阴一晃)"
+)
+
+_EN_YEAR_WORDS = (
+    r"five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|"
+    r"sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|\d{1,3}"
+)
+
+_TIME_JUMP_EN_PAT = re.compile(
+    rf"\b(?:(?:{_EN_YEAR_WORDS})\s+years?\s+(?:later|afterwards|passed|had\s+passed|elapsed|went\s+by)"
+    rf"|after\s+(?:{_EN_YEAR_WORDS})\s+years?)\b",
+    re.IGNORECASE,
+)
+
+_TIME_JUMP_FLASHBACK_RE = re.compile(
+    r"(?:年前|之前|以前|当年|昔年|昔日|往昔|曾|曾经|回想|回忆|想起|记得|犹记|"
+    r"\b(?:ago|before|had\s+passed\s+before|remembered|recalled|years\s+earlier)\b)",
+    re.IGNORECASE,
+)
+
+_TIME_JUMP_HYPOTHETICAL_RE = re.compile(
+    r"(?:想|打算|准备|希望|宁愿|奢望|恐怕|可能|将会|即将|要是|如果|倘若|若是|"
+    r"再出来|需要|还要|还得|至少要|至少需|怕是要|大约要|"
+    r"\b(?:will\s+take|would\s+take|hoped\s+to|planned\s+to|if\s+he|if\s+she)\b)",
+    re.IGNORECASE,
+)
+
+_TIME_JUMP_REGNAL_RE = re.compile(
+    r"(?:乃.{0,4}(?:年|载)|元年|年号|在位|享国|维大周|大周十|商纣|崇祯|康熙|乾隆|万历|嘉靖)"
+)
+
+
+def _parse_jump_years(num_tok: str) -> float | None:
+    s = (num_tok or "").strip().lower()
+    if not s:
+        return None
+    if s in ("数十", "几十"):
+        return 20.0
+    if s.isdigit():
+        return float(int(s))
+    m_you = re.fullmatch(r"十有([一二两三四五六七八九])", s)
+    if m_you:
+        v = _zh_to_int(m_you.group(1))
+        return float(10 + v) if v is not None else None
+    if len(s) == 2 and s[0] in "五六七八九" and s[1] in "六七八九":
+        a, b = _zh_to_int(s[0]), _zh_to_int(s[1])
+        if a is not None and b is not None and b > a:
+            return float(a)
+    zv = _zh_to_int(s)
+    if zv is not None:
+        return float(zv)
+    ev = _en_to_int(s)
+    if ev is not None:
+        return float(ev)
+    return None
+
+
+def _is_inside_dialogue_quote(para: str, pos: int) -> bool:
+    """检查段落内位置 pos 是否处于中文或英文引号对白内部。"""
+    before = para[:pos]
+    if before.count("“") > before.count("”"):
+        return True
+    if before.count("「") > before.count("」"):
+        return True
+    if before.count("『") > before.count("』"):
+        return True
+    if before.count('"') % 2 == 1:
+        return True
+    return False
+
+
+def _sentence_bounds_in_text(text: str, pos: int, end_pos: int) -> tuple[int, int]:
+    lo = pos
+    while lo > 0 and text[lo - 1] not in "。！？\n":
+        lo -= 1
+    hi = end_pos
+    n = len(text)
+    while hi < n and text[hi] not in "。！？\n":
+        hi += 1
+    return lo, hi
+
+
+def _find_valid_time_jump_in_window(
+    text: str,
+    win_start: int,
+    win_end: int,
+    para_start: int,
+    para_end: int,
+) -> tuple[int, int, float, str] | None:
+    """在指定窗口内检索首个合法正向 >= 5.0 年岁月流逝旁白，返回 (abs_s, abs_e, years, quote)。"""
+    window = text[win_start:win_end]
+    if not window:
+        return None
+    candidates: list[tuple[int, int, float]] = []
+
+    for pat in (_TIME_JUMP_ZH_PAT_1, _TIME_JUMP_ZH_PAT_2):
+        for m in pat.finditer(window):
+            num_tok = m.group(1)
+            yrs = _parse_jump_years(num_tok)
+            if yrs is None or yrs < 5.0 or yrs > 120.0:
+                continue
+            ms, me = m.start(), m.end()
+            while ms < me and window[ms] in "，、；：\t \u3000\r\n":
+                ms += 1
+            if ms < me:
+                candidates.append((win_start + ms, win_start + me, yrs))
+
+    for m in _TIME_JUMP_EN_PAT.finditer(window):
+        word_m = re.search(rf"\b({_EN_YEAR_WORDS})\b", m.group(0), re.IGNORECASE)
+        if not word_m:
+            continue
+        yrs = _parse_jump_years(word_m.group(1))
+        if yrs is None or yrs < 5.0 or yrs > 120.0:
+            continue
+        candidates.append((win_start + m.start(), win_start + m.end(), yrs))
+
+    candidates.sort(key=lambda x: (x[0], -x[2]))
+    for abs_s, abs_e, yrs in candidates:
+        p_lo = text.rfind("\n", 0, abs_s)
+        p_lo = 0 if p_lo < 0 else p_lo + 1
+        p_hi = text.find("\n", abs_e)
+        p_hi = len(text) if p_hi < 0 else p_hi
+        para_txt = text[p_lo:p_hi]
+        if _is_inside_dialogue_quote(para_txt, abs_s - p_lo):
+            continue
+        s_lo, s_hi = _sentence_bounds_in_text(text, abs_s, abs_e)
+        sent = text[s_lo:s_hi]
+        if _TIME_JUMP_FLASHBACK_RE.search(sent):
+            continue
+        if _TIME_JUMP_HYPOTHETICAL_RE.search(sent):
+            continue
+        if _TIME_JUMP_REGNAL_RE.search(sent):
+            continue
+        after_tail = text[abs_e:min(len(text), abs_e + 6)]
+        if re.match(r"^(?:之前|以前|前|ago|before)", after_tail, re.IGNORECASE):
+            continue
+        q = text[abs_s:abs_e]
+        if q and len(q) <= 80:
+            return abs_s, abs_e, yrs, q
+    return None
+
+
+def detect_narrative_time_jumps(
+    kept_facts: list[dict],
+    existing_splits: list[dict],
+    chapters: list[dict],
+    text: str | None,
+) -> list[dict]:
+    """检索人物相邻跨章保留事实之间的正文显式 >= 5.0 年正向岁月流逝旁白切点。"""
+    if not isinstance(text, str) or not text or len(kept_facts) < 2:
+        return []
+    ordered_facts = sorted(
+        [f for f in kept_facts if f.get("verdict") in (None, "keep")],
+        key=lambda f: (int(f["start"]), int(f["end"]), str(f.get("id", ""))),
+    )
+    if len(ordered_facts) < 2:
+        return []
+    body_seq = _build_body_seq(chapters)
+    ch_by_id = {str(ch["id"]): ch for ch in chapters}
+    text_len = len(text)
+
+    cuts: list[dict] = []
+    all_known_splits = list(existing_splits)
+    used_cut_chapters: set[str] = set()
+
+    for prev_f, cur_f in zip(ordered_facts, ordered_facts[1:]):
+        c1_id, c2_id = prev_f.get("chapter_id"), cur_f.get("chapter_id")
+        c1 = body_seq.get(str(c1_id)) if c1_id is not None else None
+        c2 = body_seq.get(str(c2_id)) if c2_id is not None else None
+        if c1 is not None and c2 is not None:
+            if c2 <= c1:
+                continue
+        else:
+            if c1_id == c2_id or int(cur_f["start"]) <= int(prev_f["start"]):
+                continue
+        if c2_id is not None and str(c2_id) in used_cut_chapters:
+            continue
+
+        if _is_covered_by_existing_split(prev_f, cur_f, all_known_splits, ordered_facts):
+            continue
+
+        f_start, f_end = int(cur_f["start"]), int(cur_f["end"])
+        if not (
+            any(int(gf["start"]) < f_start for gf in ordered_facts)
+            and any(int(gf["start"]) >= f_start for gf in ordered_facts)
+        ):
+            continue
+
+        ch_obj = ch_by_id.get(str(c2_id)) if c2_id is not None else None
+        hit = None
+
+        # 窗口 1：cur_f 所在章节正文段首前 400 码点
+        if ch_obj is not None:
+            ch_body = int(
+                ch_obj.get("body_start") if ch_obj.get("body_start") is not None else ch_obj["start"]
+            )
+            ch_end = min(text_len, int(ch_obj["end"]))
+            head_hi = min(ch_end, ch_body + 400)
+            if ch_body < head_hi and ch_body <= f_start:
+                hit = _find_valid_time_jump_in_window(text, ch_body, head_hi, ch_body, ch_end)
+
+        # 窗口 2：cur_f 同自然段局部窗口 [-200, +120] 码点（不越章节边界）
+        if hit is None:
+            p_lo = text.rfind("\n", 0, f_start)
+            p_lo = 0 if p_lo < 0 else p_lo + 1
+            p_hi = text.find("\n", f_end)
+            p_hi = text_len if p_hi < 0 else p_hi
+            w_lo = max(p_lo, f_start - 200)
+            w_hi = min(p_hi, f_end + 120)
+            if ch_obj is not None:
+                ch_body = int(
+                    ch_obj.get("body_start") if ch_obj.get("body_start") is not None else ch_obj["start"]
+                )
+                w_lo = max(w_lo, ch_body)
+                w_hi = min(w_hi, int(ch_obj["end"]))
+            if w_lo < w_hi:
+                hit = _find_valid_time_jump_in_window(text, w_lo, w_hi, p_lo, p_hi)
+
+        if hit is None:
+            continue
+
+        abs_s, abs_e, yrs, quote = hit
+        cut = {
+            "id": digest([
+                "narrative-time-jump-v1",
+                str(cur_f.get("entity_id", "")),
+                str(cur_f["id"]),
+                abs_s,
+                abs_e,
+            ]),
+            "event_type": "age_jump",
+            "trigger_source": TRIGGER_SOURCE_TIME_JUMP,
+            "from_stage_bucket": None,
+            "to_stage_bucket": None,
+            "source_fact_id": str(cur_f["id"]),
+            "jump_years": yrs,
+            "value": f"跨时期时间跳跃：{quote}（约 {int(yrs)} 年）",
+            "quote": quote,
+            "start": int(abs_s),
+            "end": int(abs_e),
+            "chapter_id": cur_f.get("chapter_id"),
+            "cut_start": int(cur_f["start"]),
+            "cut_chapter_id": cur_f.get("chapter_id"),
+            "stage_split": True,
+        }
+        cuts.append(cut)
+        all_known_splits.append(cut)
+        if c2_id is not None:
+            used_cut_chapters.add(str(c2_id))
 
     return cuts

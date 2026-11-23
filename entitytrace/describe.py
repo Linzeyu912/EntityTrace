@@ -22,10 +22,17 @@ from .corrections import (
     partition_active_corrections,
 )
 from .discovery import plan_tasks
-from .life_stages import TRIGGER_SOURCE_LIFE_STAGE, infer_life_stage_cuts
+from .life_stages import (
+    TRIGGER_SOURCE_LIFE_STAGE,
+    TRIGGER_SOURCE_TIME_JUMP,
+    detect_narrative_time_jumps,
+    infer_life_stage_cuts,
+)
 from .models import BudgetError, ModelError, Models, RequestBudget, bounded_map
+from .persona_hints import propose_persona_link_hints
 from .query import MAX_LIMIT, _load_roster_snapshot, query_rank
 from .storage import Store
+from .timeline_profiles import build_entity_timeline_profiles
 from .util import digest, dumps, utc_now, write_json
 
 DESCRIBE_VERSION = "describe-v7"
@@ -2291,8 +2298,9 @@ def build_entity_stages(
     *,
     text: str | None = None,
     infer_life_stages: bool = True,
+    infer_time_jumps: bool = True,
 ) -> list[dict]:
-    """按 `stage_split == True` 的保留事件及人物跨时期人生阶段切点确定性切分非空实体阶段（零模型调用）。"""
+    """按 `stage_split == True` 的保留事件、人物年龄序列及正文跨年跳跃确定性切分非空实体阶段（零模型调用）。"""
     range_start, range_end = int(range_bounds[0]), int(range_bounds[1])
     body_seq: dict[str, int] = {}
     seq = 0
@@ -2308,6 +2316,15 @@ def build_entity_stages(
             entity_facts, existing_splits, chapters, text=text,
         )
         raw_candidates.extend(life_cuts)
+        if infer_time_jumps:
+            kept_facts = sorted(
+                [f for f in entity_facts if f.get("verdict") in (None, "keep")],
+                key=lambda f: (int(f["start"]), int(f["end"]), str(f.get("id", ""))),
+            )
+            tj_cuts = detect_narrative_time_jumps(
+                kept_facts, [*existing_splits, *life_cuts], chapters, text,
+            )
+            raw_candidates.extend(tj_cuts)
 
     candidates = sorted(
         raw_candidates,
@@ -2329,6 +2346,8 @@ def build_entity_stages(
             summary["from_stage_bucket"] = ev.get("from_stage_bucket")
             summary["to_stage_bucket"] = ev.get("to_stage_bucket")
             summary["source_fact_id"] = ev.get("source_fact_id")
+            if ev.get("jump_years") is not None:
+                summary["jump_years"] = float(ev["jump_years"])
         return summary
 
     coalesced: list[dict] = []
@@ -2397,6 +2416,35 @@ def build_entity_stages(
     return stages
 
 
+def _load_persona_hint_inputs(
+    store: Store,
+    run_id: str,
+    chapters: list[dict],
+    active_user: list[dict],
+) -> tuple[dict | None, list[dict] | None]:
+    """读取名册快照并在存在生效用户更正时重放最新提及列表（纯只读、零写库）。"""
+    try:
+        saved_roster = store.records(run_id, "roster_output")
+    except Exception:
+        saved_roster = []
+    roster_out = saved_roster[0] if saved_roster else None
+    if roster_out is None or not active_user:
+        return roster_out, None
+    try:
+        raw_reviews = store.records(run_id, "review")
+        chapter_order = {str(ch["id"]): idx for idx, ch in enumerate(chapters)}
+        entities_by_id, mentions_by_id, id_rev, non_id_rev = _init_replay_state(
+            roster_out, raw_reviews,
+        )
+        for corr in active_user:
+            _apply_single_op_in_place(
+                corr, entities_by_id, mentions_by_id, chapter_order, id_rev, non_id_rev,
+            )
+        return roster_out, list(mentions_by_id.values())
+    except Exception:
+        return roster_out, None
+
+
 def _export_document(
     store: Store,
     describe_id: str,
@@ -2415,6 +2463,12 @@ def _export_document(
     persistence_enabled: bool = False,
     source_text: str | None = None,
     infer_life_stages: bool = True,
+    infer_time_jumps: bool = True,
+    timeline_profiles: bool = True,
+    persona_hints: bool = True,
+    snap: dict | None = None,
+    roster_out: dict | None = None,
+    mentions_override: list[dict] | None = None,
     rebind_meta: dict | None = None,
     override_voted: tuple[list[dict], list[dict], dict, dict] | None = None,
 ) -> dict:
@@ -2496,7 +2550,9 @@ def _export_document(
         covered = {item["facet"] for item in entity_facts}
         stages = build_entity_stages(
             ent["kind"], entity_facts, entity_events, chapters_list, range_bounds,
-            text=source_text, infer_life_stages=infer_life_stages,
+            text=source_text,
+            infer_life_stages=infer_life_stages,
+            infer_time_jumps=infer_time_jumps,
         )
         persistence_counts = {"trait": 0, "stage": 0, "scene": 0, "unlabeled": 0}
         for fact in entity_facts:
@@ -2505,7 +2561,7 @@ def _export_document(
                 persistence_counts[label] += 1
             else:
                 persistence_counts["unlabeled"] += 1
-        entities.append({
+        ent_doc = {
             "entity_id": ent["entity_id"],
             "kind": ent["kind"],
             "kind_rank": ent["kind_rank"],
@@ -2515,7 +2571,10 @@ def _export_document(
             "gaps": [facet for facet in FACETS[ent["kind"]] if facet not in covered],
             "stages": stages,
             "persistence_counts": persistence_counts,
-        })
+        }
+        if timeline_profiles:
+            ent_doc = build_entity_timeline_profiles(ent_doc, chapters_list, text=source_text)
+        entities.append(ent_doc)
     reviews = []
     for row in review_rows:
         reviews.append({
@@ -2539,6 +2598,18 @@ def _export_document(
         "persistence": _persistence_summary(store, describe_id, persistence_enabled),
         "stats": stats,
     }
+    if persona_hints:
+        if snap is not None and source_text:
+            document["persona_alias_hints"] = propose_persona_link_hints(
+                snap,
+                roster_out,
+                document,
+                source_text,
+                chapters_list,
+                mentions_override=mentions_override,
+            )
+        else:
+            document["persona_alias_hints"] = []
     if rebind_meta is not None:
         document["result_revision"] = rebind_meta["result_revision"]
         document["rebound_from_describe_id"] = rebind_meta["rebound_from_describe_id"]
@@ -3043,6 +3114,9 @@ def export_describe_run(
     *,
     rebind_corrections: bool = True,
     infer_life_stages: bool = True,
+    infer_time_jumps: bool = True,
+    timeline_profiles: bool = True,
+    persona_hints: bool = True,
 ) -> dict:
     """从 `describe_runs` 已存记录重新导出；兼容 `describe-v1` 旧库，并支持零请求更正投影重绑。"""
     rows = store.rows("SELECT * FROM describe_runs WHERE id=?", (describe_id,))
@@ -3157,6 +3231,11 @@ def export_describe_run(
         and current_rev is not None
         and state.get("result_revision") != current_rev
     )
+    roster_out, mentions_override = (
+        _load_persona_hint_inputs(store, run_id, chapters, active_user)
+        if persona_hints
+        else (None, None)
+    )
 
     if need_rebind:
         raw_facts = _raw_facts_with_views(store, describe_id)
@@ -3227,6 +3306,12 @@ def export_describe_run(
             persistence_enabled=persistence_enabled,
             source_text=source_text,
             infer_life_stages=infer_life_stages,
+            infer_time_jumps=infer_time_jumps,
+            timeline_profiles=timeline_profiles,
+            persona_hints=persona_hints,
+            snap=snap,
+            roster_out=roster_out,
+            mentions_override=mentions_override,
             rebind_meta={
                 "result_revision": current_rev,
                 "rebound_from_describe_id": describe_id,
@@ -3263,6 +3348,12 @@ def export_describe_run(
             persistence_enabled=persistence_enabled,
             source_text=source_text,
             infer_life_stages=infer_life_stages,
+            infer_time_jumps=infer_time_jumps,
+            timeline_profiles=timeline_profiles,
+            persona_hints=persona_hints,
+            snap=snap,
+            roster_out=roster_out,
+            mentions_override=mentions_override,
         )
     if out is not None:
         write_json(Path(out), document)
@@ -4173,6 +4264,13 @@ def run_describe(
     )
     effective_wall = prev_completed_wall if is_pure_cache_replay else elapsed
     stats = _metrics(store, run_id, describe_id, effective_wall)
+    try:
+        active_user, _, _, _ = partition_active_corrections(store.corrections(run_id))
+    except Exception:
+        active_user = []
+    roster_out, mentions_override = _load_persona_hint_inputs(
+        store, run_id, chapters, active_user,
+    )
     document = _export_document(
         store, describe_id, run_id, top_k, kinds_list, top_entities, stats,
         views=views,
@@ -4184,13 +4282,12 @@ def run_describe(
         event_verify_enabled=verify in (1, 3),
         persistence_enabled=persistence == 1,
         source_text=text,
+        snap=snap,
+        roster_out=roster_out,
+        mentions_override=mentions_override,
     )
     if out is not None:
         write_json(Path(out), document)
-    try:
-        active_user, _, _, _ = partition_active_corrections(store.corrections(run_id))
-    except Exception:
-        active_user = []
     completed_state = {
         "status": "completed",
         "views": views,
@@ -4210,6 +4307,8 @@ def run_describe(
         "reviews": len(document["reviews"]),
         "stages": sum(len(entity["stages"]) for entity in document["entities"]),
         "multi_stage_entities": sum(1 for entity in document["entities"] if len(entity["stages"]) > 1),
+        "scene_appearances": sum(int(entity.get("total_scene_appearances", 0)) for entity in document["entities"]),
+        "persona_alias_hints": len(document.get("persona_alias_hints") or []),
     }
     return {
         "describe_id": describe_id,
