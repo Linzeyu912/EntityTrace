@@ -8,7 +8,7 @@ from pathlib import Path
 
 from .config import OPENAI_DEFAULT_CONCURRENCY, load_services, read_env, resolve_decision_mode
 from .corrections import apply_correction
-from .describe import run_describe
+from .describe import empty_rebind_summary, export_describe_run, run_describe
 from .pipeline import (
     EXIT_CODE_BY_CATEGORY,
     PROTOCOL,
@@ -19,6 +19,7 @@ from .pipeline import (
 from .query import (
     DEFAULT_CONTEXT,
     DEFAULT_LIMIT,
+    _load_roster_snapshot,
     query_entities,
     query_entity,
     query_quote_json,
@@ -221,6 +222,8 @@ def _build_parser() -> _CliParser:
                           help="Decision 阶段并发上限（1—16，默认 8）")
     describe.add_argument("--persistence", type=int, choices=[0, 1], default=1,
                           help="是否为导出事实打持久性标签 trait/stage/scene（默认 1 启用，0 关闭且 describe_id 与旧版 describe-v6 一致）")
+    describe.add_argument("--rebind", default=None,
+                          help="从已有 describe_id 按当前最新更正版本零模型请求重绑并重新导出（无需凭证配置）")
     describe.add_argument("--out", type=Path, default=None, help="将描述事实导出 JSON 写入该路径")
 
     export = subs.add_parser("export", help="从已保存数据重新导出，不调用模型")
@@ -372,44 +375,100 @@ def main(argv=None) -> int:
                     )
                 )
             elif args.command == "describe":
-                resolved_decision_mode = resolve_decision_mode(args.decision, read_env(args.config))
-                services = load_services(
-                    args.config,
-                    generator=args.generator,
-                    decision_mode=resolved_decision_mode,
-                )
-                result = run_describe(
-                    store,
-                    args.run_id,
-                    services=services,
-                    top_k=args.top_k,
-                    kinds=args.kinds,
-                    topk_file=args.topk_file,
-                    concurrency=args.concurrency,
-                    out=args.out,
-                    views=args.views,
-                    max_requests=args.max_requests,
-                    max_seconds=args.max_seconds,
-                    entities_per_request=args.entities_per_request,
-                    verify=args.verify,
-                    from_chapter=args.from_chapter,
-                    to_chapter=args.to_chapter,
-                    decision_concurrency=args.decision_concurrency,
-                    decision_mode=resolved_decision_mode,
-                    persistence=args.persistence,
-                )
-                _emit_json_line({
-                    "ok": True,
-                    "describe_id": result["describe_id"],
-                    "run_id": result["run_id"],
-                    "views": result["views"],
-                    "entities_per_request": result["entities_per_request"],
-                    "verify": result["verify"],
-                    "chapter_range": result["chapter_range"],
-                    "counts": result["counts"],
-                    "persistence": result["persistence"],
-                    "out": str(args.out.resolve()) if args.out is not None else None,
-                })
+                if args.rebind is not None:
+                    rebind_id = str(args.rebind).strip()
+                    if not rebind_id:
+                        raise ValueError("--rebind 必须提供非空 describe_id")
+                    drows = store.rows(
+                        "SELECT id, run_id, config FROM describe_runs WHERE id=?",
+                        (rebind_id,),
+                    )
+                    if not drows:
+                        raise ValueError(f"描述运行不存在：{rebind_id}")
+                    if str(drows[0]["run_id"]) != str(args.run_id):
+                        raise ValueError(f"描述运行 {rebind_id} 不属于 run_id {args.run_id}")
+                    try:
+                        stored_cfg = json.loads(drows[0]["config"])
+                    except (TypeError, ValueError):
+                        stored_cfg = {}
+                    if not isinstance(stored_cfg, dict):
+                        stored_cfg = {}
+                    doc = export_describe_run(
+                        store, rebind_id, out=args.out, rebind_corrections=True,
+                    )
+                    current_rev = doc.get("result_revision")
+                    if current_rev is None:
+                        _, snap = _load_roster_snapshot(store, args.run_id, need_entities=False)
+                        current_rev = snap["meta"].get("result_revision")
+                    rebind_summary = doc.get("rebind_summary") or empty_rebind_summary(0)
+                    verify_val = stored_cfg.get("verify", 0)
+                    if not isinstance(verify_val, int) or isinstance(verify_val, bool):
+                        verify_val = 0
+                    counts = {
+                        "tasks": 0,
+                        "facts": sum(len(entity["facts"]) for entity in doc["entities"]),
+                        "events": sum(len(entity["state_events"]) for entity in doc["entities"]),
+                        "stages": sum(len(entity["stages"]) for entity in doc["entities"]),
+                        "multi_stage_entities": sum(
+                            1 for entity in doc["entities"] if len(entity["stages"]) > 1
+                        ),
+                        "reviews": len(doc["reviews"]),
+                    }
+                    persistence_flag = 1 if (doc.get("persistence") or {}).get("enabled") else 0
+                    _emit_json_line({
+                        "ok": True,
+                        "describe_id": doc["describe_id"],
+                        "run_id": doc["run_id"],
+                        "result_revision": current_rev,
+                        "rebound": True,
+                        "rebind_summary": rebind_summary,
+                        "views": doc["views"],
+                        "entities_per_request": doc["entities_per_request"],
+                        "verify": verify_val,
+                        "chapter_range": doc["chapter_range"],
+                        "counts": counts,
+                        "persistence": persistence_flag,
+                        "out": str(args.out.resolve()) if args.out is not None else None,
+                    })
+                else:
+                    resolved_decision_mode = resolve_decision_mode(args.decision, read_env(args.config))
+                    services = load_services(
+                        args.config,
+                        generator=args.generator,
+                        decision_mode=resolved_decision_mode,
+                    )
+                    result = run_describe(
+                        store,
+                        args.run_id,
+                        services=services,
+                        top_k=args.top_k,
+                        kinds=args.kinds,
+                        topk_file=args.topk_file,
+                        concurrency=args.concurrency,
+                        out=args.out,
+                        views=args.views,
+                        max_requests=args.max_requests,
+                        max_seconds=args.max_seconds,
+                        entities_per_request=args.entities_per_request,
+                        verify=args.verify,
+                        from_chapter=args.from_chapter,
+                        to_chapter=args.to_chapter,
+                        decision_concurrency=args.decision_concurrency,
+                        decision_mode=resolved_decision_mode,
+                        persistence=args.persistence,
+                    )
+                    _emit_json_line({
+                        "ok": True,
+                        "describe_id": result["describe_id"],
+                        "run_id": result["run_id"],
+                        "views": result["views"],
+                        "entities_per_request": result["entities_per_request"],
+                        "verify": result["verify"],
+                        "chapter_range": result["chapter_range"],
+                        "counts": result["counts"],
+                        "persistence": result["persistence"],
+                        "out": str(args.out.resolve()) if args.out is not None else None,
+                    })
             elif args.command == "export":
                 print(export_run(store, args.run_id, args.output).resolve())
             elif args.command == "correct":

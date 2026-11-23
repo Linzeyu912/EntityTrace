@@ -30,7 +30,7 @@
   {"protocol":"entitytrace.v1","command":"<命令名>","run_id":"<已知则填，否则 null>","error":{"category":"...","message":"...","retryable":false}}
   ```
   注：`run --json` 在运行尚未建立（`run_id` 为 `null`）即失败时，`status` 固定为 `"failed"`，退出码为 `1`。
-- **例外**：`describe` 成功时按描述抽取契约输出 `{"ok":true,"describe_id":...,"run_id":...,"views":...,"entities_per_request":...,"verify":...,"chapter_range":{...},"counts":{...},"persistence":...,"out":...}`，不带 `protocol` 字段；失败仍输出上述统一错误 JSON。
+- **例外**：`describe` 成功时按描述抽取契约输出 `{"ok":true,"describe_id":...,"run_id":...,"views":...,"entities_per_request":...,"verify":...,"chapter_range":{...},"counts":{...},"persistence":...,"out":...}`（使用 `--rebind <describe_id>` 零请求重绑时另附 `result_revision`、`rebound: true` 与 `rebind_summary`），不带 `protocol` 字段；失败仍输出上述统一错误 JSON。
 
 ---
 
@@ -126,6 +126,7 @@ python -X utf8 -m entitytrace correct <run_id> revoke <更正ID> [--cascade] --s
 python -X utf8 -m entitytrace describe <run_id> --top-k 20 --kinds person,place,object,ability --concurrency 8 --decision auto --out "<描述导出路径>" --db "<数据库路径>" --config "<凭证配置文件>"
 python -X utf8 -m entitytrace describe <run_id> --from-chapter 1 --to-chapter 15 --out "<描述导出路径>" --db "<数据库路径>" --config "<凭证配置文件>"
 python -X utf8 -m entitytrace describe <run_id> --views 1 --entities-per-request 0 --verify 0 --out "<描述导出路径>" --db "<数据库路径>" --config "<凭证配置文件>"
+python -X utf8 -m entitytrace describe <run_id> --rebind <describe_id> --out "<重绑描述导出路径>" --db "<数据库路径>"
 ```
 
 - 按发现任务块抽取并跳过不含 top-K 实体的块。默认启用 `--views 3 --entities-per-request 4 --verify 1`（`--top-k` 默认 `20`）：以《封神演义》百回四类 top-20 实测为准，默认三遍且每请求最多 `4` 个实体的抽取任务数为 `1,545` 次，约为 `--views 1 --entities-per-request 0` 单遍整块抽取（`114` 次）的 `13.6` 倍（单遍按 `4` 实体分组为 `515` 次，三遍为其 `3` 倍）；事实复核每 `12` 条表决后事实约 `1` 个请求（单遍实测 `84`—`89` 次，`--verify 3` 三遍实测 `269`—`280` 次），状态变化事件复核每 `12` 条表决后事件约 `1` 个请求（单遍约 `10` 次，三遍约 `30` 次）。显式传入 `--views 1 --entities-per-request 0 --verify 0` 可回到最省请求的单遍模式。
@@ -136,7 +137,8 @@ python -X utf8 -m entitytrace describe <run_id> --views 1 --entities-per-request
 - `--persistence {0,1}` 默认 `1`：复核后按有保留事实的实体每实体发 1 次请求标注 `trait` 固有／长期、`stage` 阶段性、`scene` 单场，纯导出注释不删事实、不介入 `stages` 切分，单实体输出非法记入 `failed_entities`（该实体事实 `persistence` 为 `null`）不阻断导出，按任务编号续跑；传 `0` 关闭且 `describe_id` 与未开持久性标签的 `describe-v6` 逐位一致。
 - `--decision {auto,on,off}` / `--decision-concurrency N` 同样作用于 `describe`；相同实际生效配置得到相同 `describe_id` 并自动续跑（未配置 `TYPESAFE_API_KEY` 时 `auto` 与 `off` 产生相同 `describe_id`）；更换 `--top-k`、名单、章节范围、`--views`、`--entities-per-request`、`--verify`、`--persistence` 或生效配置会得到新编号。需要独立冷跑时使用新的 `--db` 副本。
 - 成功输出单行 `{"ok":true,"describe_id","run_id","views","entities_per_request","verify","chapter_range","counts":{"tasks","facts","events","stages","multi_stage_entities","reviews"},"persistence","out"}`；失败沿用统一错误 JSON 与退出码。401/402/429 等硬额度停止后保留断点，用原命令同库续跑。
-- 导出 `entities[]` 每项含 `facts`（每条事实及 `stages[].facts[]` 均含 `persistence` 字段）、`state_events`、确定性非空阶段列表 `stages`（每项含 `stage_index`、`start`、`end`、`from_chapter`、`to_chapter`、`first_fact_chapter_id`、`last_fact_chapter_id`、`trigger_events`、`facts`、`gaps`）、整体 `gaps` 与实体级 `persistence_counts`（`trait`/`stage`/`scene`/`unlabeled` 四项之和等于事实数），导出顶层含 `views`、`entities_per_request`、`chapter_range`、`verification`、`event_verification` 与 `persistence`（`enabled`/`requests`/`failed_entities`）；待审项在 `reviews[]` 中给出原因（未知实体、facet 与类别不符、枚举非法、引用找不到或超长、`holder` 引文不含持有者称呼的 `holder-not-in-quote` 等）。`holder` 事实的引文会在同一片段内向左扩展到最近的持有者称呼，候选称呼来自全书名册（事实 `value`、`holder_entity_id` 的称呼及 `value` 中可解析人物的称呼，不要求持有者实体出现在本请求中）。
+- **`--rebind <describe_id>`（零模型请求更正投影重绑，无需 `--config` 与 API 密钥）**：当宿主对名册执行 `correct`（`merge` / `split-surface` / `assign` / `not-entity`）更新 `result_revision` 后，可直接对既有 `describe_id` 执行 `--rebind` 完成零请求投影重聚（合并实体事实与事件去重汇聚、拆出或改派称呼按同章重叠与最近提及分离、非实体剔除、`holder_entity_id` 重定向、按最新 `rank` 刷新名次并重算阶段切分），绝不改写 SQLite 既有描述原表，撤回更正后可逐字节复原；不存在或不属于 `<run_id>` 的 `<describe_id>` 按 `input` 错误（退出码 `1`）拒绝。成功回执附加 `result_revision`、`rebound: true` 与 `rebind_summary`（`active_corrections`、`merged_entities`、`split_reassigned_facts`、`split_reassigned_events`、`dropped_not_entity_facts`、`dropped_not_entity_events`、`dropped_incompatible_facet_facts`、`dropped_entities`、`deduped_facts`、`deduped_events`、`redirected_holders`、`ambiguous_facts`、`ambiguous_events`），导出文档顶层在发生有效重绑时同步附加 `result_revision`、`rebound_from_describe_id` 与 `rebind_summary`。
+- 导出 `entities[]` 每项含 `facts`（每条事实及 `stages[].facts[]` 均含 `persistence` 字段）、`state_events`、确定性非空阶段列表 `stages`（每项含 `stage_index`、`start`、`end`、`from_chapter`、`to_chapter`、`first_fact_chapter_id`、`last_fact_chapter_id`、`trigger_events`、`facts`、`gaps`）、整体 `gaps` 与实体级 `persistence_counts`（`trait`/`stage`/`scene`/`unlabeled` 四项之和等于事实数），导出顶层含 `views`、`entities_per_request`、`chapter_range`、`verification`、`event_verification` 与 `persistence`（`enabled`/`requests`/`failed_entities`）；对 `person` 实体，除显式状态事件切点外，还基于已核验 `age` 序列按五级视觉人生阶段桶（`child`/`teen`/`young_adult`/`middle`/`senior`）确定性补充跨时期切点，其 `trigger_events[]` 额外携带 `trigger_source="life_stage_age_sequence"`、`from_stage_bucket`、`to_stage_bucket` 与 `source_fact_id`（仍保留原文逐字 `quote` 与 `[start, end)`，且不改写 `state_events`）；待审项在 `reviews[]` 中给出原因（未知实体、facet 与类别不符、枚举非法、引用找不到或超长、`holder` 引文不含持有者称呼的 `holder-not-in-quote` 等）。`holder` 事实的引文会在同一片段内向左扩展到最近的持有者称呼，候选称呼来自全书名册（事实 `value`、`holder_entity_id` 的称呼及 `value` 中可解析人物的称呼，不要求持有者实体出现在本请求中）。
 
 ---
 

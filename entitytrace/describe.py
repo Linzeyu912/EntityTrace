@@ -10,14 +10,21 @@ from __future__ import annotations
 
 import json
 import math
+import re
 import threading
 import time
 from pathlib import Path
 
 from .config import is_typesafe_decision_service, resolve_decision_mode
+from .corrections import (
+    _apply_single_op_in_place,
+    _init_replay_state,
+    partition_active_corrections,
+)
 from .discovery import plan_tasks
+from .life_stages import TRIGGER_SOURCE_LIFE_STAGE, infer_life_stage_cuts
 from .models import BudgetError, ModelError, Models, RequestBudget, bounded_map
-from .query import _load_roster_snapshot, query_rank
+from .query import MAX_LIMIT, _load_roster_snapshot, query_rank
 from .storage import Store
 from .util import digest, dumps, utc_now, write_json
 
@@ -2249,14 +2256,43 @@ def _event_verification_summary(
     }
 
 
+_WS_NORM_RE = re.compile(r"[\s\u3000]+")
+_NOT_ENTITY_DEST = "__not_entity_confirmed__"
+
+
+def _norm_value(value: str) -> str:
+    return _WS_NORM_RE.sub(" ", str(value or "").strip()).lower()
+
+
+def empty_rebind_summary(active_corrections: int = 0) -> dict[str, int]:
+    return {
+        "active_corrections": int(active_corrections),
+        "merged_entities": 0,
+        "split_reassigned_facts": 0,
+        "split_reassigned_events": 0,
+        "dropped_not_entity_facts": 0,
+        "dropped_not_entity_events": 0,
+        "dropped_incompatible_facet_facts": 0,
+        "dropped_entities": 0,
+        "deduped_facts": 0,
+        "deduped_events": 0,
+        "redirected_holders": 0,
+        "ambiguous_facts": 0,
+        "ambiguous_events": 0,
+    }
+
+
 def build_entity_stages(
     kind: str,
     entity_facts: list[dict],
     entity_events: list[dict],
     chapters: list[dict],
     range_bounds: tuple[int, int],
+    *,
+    text: str | None = None,
+    infer_life_stages: bool = True,
 ) -> list[dict]:
-    """按 `stage_split == True` 的保留事件确定性切分非空实体阶段（零模型调用）。"""
+    """按 `stage_split == True` 的保留事件及人物跨时期人生阶段切点确定性切分非空实体阶段（零模型调用）。"""
     range_start, range_end = int(range_bounds[0]), int(range_bounds[1])
     body_seq: dict[str, int] = {}
     seq = 0
@@ -2265,13 +2301,21 @@ def build_entity_stages(
             seq += 1
             body_seq[str(ch["id"])] = seq
 
+    existing_splits = [ev for ev in entity_events if ev.get("stage_split") is True]
+    raw_candidates = list(existing_splits)
+    if infer_life_stages and kind == "person" and entity_facts:
+        life_cuts = infer_life_stage_cuts(
+            entity_facts, existing_splits, chapters, text=text,
+        )
+        raw_candidates.extend(life_cuts)
+
     candidates = sorted(
-        [ev for ev in entity_events if ev.get("stage_split") is True],
-        key=lambda ev: (int(ev["start"]), int(ev["end"]), str(ev["id"])),
+        raw_candidates,
+        key=lambda ev: (int(ev.get("cut_start", ev["start"])), int(ev["end"]), str(ev["id"])),
     )
 
     def _trigger_summary(ev: dict) -> dict:
-        return {
+        summary = {
             "id": ev["id"],
             "event_type": ev["event_type"],
             "value": ev["value"],
@@ -2280,11 +2324,17 @@ def build_entity_stages(
             "end": int(ev["end"]),
             "chapter_id": ev.get("chapter_id"),
         }
+        if ev.get("trigger_source"):
+            summary["trigger_source"] = ev["trigger_source"]
+            summary["from_stage_bucket"] = ev.get("from_stage_bucket")
+            summary["to_stage_bucket"] = ev.get("to_stage_bucket")
+            summary["source_fact_id"] = ev.get("source_fact_id")
+        return summary
 
     coalesced: list[dict] = []
     for ev in candidates:
-        ev_start = int(ev["start"])
-        ev_ch = ev.get("chapter_id")
+        ev_start = int(ev.get("cut_start", ev["start"]))
+        ev_ch = ev.get("cut_chapter_id", ev.get("chapter_id"))
         if coalesced:
             prev = coalesced[-1]
             if (
@@ -2363,6 +2413,10 @@ def _export_document(
     chapter_range: dict | None = None,
     event_verify_enabled: bool | None = None,
     persistence_enabled: bool = False,
+    source_text: str | None = None,
+    infer_life_stages: bool = True,
+    rebind_meta: dict | None = None,
+    override_voted: tuple[list[dict], list[dict], dict, dict] | None = None,
 ) -> dict:
     chapters_list = list(chapters or [])
     if chapter_range is None or range_bounds is None:
@@ -2377,48 +2431,51 @@ def _export_document(
     review_rows = store.rows(
         "SELECT * FROM describe_reviews WHERE describe_id=? ORDER BY task_id,id", (describe_id,),
     )
-    raw_facts = _raw_facts_with_views(store, describe_id)
-    raw_events = _raw_events_with_views(store, describe_id)
-    voted_facts = vote_facts(raw_facts, views=views, field="facet")
-    if verify in (1, 3):
-        voted_facts, verification = _verification_summary(
-            store, describe_id, voted_facts, passes=verify,
-        )
+    if override_voted is not None:
+        voted_facts, voted_events, verification, event_verification = override_voted
     else:
-        verification = {"enabled": False}
-
-    voted_events = vote_facts(raw_events, views=views, field="event_type")
-    if event_verify_enabled:
-        voted_events, event_verification = _event_verification_summary(
-            store, describe_id, voted_events, passes=verify,
-        )
-        has_event_verdicts = bool(
-            store.rows(
-                "SELECT 1 FROM event_verdicts WHERE describe_id=? LIMIT 1",
-                (describe_id,),
+        raw_facts = _raw_facts_with_views(store, describe_id)
+        raw_events = _raw_events_with_views(store, describe_id)
+        voted_facts = vote_facts(raw_facts, views=views, field="facet")
+        if verify in (1, 3):
+            voted_facts, verification = _verification_summary(
+                store, describe_id, voted_facts, passes=verify,
             )
-        )
-        if has_event_verdicts:
-            voted_events = apply_stage_split_guards(voted_facts, voted_events, chapters=chapters_list)
-            event_verification["split_events"] = sum(
-                1 for item in voted_events if item.get("stage_split") is True
-            )
-    else:
-        exported_events: list[dict] = []
-        for item in voted_events:
-            entry = dict(item)
-            entry["stage_split"] = bool(item.get("splits_entity", False))
-            exported_events.append(entry)
-        voted_events = exported_events
-        event_verification = {"enabled": False}
+        else:
+            verification = {"enabled": False}
 
-    # 持久性标签：逐条事实补 persistence 字段；标签不参与阶段切分，也不删除任何事实。
-    if persistence_enabled:
-        label_map = _persistence_label_map(store, describe_id)
-    else:
-        label_map = {}
-    for item in voted_facts:
-        item["persistence"] = label_map.get(str(item["id"])) if persistence_enabled else None
+        voted_events = vote_facts(raw_events, views=views, field="event_type")
+        if event_verify_enabled:
+            voted_events, event_verification = _event_verification_summary(
+                store, describe_id, voted_events, passes=verify,
+            )
+            has_event_verdicts = bool(
+                store.rows(
+                    "SELECT 1 FROM event_verdicts WHERE describe_id=? LIMIT 1",
+                    (describe_id,),
+                )
+            )
+            if has_event_verdicts:
+                voted_events = apply_stage_split_guards(voted_facts, voted_events, chapters=chapters_list)
+                event_verification["split_events"] = sum(
+                    1 for item in voted_events if item.get("stage_split") is True
+                )
+        else:
+            exported_events: list[dict] = []
+            for item in voted_events:
+                entry = dict(item)
+                entry["stage_split"] = bool(item.get("splits_entity", False))
+                exported_events.append(entry)
+            voted_events = exported_events
+            event_verification = {"enabled": False}
+
+        # 持久性标签：逐条事实补 persistence 字段；标签不参与阶段切分，也不删除任何事实。
+        if persistence_enabled:
+            label_map = _persistence_label_map(store, describe_id)
+        else:
+            label_map = {}
+        for item in voted_facts:
+            item["persistence"] = label_map.get(str(item["id"])) if persistence_enabled else None
 
     facts_by_entity: dict[str, list[dict]] = {}
     for item in voted_facts:
@@ -2428,11 +2485,18 @@ def _export_document(
         events_by_entity.setdefault(item["entity_id"], []).append(item)
     entities: list[dict] = []
     for ent in top_entities:
-        entity_facts = facts_by_entity.get(ent["entity_id"], [])
-        entity_events = events_by_entity.get(ent["entity_id"], [])
+        entity_facts = sorted(
+            facts_by_entity.get(ent["entity_id"], []),
+            key=lambda item: (int(item["start"]), int(item["end"]), str(item["facet"]), str(item["id"])),
+        )
+        entity_events = sorted(
+            events_by_entity.get(ent["entity_id"], []),
+            key=lambda item: (int(item["start"]), int(item["end"]), str(item["event_type"]), str(item["id"])),
+        )
         covered = {item["facet"] for item in entity_facts}
         stages = build_entity_stages(
             ent["kind"], entity_facts, entity_events, chapters_list, range_bounds,
+            text=source_text, infer_life_stages=infer_life_stages,
         )
         persistence_counts = {"trait": 0, "stage": 0, "scene": 0, "unlabeled": 0}
         for fact in entity_facts:
@@ -2460,7 +2524,7 @@ def _export_document(
             "reason": row["reason"],
             "data": json.loads(row["data"]),
         })
-    return {
+    document = {
         "describe_id": describe_id,
         "run_id": run_id,
         "views": int(views),
@@ -2475,6 +2539,39 @@ def _export_document(
         "persistence": _persistence_summary(store, describe_id, persistence_enabled),
         "stats": stats,
     }
+    if rebind_meta is not None:
+        document["result_revision"] = rebind_meta["result_revision"]
+        document["rebound_from_describe_id"] = rebind_meta["rebound_from_describe_id"]
+        document["rebind_summary"] = rebind_meta["rebind_summary"]
+    return document
+
+
+def _infer_kind_from_items(
+    facets: set[str],
+    event_types: set[str],
+    kinds: list[str],
+) -> str:
+    def recognized(kind: str) -> set[str]:
+        return set(FACETS.get(kind, ())) | {
+            facet for facet, owner in _LEGACY_FACET_KIND.items() if owner == kind
+        }
+
+    candidates = [k for k in (list(kinds) or list(DESCRIBE_KINDS)) if k in FACETS] or list(DESCRIBE_KINDS)
+    for kind in candidates:
+        allowed = recognized(kind)
+        if facets and facets <= allowed:
+            return kind
+    for kind in candidates:
+        if facets & recognized(kind):
+            return kind
+    for kind in candidates:
+        allowed_ev = set(ALLOWED_EVENT_TYPES_BY_KIND.get(kind, ()))
+        if event_types and event_types <= allowed_ev:
+            return kind
+    for kind in candidates:
+        if event_types & set(ALLOWED_EVENT_TYPES_BY_KIND.get(kind, ())):
+            return kind
+    return candidates[0]
 
 
 def _fallback_kind(store: Store, describe_id: str, entity_id: str, kinds: list[str]) -> str:
@@ -2484,25 +2581,470 @@ def _fallback_kind(store: Store, describe_id: str, entity_id: str, kinds: list[s
         (describe_id, entity_id),
     )
     facets = {row["facet"] for row in rows}
+    return _infer_kind_from_items(facets, set(), kinds)
 
-    def recognized(kind: str) -> set[str]:
-        return set(FACETS.get(kind, ())) | {
-            facet for facet, owner in _LEGACY_FACET_KIND.items() if owner == kind
+
+def rebind_describe_for_corrections(
+    store: Store,
+    run_id: str,
+    describe_id: str,
+    entity_ids: list[str],
+    kinds: list[str],
+    state: dict,
+    snap: dict,
+    chapters: list[dict],
+    chapter_range: dict,
+    active_user: list[dict],
+    voted_facts: list[dict],
+    voted_events: list[dict],
+    *,
+    event_verify_enabled: bool,
+    has_event_verdicts: bool,
+) -> tuple[list[dict], list[dict], list[dict], dict[str, int]]:
+    """纯内存确定性更正投影重绑（严禁写回 SQLite 原表，保证 revoke 100% 原始字节可逆）。"""
+    by_id = {str(ent["id"]): ent for ent in snap.get("entities", [])}
+    not_entity_eids = {
+        eid for eid, ent in by_id.items()
+        if ent.get("identity_status") == "not_entity_confirmed"
+    }
+    active_by_id = {
+        eid: ent for eid, ent in by_id.items()
+        if eid not in not_entity_eids
+    }
+
+    merge_direct: dict[str, str] = {}
+    origin_partition: dict[str, dict[str, list[dict]]] = {}
+    saved_roster = store.records(run_id, "roster_output")
+    chapter_order = {str(ch["id"]): idx for idx, ch in enumerate(chapters)}
+
+    if saved_roster:
+        roster_out = saved_roster[0]
+        raw_reviews = store.records(run_id, "review")
+        entities_by_id, mentions_by_id, id_rev, non_id_rev = _init_replay_state(
+            roster_out, raw_reviews,
+        )
+        base_cids = (
+            {str(cid) for cid in (state.get("active_correction_ids") or [])}
+            if "active_correction_ids" in state
+            else set()
+        )
+        active_id_set = {str(c["id"]) for c in active_user}
+        if base_cids and base_cids <= active_id_set:
+            pre_corrs = [c for c in active_user if str(c["id"]) in base_cids]
+            delta_corrs = [c for c in active_user if str(c["id"]) not in base_cids]
+        else:
+            pre_corrs = []
+            delta_corrs = list(active_user)
+
+        for corr in pre_corrs:
+            _apply_single_op_in_place(
+                corr, entities_by_id, mentions_by_id, chapter_order, id_rev, non_id_rev,
+            )
+        baseline_owner: dict[str, str] = {
+            mid: str(m["entity_id"]) for mid, m in mentions_by_id.items()
         }
+        for corr in delta_corrs:
+            if corr.get("op") == "merge":
+                args = corr.get("args") or {}
+                merge_direct[str(args["merged_entity_id"])] = str(args["target_entity_id"])
+            _apply_single_op_in_place(
+                corr, entities_by_id, mentions_by_id, chapter_order, id_rev, non_id_rev,
+            )
+        for eid, ent in entities_by_id.items():
+            if ent.get("identity_status") == "not_entity_confirmed":
+                not_entity_eids.add(str(eid))
+        for mid, orig_eid in baseline_owner.items():
+            m = mentions_by_id[mid]
+            feid = str(m["entity_id"])
+            if m.get("identity_status") == "not_entity_confirmed" or feid in not_entity_eids:
+                dest = _NOT_ENTITY_DEST
+            else:
+                dest = feid
+            origin_partition.setdefault(orig_eid, {}).setdefault(dest, []).append(m)
+    else:
+        # 合成测试库无 roster_output 时的确定性回退：基于 active_user args 与最新查询提及推导分区
+        def _load_qmentions(eid: str) -> list[dict]:
+            qrows = store.rows(
+                "SELECT mentions_json FROM query_entity_mentions WHERE run_id=? AND entity_id=?",
+                (run_id, eid),
+            )
+            if not qrows:
+                return []
+            try:
+                return json.loads(qrows[0]["mentions_json"]) or []
+            except (TypeError, ValueError):
+                return []
 
-    candidates = list(kinds) or list(DESCRIBE_KINDS)
-    for kind in candidates:
-        allowed = recognized(kind)
-        if facets and facets <= allowed:
-            return kind
-    for kind in candidates:
-        if facets & recognized(kind):
-            return kind
-    return candidates[0]
+        for corr in active_user:
+            op = corr.get("op")
+            args = corr.get("args") or {}
+            if op == "merge":
+                merge_direct[str(args["merged_entity_id"])] = str(args["target_entity_id"])
+            elif op == "split-surface":
+                old_eid = str(args["entity_id"])
+                new_eid = digest(["correction-split", str(corr["id"])])
+                part = origin_partition.setdefault(old_eid, {})
+                if old_eid in active_by_id:
+                    part[old_eid] = _load_qmentions(old_eid)
+                if new_eid in active_by_id:
+                    part[new_eid] = _load_qmentions(new_eid)
+            elif op == "not-entity":
+                mid = str(args["mention_id"])
+                ne_id = digest(["correction-not-entity", mid])
+                not_entity_eids.add(ne_id)
+
+    merge_redirect: dict[str, str] = {}
+    for old_eid in merge_direct:
+        cur = old_eid
+        seen: set[str] = set()
+        while cur in merge_direct and cur not in seen:
+            seen.add(cur)
+            cur = merge_direct[cur]
+        merge_redirect[old_eid] = cur
+
+    summary = empty_rebind_summary(len(active_user))
+
+    # 统计被并入实体与整实体非实体消亡计数
+    for orig_eid in dict.fromkeys(entity_ids):
+        part = origin_partition.get(orig_eid)
+        if part is not None:
+            active_dests = [d for d in part if d != _NOT_ENTITY_DEST and d in active_by_id]
+            if not active_dests:
+                summary["dropped_entities"] += 1
+            elif len(part) == 1 and active_dests[0] != orig_eid:
+                summary["merged_entities"] += 1
+            elif orig_eid in merge_redirect and orig_eid not in active_by_id:
+                summary["merged_entities"] += 1
+        else:
+            if orig_eid in merge_redirect:
+                target = merge_redirect[orig_eid]
+                if target in active_by_id:
+                    summary["merged_entities"] += 1
+                else:
+                    summary["dropped_entities"] += 1
+            elif orig_eid in not_entity_eids or (active_by_id and orig_eid not in active_by_id):
+                summary["dropped_entities"] += 1
+
+    def _resolve_holder(holder_id: str | None) -> str | None:
+        if not isinstance(holder_id, str) or not holder_id:
+            return None
+        if holder_id in merge_redirect:
+            target = merge_redirect[holder_id]
+            return target if target in active_by_id else None
+        if holder_id in not_entity_eids:
+            return None
+        part = origin_partition.get(holder_id)
+        if part is not None:
+            active_dests = [d for d in part if d != _NOT_ENTITY_DEST and d in active_by_id]
+            if not active_dests:
+                return None
+            if len(part) == 1 and len(active_dests) == 1:
+                return active_dests[0]
+        return holder_id
+
+    def _route_item(item: dict, *, is_event: bool) -> tuple[str | None, bool]:
+        orig_eid = str(item["entity_id"])
+        part = origin_partition.get(orig_eid)
+        if part is None:
+            if orig_eid in merge_redirect:
+                target = merge_redirect[orig_eid]
+                return (target, False) if target in active_by_id else (None, False)
+            if orig_eid in not_entity_eids or (active_by_id and orig_eid not in active_by_id):
+                return (None, False)
+            return (orig_eid, False)
+
+        active_dests = [d for d in part if d != _NOT_ENTITY_DEST and d in active_by_id]
+        # 1. 未受影响实体
+        if len(part) == 1 and orig_eid in part and orig_eid in active_by_id:
+            return (orig_eid, False)
+        # 2. 纯合并或整体单去向转移
+        if len(part) == 1 and len(active_dests) == 1:
+            dest = active_dests[0]
+            return (dest, False if orig_eid in merge_redirect else (dest != orig_eid))
+        # 3. 整实体非实体
+        if not active_dests:
+            return (None, False)
+        # 4. 多去向拆分／指派／局部非实体
+        x_start, x_end = int(item["start"]), int(item["end"])
+        ch_id = item.get("chapter_id")
+        valid_keys = [d for d in part if d == _NOT_ENTITY_DEST or d in active_by_id]
+        same_ch_pool = [
+            (d, m) for d in valid_keys for m in part[d]
+            if ch_id is not None and m.get("chapter_id") == ch_id
+        ]
+        pool = same_ch_pool if same_ch_pool else [
+            (d, m) for d in valid_keys for m in part[d]
+        ]
+        overlap_dests = {
+            d for d, m in pool
+            if min(int(m["end"]), x_end) > max(int(m["start"]), x_start)
+        }
+        if len(overlap_dests) == 1:
+            chosen = next(iter(overlap_dests))
+        else:
+            dist_by_dest: dict[str, int] = {}
+            for d, m in pool:
+                dist = max(0, int(m["start"]) - x_end, x_start - int(m["end"]))
+                if d not in dist_by_dest or dist < dist_by_dest[d]:
+                    dist_by_dest[d] = dist
+            if dist_by_dest:
+                best_dist = min(dist_by_dest.values())
+                best_dests = [d for d, dist in dist_by_dest.items() if dist == best_dist]
+            else:
+                best_dests = []
+            if len(best_dests) == 1:
+                chosen = best_dests[0]
+            else:
+                if is_event:
+                    summary["ambiguous_events"] += 1
+                else:
+                    summary["ambiguous_facts"] += 1
+                if orig_eid in active_dests:
+                    chosen = orig_eid
+                else:
+                    chosen = min(active_dests, key=lambda d: (-len(part[d]), d))
+        if chosen == _NOT_ENTITY_DEST:
+            return (None, False)
+        return (chosen, chosen != orig_eid)
+
+    projected_facts: list[dict] = []
+    for fact in voted_facts:
+        dest, reassigned = _route_item(fact, is_event=False)
+        if dest is None:
+            summary["dropped_not_entity_facts"] += 1
+            continue
+        entry = dict(fact)
+        entry["entity_id"] = dest
+        if reassigned:
+            summary["split_reassigned_facts"] += 1
+        old_holder = entry.get("holder_entity_id")
+        if isinstance(old_holder, str) and old_holder:
+            new_holder = _resolve_holder(old_holder)
+            if new_holder != old_holder:
+                entry["holder_entity_id"] = new_holder
+                summary["redirected_holders"] += 1
+        projected_facts.append(entry)
+
+    projected_events: list[dict] = []
+    for ev in voted_events:
+        dest, reassigned = _route_item(ev, is_event=True)
+        if dest is None:
+            summary["dropped_not_entity_events"] += 1
+            continue
+        entry = dict(ev)
+        entry["entity_id"] = dest
+        if reassigned:
+            summary["split_reassigned_events"] += 1
+        projected_events.append(entry)
+
+    # 构建重绑后活跃实体集合（原 entity_ids 映射后活跃实体 ∪ 收到 >=1 条拆分事实/事件的新实体）
+    candidate_eids_ordered: list[str] = []
+    seen_eids: set[str] = set()
+
+    def _add_candidate(eid: str) -> None:
+        if eid in seen_eids:
+            return
+        if eid in not_entity_eids:
+            return
+        if active_by_id and eid not in active_by_id:
+            return
+        seen_eids.add(eid)
+        candidate_eids_ordered.append(eid)
+
+    for orig_eid in entity_ids:
+        if orig_eid in active_by_id:
+            _add_candidate(orig_eid)
+        elif orig_eid in merge_redirect:
+            _add_candidate(merge_redirect[orig_eid])
+        elif not active_by_id and orig_eid not in not_entity_eids:
+            _add_candidate(orig_eid)
+    for item in projected_facts:
+        _add_candidate(str(item["entity_id"]))
+    for item in projected_events:
+        _add_candidate(str(item["entity_id"]))
+
+    facts_facets_by_eid: dict[str, set[str]] = {}
+    for f in projected_facts:
+        facts_facets_by_eid.setdefault(str(f["entity_id"]), set()).add(str(f["facet"]))
+    events_types_by_eid: dict[str, set[str]] = {}
+    for ev in projected_events:
+        events_types_by_eid.setdefault(str(ev["entity_id"]), set()).add(str(ev["event_type"]))
+
+    resolved_kind: dict[str, str] = {}
+    for eid in candidate_eids_ordered:
+        snap_ent = active_by_id.get(eid) or by_id.get(eid) or {}
+        sk = snap_ent.get("kind")
+        if sk in FACETS:
+            resolved_kind[eid] = str(sk)
+        else:
+            resolved_kind[eid] = _infer_kind_from_items(
+                facts_facets_by_eid.get(eid, set()),
+                events_types_by_eid.get(eid, set()),
+                kinds,
+            )
+
+    # 跨粗类合并兼容过滤
+    compat_facts: list[dict] = []
+    for f in projected_facts:
+        eid = str(f["entity_id"])
+        if eid not in resolved_kind:
+            summary["dropped_not_entity_facts"] += 1
+            continue
+        tk = resolved_kind[eid]
+        if f["facet"] not in FACETS[tk]:
+            summary["dropped_incompatible_facet_facts"] += 1
+            continue
+        compat_facts.append(f)
+
+    compat_events: list[dict] = []
+    for ev in projected_events:
+        eid = str(ev["entity_id"])
+        if eid not in resolved_kind:
+            summary["dropped_not_entity_events"] += 1
+            continue
+        tk = resolved_kind[eid]
+        if event_verify_enabled and ev.get("event_type") not in ALLOWED_EVENT_TYPES_BY_KIND.get(tk, ()):
+            ev = dict(ev)
+            ev["stage_split"] = False
+        compat_events.append(ev)
+
+    # 实体内事实去重与排序
+    fact_groups: dict[tuple[str, str, str, int, int], list[dict]] = {}
+    for f in compat_facts:
+        key = (
+            str(f["entity_id"]),
+            str(f["facet"]),
+            _norm_value(str(f["value"])),
+            int(f["start"]),
+            int(f["end"]),
+        )
+        fact_groups.setdefault(key, []).append(f)
+    deduped_facts: list[dict] = []
+    for group in fact_groups.values():
+        if len(group) > 1:
+            summary["deduped_facts"] += len(group) - 1
+        winner = min(group, key=lambda x: (-int(x.get("support", 1)), str(x["id"])))
+        deduped_facts.append(winner)
+    deduped_facts.sort(
+        key=lambda f: (str(f["entity_id"]), int(f["start"]), int(f["end"]), str(f["facet"]), str(f["id"]))
+    )
+
+    # 实体内事件去重与排序
+    event_groups: dict[tuple[str, str, str, int, int], list[dict]] = {}
+    for ev in compat_events:
+        key = (
+            str(ev["entity_id"]),
+            str(ev["event_type"]),
+            _norm_value(str(ev["value"])),
+            int(ev["start"]),
+            int(ev["end"]),
+        )
+        event_groups.setdefault(key, []).append(ev)
+    deduped_events: list[dict] = []
+    for group in event_groups.values():
+        if len(group) > 1:
+            summary["deduped_events"] += len(group) - 1
+        winner = dict(min(group, key=lambda x: (-int(x.get("support", 1)), str(x["id"]))))
+        winner["stage_split"] = any(bool(x.get("stage_split")) for x in group)
+        deduped_events.append(winner)
+    deduped_events.sort(
+        key=lambda ev: (str(ev["entity_id"]), int(ev["start"]), int(ev["end"]), str(ev["event_type"]), str(ev["id"]))
+    )
+
+    if event_verify_enabled and has_event_verdicts:
+        deduped_events = apply_stage_split_guards(deduped_facts, deduped_events, chapters=chapters)
+
+    # 刷新 query_rank 排名（遵循 chapter_range）
+    fc = chapter_range["from_chapter"] if chapter_range.get("filtered") else None
+    tc = chapter_range["to_chapter"] if chapter_range.get("filtered") else None
+    rank_info: dict[str, dict] = {}
+    remaining_ids = set(candidate_eids_ordered)
+    if remaining_ids:
+        try:
+            offset = 0
+            while remaining_ids:
+                page = query_rank(
+                    store, run_id, kind=None, from_chapter=fc, to_chapter=tc,
+                    limit=MAX_LIMIT, offset=offset,
+                )
+                for item in page.get("items") or []:
+                    iid = str(item["id"])
+                    if iid in remaining_ids:
+                        rank_info[iid] = item
+                        remaining_ids.discard(iid)
+                next_off = page.get("next_offset")
+                if next_off is None:
+                    break
+                offset = int(next_off)
+        except Exception:
+            rank_info = {}
+
+    kind_order_list = list(kinds) if kinds else list(DESCRIBE_KINDS)
+    for k in DESCRIBE_KINDS:
+        if k not in kind_order_list:
+            kind_order_list.append(k)
+    kind_order = {k: idx for idx, k in enumerate(kind_order_list)}
+
+    by_kind_entries: dict[str, list[dict]] = {}
+    for eid in candidate_eids_ordered:
+        ek = resolved_kind[eid]
+        rinfo = rank_info.get(eid)
+        snap_ent = active_by_id.get(eid) or by_id.get(eid) or {}
+        name = (rinfo or {}).get("name") or snap_ent.get("name") or eid
+        score = float(rinfo["score"]) if rinfo is not None else 0.0
+        raw_rank = (
+            int(rinfo["kind_rank"])
+            if (rinfo is not None and rinfo.get("kind") == ek)
+            else None
+        )
+        by_kind_entries.setdefault(ek, []).append({
+            "entity_id": eid,
+            "kind": ek,
+            "raw_rank": raw_rank,
+            "name": name,
+            "score": score,
+        })
+
+    rebound_top_entities: list[dict] = []
+    for ek, items in by_kind_entries.items():
+        ranked = [x for x in items if x["raw_rank"] is not None]
+        unranked = [x for x in items if x["raw_rank"] is None]
+        ranked.sort(key=lambda x: (x["raw_rank"], x["entity_id"]))
+        unranked.sort(key=lambda x: (-x["score"], x["entity_id"]))
+        next_rank = max((x["raw_rank"] for x in ranked), default=0) + 1
+        for x in ranked:
+            rebound_top_entities.append({
+                "entity_id": x["entity_id"],
+                "kind": ek,
+                "kind_rank": int(x["raw_rank"]),
+                "name": x["name"],
+                "score": x["score"],
+            })
+        for x in unranked:
+            rebound_top_entities.append({
+                "entity_id": x["entity_id"],
+                "kind": ek,
+                "kind_rank": next_rank,
+                "name": x["name"],
+                "score": x["score"],
+            })
+            next_rank += 1
+
+    rebound_top_entities.sort(
+        key=lambda e: (kind_order.get(e["kind"], len(kind_order)), e["kind_rank"], e["entity_id"])
+    )
+    return rebound_top_entities, deduped_facts, deduped_events, summary
 
 
-def export_describe_run(store: Store, describe_id: str, out: Path | None = None) -> dict:
-    """从 `describe_runs` 已存记录重新导出；兼容 `describe-v1` 旧库（含 other 事件）。"""
+def export_describe_run(
+    store: Store,
+    describe_id: str,
+    out: Path | None = None,
+    *,
+    rebind_corrections: bool = True,
+    infer_life_stages: bool = True,
+) -> dict:
+    """从 `describe_runs` 已存记录重新导出；兼容 `describe-v1` 旧库，并支持零请求更正投影重绑。"""
     rows = store.rows("SELECT * FROM describe_runs WHERE id=?", (describe_id,))
     if not rows:
         raise ValueError(f"描述运行不存在：{describe_id}")
@@ -2545,17 +3087,21 @@ def export_describe_run(store: Store, describe_id: str, out: Path | None = None)
         chapters = list(snap["meta"].get("chapters") or [])
     except Exception:
         run_obj = None
+        snap = None
         by_id = {}
         try:
             chapters = store.records(run_id, "chapter")
         except Exception:
             chapters = []
 
+    source_text: str | None = None
     text_len = 0
     if isinstance(run_obj, dict) and run_obj.get("source_id"):
         try:
-            text_len = len(store.source(run_obj["source_id"])["text"])
+            source_text = store.source(run_obj["source_id"])["text"]
+            text_len = len(source_text)
         except Exception:
+            source_text = None
             text_len = 0
 
     stored_cr = config.get("chapter_range")
@@ -2587,22 +3133,7 @@ def export_describe_run(store: Store, describe_id: str, out: Path | None = None)
         _, _, range_bounds, chapter_range = _resolve_chapter_range(chapters, text_len)
 
     event_verify_enabled = verify in (1, 3) and bool(config.get("event_verify_prompt_version"))
-
-    top_entities: list[dict] = []
-    rank_counter: dict[str, int] = {}
-    for eid in entity_ids:
-        snapshot = by_id.get(eid) or {}
-        kind = snapshot.get("kind")
-        if kind not in FACETS:
-            kind = _fallback_kind(store, describe_id, eid, kinds)
-        rank_counter[kind] = rank_counter.get(kind, 0) + 1
-        top_entities.append({
-            "entity_id": eid,
-            "kind": kind,
-            "kind_rank": rank_counter[kind],
-            "name": snapshot.get("name") or eid,
-            "score": 0.0,
-        })
+    persistence_enabled = bool(config.get("persistence"))
 
     stored_stats = state.get("stats")
     if isinstance(stored_stats, dict):
@@ -2610,17 +3141,129 @@ def export_describe_run(store: Store, describe_id: str, out: Path | None = None)
     else:
         stats = _metrics(store, run_id, describe_id, 0.0)
 
-    document = _export_document(
-        store, describe_id, run_id, top_k, kinds, top_entities, stats,
-        views=views,
-        entities_per_request=entities_per_request,
-        verify=verify,
-        chapters=chapters,
-        range_bounds=range_bounds,
-        chapter_range=chapter_range,
-        event_verify_enabled=event_verify_enabled,
-        persistence_enabled=bool(config.get("persistence")),
+    try:
+        active_user, _, _, _ = partition_active_corrections(store.corrections(run_id))
+    except Exception:
+        active_user = []
+    current_rev = (
+        snap["meta"].get("result_revision")
+        if isinstance(snap, dict) and isinstance(snap.get("meta"), dict)
+        else None
     )
+    need_rebind = bool(
+        rebind_corrections
+        and active_user
+        and snap is not None
+        and current_rev is not None
+        and state.get("result_revision") != current_rev
+    )
+
+    if need_rebind:
+        raw_facts = _raw_facts_with_views(store, describe_id)
+        raw_events = _raw_events_with_views(store, describe_id)
+        voted_facts = vote_facts(raw_facts, views=views, field="facet")
+        if verify in (1, 3):
+            voted_facts, verification = _verification_summary(
+                store, describe_id, voted_facts, passes=verify,
+            )
+        else:
+            verification = {"enabled": False}
+        voted_events = vote_facts(raw_events, views=views, field="event_type")
+        has_event_verdicts = False
+        if event_verify_enabled:
+            voted_events, event_verification = _event_verification_summary(
+                store, describe_id, voted_events, passes=verify,
+            )
+            has_event_verdicts = bool(
+                store.rows(
+                    "SELECT 1 FROM event_verdicts WHERE describe_id=? LIMIT 1",
+                    (describe_id,),
+                )
+            )
+        else:
+            voted_events = [
+                {**item, "stage_split": bool(item.get("splits_entity", False))}
+                for item in voted_events
+            ]
+            event_verification = {"enabled": False}
+        if persistence_enabled:
+            label_map = _persistence_label_map(store, describe_id)
+        else:
+            label_map = {}
+        for item in voted_facts:
+            item["persistence"] = label_map.get(str(item["id"])) if persistence_enabled else None
+
+        rebound_top_entities, rebound_facts, rebound_events, rebind_summary = (
+            rebind_describe_for_corrections(
+                store,
+                run_id,
+                describe_id,
+                entity_ids,
+                kinds,
+                state,
+                snap,
+                chapters,
+                chapter_range,
+                active_user,
+                voted_facts,
+                voted_events,
+                event_verify_enabled=event_verify_enabled,
+                has_event_verdicts=has_event_verdicts,
+            )
+        )
+        if event_verify_enabled and has_event_verdicts:
+            event_verification["split_events"] = sum(
+                1 for item in rebound_events if item.get("stage_split") is True
+            )
+        document = _export_document(
+            store, describe_id, run_id, top_k, kinds, rebound_top_entities, stats,
+            views=views,
+            entities_per_request=entities_per_request,
+            verify=verify,
+            chapters=chapters,
+            range_bounds=range_bounds,
+            chapter_range=chapter_range,
+            event_verify_enabled=event_verify_enabled,
+            persistence_enabled=persistence_enabled,
+            source_text=source_text,
+            infer_life_stages=infer_life_stages,
+            rebind_meta={
+                "result_revision": current_rev,
+                "rebound_from_describe_id": describe_id,
+                "rebind_summary": rebind_summary,
+            },
+            override_voted=(rebound_facts, rebound_events, verification, event_verification),
+        )
+    else:
+        top_entities: list[dict] = []
+        rank_counter: dict[str, int] = {}
+        for eid in entity_ids:
+            snapshot = by_id.get(eid) or {}
+            kind = snapshot.get("kind")
+            if kind not in FACETS:
+                kind = _fallback_kind(store, describe_id, eid, kinds)
+            rank_counter[kind] = rank_counter.get(kind, 0) + 1
+            top_entities.append({
+                "entity_id": eid,
+                "kind": kind,
+                "kind_rank": rank_counter[kind],
+                "name": snapshot.get("name") or eid,
+                "score": 0.0,
+            })
+
+        document = _export_document(
+            store, describe_id, run_id, top_k, kinds, top_entities, stats,
+            views=views,
+            entities_per_request=entities_per_request,
+            verify=verify,
+            chapters=chapters,
+            range_bounds=range_bounds,
+            chapter_range=chapter_range,
+            event_verify_enabled=event_verify_enabled,
+            persistence_enabled=persistence_enabled,
+            source_text=source_text,
+            infer_life_stages=infer_life_stages,
+        )
     if out is not None:
         write_json(Path(out), document)
     return document
@@ -3540,13 +4183,25 @@ def run_describe(
         chapter_range=chapter_range,
         event_verify_enabled=verify in (1, 3),
         persistence_enabled=persistence == 1,
+        source_text=text,
     )
     if out is not None:
         write_json(Path(out), document)
+    try:
+        active_user, _, _, _ = partition_active_corrections(store.corrections(run_id))
+    except Exception:
+        active_user = []
+    completed_state = {
+        "status": "completed",
+        "views": views,
+        "verify": verify,
+        "stats": stats,
+        "result_revision": snap["meta"].get("result_revision"),
+        "active_correction_ids": [str(c["id"]) for c in active_user],
+    }
     store.execute(
         "UPDATE describe_runs SET state=?,updated=? WHERE id=?",
-        (dumps({"status": "completed", "views": views, "verify": verify, "stats": stats}),
-         utc_now(), describe_id),
+        (dumps(completed_state), utc_now(), describe_id),
     )
     counts = {
         "tasks": len(tasks) + verify_task_count + event_verify_task_count,
